@@ -1,0 +1,29 @@
+<div class="key-features-container">
+  <section class="intro">
+    <h2>✨ Key Features</h2>
+    <p>
+      We help you organize your tasks, track productivity, and manage your schedule using cutting-edge AI tools.
+    </p>
+  </section>
+
+  <section class="feature-grid">
+    <div class="card" *ngFor="let feature of features">
+      <img [src]="feature.icon" alt="{{ feature.title }} Icon" class="card-icon" />
+      <h3>{{ feature.title }}</h3>
+      <p>{{ feature.description }}</p>
+    </div>
+  </section>
+
+  <section class="tasks-section">
+    <h2>📋 Tasks You Can Manage</h2>
+    <p>From daily reminders to AI-assisted planning — we cover it all.</p>
+
+    <div class="task-grid">
+      <div class="task-card" *ngFor="let task of taskCategories">
+        <img [src]="task.icon" alt="{{ task.title }} Icon" class="task-icon" />
+        <h4>{{ task.title }}</h4>
+        <p>{{ task.description }}</p>
+      </div>
+    </div>
+  </section>
+</div>

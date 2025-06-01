@@ -1,0 +1,109 @@
+<section class="contact-cta-section">
+  <div class="contact-card">
+    <div class="card-header">
+      <h2>{{ title }}</h2>
+      <p class="description">{{ description }}</p>
+    </div>
+    <div class="card-body">
+      <!-- Success message -->
+      <div class="alert success-alert" *ngIf="submitSuccess">
+        <div class="alert-icon">✓</div>
+        <div class="alert-message">
+          <h4>Message Sent Successfully!</h4>
+          <p>Thank you for reaching out. We've received your message and will get back to you within 24 hours.</p>
+        </div>
+      </div>
+      
+      <!-- Error message -->
+      <div class="alert error-alert" *ngIf="submitError">
+        <div class="alert-icon">!</div>
+        <div class="alert-message">
+          <h4>Something Went Wrong</h4>
+          <p>We couldn't send your message. Please try again or contact us directly at </p>
+        </div>
+      </div>
+      
+      <!-- Contact Form -->
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="!submitSuccess" class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name</label>
+            <input 
+              type="text" 
+              id="firstName" 
+              formControlName="firstName"
+              placeholder="Your first name"
+              [class.input-error]="hasError('firstName', 'required') || hasError('firstName', 'minlength')"
+            >
+            <div class="error-message" *ngIf="hasError('firstName', 'required') || hasError('firstName', 'minlength')">
+              {{ getErrorMessage('firstName') }}
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="lastName">Surname</label>
+            <input 
+              type="text" 
+              id="lastName" 
+              formControlName="lastName"
+              placeholder="Your surname"
+              [class.input-error]="hasError('lastName', 'required') || hasError('lastName', 'minlength')"
+            >
+            <div class="error-message" *ngIf="hasError('lastName', 'required') || hasError('lastName', 'minlength')">
+              {{ getErrorMessage('lastName') }}
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input 
+            type="email" 
+            id="email" 
+            formControlName="email"
+            placeholder="your.email@example.com"
+            [class.input-error]="hasError('email', 'required') || hasError('email', 'email')"
+          >
+          <div class="error-message" *ngIf="hasError('email', 'required') || hasError('email', 'email')">
+            {{ getErrorMessage('email') }}
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input 
+            type="tel" 
+            id="phone" 
+            formControlName="phone"
+            placeholder="+27 (61) 123-4567"
+            [class.input-error]="hasError('phone', 'required') || hasError('phone', 'pattern')"
+          >
+          <div class="error-message" *ngIf="hasError('phone', 'required') || hasError('phone', 'pattern')">
+            {{ getErrorMessage('phone') }}
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="message">Your Message</label>
+          <textarea 
+            id="message" 
+            formControlName="message" 
+            rows="5"
+            placeholder="Please describe how we can help you..."
+            [class.input-error]="hasError('message', 'required') || hasError('message', 'minlength')"
+          ></textarea>
+          <div class="error-message" *ngIf="hasError('message', 'required') || hasError('message', 'minlength')">
+            {{ getErrorMessage('message') }}
+          </div>
+        </div>
+        
+        <div class="button-container">
+          <button type="submit" class="primary-button" [disabled]="isSubmitting || contactForm.invalid">
+            <span *ngIf="!isSubmitting">{{ buttonText }}</span>
+            <span *ngIf="isSubmitting" class="loading-spinner"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

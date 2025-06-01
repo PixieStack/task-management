@@ -1,0 +1,52 @@
+<nav class="dashboard-navbar">
+  <div class="navbar-brand">
+    <h1>Task Manager</h1>
+  </div>
+  
+  <div class="user-profile">
+    <div class="welcome-message">
+      <span class="greeting-emoji">{{ greetingEmoji }}</span> {{ greeting }}, {{ username }}
+    </div>
+    
+    <div class="profile-dropdown-container">
+      <div class="profile-picture" (click)="toggleProfileDropdown($event)">
+        <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile Picture">
+        <div *ngIf="!profilePicture" class="profile-initials">{{ username?.charAt(0) || 'U' }}</div>
+      </div>
+      
+      <!-- Profile Dropdown Menu -->
+      <div class="profile-dropdown" *ngIf="isProfileDropdownOpen">
+        <div class="dropdown-header">
+          <div class="user-info">
+            <h3>{{ username }}</h3>
+            <p *ngIf="email">{{ email }}</p>
+          </div>
+          <button class="change-photo-btn" (click)="addProfilePicture($event)">
+            <i class="fas fa-camera"></i> Change Photo
+          </button>
+        </div>
+        
+        <div class="dropdown-menu">
+          <ul>
+            <li>
+              <a routerLink="/dashboard" routerLinkActive="active" (click)="closeProfileDropdown()">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+            </li>
+            <li>
+              <a routerLink="/profile" routerLinkActive="active" (click)="closeProfileDropdown()">
+                <i class="fas fa-user-circle"></i> Account Settings
+              </a>
+            </li>
+            <li class="dropdown-divider"></li>
+            <li>
+              <a (click)="logout()" class="logout-item">
+                <i class="fas fa-sign-out-alt"></i> Logout
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

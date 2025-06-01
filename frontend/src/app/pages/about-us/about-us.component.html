@@ -1,0 +1,129 @@
+<div class="about-container">
+  <h1 class="page-title" @fadeIn>About TaskManager</h1>
+
+  <!-- Slideshow Section -->
+  <section class="section slideshow" @fadeIn>
+    <div class="slideshow-container">
+      <div class="slide-wrapper" [style.transform]="'translateX(-' + (currentSlide * 100) + '%)'">
+        <div class="slide" *ngFor="let slide of slideImages; let i = index; trackBy: trackByFn">
+          <img [src]="slide.url" [alt]="slide.alt" 
+               (mouseenter)="pauseSlideshow()" 
+               (mouseleave)="resumeSlideshow()">
+        </div>
+      </div>
+      <button class="slide-nav prev" (click)="prevSlide()">❮</button>
+      <button class="slide-nav next" (click)="nextSlide()">❯</button>
+      <div class="slide-dots">
+        <span class="dot" *ngFor="let slide of slideImages; let i = index; trackBy: trackByFn" 
+              [class.active]="i === currentSlide"
+              (click)="setCurrentSlide(i)"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Mission Section -->
+  <section class="section mission" @fadeIn>
+    <h2>Our Mission</h2>
+    <div class="content-wrapper">
+      <img src="assets/mission.jpg" alt="Mission Illustration" class="illustration" />
+      <p>
+        Our mission is to empower individuals and teams to efficiently manage their tasks and time with the help of smart AI-powered tools,
+        enhancing productivity and reducing stress. We believe that everyone deserves tools that adapt to their unique workflow.
+      </p>
+    </div>
+  </section>
+
+  <!-- Vision Section -->
+  <section class="section vision" @fadeIn>
+    <h2>Our Vision</h2>
+    <div class="content-wrapper reverse">
+      <p>
+        We envision a future where every person can effortlessly organize their work and personal life,
+        seamlessly integrating AI assistance to boost focus and creativity. TaskManager aims to be at the forefront of
+        this productivity revolution, making advanced task management accessible to everyone.
+      </p>
+      <img src="assets/vision.jpg" alt="Vision Illustration" class="illustration" />
+    </div>
+  </section>
+
+  <!-- Values Section -->
+  <section class="section values" @fadeIn>
+    <h2>Our Values</h2>
+    <div class="content-wrapper">
+      <img src="assets/values.jpg" alt="Values Illustration" class="illustration" />
+      <ul>
+        <li><strong>Innovation:</strong> Constantly improving with cutting-edge AI technology.</li>
+        <li><strong>User Focus:</strong> Designed for simplicity and maximum usefulness.</li>
+        <li><strong>Integrity:</strong> Respecting your privacy and data security.</li>
+        <li><strong>Collaboration:</strong> Helping teams work better together.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- What is TaskManager Section with Cards -->
+  <section class="section what-is-app" @fadeIn>
+    <h2>What is TaskManager?</h2>
+    <div class="cards-container">
+      <div class="feature-card" *ngFor="let card of featureCards; trackBy: trackByFn" @fadeIn>
+        <div class="card-icon">
+          <i class="fas" [ngClass]="card.icon"></i>
+        </div>
+        <h3>{{ card.title }}</h3>
+        <p>{{ card.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Meet the Developer -->
+  <section class="section developer" @fadeIn>
+    <h2>Meet The Developer</h2>
+    
+    <div class="developer-profile">
+      <div class="developer-header">
+        <img src="assets/Eden.jpg" alt="Thembinkosi Eden Thwala" class="developer-photo" />
+        <div class="developer-intro">
+          <h3>Thembinkosi Eden Thwala</h3>
+          <p class="developer-title">Full Stack Developer</p>
+          <p class="developer-bio">
+            Passionate about building intuitive, AI-powered productivity apps that make life easier. 
+            With over 5 years of experience developing web applications, I specialize in creating 
+            responsive, user-friendly interfaces with powerful backend functionality.
+          </p>
+          
+          <div class="social-links">
+            <a *ngFor="let social of socialLinks; trackBy: trackByFn" [href]="social.url" target="_blank" class="social-icon">
+              <i class="fab" [ngClass]="social.icon"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="skills-section">
+        <h4>Technical Expertise</h4>
+        <div class="skill-bars">
+          <div class="skill" *ngFor="let skill of developerSkills; trackBy: trackByFn">
+            <div class="skill-info">
+              <span class="skill-name">{{ skill.name }}</span>
+              <span class="skill-percent">{{ skill.animatedLevel | number:'1.0-0' }}%</span>
+            </div>
+            <div class="skill-bar">
+              <div class="skill-progress" [style.width.%]="skill.animatedLevel"></div>
+            </div>
+            <div class="skill-technologies">
+              <span class="tech-tag" *ngFor="let tech of skill.technologies">{{ tech }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="developer-statement">
+        <h4>Developer Statement</h4>
+        <blockquote>
+          "I believe that technology should simplify our lives, not complicate them. My goal with TaskManager 
+          is to create an intelligent system that understands how you work and adapts to help you achieve more 
+          with less stress. Every feature is designed with the user's productivity and wellbeing in mind."
+        </blockquote>
+      </div>
+    </div>
+  </section>
+</div>

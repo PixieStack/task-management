@@ -1,0 +1,22 @@
+<nav class="navbar">
+  <div class="container">
+    <a routerLink="/" class="logo">TaskManager</a>
+
+    <ul class="nav-links">
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a></li>
+      <li><a routerLink="/key-features" routerLinkActive="active">Key Features</a></li>
+      <li><a routerLink="/about" routerLinkActive="active">About Us</a></li>
+      <li><a routerLink="/contact" routerLinkActive="active">Contact Us</a></li>
+    </ul>
+
+    <div class="auth-buttons" *ngIf="!user">
+      <button routerLink="/login" class="btn btn-primary">Login</button>
+      <button routerLink="/register" class="btn btn-secondary">Register</button>
+    </div>
+
+    <div class="auth-buttons" *ngIf="user">
+      <span class="welcome-text">Welcome, {{ user.name }}!</span>
+      <button (click)="logout()" class="btn btn-logout">Logout</button>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,60 @@
+.key-features-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  font-family: 'Segoe UI', sans-serif;
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #333;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    color: #666;
+  }
+
+  .feature-grid, .task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+
+  .card, .task-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    transition: transform 0.25s ease-in-out;
+
+    &:hover {
+      transform: translateY(-6px);
+    }
+
+    h3, h4 {
+      margin: 1rem 0 0.5rem;
+      color: #222;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .card-icon, .task-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .feature-grid, .task-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}

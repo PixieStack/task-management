@@ -1,0 +1,337 @@
+// Variables
+$primary-color: #4caf50;
+$primary-hover: #43a047;
+$error-color: #f44336;
+$success-color: #4caf50;
+$text-color: #333;
+$text-light: #555;
+$border-color: #ddd;
+$bg-color: #f5f5f5;
+$card-bg: #fff;
+
+.contact-cta-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $bg-color;
+  padding: 40px 20px;
+  
+  .contact-card {
+    background-color: $card-bg;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    width: 100%;
+    max-width: 700px;
+    overflow: hidden;
+    margin: 0 auto; // Explicitly center the card
+    
+    .card-header {
+      background-color: white;
+      padding: 30px 40px 0; // Equal padding left and right
+      text-align: center;
+      border-bottom: none;
+      
+      h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: $text-color;
+        margin: 0 0 5px;
+      }
+    }
+    
+    .card-body {
+      padding: 20px 40px 40px; // Equal padding left and right
+      box-sizing: border-box; // Ensure padding is included in width
+      
+      .description {
+        text-align: center;
+        color: $text-light;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 35px;
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .alert {
+        display: flex;
+        align-items: center;
+        border-radius: 10px;
+        padding: 16px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        
+        .alert-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          font-weight: bold;
+          margin-right: 15px;
+          flex-shrink: 0;
+          font-size: 16px;
+        }
+        
+        .alert-message {
+          h4 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+            font-weight: 600;
+          }
+          
+          p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+          }
+        }
+        
+        &.success-alert {
+          background-color: rgba($success-color, 0.05);
+          border-left: 4px solid $success-color;
+          
+          .alert-icon {
+            background-color: $success-color;
+            color: white;
+          }
+          
+          h4, p {
+            color: darken($success-color, 10%);
+          }
+        }
+        
+        &.error-alert {
+          background-color: rgba($error-color, 0.05);
+          border-left: 4px solid $error-color;
+          
+          .alert-icon {
+            background-color: $error-color;
+            color: white;
+          }
+          
+          h4, p {
+            color: darken($error-color, 5%);
+          }
+        }
+      }
+      
+      .contact-form {
+        width: 100%; // Ensure form takes full width of its container
+        margin: 0 auto; // Center the form
+        box-sizing: border-box; // Include padding in width calculation
+        
+        .form-row {
+          display: flex;
+          justify-content: space-between; // This evenly distributes the space
+          margin: 0 0 5px 0; // Reset margins to prevent any offset
+          width: 100%; // Ensure it takes full width
+          
+          .form-group {
+            width: calc(50% - 25px); // Each group takes exactly half minus half the gap
+            margin: 0; // Reset margins
+            padding: 0; // Reset padding
+            box-sizing: border-box; // Include any padding in width calculation
+          }
+        }
+        
+        .form-group {
+          margin-bottom: 25px;
+          
+          label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: $text-color;
+            font-size: 15px;
+          }
+          
+          input, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid $border-color;
+            border-radius: 8px;
+            font-size: 16px;
+            color: $text-color;
+            transition: all 0.3s ease;
+            background-color: #fcfcfc;
+            box-sizing: border-box; // Include padding in width calculation
+            
+            &:focus {
+              outline: none;
+              border-color: $primary-color;
+              box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+              background-color: white;
+            }
+            
+            &.input-error {
+              border-color: $error-color;
+              background-color: rgba($error-color, 0.02);
+              
+              &:focus {
+                box-shadow: 0 0 0 3px rgba($error-color, 0.1);
+              }
+            }
+            
+            &::placeholder {
+              color: lighten($text-light, 20%);
+              font-size: 15px;
+            }
+          }
+          
+          textarea {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.6;
+          }
+          
+          .error-message {
+            font-size: 12px;
+            color: $error-color;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            
+            &:before {
+              content: "!";
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              width: 16px;
+              height: 16px;
+              background-color: rgba($error-color, 0.1);
+              border-radius: 50%;
+              margin-right: 6px;
+              font-size: 10px;
+              font-weight: bold;
+              color: $error-color;
+            }
+          }
+        }
+        
+        .button-container {
+          display: flex;
+          justify-content: center;
+          margin-top: 20px;
+          width: 100%; // Ensure it takes full width
+          
+          .primary-button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 8px;
+            border: none;
+            background-color: $primary-color;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba($primary-color, 0.3);
+            
+            &:hover {
+              background-color: $primary-hover;
+              transform: translateY(-2px);
+              box-shadow: 0 6px 15px rgba($primary-color, 0.35);
+            }
+            
+            &:active {
+              transform: translateY(0);
+              box-shadow: 0 4px 8px rgba($primary-color, 0.3);
+            }
+            
+            &:disabled {
+              background-color: lighten($primary-color, 20%);
+              cursor: not-allowed;
+              transform: none;
+              box-shadow: none;
+            }
+            
+            .loading-spinner {
+              display: inline-block;
+              width: 20px;
+              height: 20px;
+              border: 3px solid rgba(255, 255, 255, 0.3);
+              border-radius: 50%;
+              border-top-color: white;
+              animation: spin 1s ease-in-out infinite;
+            }
+            
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Enhanced form field focus effect
+.form-group {
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: $primary-color;
+    transition: width 0.3s ease, left 0.3s ease;
+    z-index: 1;
+  }
+  
+  &:focus-within:after {
+    width: 100%;
+    left: 0;
+  }
+}
+
+/* Reset all boxes to include padding in width */
+* {
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .contact-cta-section {
+    padding: 20px;
+    
+    .contact-card {
+      .card-header {
+        padding: 25px 20px 0;
+        
+        h2 {
+          font-size: 24px;
+        }
+      }
+      
+      .card-body {
+        padding: 15px 20px 30px;
+        
+        .description {
+          font-size: 14px;
+          max-width: 100%;
+          margin-bottom: 25px;
+        }
+        
+        .contact-form {
+          .form-row {
+            flex-direction: column;
+            
+            .form-group {
+              width: 100%; // Full width on mobile
+              margin: 0 0 20px 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
