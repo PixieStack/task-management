@@ -1,70 +1,78 @@
-# 📋 TaskManager - Full-Stack Task Management Application
+# 📋 Task Management Application
 
-> A modern, production-ready task management application showcasing full-stack development with Angular and FastAPI
+A modern, full-stack task management application built with Angular frontend and FastAPI backend. Features include user authentication, personalized profiles, AI-powered task organization, and real-time productivity analytics.
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://your-demo-link.com)
-[![Backend API](https://img.shields.io/badge/API-Documentation-blue)](http://localhost:8000/docs)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-black)](https://github.com/PixieStack/task-management)
+![Task Manager Screenshot](assets/screenshots/dashboard.png)
 
-## 🌟 Portfolio Highlights
+## ✨ Features
 
-This project demonstrates **professional-level full-stack development** with:
+### 🔐 Authentication & User Management
+- Secure user registration and login
+- JWT token-based authentication
+- Password change and account management
+- User-specific profile pictures and data
 
-- ⚡ **Modern Frontend** - Angular 17+ with TypeScript and responsive design
-- 🔐 **Secure Backend** - FastAPI with JWT authentication and proper security
-- 📊 **Data Analytics** - Real-time productivity insights and task statistics
-- 🎨 **UI/UX Excellence** - Smooth animations, intuitive interface, and mobile-first design
-- 📧 **Email Integration** - SMTP notifications and contact form functionality
-- 🗃️ **Database Design** - Proper relational modeling with SQLAlchemy ORM
-- 🔒 **Security Best Practices** - Password hashing, token validation, and data protection
+### 📊 Task Management
+- Create, edit, and delete tasks
+- Task prioritization (High, Medium, Low)
+- Status tracking (Not Started, In Progress, Completed)
+- Due date management with overdue notifications
+- Tag system for better organization
+- Time tracking and estimation
+- Bulk operations and drag-and-drop interface
 
-## 🚀 Live Demo
+### 📈 Analytics & Insights
+- Personal productivity dashboard
+- Task completion statistics
+- Time efficiency tracking
+- Productivity trends and patterns
+- Overdue task monitoring
 
-**🌐 Frontend:** [TaskManager Live App](https://your-demo-link.com)  
-**📚 API Docs:** [Interactive API Documentation](https://your-api-link.com/docs)  
-**📱 Mobile:** Fully responsive - try it on your phone!
+### 🎨 User Experience
+- Responsive design for all devices
+- Dark/Light mode support
+- Real-time greeting based on time of day
+- Smooth animations and transitions
+- Intuitive user interface
 
-> **Demo Credentials:**  
-> Email: `demo@taskmanager.com`  
-> Password: `demo123`
+### 📧 Communication
+- Contact form with email notifications
+- Admin message management
+- SMTP integration for notifications
 
-## ✨ Key Features
+## 🛠️ Tech Stack
 
-### 🔐 **Authentication System**
-- User registration with email validation
-- Secure login with JWT tokens
-- Password reset and account management
-- Protected routes and API endpoints
+### Frontend
+- **Angular 17+** - Modern web framework
+- **TypeScript** - Type-safe JavaScript
+- **SCSS** - Enhanced CSS with variables and mixins
+- **Angular Animations** - Smooth UI transitions
+- **Reactive Forms** - Form validation and management
+- **HttpClient** - API communication
 
-### 📋 **Advanced Task Management**
-- **CRUD Operations** - Create, read, update, delete tasks
-- **Smart Organization** - Priority levels, status tracking, tags
-- **Time Management** - Due dates, time tracking, estimates
-- **Bulk Operations** - Multi-select and batch updates
-- **Search & Filter** - Find tasks by status, priority, tags
+### Backend
+- **FastAPI** - High-performance Python web framework
+- **SQLAlchemy** - SQL toolkit and ORM
+- **SQLite** - Lightweight database
+- **JWT** - JSON Web Token authentication
+- **Pydantic** - Data validation using Python type hints
+- **SMTP** - Email sending capabilities
 
-### 📊 **Analytics Dashboard**
-- **Productivity Metrics** - Completion rates, time efficiency
-- **Visual Charts** - Task distribution, progress trends
-- **Insights** - Overdue tasks, productivity patterns
-- **Statistics** - Daily/weekly/monthly summaries
+### Development Tools
+- **Git** - Version control
+- **VS Code** - Development environment
+- **Postman** - API testing
 
-### 🎨 **Premium User Experience**
-- **Responsive Design** - Works on desktop, tablet, mobile
-- **Dynamic Greetings** - Time-based welcome messages
-- **Smooth Animations** - Professional transitions and effects
-- **Dark/Light Themes** - User preference support
-- **Profile Management** - Custom avatars and personal settings
+## 🚀 Getting Started
 
-## 🛠️ Technical Stack
+### Prerequisites
+- **Node.js** (v18 or higher)
+- **Python** (v3.8 or higher)
+- **Git**
 
-### **Frontend Architecture**
-```typescript
-Angular 17+ 
-├── TypeScript (Type Safety)
-├── SCSS (Advanced Styling)
-├── Reactive Forms (Form Management)
-├── Angular Animations (Smooth Transitions)
-├── HttpClient (API Communication)
-├── Guards & Interceptors (Security)
-└── Responsive Design (Mobile-First)
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone git@github.com:PixieStack/task-management.git
+   cd task-management
