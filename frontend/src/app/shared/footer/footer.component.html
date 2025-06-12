@@ -65,18 +65,28 @@
     </div>
 
     <!-- Bottom Bar -->
-    <div class="footer-bottom">
-      <p class="copyright">
-        &copy; {{ currentYear }} Task Manager. Built By
-        <a
-          href="https://github.com/PixieStack/task-management"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-accent hover:text-white transition-colors duration-300"
-        >
-          PixieStack
-        </a>
-      </p>
-    </div>
+<div class="footer-bottom">
+  <p class="copyright">
+    &copy; {{ currentYear }} Task Manager. Built By
+    <a
+      href="https://github.com/PixieStack/task-management"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-accent hover:text-white transition-colors duration-300"
+    >
+      PixieStack
+    </a>
+  </p>
+  <p class="text-xs text-gray-400 mt-1">
+    ⚠️ Source code is not open source. For permitted use and legal consequences, 
+    <a
+      routerLink="/terms"
+      class="underline text-yellow-700 hover:text-yellow-500 transition-colors"
+    >
+      read our Terms.
+    </a>
+  </p>
+</div>
+
   </div>
 </footer>

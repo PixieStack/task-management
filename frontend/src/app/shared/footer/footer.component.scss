@@ -147,4 +147,18 @@
   .duration-300 {
     transition-duration: 300ms;
   }
+
+  .footer-terms-link {
+    color: #f1c40f; 
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: #f39c12; 
+    }
+
+    &:active {
+      color: #3498db; 
+    }
+  }
 }

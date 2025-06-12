@@ -26,7 +26,6 @@ export class FaqComponent {
     { value: 'general', label: 'General' },
     { value: 'features', label: 'Features' },
     { value: 'account', label: 'Account & Security' },
-    { value: 'pricing', label: 'Pricing' },
     { value: 'technical', label: 'Technical' }
   ];
 
@@ -34,7 +33,7 @@ export class FaqComponent {
     // General
     {
       question: 'What is Task Manager?',
-      answer: 'Task Manager is an AI-powered productivity application that helps you organize, prioritize, and manage your tasks efficiently. It combines smart automation with intuitive design to boost your productivity.',
+      answer: 'Task Manager is a free, AI-powered productivity application that helps you organize, prioritize, and manage your tasks efficiently. It combines smart automation with intuitive design to boost your productivity.',
       category: 'general',
       isOpen: false
     },
@@ -50,6 +49,19 @@ export class FaqComponent {
       category: 'general',
       isOpen: false
     },
+    {
+      question: 'Is Task Manager really free?',
+      answer: 'Yes! Task Manager is completely free to use. We believe everyone should have access to powerful productivity tools. There are no hidden fees or premium tiers.',
+      category: 'general',
+      isOpen: false
+    },
+    {
+      question: 'Who created Task Manager?',
+      answer: 'Task Manager is developed and maintained by PixieStack. It\'s an open-source project aimed at helping people manage their tasks more efficiently using AI technology.',
+      category: 'general',
+      isOpen: false
+    },
+
     // Features
     {
       question: 'What is the Smart Inbox?',
@@ -69,6 +81,13 @@ export class FaqComponent {
       category: 'features',
       isOpen: false
     },
+    {
+      question: 'Are there any usage limits?',
+      answer: 'No! There are no limits on the number of tasks, projects, or boards you can create. Use Task Manager as much as you need without any restrictions.',
+      category: 'features',
+      isOpen: false
+    },
+
     // Account & Security
     {
       question: 'How do I reset my password?',
@@ -88,25 +107,13 @@ export class FaqComponent {
       category: 'account',
       isOpen: false
     },
-    // Pricing
     {
-      question: 'Is there a free version?',
-      answer: 'Yes! Our free tier includes core features like Smart Inbox, basic task boards, and calendar view for individual users. Perfect for personal productivity.',
-      category: 'pricing',
+      question: 'Can I delete my account?',
+      answer: 'Yes, you can delete your account at any time from your account settings. This will permanently remove all your data. We recommend exporting your data before deletion.',
+      category: 'account',
       isOpen: false
     },
-    {
-      question: 'What are the paid plans?',
-      answer: 'We offer Pro ($9.99/month) with advanced AI features and unlimited boards, and Team ($19.99/user/month) with collaboration tools and admin controls.',
-      category: 'pricing',
-      isOpen: false
-    },
-    {
-      question: 'Can I cancel anytime?',
-      answer: 'Yes, you can cancel your subscription at any time. You will continue to have access until the end of your billing period, and you can always downgrade to our free plan.',
-      category: 'pricing',
-      isOpen: false
-    },
+
     // Technical
     {
       question: 'What browsers are supported?',
@@ -123,6 +130,12 @@ export class FaqComponent {
     {
       question: 'What about offline access?',
       answer: 'Task Manager includes limited offline functionality. Your tasks are cached locally, and changes sync automatically when you reconnect to the internet.',
+      category: 'technical',
+      isOpen: false
+    },
+    {
+      question: 'Is the source code available?',
+      answer: 'Yes! Task Manager is an open-source project. You can find the source code on our GitHub repository at github.com/PixieStack/task-management.',
       category: 'technical',
       isOpen: false
     }

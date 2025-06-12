@@ -1,0 +1,273 @@
+<div class="legal-container">
+  <div class="legal-header">
+    <h1>Terms of Service</h1>
+    <p class="last-updated">Last updated: {{ lastUpdated }}</p>
+  </div>
+
+  <div class="legal-content">
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li *ngFor="let section of sections">
+          <a (click)="scrollToSection(section.id)">{{ section.title }}</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+      <section id="introduction">
+        <p class="intro">
+          Welcome to Task Manager. These Terms of Service ("Terms") govern your use of our free web application 
+          and services. By using Task Manager, you agree to be bound by these Terms.
+        </p>
+      </section>
+
+      <section id="acceptance">
+        <h2>1. Acceptance of Terms</h2>
+        <p>
+          By accessing or using Task Manager, you acknowledge that you have read, understood, and agree 
+          to be bound by these Terms and our Privacy Policy. If you do not agree to these Terms, 
+          please do not use our services.
+        </p>
+      </section>
+
+      <section id="user-accounts">
+        <h2>2. User Accounts</h2>
+        <h3>Account Creation</h3>
+        <ul>
+          <li>You must be at least 13 years old to create an account</li>
+          <li>You must provide accurate and complete information</li>
+          <li>You are responsible for maintaining account security</li>
+          <li>One person or entity may maintain only one account</li>
+        </ul>
+
+        <h3>Account Security</h3>
+        <p>You are responsible for:</p>
+        <ul>
+          <li>Maintaining the confidentiality of your password</li>
+          <li>All activities that occur under your account</li>
+          <li>Notifying us immediately of any unauthorized use</li>
+        </ul>
+      </section>
+
+      <section id="acceptable-use">
+        <h2>3. Acceptable Use</h2>
+        <p>You agree not to use Task Manager to:</p>
+        <ul>
+          <li>Violate any laws or regulations</li>
+          <li>Infringe upon intellectual property rights</li>
+          <li>Transmit malware, viruses, or harmful code</li>
+          <li>Harass, abuse, or harm other users</li>
+          <li>Attempt to gain unauthorized access to our systems</li>
+          <li>Use automated systems or software to extract data</li>
+          <li>Interfere with or disrupt the service</li>
+          <li>Create false or misleading content</li>
+        </ul>
+        
+        <h3>Content Guidelines</h3>
+        <p>You retain ownership of content you create, but grant us a license to:</p>
+        <ul>
+          <li>Store and display your content within the service</li>
+          <li>Make backups to prevent data loss</li>
+          <li>Improve our AI and machine learning models (anonymized)</li>
+        </ul>
+      </section>
+
+      <section id="intellectual-property">
+        <h2>4. Intellectual Property</h2>
+        <h3>Our Property</h3>
+        <p>
+          Task Manager, including its original content, features, and functionality, is owned by 
+          PixieStack and is protected by international copyright, trademark, patent, trade secret, 
+          and other intellectual property laws.
+        </p>
+        
+        <h3>Your Content</h3>
+        <p>
+          You retain all rights to the content you create using our service. By using Task Manager, 
+          you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, and 
+          display your content solely for the purpose of operating and improving our services.
+        </p>
+        
+        <h3>Feedback</h3>
+        <p>
+          Any feedback, suggestions, or ideas you provide about Task Manager become our property 
+          and may be used without compensation or attribution.
+        </p>
+      </section>
+
+      <section id="privacy-data">
+        <h2>5. Privacy and Data Protection</h2>
+        <p>
+          Your use of Task Manager is also governed by our Privacy Policy. By using our service, 
+          you consent to our collection and use of personal information as outlined in the Privacy Policy.
+        </p>
+        
+        <h3>Data Security</h3>
+        <p>We implement reasonable security measures to protect your data, including:</p>
+        <ul>
+          <li>Encryption in transit and at rest</li>
+          <li>Regular security audits</li>
+          <li>Access controls and authentication</li>
+          <li>Secure data centers</li>
+        </ul>
+        
+        <h3>Data Portability</h3>
+        <p>
+          You can export your data at any time through your account settings. We support standard 
+          formats to ensure you can take your data with you.
+        </p>
+      </section>
+
+      <section id="limitation">
+        <h2>6. Limitation of Liability</h2>
+        <p>
+          TO THE MAXIMUM EXTENT PERMITTED BY LAW, TASK MANAGER AND PIXIESTACK SHALL NOT BE LIABLE FOR ANY 
+          INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT 
+          LIMITED TO LOSS OF PROFITS, DATA, USE, OR GOODWILL.
+        </p>
+        
+        <h3>Service Availability</h3>
+        <p>
+          As a free service, we strive for high availability but do not guarantee uninterrupted service. 
+          We are not liable for any downtime, data loss, or service interruptions.
+        </p>
+        
+        <h3>Third-Party Services</h3>
+        <p>
+          We are not responsible for third-party services integrated with Task Manager. Use of 
+          such services is at your own risk and subject to their terms.
+        </p>
+      </section>
+
+      <section id="indemnification">
+        <h2>7. Indemnification</h2>
+        <p>
+          You agree to defend, indemnify, and hold harmless Task Manager, PixieStack, and 
+          their respective officers, directors, employees, and agents from any claims, damages, 
+          obligations, losses, liabilities, costs, or expenses arising from:
+        </p>
+        <ul>
+          <li>Your use of the service</li>
+          <li>Your violation of these Terms</li>
+          <li>Your violation of any third-party rights</li>
+          <li>Any content you create or share through the service</li>
+        </ul>
+      </section>
+
+      <section id="termination">
+        <h2>8. Termination</h2>
+        <h3>By You</h3>
+        <p>
+          You may terminate your account at any time by contacting support or using the account 
+          deletion option in settings. Upon termination, your data will be deleted according to 
+          our data retention policy.
+        </p>
+        
+        <h3>By Us</h3>
+        <p>We may terminate or suspend your account immediately if you:</p>
+        <ul>
+          <li>Violate these Terms of Service</li>
+          <li>Engage in fraudulent or illegal activities</li>
+          <li>Create risk or legal exposure for us</li>
+          <li>Abuse our free service</li>
+        </ul>
+        
+        <h3>Effect of Termination</h3>
+        <p>
+          Upon termination, your right to use the service ceases immediately. We may delete your 
+          data after a 30-day grace period, during which you can export your information.
+        </p>
+      </section>
+
+      <section id="modifications">
+        <h2>9. Modifications to Terms</h2>
+        <p>
+          We reserve the right to modify these Terms at any time. If we make material changes, 
+          we will notify you via email or through the service at least 30 days before the changes 
+          take effect. Your continued use of Task Manager after the changes indicates acceptance 
+          of the modified Terms.
+        </p>
+      </section>
+
+      <section id="general">
+        <h2>10. General Provisions</h2>
+        <h3>Governing Law</h3>
+        <p>
+          These Terms are governed by the laws of the United States, without regard to conflict 
+          of law principles.
+        </p>
+        
+        <h3>Dispute Resolution</h3>
+        <p>
+          Any disputes arising from these Terms will be resolved through good faith negotiations. 
+          If that fails, disputes will be resolved through binding arbitration in accordance with 
+          the American Arbitration Association's rules.
+        </p>
+        
+        <h3>Severability</h3>
+        <p>
+          If any provision of these Terms is found to be unenforceable, the remaining provisions 
+          will continue to be valid and enforceable.
+        </p>
+        
+        <h3>Entire Agreement</h3>
+        <p>
+          These Terms, together with our Privacy Policy, constitute the entire agreement between 
+          you and Task Manager regarding the use of our free service.
+        </p>
+      </section>
+
+      <section id="source-code" class="source-code-section">
+        <h2>11. Source Code and Portfolio Usage</h2>
+        <div class="warning-box">
+          <p>
+            <strong>⚠️ IMPORTANT NOTICE:</strong> While Task Manager's source code is publicly visible on GitHub 
+            for portfolio demonstration purposes, it remains the exclusive intellectual property of PixieStack.
+          </p>
+        </div>
+        
+        <h3>Permitted Uses</h3>
+        <p>The source code is made available ONLY for:</p>
+        <ul>
+          <li>Educational and reference purposes</li>
+          <li>Portfolio review by potential employers or clients</li>
+          <li>Learning and inspiration for other developers</li>
+          <li>Personal study and skill development</li>
+        </ul>
+        
+        <h3>Prohibited Uses</h3>
+        <p><strong>The following actions are STRICTLY PROHIBITED without explicit written permission:</strong></p>
+        <ul class="prohibited-list">
+        <li>Commercial use of any portion of the code</li>
+        <li>Reproduction or distribution of the code</li>
+        <li>Creating derivative works based on the code</li>
+        <li>Using the code in your own projects (commercial or personal), including portfolios</li>
+        <li>Claiming ownership or authorship of the code</li>
+        <li>Removing or altering copyright notices</li>
+        </ul>
+
+        
+        <div class="legal-warning">
+          <h3>⚖️ Legal Action</h3>
+          <p>
+            <strong>Any unauthorized use, copying, modification, or distribution of the source code will be 
+            considered a violation of intellectual property rights and may result in:</strong>
+          </p>
+          <ul>
+            <li>Immediate legal action</li>
+            <li>Cease and desist orders</li>
+            <li>Claims for damages and legal fees</li>
+            <li>Criminal prosecution where applicable</li>
+          </ul>
+        </div>
+        
+        <p class="copyright-notice">
+          This code is NOT open source.
+        </p>
+      </section>
+    </div>
+  </div>
+</div>

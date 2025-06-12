@@ -1,111 +1,174 @@
-# 📋 Task Management Application
+# Task Management Application
 
-A modern, full-stack task management application built with Angular frontend and FastAPI backend. Features include user authentication, personalized profiles, AI-powered task organization, and real-time productivity analytics.
+-----
 
-![Task Manager Screenshot](assets/screenshots/dashboard.png)
+## Overview
 
-## ✨ Features
+This is a modern, full-stack **Task Management Application** meticulously engineered to provide a comprehensive solution for personal and professional productivity. It features a responsive **Angular** frontend seamlessly integrated with a high-performance **FastAPI** backend. This application is designed to streamline task organization, enhance user productivity, and offer insightful analytics.
+
+Key highlights include:
+
+  * **Secure user authentication** and personalized profiles.
+  * Advanced **task management** capabilities with prioritization and status tracking.
+  * **Real-time productivity analytics** and insights.
+  * Intuitive **user experience** with responsive design and modern UI features.
+  * Robust **email communication** and notification system.
+
+-----
+
+## ✨ Key Features
 
 ### 🔐 Authentication & User Management
 
-- Secure user registration and login
-- JWT token-based authentication
-- Password change and account management
-- User-specific profile pictures and data
+  * **Secure User Registration and Login**: Robust authentication mechanisms for user accounts.
+  * **JWT Token-Based Authentication**: Industry-standard secure token management for API access.
+  * **Password Change and Account Management**: Comprehensive user control over their account settings.
+  * **User-Specific Profile Pictures and Data**: Personalized user experience with customizable profiles.
 
 ### 📊 Task Management
 
-- Create, edit, and delete tasks
-- Task prioritization (High, Medium, Low)
-- Status tracking (Not Started, In Progress, Completed)
-- Due date management with overdue notifications
-- Tag system for better organization
-- Time tracking and estimation
-- Bulk operations and drag-and-drop interface
+  * **Create, Edit, and Delete Tasks**: Full CRUD (Create, Read, Update, Delete) operations for seamless task control.
+  * **Task Prioritization**: Assign clear priorities (High, Medium, Low) to effectively manage workload.
+  * **Status Tracking**: Monitor task progress with distinct statuses: "Not Started," "In Progress," and "Completed."
+  * **Due Date Management with Overdue Notifications**: Receive timely alerts for approaching or missed deadlines.
+  * **Tag System for Better Organization**: Categorize tasks efficiently using custom tags for quick filtering.
+  * **Time Tracking and Estimation**: Log time spent on tasks and estimate future efforts for improved planning.
+  * **Bulk Operations and Drag-and-Drop Interface**: Efficiently manage multiple tasks and reorder them with an intuitive drag-and-drop feature.
 
 ### 📈 Analytics & Insights
 
-- Personal productivity dashboard
-- Task completion statistics
-- Time efficiency tracking
-- Productivity trends and patterns
-- Overdue task monitoring
+  * **Personal Productivity Dashboard**: A centralized, visual overview of individual productivity metrics.
+  * **Task Completion Statistics**: Track your success rate and gain insights into completed tasks over time.
+  * **Time Efficiency Tracking**: Analyze how effectively time is utilized across various tasks.
+  * **Productivity Trends and Patterns**: Identify long-term work habits, peak performance times, and areas for improvement.
+  * **Overdue Task Monitoring**: Keep a close watch on tasks that have passed their due date to ensure nothing falls through the cracks.
 
 ### 🎨 User Experience
 
-- Responsive design for all devices
-- Dark/Light mode support
-- Real-time greeting based on time of day
-- Smooth animations and transitions
-- Intuitive user interface
+  * **Responsive Design for All Devices**: Ensures a seamless and optimized experience across desktops, tablets, and mobile phones.
+  * **Dark/Light Mode Support**: Customizable interface themes to suit user preference and reduce eye strain.
+  * **Real-time Greeting Based on Time of Day**: A dynamic and welcoming personalized touch.
+  * **Smooth Animations and Transitions**: Enhanced visual appeal and fluid user interactions.
+  * **Intuitive User Interface**: Designed for ease of navigation and a straightforward user journey.
 
 ### 📧 Communication
 
-- Contact form with email notifications
-- Admin message management
-- SMTP integration for notifications
+  * **Contact Form with Email Notifications**: Enables users to reach out directly with automated email alerts to the administrator.
+  * **Admin Message Management**: Tools for administrators to efficiently handle and respond to user communications.
+  * **SMTP Integration for Notifications**: Reliable email delivery system for various application alerts and updates.
+
+-----
 
 ## 🛠️ Tech Stack
 
 ### Frontend
 
-- **Angular 17+** - Modern web framework
-- **TypeScript** - Type-safe JavaScript
-- **SCSS** - Enhanced CSS with variables and mixins
-- **Angular Animations** - Smooth UI transitions
-- **Reactive Forms** - Form validation and management
-- **HttpClient** - API communication
+  * **Angular 17+**: A cutting-edge, component-based framework for building dynamic single-page applications.
+  * **TypeScript**: A strongly-typed superset of JavaScript that enhances code quality and developer productivity.
+  * **SCSS**: Syntactically Awesome Style Sheets for powerful, modular, and maintainable CSS.
+  * **Angular Animations**: For rich and smooth UI transitions and sophisticated visual effects.
+  * **Reactive Forms**: A robust, model-driven approach to form validation and management in Angular applications.
+  * **HttpClient**: Angular's built-in module for making efficient HTTP requests to communicate with the backend API.
 
 ### Backend
 
-- **FastAPI** - High-performance Python web framework
-- **SQLAlchemy** - SQL toolkit and ORM
-- **SQLite** - Lightweight database
-- **JWT** - JSON Web Token authentication
-- **Pydantic** - Data validation using Python type hints
-- **SMTP** - Email sending capabilities
+  * **FastAPI**: A modern, high-performance web framework for building APIs with Python 3.7+, leveraging standard Python type hints for data validation and auto-generated OpenAPI documentation.
+  * **SQLAlchemy**: A powerful SQL toolkit and Object Relational Mapper (ORM) for Python, providing a flexible interface for database interactions.
+  * **SQLite**: A lightweight, file-based relational database management system, ideal for development, testing, and small-scale deployments.
+  * **JWT (JSON Web Token)**: Used for secure and stateless authentication, enabling secure information exchange between the frontend and backend.
+  * **Pydantic**: A data validation and settings management library using Python type hints, ensuring data integrity for API requests and responses.
+  * **SMTP**: Utilized for sending emails directly from the backend, supporting features like user notifications and contact form submissions.
 
 ### Development Tools
 
-- **Git** - Version control
-- **VS Code** - Development environment
-- **Postman** - API testing
+  * **Git**: An indispensable version control system for tracking changes and collaborative development.
+  * **VS Code (Visual Studio Code)**: A highly customizable and popular code editor offering extensive features for development.
+  * **Postman**: A widely used API platform for building, testing, and documenting APIs.
+
+-----
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Node.js** (v18 or higher)
-- **Python** (v3.8 or higher)
-- **Git**
+Before you begin, ensure you have the following software installed on your system:
 
-### Installation
+  * **Node.js** (v18 or higher): Essential for running the Angular frontend development environment.
+  * **Python** (v3.8 or higher): Required for setting up and running the FastAPI backend.
+  * **Git**: For cloning the application repository and managing source code versions.
 
-1. **Clone the repository**
-   ```bash
-   git clone git@github.com:PixieStack/task-management.git
-   cd task-management
-<<<<<<< HEAD
-   ```
-=======
+### Installation and Running the Application
 
-```markdown
-## Run the Backend (FastAPI)
+Follow these steps to set up and launch the Task Management Application:
 
-```bash
-uvicorn app:app --reload
-```
+1.  **Clone the repository:**
+    Begin by cloning the project from its GitHub repository:
 
-> ⚠️ **Important:** The backend must be running to enable login, registration, and all authenticated features.
+    ```bash
+    git clone git@github.com:PixieStack/task-management.git
+    cd task-management
+    ```
 
-## Run the Frontend (Angular)
+    *Note: This project's code is hosted under the **PixieStack** GitHub account.*
 
-```bash
-cd frontend
-npm install
-ng serve
-```
+2.  **Set up and run the Backend (FastAPI):**
+    Navigate to the `backend` directory, install the necessary Python dependencies, and then start the FastAPI server.
 
-This will start the Angular application at **http://localhost:4200**.
-```
->>>>>>> 99e1f692e00b21c248fc286cec9c85d4738694bb
+    ```bash
+    cd backend
+    # It's recommended to use a Python virtual environment:
+    # python -m venv venv
+    # For Windows: .\venv\Scripts\activate
+    # For macOS/Linux: source venv/bin/activate
+
+    # Install Python dependencies (ensure you have a requirements.txt if needed)
+    # pip install -r requirements.txt 
+
+    python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+    ```
+
+    *The backend will typically be accessible at `http://localhost:8000`.*
+
+      * **Crucially, the backend must be running for the application's authentication and data features to work.**
+
+3.  **Set up and run the Frontend (Angular):**
+    Open a **new terminal window**. Navigate into the `frontend` directory, install its Node.js dependencies, and then launch the Angular development server.
+
+    ```bash
+    cd frontend
+    npm install
+    ng serve --open
+    ```
+
+    *The frontend application will compile and automatically open in your default web browser, usually at `http://localhost:4200`.*
+
+-----
+
+## Troubleshooting
+
+If you encounter any issues while setting up or running the application, consider these common troubleshooting steps:
+
+  * **Verify Process Status**: Confirm that both the FastAPI backend and the Angular frontend servers are actively running in their respective terminal windows.
+  * **Check Port Availability**: Ensure that ports `8000` (for FastAPI) and `4200` (for Angular) are not in use by other applications on your system. If they are, you might need to adjust the port numbers in the run commands.
+  * **Review Backend Path**: If you see "Error loading ASGI app" messages, double-check that the `uvicorn` command correctly points to your FastAPI application (e.g., `app.main:app`).
+  * **Inspect JWT Handling**: Issues like "JWT decoding failed" often indicate a mismatch in the `SECRET_KEY` between your backend's configuration and what's used to sign tokens, or an issue with how the frontend sends the token (e.g., missing `Authorization: Bearer <token>` header).
+  * **Consult Console Logs**: Always examine the detailed error messages in both your backend and frontend terminal outputs; they are your primary source for diagnosing problems.
+  * **Sass Deprecation Warnings**: While not critical errors, the Sass warnings about `lighten()` and `darken()` indicate outdated syntax. For future compatibility, consider updating your SCSS code to use `color.adjust()` or `color.scale()` as suggested by the warnings.
+
+-----
+
+## ⚖️ Legal Notice
+
+This project, the **Task Management Application**, is part of my personal portfolio, developed solely by **Thembinkosi Eden Thwala** through **PixieStack**. While the code is publicly visible for demonstration purposes, it is **NOT open source**. All rights are expressly reserved. Unauthorized copying, modification, reproduction, redistribution, or any form of distribution of this code, in whole or in part, is **strictly prohibited** and may result in severe legal action.
+
+© 2025 PixieStack. All Rights Reserved.
+
+-----
+
+## Contact
+
+For support or inquiries regarding the **Task Management Application**, please contact:
+
+**Thembinkosi Eden Thwala**
+
+Email: thwalathembinkosi16@gmail.com

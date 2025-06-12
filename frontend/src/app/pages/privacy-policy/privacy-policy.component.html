@@ -1,0 +1,116 @@
+<div class="legal-container">
+  <div class="legal-header">
+    <h1>Privacy Policy</h1>
+    <p class="last-updated">Last updated: {{ lastUpdated }}</p>
+  </div>
+
+  <div class="legal-content">
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li *ngFor="let section of sections">
+          <a (click)="scrollToSection(section.id)">{{ section.title }}</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+      <section id="introduction">
+        <p class="intro">
+          At Task Manager, we take your privacy seriously. This Privacy Policy explains how we collect, 
+          use, disclose, and safeguard your information when you use our application.
+        </p>
+      </section>
+
+      <section id="information-collected">
+        <h2>Information We Collect</h2>
+        <h3>Personal Information</h3>
+        <p>When you create an account, we collect:</p>
+        <ul>
+          <li>Name and email address</li>
+          <li>Password (encrypted)</li>
+          <li>Profile picture (optional)</li>
+        </ul>
+
+        <h3>Usage Information</h3>
+        <p>We automatically collect certain information about your device and usage:</p>
+        <ul>
+          <li>Browser type and version</li>
+          <li>Operating system</li>
+          <li>IP address</li>
+          <li>Pages visited and features used</li>
+          <li>Time spent on the application</li>
+        </ul>
+
+        <h3>Task Data</h3>
+        <p>We store the tasks and projects you create, including:</p>
+        <ul>
+          <li>Task titles and descriptions</li>
+          <li>Due dates and priorities</li>
+          <li>Categories and tags</li>
+          <li>Completion status</li>
+        </ul>
+      </section>
+
+      <section id="how-we-use">
+        <h2>How We Use Your Information</h2>
+        <p>We use the collected information to:</p>
+        <ul>
+          <li>Provide and maintain our service</li>
+          <li>Personalize your experience</li>
+          <li>Send important notifications about your tasks</li>
+          <li>Improve our AI recommendations</li>
+          <li>Analyze usage patterns to enhance features</li>
+          <li>Respond to customer service requests</li>
+          <li>Ensure security and prevent fraud</li>
+        </ul>
+      </section>
+
+      <section id="data-security">
+        <h2>Data Security</h2>
+        <p>
+          We implement industry-standard security measures to protect your data:
+        </p>
+        <ul>
+          <li>SSL/TLS encryption for data in transit</li>
+          <li>Encryption at rest for sensitive data</li>
+          <li>Regular security audits and updates</li>
+          <li>Access controls and authentication</li>
+          <li>Secure data centers with 24/7 monitoring</li>
+        </ul>
+        <p>
+          However, no method of transmission over the Internet or electronic storage is 100% secure. 
+          While we strive to protect your personal information, we cannot guarantee absolute security.
+        </p>
+      </section>
+
+      <section id="third-party">
+        <h2>Third-Party Services</h2>
+        <p>We may share your information with third-party services that help us operate our application:</p>
+        <ul>
+          <li><strong>Analytics:</strong> To understand usage patterns</li>
+          <li><strong>Email Services:</strong> To send notifications</li>
+          <li><strong>Cloud Storage:</strong> To securely store your data</li>
+          <li><strong>Payment Processors:</strong> For premium subscriptions</li>
+        </ul>
+        <p>
+          These services are bound by their own privacy policies and we ensure they meet our security standards.
+        </p>
+      </section>
+
+      <section id="your-rights">
+        <h2>Your Rights</h2>
+        <p>You have the right to:</p>
+        <ul>
+          <li><strong>Access:</strong> Request a copy of your personal data</li>
+          <li><strong>Rectification:</strong> Correct inaccurate data</li>
+          <li><strong>Deletion:</strong> Request deletion of your account and data</li>
+          <li><strong>Portability:</strong> Export your data in a readable format</li>
+          <li><strong>Opt-out:</strong> Unsubscribe from marketing communications</li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>

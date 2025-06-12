@@ -1,0 +1,151 @@
+<div class="legal-container">
+  <div class="legal-header">
+    <h1>Cookie Policy</h1>
+    <p class="last-updated">Last updated: {{ lastUpdated }}</p>
+  </div>
+
+  <div class="legal-content">
+    <!-- Table of Contents -->
+    <nav class="toc">
+      <h3>Table of Contents</h3>
+      <ul>
+        <li *ngFor="let section of sections">
+          <a (click)="scrollToSection(section.id)" class="toc-link">{{ section.title }}</a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="content">
+      <section id="introduction">
+        <p class="intro">
+          This Cookie Policy explains how Task Manager uses cookies and similar technologies 
+          to recognize you when you visit our website. It explains what these technologies are 
+          and why we use them, as well as your rights to control our use of them.
+        </p>
+      </section>
+
+      <section id="what-are-cookies">
+        <h2>What Are Cookies</h2>
+        <p>
+          Cookies are small data files that are placed on your computer or mobile device when 
+          you visit a website. Cookies are widely used by website owners in order to make their 
+          websites work, or to work more efficiently, as well as to provide reporting information.
+        </p>
+        
+        <p>
+          Cookies set by the website owner (in this case, Task Manager) are called "first-party cookies". 
+          Cookies set by parties other than the website owner are called "third-party cookies". 
+          Third-party cookies enable third-party features or functionality to be provided on or 
+          through the website.
+        </p>
+      </section>
+
+      <section id="how-we-use">
+        <h2>How We Use Cookies</h2>
+        <p>We use cookies for the following purposes:</p>
+        <ul>
+          <li><strong>Authentication:</strong> To identify you when you sign in to our service</li>
+          <li><strong>Security:</strong> To protect your data and prevent fraud</li>
+          <li><strong>Preferences:</strong> To remember your settings and preferences</li>
+          <li><strong>Analytics:</strong> To understand how you use our service and improve it</li>
+          <li><strong>Performance:</strong> To monitor and improve site performance</li>
+        </ul>
+      </section>
+
+      <section id="types-of-cookies">
+        <h2>Types of Cookies We Use</h2>
+        <div class="cookie-types">
+          <div class="cookie-type" *ngFor="let type of cookieTypes">
+            <h3>{{ type.name }}</h3>
+            <p>{{ type.description }}</p>
+            <ul>
+              <li *ngFor="let example of type.examples">{{ example }}</li>
+            </ul>
+            <p class="cookie-control">
+              <strong>Can be disabled:</strong> 
+              <span [class.yes]="type.canDisable" [class.no]="!type.canDisable">
+                {{ type.canDisable ? 'Yes' : 'No (Required for site functionality)' }}
+              </span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+            <section id="managing-cookies">
+        <h2>Managing Cookies</h2>
+        <h3>Browser Controls</h3>
+        <p>
+          Most web browsers allow you to control cookies through their settings preferences. 
+          However, if you limit the ability of websites to set cookies, you may impact your 
+          overall user experience.
+        </p>
+        
+        <h3>How to Manage Cookies in Popular Browsers</h3>
+        <ul>
+          <li><strong>Chrome:</strong> Settings → Privacy and Security → Cookies and other site data</li>
+          <li><strong>Firefox:</strong> Settings → Privacy & Security → Cookies and Site Data</li>
+          <li><strong>Safari:</strong> Preferences → Privacy → Manage Website Data</li>
+          <li><strong>Edge:</strong> Settings → Privacy, search, and services → Cookies and site permissions</li>
+        </ul>
+        
+        <h3>Cookie Settings in Task Manager</h3>
+        <p>
+          You can manage your cookie preferences directly within Task Manager by visiting your 
+          account settings and navigating to the Privacy section. Here you can:
+        </p>
+        <ul>
+          <li>View all cookies currently set</li>
+          <li>Choose which types of cookies to accept</li>
+          <li>Delete existing cookies</li>
+          <li>Set preferences for future visits</li>
+        </ul>
+      </section>
+
+      <section id="third-party">
+        <h2>Third-Party Cookies</h2>
+        <p>
+          In addition to our own cookies, we may also use various third-party cookies to report 
+          usage statistics of the Service and deliver advertisements on and through the Service.
+        </p>
+        
+        <h3>Analytics Partners</h3>
+        <p>We use the following analytics services:</p>
+        <ul>
+          <li><strong>Google Analytics:</strong> Helps us understand site usage patterns</li>
+          <li><strong>Hotjar:</strong> Provides heatmaps and user session recordings (anonymized)</li>
+        </ul>
+        
+        <h3>Advertising Partners</h3>
+        <p>
+          We don't currently display third-party advertisements, but we may use retargeting 
+          pixels from:
+        </p>
+        <ul>
+          <li>Google Ads</li>
+          <li>Facebook Pixel</li>
+          <li>LinkedIn Insight Tag</li>
+        </ul>
+        
+        <p>
+          These partners may use cookies to track your activity across websites to provide 
+          targeted advertisements. You can opt out of targeted advertising through:
+        </p>
+        <ul>
+          <li><a href="http://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer">Digital Advertising Alliance</a></li>
+          <li><a href="http://www.networkadvertising.org/choices/" target="_blank" rel="noopener noreferrer">Network Advertising Initiative</a></li>
+        </ul>
+      </section>
+
+      <section id="changes-policy">
+        <h2>Changes to This Policy</h2>
+        <p>
+          We may update this Cookie Policy from time to time to reflect changes in our practices 
+          or for other operational, legal, or regulatory reasons. We will notify you of any 
+          material changes by posting the new Cookie Policy on this page and updating the 
+          "Last updated" date.
+        </p>
+      </section>
+    </div>
+  </div>
+</div>

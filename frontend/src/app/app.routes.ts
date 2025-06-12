@@ -52,6 +52,21 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/faq/faq.component').then(
       m => m.FaqComponent)
   },
+  { 
+    path: 'privacy', 
+    loadComponent: () => import('./pages/privacy-policy/privacy-policy.component').then(
+      m => m.PrivacyPolicyComponent) 
+  },
+  { 
+    path: 'terms', 
+    loadComponent: () => import('./pages/terms-of-service/terms-of-service.component').then(
+      m => m.TermsOfServiceComponent) 
+  },
+  { 
+    path: 'cookies', 
+    loadComponent: () => import('./pages/cookie-policy/cookie-policy.component').then(
+      m => m.CookiePolicyComponent) 
+  },
 
   { path: '**', redirectTo: '' },
 ];
