@@ -76,16 +76,17 @@ A modern, full-stack task management application built with Angular frontend and
    ```bash
    git clone git@github.com:PixieStack/task-management.git
    cd task-management
+
 ```markdown
-# Run the Backend (FastAPI)
+## Run the Backend (FastAPI)
 
 ```bash
 uvicorn app:app --reload
 ```
 
-# ⚠️ Important: The backend must be running to enable login, registration, and all authenticated features.
+> ⚠️ **Important:** The backend must be running to enable login, registration, and all authenticated features.
 
-# Run the Frontend (Angular)
+## Run the Frontend (Angular)
 
 ```bash
 cd frontend
@@ -93,5 +94,5 @@ npm install
 ng serve
 ```
 
-# This will start the Angular application at http://localhost:4200.
+This will start the Angular application at **http://localhost:4200**.
 ```
