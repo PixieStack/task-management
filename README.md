@@ -86,6 +86,9 @@ A modern, full-stack task management application built with Angular frontend and
    git clone git@github.com:PixieStack/task-management.git
    cd task-management
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2b87639 (Temporary commit to sync with remote master)
 
 ```markdown
 ## Run the Backend (FastAPI)
@@ -106,6 +109,9 @@ ng serve
 
 This will start the Angular application at **http://localhost:4200**.
 ```
+<<<<<<< HEAD
 =======
    ```
 >>>>>>> 25d736a (Add FAQ page feature and Prettier changes)
+=======
+>>>>>>> 2b87639 (Temporary commit to sync with remote master)
