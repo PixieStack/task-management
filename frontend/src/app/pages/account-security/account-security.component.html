@@ -3,21 +3,29 @@
     <h1>Account Security</h1>
     <p>Manage your account settings and security preferences</p>
   </div>
-  
+
   <div class="security-content">
     <div class="security-card">
       <div class="security-sidebar">
         <div class="profile-picture-container">
           <div class="profile-picture">
-            <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile Picture">
-            <div *ngIf="!profilePicture" class="profile-initials">{{ username?.charAt(0) || 'U' }}</div>
+            <img
+              *ngIf="profilePicture"
+              [src]="profilePicture"
+              alt="Profile Picture"
+            />
+            <div *ngIf="!profilePicture" class="profile-initials">
+              {{ username?.charAt(0) || "U" }}
+            </div>
           </div>
           <h2>{{ username }}</h2>
         </div>
-        
+
         <div class="profile-nav">
           <ul>
-            <li (click)="navigateToProfile()"><i class="fas fa-user"></i> Personal Information</li>
+            <li (click)="navigateToProfile()">
+              <i class="fas fa-user"></i> Personal Information
+            </li>
             <li class="active"><i class="fas fa-lock"></i> Account Security</li>
             <li><i class="fas fa-bell"></i> Notifications</li>
             <li><i class="fas fa-palette"></i> Appearance</li>
@@ -25,121 +33,185 @@
           </ul>
         </div>
       </div>
-      
+
       <div class="security-form-container">
         <div class="section email-section">
           <h3>Email Address</h3>
           <p>Update your email address. You'll need to verify any new email.</p>
-          
+
           <div class="success-message" *ngIf="showEmailSuccess">
             <i class="fas fa-check-circle"></i>
-            Email updated successfully! A verification link has been sent to your new email.
+            Email updated successfully! A verification link has been sent to
+            your new email.
           </div>
-          
+
           <form [formGroup]="emailForm" (ngSubmit)="onEmailSubmit()">
             <div class="form-group">
               <label for="currentEmail">Current Email</label>
-              <input type="email" id="currentEmail" formControlName="currentEmail" [disabled]="true">
+              <input
+                type="email"
+                id="currentEmail"
+                formControlName="currentEmail"
+                [disabled]="true"
+              />
             </div>
-            
+
             <div class="form-group">
-              <label for="newEmail">New Email <span class="required">*</span></label>
-              <input 
-                type="email" 
-                id="newEmail" 
-                formControlName="newEmail"
-                [ngClass]="{'invalid': hasError(emailForm, 'newEmail', 'required') || hasError(emailForm, 'newEmail', 'email')}"
+              <label for="newEmail"
+                >New Email <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError(emailForm, 'newEmail', 'required')">
+              <input
+                type="email"
+                id="newEmail"
+                formControlName="newEmail"
+                [ngClass]="{
+                  invalid:
+                    hasError(emailForm, 'newEmail', 'required') ||
+                    hasError(emailForm, 'newEmail', 'email'),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError(emailForm, 'newEmail', 'required')"
+              >
                 New email is required
               </div>
-              <div class="error-message" *ngIf="hasError(emailForm, 'newEmail', 'email')">
+              <div
+                class="error-message"
+                *ngIf="hasError(emailForm, 'newEmail', 'email')"
+              >
                 Please enter a valid email
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="emailPassword">Confirm Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="emailPassword" 
-                formControlName="password"
-                [ngClass]="{'invalid': hasError(emailForm, 'password', 'required')}"
+              <label for="emailPassword"
+                >Confirm Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError(emailForm, 'password', 'required')">
+              <input
+                type="password"
+                id="emailPassword"
+                formControlName="password"
+                [ngClass]="{
+                  invalid: hasError(emailForm, 'password', 'required'),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError(emailForm, 'password', 'required')"
+              >
                 Password is required to confirm this change
               </div>
             </div>
-            
+
             <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="loading.email">
+              <button
+                type="submit"
+                class="btn-primary"
+                [disabled]="loading.email"
+              >
                 <span *ngIf="!loading.email">Update Email</span>
                 <span *ngIf="loading.email" class="loader"></span>
               </button>
             </div>
           </form>
         </div>
-        
+
         <div class="section password-section">
           <h3>Change Password</h3>
           <p>Update your password to maintain account security</p>
-          
+
           <div class="success-message" *ngIf="showPasswordSuccess">
             <i class="fas fa-check-circle"></i>
             Password updated successfully!
           </div>
-          
+
           <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
             <div class="form-group">
-              <label for="currentPassword">Current Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="currentPassword" 
-                formControlName="currentPassword"
-                [ngClass]="{'invalid': hasError(passwordForm, 'currentPassword', 'required')}"
+              <label for="currentPassword"
+                >Current Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError(passwordForm, 'currentPassword', 'required')">
+              <input
+                type="password"
+                id="currentPassword"
+                formControlName="currentPassword"
+                [ngClass]="{
+                  invalid: hasError(
+                    passwordForm,
+                    'currentPassword',
+                    'required'
+                  ),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError(passwordForm, 'currentPassword', 'required')"
+              >
                 Current password is required
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="newPassword">New Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="newPassword" 
-                formControlName="newPassword"
-                [ngClass]="{'invalid': hasError(passwordForm, 'newPassword', 'required') || 
-                           hasError(passwordForm, 'newPassword', 'minlength') || 
-                           hasError(passwordForm, 'newPassword', 'pattern')}"
+              <label for="newPassword"
+                >New Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError(passwordForm, 'newPassword', 'required')">
+              <input
+                type="password"
+                id="newPassword"
+                formControlName="newPassword"
+                [ngClass]="{
+                  invalid:
+                    hasError(passwordForm, 'newPassword', 'required') ||
+                    hasError(passwordForm, 'newPassword', 'minlength') ||
+                    hasError(passwordForm, 'newPassword', 'pattern'),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError(passwordForm, 'newPassword', 'required')"
+              >
                 New password is required
               </div>
-              <div class="error-message" *ngIf="hasError(passwordForm, 'newPassword', 'minlength')">
+              <div
+                class="error-message"
+                *ngIf="hasError(passwordForm, 'newPassword', 'minlength')"
+              >
                 Password must be at least 8 characters
               </div>
-              <div class="error-message" *ngIf="hasError(passwordForm, 'newPassword', 'pattern')">
-                Password must include uppercase, lowercase, number, and special character
+              <div
+                class="error-message"
+                *ngIf="hasError(passwordForm, 'newPassword', 'pattern')"
+              >
+                Password must include uppercase, lowercase, number, and special
+                character
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="confirmPassword">Confirm New Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="confirmPassword" 
-                formControlName="confirmPassword"
-                [ngClass]="{'invalid': hasError(passwordForm, 'confirmPassword', 'required') || hasPasswordMismatch()}"
+              <label for="confirmPassword"
+                >Confirm New Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError(passwordForm, 'confirmPassword', 'required')">
+              <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                [ngClass]="{
+                  invalid:
+                    hasError(passwordForm, 'confirmPassword', 'required') ||
+                    hasPasswordMismatch(),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError(passwordForm, 'confirmPassword', 'required')"
+              >
                 Please confirm your new password
               </div>
               <div class="error-message" *ngIf="hasPasswordMismatch()">
                 Passwords do not match
               </div>
             </div>
-            
+
             <div class="password-requirements">
               <h4>Password Requirements:</h4>
               <ul>
@@ -150,65 +222,120 @@
                 <li>At least one special character (!&#64;#$%^&*)</li>
               </ul>
             </div>
-            
+
             <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="loading.password">
+              <button
+                type="submit"
+                class="btn-primary"
+                [disabled]="loading.password"
+              >
                 <span *ngIf="!loading.password">Update Password</span>
                 <span *ngIf="loading.password" class="loader"></span>
               </button>
             </div>
           </form>
         </div>
-        
+
         <div class="section danger-section">
           <h3>Delete Account</h3>
-          <p class="warning">This action is permanent and cannot be undone. All your data will be erased.</p>
-          
-          <button type="button" class="btn-danger" (click)="toggleDeleteConfirmation()">
+          <p class="warning">
+            This action is permanent and cannot be undone. All your data will be
+            erased.
+          </p>
+
+          <button
+            type="button"
+            class="btn-danger"
+            (click)="toggleDeleteConfirmation()"
+          >
             Delete Account
           </button>
-          
+
           <div class="delete-confirmation" *ngIf="showDeleteConfirmation">
             <h4>Are you absolutely sure?</h4>
-            <p>This action cannot be undone. This will permanently delete your account and remove all associated data.</p>
-            
+            <p>
+              This action cannot be undone. This will permanently delete your
+              account and remove all associated data.
+            </p>
+
             <form [formGroup]="deleteAccountForm" (ngSubmit)="onDeleteSubmit()">
               <div class="form-group">
-                <label for="deletePassword">Enter your password <span class="required">*</span></label>
-                <input 
-                  type="password" 
-                  id="deletePassword" 
-                  formControlName="password"
-                  [ngClass]="{'invalid': hasError(deleteAccountForm, 'password', 'required')}"
+                <label for="deletePassword"
+                  >Enter your password <span class="required">*</span></label
                 >
-                <div class="error-message" *ngIf="hasError(deleteAccountForm, 'password', 'required')">
+                <input
+                  type="password"
+                  id="deletePassword"
+                  formControlName="password"
+                  [ngClass]="{
+                    invalid: hasError(
+                      deleteAccountForm,
+                      'password',
+                      'required'
+                    ),
+                  }"
+                />
+                <div
+                  class="error-message"
+                  *ngIf="hasError(deleteAccountForm, 'password', 'required')"
+                >
                   Password is required to confirm deletion
                 </div>
               </div>
-              
+
               <div class="form-group">
-                <label for="confirmPhrase">Type "DELETE" to confirm <span class="required">*</span></label>
-                <input 
-                  type="text" 
-                  id="confirmPhrase" 
-                  formControlName="confirmPhrase"
-                  [ngClass]="{'invalid': hasError(deleteAccountForm, 'confirmPhrase', 'required') || 
-                             hasError(deleteAccountForm, 'confirmPhrase', 'pattern')}"
+                <label for="confirmPhrase"
+                  >Type "DELETE" to confirm
+                  <span class="required">*</span></label
                 >
-                <div class="error-message" *ngIf="hasError(deleteAccountForm, 'confirmPhrase', 'required')">
+                <input
+                  type="text"
+                  id="confirmPhrase"
+                  formControlName="confirmPhrase"
+                  [ngClass]="{
+                    invalid:
+                      hasError(
+                        deleteAccountForm,
+                        'confirmPhrase',
+                        'required'
+                      ) ||
+                      hasError(deleteAccountForm, 'confirmPhrase', 'pattern'),
+                  }"
+                />
+                <div
+                  class="error-message"
+                  *ngIf="
+                    hasError(deleteAccountForm, 'confirmPhrase', 'required')
+                  "
+                >
                   Confirmation text is required
                 </div>
-                <div class="error-message" *ngIf="hasError(deleteAccountForm, 'confirmPhrase', 'pattern')">
+                <div
+                  class="error-message"
+                  *ngIf="
+                    hasError(deleteAccountForm, 'confirmPhrase', 'pattern')
+                  "
+                >
                   You must type DELETE exactly (all caps)
                 </div>
               </div>
-              
+
               <div class="form-actions delete-actions">
-                <button type="button" class="btn-secondary" (click)="toggleDeleteConfirmation()">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="toggleDeleteConfirmation()"
+                >
                   Cancel
                 </button>
-                <button type="submit" class="btn-danger" [disabled]="loading.delete">
-                  <span *ngIf="!loading.delete">Permanently Delete Account</span>
+                <button
+                  type="submit"
+                  class="btn-danger"
+                  [disabled]="loading.delete"
+                >
+                  <span *ngIf="!loading.delete"
+                    >Permanently Delete Account</span
+                  >
                   <span *ngIf="loading.delete" class="loader"></span>
                 </button>
               </div>

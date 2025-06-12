@@ -32,14 +32,14 @@ $apple-color: #000;
 .auth-header {
   text-align: center;
   margin-bottom: 30px;
-  
+
   h2 {
     font-size: 26px;
     font-weight: 700;
     color: $text-color;
     margin-bottom: 10px;
   }
-  
+
   p {
     color: $text-light;
     font-size: 16px;
@@ -51,7 +51,7 @@ $apple-color: #000;
   .form-group {
     margin-bottom: 20px;
   }
-  
+
   label {
     display: block;
     margin-bottom: 8px;
@@ -59,26 +59,26 @@ $apple-color: #000;
     color: $text-color;
     font-size: 14px;
   }
-  
+
   .label-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     .forgot-link {
       font-size: 14px;
       color: $primary-color;
       text-decoration: none;
-      
+
       &:hover {
         text-decoration: underline;
       }
     }
   }
-  
+
   .input-container {
     position: relative;
-    
+
     .input-icon {
       position: absolute;
       left: 12px;
@@ -87,7 +87,7 @@ $apple-color: #000;
       color: $text-light;
       font-size: 16px;
     }
-    
+
     .password-toggle {
       position: absolute;
       right: 12px;
@@ -96,12 +96,12 @@ $apple-color: #000;
       color: $text-light;
       cursor: pointer;
       font-size: 16px;
-      
+
       &:hover {
         color: $primary-color;
       }
     }
-    
+
     input {
       width: 100%;
       max-width: 100%;
@@ -111,33 +111,33 @@ $apple-color: #000;
       border-radius: 8px;
       font-size: 16px;
       transition: all 0.3s ease;
-      
+
       &:focus {
         outline: none;
         border-color: $primary-color;
         box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
       }
-      
+
       &.invalid {
         border-color: $error-color;
-        
+
         &:focus {
           box-shadow: 0 0 0 2px rgba($error-color, 0.2);
         }
       }
-      
+
       &::placeholder {
         color: #aaa;
       }
     }
   }
-  
+
   .error-text {
     font-size: 12px;
     color: $error-color;
     margin-top: 5px;
   }
-  
+
   .error-message {
     background-color: rgba($error-color, 0.1);
     color: $error-color;
@@ -146,15 +146,15 @@ $apple-color: #000;
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-    
+
     i {
       margin-right: 8px;
     }
   }
-  
+
   .remember-me {
     margin-bottom: 20px;
-    
+
     .checkbox-container {
       display: flex;
       align-items: center;
@@ -164,24 +164,24 @@ $apple-color: #000;
       font-size: 14px;
       user-select: none;
       color: $text-light;
-      
+
       input {
         position: absolute;
         opacity: 0;
         cursor: pointer;
         height: 0;
         width: 0;
-        
+
         &:checked ~ .checkmark {
           background-color: $primary-color;
           border-color: $primary-color;
-          
+
           &:after {
             display: block;
           }
         }
       }
-      
+
       .checkmark {
         position: absolute;
         top: 0;
@@ -192,7 +192,7 @@ $apple-color: #000;
         border: 1px solid $border-color;
         border-radius: 4px;
         transition: all 0.2s ease;
-        
+
         &:after {
           content: "";
           position: absolute;
@@ -208,7 +208,7 @@ $apple-color: #000;
       }
     }
   }
-  
+
   .btn {
     display: block;
     width: 100%;
@@ -221,22 +221,22 @@ $apple-color: #000;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    
+
     &.btn-primary {
       background-color: $primary-color;
       color: white;
-      
+
       &:hover {
         background-color: $primary-hover;
       }
-      
+
       &:disabled {
         background-color: lighten($primary-color, 20%);
         cursor: not-allowed;
       }
     }
   }
-  
+
   .spinner {
     display: inline-block;
     width: 20px;
@@ -246,17 +246,20 @@ $apple-color: #000;
     border-top-color: #fff;
     animation: spin 1s ease-in-out infinite;
   }
-  
+
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
-  
+
   .divider {
     text-align: center;
     margin: 20px 0;
     position: relative;
-    
-    &:before, &:after {
+
+    &:before,
+    &:after {
       content: "";
       position: absolute;
       top: 50%;
@@ -264,15 +267,15 @@ $apple-color: #000;
       height: 1px;
       background-color: $border-color;
     }
-    
+
     &:before {
       left: 0;
     }
-    
+
     &:after {
       right: 0;
     }
-    
+
     span {
       background-color: $card-bg;
       padding: 0 15px;
@@ -282,13 +285,13 @@ $apple-color: #000;
       z-index: 1;
     }
   }
-  
+
   .social-logins {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
-    flex-wrap: wrap; 
-    
+    flex-wrap: wrap;
+
     .social-btn {
       flex: 1 1 48%;
       display: flex;
@@ -302,42 +305,42 @@ $apple-color: #000;
       transition: all 0.3s ease;
       box-sizing: border-box;
       max-width: 100%;
-      
+
       img {
         width: 20px;
         height: 20px;
         margin-right: 8px;
       }
-      
+
       span {
         font-size: 14px;
         font-weight: 500;
       }
-      
+
       &.google-btn:hover {
         background-color: rgba($google-color, 0.05);
         border-color: rgba($google-color, 0.2);
       }
-      
+
       &.apple-btn:hover {
         background-color: rgba($apple-color, 0.05);
         border-color: rgba($apple-color, 0.2);
       }
     }
   }
-  
+
   .auth-footer {
     text-align: center;
     margin-top: 20px;
     font-size: 14px;
     color: $text-light;
-    
+
     a {
       color: $primary-color;
       text-decoration: none;
       font-weight: 500;
       margin-left: 5px;
-      
+
       &:hover {
         text-decoration: underline;
       }
@@ -350,14 +353,14 @@ $apple-color: #000;
   .auth-card {
     padding: 20px;
   }
-  
+
   .auth-header h2 {
     font-size: 22px;
   }
-  
+
   .social-logins {
     flex-direction: column;
-    
+
     .social-btn {
       flex: 1 1 100%;
       max-width: 100%;

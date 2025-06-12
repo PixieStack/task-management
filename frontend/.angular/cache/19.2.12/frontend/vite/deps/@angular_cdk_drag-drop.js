@@ -77,7 +77,7 @@ import {
   ɵɵprojectionDef,
   ɵɵqueryRefresh,
   ɵɵstyleProp,
-  ɵɵviewQuery
+  ɵɵviewQuery,
 } from "./chunk-HRO3QSUQ.js";
 import "./chunk-WDMUDEB6.js";
 
@@ -86,14 +86,21 @@ var shadowDomIsSupported;
 function _supportsShadowDom() {
   if (shadowDomIsSupported == null) {
     const head = typeof document !== "undefined" ? document.head : null;
-    shadowDomIsSupported = !!(head && (head.createShadowRoot || head.attachShadow));
+    shadowDomIsSupported = !!(
+      head &&
+      (head.createShadowRoot || head.attachShadow)
+    );
   }
   return shadowDomIsSupported;
 }
 function _getShadowRoot(element) {
   if (_supportsShadowDom()) {
     const rootNode = element.getRootNode ? element.getRootNode() : null;
-    if (typeof ShadowRoot !== "undefined" && ShadowRoot && rootNode instanceof ShadowRoot) {
+    if (
+      typeof ShadowRoot !== "undefined" &&
+      ShadowRoot &&
+      rootNode instanceof ShadowRoot
+    ) {
       return rootNode;
     }
   }
@@ -108,8 +115,15 @@ function isFakeMousedownFromScreenReader(event) {
   return event.buttons === 0 || event.detail === 0;
 }
 function isFakeTouchstartFromScreenReader(event) {
-  const touch = event.touches && event.touches[0] || event.changedTouches && event.changedTouches[0];
-  return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1);
+  const touch =
+    (event.touches && event.touches[0]) ||
+    (event.changedTouches && event.changedTouches[0]);
+  return (
+    !!touch &&
+    touch.identifier === -1 &&
+    (touch.radiusX == null || touch.radiusX === 1) &&
+    (touch.radiusY == null || touch.radiusY === 1)
+  );
 }
 
 // ../../node_modules/@angular/cdk/fesm2022/element-x4z00URv.mjs
@@ -123,14 +137,20 @@ function _isNumberValue(value) {
   return !isNaN(parseFloat(value)) && !isNaN(Number(value));
 }
 function coerceElement(elementOrRef) {
-  return elementOrRef instanceof ElementRef ? elementOrRef.nativeElement : elementOrRef;
+  return elementOrRef instanceof ElementRef
+    ? elementOrRef.nativeElement
+    : elementOrRef;
 }
 
 // ../../node_modules/@angular/cdk/fesm2022/backwards-compatibility-DHR38MsD.mjs
 function _bindEventWithOptions(renderer, target, eventName, callback, options) {
   const major = parseInt(VERSION.major);
   const minor = parseInt(VERSION.minor);
-  if (major > 19 || major === 19 && minor > 0 || major === 0 && minor === 0) {
+  if (
+    major > 19 ||
+    (major === 19 && minor > 0) ||
+    (major === 0 && minor === 0)
+  ) {
     return renderer.listen(target, eventName, callback, options);
   }
   target.addEventListener(eventName, callback, options);
@@ -150,12 +170,13 @@ var _CdkPrivateStyleLoader = class __CdkPrivateStyleLoader {
    * @param loader Component which will be instantiated to load the styles.
    */
   load(loader) {
-    const appRef = this._appRef = this._appRef || this._injector.get(ApplicationRef);
+    const appRef = (this._appRef =
+      this._appRef || this._injector.get(ApplicationRef));
     let data = appsWithLoaders.get(appRef);
     if (!data) {
       data = {
         loaders: /* @__PURE__ */ new Set(),
-        refs: []
+        refs: [],
       };
       appsWithLoaders.set(appRef, data);
       appRef.onDestroy(() => {
@@ -165,9 +186,11 @@ var _CdkPrivateStyleLoader = class __CdkPrivateStyleLoader {
     }
     if (!data.loaders.has(loader)) {
       data.loaders.add(loader);
-      data.refs.push(createComponent(loader, {
-        environmentInjector: this._environmentInjector
-      }));
+      data.refs.push(
+        createComponent(loader, {
+          environmentInjector: this._environmentInjector,
+        }),
+      );
     }
   }
   static ɵfac = function _CdkPrivateStyleLoader_Factory(__ngFactoryType__) {
@@ -176,16 +199,26 @@ var _CdkPrivateStyleLoader = class __CdkPrivateStyleLoader {
   static ɵprov = ɵɵdefineInjectable({
     token: __CdkPrivateStyleLoader,
     factory: __CdkPrivateStyleLoader.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(_CdkPrivateStyleLoader, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      _CdkPrivateStyleLoader,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 
 // ../../node_modules/@angular/cdk/fesm2022/platform-DmdVEw_C.mjs
@@ -201,20 +234,35 @@ var Platform = class _Platform {
   // without the navigator, the following checks will fail. This is preferred because
   // sometimes the Document may be shimmed without the user's knowledge or intention
   /** Whether the Angular application is being rendered in the browser. */
-  isBrowser = this._platformId ? isPlatformBrowser(this._platformId) : typeof document === "object" && !!document;
+  isBrowser = this._platformId
+    ? isPlatformBrowser(this._platformId)
+    : typeof document === "object" && !!document;
   /** Whether the current browser is Microsoft Edge. */
   EDGE = this.isBrowser && /(edge)/i.test(navigator.userAgent);
   /** Whether the current rendering engine is Microsoft Trident. */
   TRIDENT = this.isBrowser && /(msie|trident)/i.test(navigator.userAgent);
   // EdgeHTML and Trident mock Blink specific things and need to be excluded from this check.
   /** Whether the current rendering engine is Blink. */
-  BLINK = this.isBrowser && !!(window.chrome || hasV8BreakIterator) && typeof CSS !== "undefined" && !this.EDGE && !this.TRIDENT;
+  BLINK =
+    this.isBrowser &&
+    !!(window.chrome || hasV8BreakIterator) &&
+    typeof CSS !== "undefined" &&
+    !this.EDGE &&
+    !this.TRIDENT;
   // Webkit is part of the userAgent in EdgeHTML, Blink and Trident. Therefore we need to
   // ensure that Webkit runs standalone and is not used as another engine's base.
   /** Whether the current rendering engine is WebKit. */
-  WEBKIT = this.isBrowser && /AppleWebKit/i.test(navigator.userAgent) && !this.BLINK && !this.EDGE && !this.TRIDENT;
+  WEBKIT =
+    this.isBrowser &&
+    /AppleWebKit/i.test(navigator.userAgent) &&
+    !this.BLINK &&
+    !this.EDGE &&
+    !this.TRIDENT;
   /** Whether the current platform is Apple iOS. */
-  IOS = this.isBrowser && /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
+  IOS =
+    this.isBrowser &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent) &&
+    !("MSStream" in window);
   // It's difficult to detect the plain Gecko engine, because most of the browsers identify
   // them self as Gecko-like browsers and modify the userAgent's according to that.
   // Since we only cover one explicit Firefox case, we can simply check for Firefox
@@ -223,44 +271,59 @@ var Platform = class _Platform {
   FIREFOX = this.isBrowser && /(firefox|minefield)/i.test(navigator.userAgent);
   /** Whether the current platform is Android. */
   // Trident on mobile adds the android platform to the userAgent to trick detections.
-  ANDROID = this.isBrowser && /android/i.test(navigator.userAgent) && !this.TRIDENT;
+  ANDROID =
+    this.isBrowser && /android/i.test(navigator.userAgent) && !this.TRIDENT;
   // Safari browsers will include the Safari keyword in their userAgent. Some browsers may fake
   // this and just place the Safari keyword in the userAgent. To be more safe about Safari every
   // Safari browser should also use Webkit as its layout engine.
   /** Whether the current browser is Safari. */
   SAFARI = this.isBrowser && /safari/i.test(navigator.userAgent) && this.WEBKIT;
-  constructor() {
-  }
+  constructor() {}
   static ɵfac = function Platform_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _Platform)();
   };
   static ɵprov = ɵɵdefineInjectable({
     token: _Platform,
     factory: _Platform.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(Platform, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      Platform,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 
 // ../../node_modules/@angular/cdk/fesm2022/directionality-CBXD4hga.mjs
 var DIR_DOCUMENT = new InjectionToken("cdk-dir-doc", {
   providedIn: "root",
-  factory: DIR_DOCUMENT_FACTORY
+  factory: DIR_DOCUMENT_FACTORY,
 });
 function DIR_DOCUMENT_FACTORY() {
   return inject(DOCUMENT);
 }
-var RTL_LOCALE_PATTERN = /^(ar|ckb|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Adlm|Arab|Hebr|Nkoo|Rohg|Thaa))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)/i;
+var RTL_LOCALE_PATTERN =
+  /^(ar|ckb|dv|he|iw|fa|nqo|ps|sd|ug|ur|yi|.*[-_](Adlm|Arab|Hebr|Nkoo|Rohg|Thaa))(?!.*[-_](Latn|Cyrl)($|-|_))($|-|_)/i;
 function _resolveDirectionality(rawValue) {
   const value = rawValue?.toLowerCase() || "";
-  if (value === "auto" && typeof navigator !== "undefined" && navigator?.language) {
+  if (
+    value === "auto" &&
+    typeof navigator !== "undefined" &&
+    navigator?.language
+  ) {
     return RTL_LOCALE_PATTERN.test(navigator.language) ? "rtl" : "ltr";
   }
   return value === "rtl" ? "rtl" : "ltr";
@@ -272,11 +335,13 @@ var Directionality = class _Directionality {
   change = new EventEmitter();
   constructor() {
     const _document = inject(DIR_DOCUMENT, {
-      optional: true
+      optional: true,
     });
     if (_document) {
       const bodyDir = _document.body ? _document.body.dir : null;
-      const htmlDir = _document.documentElement ? _document.documentElement.dir : null;
+      const htmlDir = _document.documentElement
+        ? _document.documentElement.dir
+        : null;
       this.value = _resolveDirectionality(bodyDir || htmlDir || "ltr");
     }
   }
@@ -289,30 +354,45 @@ var Directionality = class _Directionality {
   static ɵprov = ɵɵdefineInjectable({
     token: _Directionality,
     factory: _Directionality.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(Directionality, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      Directionality,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 
 // ../../node_modules/@angular/cdk/fesm2022/scrolling-BkvA05C8.mjs
 var RtlScrollAxisType;
-(function(RtlScrollAxisType2) {
-  RtlScrollAxisType2[RtlScrollAxisType2["NORMAL"] = 0] = "NORMAL";
-  RtlScrollAxisType2[RtlScrollAxisType2["NEGATED"] = 1] = "NEGATED";
-  RtlScrollAxisType2[RtlScrollAxisType2["INVERTED"] = 2] = "INVERTED";
+(function (RtlScrollAxisType2) {
+  RtlScrollAxisType2[(RtlScrollAxisType2["NORMAL"] = 0)] = "NORMAL";
+  RtlScrollAxisType2[(RtlScrollAxisType2["NEGATED"] = 1)] = "NEGATED";
+  RtlScrollAxisType2[(RtlScrollAxisType2["INVERTED"] = 2)] = "INVERTED";
 })(RtlScrollAxisType || (RtlScrollAxisType = {}));
 var rtlScrollAxisType;
 var scrollBehaviorSupported;
 function supportsScrollBehavior() {
   if (scrollBehaviorSupported == null) {
-    if (typeof document !== "object" || !document || typeof Element !== "function" || !Element) {
+    if (
+      typeof document !== "object" ||
+      !document ||
+      typeof Element !== "function" ||
+      !Element
+    ) {
       scrollBehaviorSupported = false;
       return scrollBehaviorSupported;
     }
@@ -321,7 +401,9 @@ function supportsScrollBehavior() {
     } else {
       const scrollToFunction = Element.prototype.scrollTo;
       if (scrollToFunction) {
-        scrollBehaviorSupported = !/\{\s*\[native code\]\s*\}/.test(scrollToFunction.toString());
+        scrollBehaviorSupported = !/\{\s*\[native code\]\s*\}/.test(
+          scrollToFunction.toString(),
+        );
       } else {
         scrollBehaviorSupported = false;
       }
@@ -351,7 +433,10 @@ function getRtlScrollAxisType() {
     rtlScrollAxisType = RtlScrollAxisType.NORMAL;
     if (scrollContainer.scrollLeft === 0) {
       scrollContainer.scrollLeft = 1;
-      rtlScrollAxisType = scrollContainer.scrollLeft === 0 ? RtlScrollAxisType.NEGATED : RtlScrollAxisType.INVERTED;
+      rtlScrollAxisType =
+        scrollContainer.scrollLeft === 0
+          ? RtlScrollAxisType.NEGATED
+          : RtlScrollAxisType.INVERTED;
     }
     scrollContainer.remove();
   }
@@ -404,41 +489,61 @@ var Dir = class _Dir {
       }
     },
     inputs: {
-      dir: "dir"
+      dir: "dir",
     },
     outputs: {
-      change: "dirChange"
+      change: "dirChange",
     },
     exportAs: ["dir"],
-    features: [ɵɵProvidersFeature([{
-      provide: Directionality,
-      useExisting: _Dir
-    }])]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: Directionality,
+          useExisting: _Dir,
+        },
+      ]),
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(Dir, [{
-    type: Directive,
-    args: [{
-      selector: "[dir]",
-      providers: [{
-        provide: Directionality,
-        useExisting: Dir
-      }],
-      host: {
-        "[attr.dir]": "_rawDir"
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      Dir,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[dir]",
+              providers: [
+                {
+                  provide: Directionality,
+                  useExisting: Dir,
+                },
+              ],
+              host: {
+                "[attr.dir]": "_rawDir",
+              },
+              exportAs: "dir",
+            },
+          ],
+        },
+      ],
+      null,
+      {
+        change: [
+          {
+            type: Output,
+            args: ["dirChange"],
+          },
+        ],
+        dir: [
+          {
+            type: Input,
+          },
+        ],
       },
-      exportAs: "dir"
-    }]
-  }], null, {
-    change: [{
-      type: Output,
-      args: ["dirChange"]
-    }],
-    dir: [{
-      type: Input
-    }]
-  });
+    );
 })();
 var BidiModule = class _BidiModule {
   static ɵfac = function BidiModule_Factory(__ngFactoryType__) {
@@ -447,25 +552,38 @@ var BidiModule = class _BidiModule {
   static ɵmod = ɵɵdefineNgModule({
     type: _BidiModule,
     imports: [Dir],
-    exports: [Dir]
+    exports: [Dir],
   });
   static ɵinj = ɵɵdefineInjector({});
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(BidiModule, [{
-    type: NgModule,
-    args: [{
-      imports: [Dir],
-      exports: [Dir]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      BidiModule,
+      [
+        {
+          type: NgModule,
+          args: [
+            {
+              imports: [Dir],
+              exports: [Dir],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 
 // ../../node_modules/@angular/cdk/fesm2022/data-source-D34wiQZj.mjs
-var DataSource = class {
-};
+var DataSource = class {};
 function isDataSource(value) {
-  return value && typeof value.connect === "function" && !(value instanceof ConnectableObservable);
+  return (
+    value &&
+    typeof value.connect === "function" &&
+    !(value instanceof ConnectableObservable)
+  );
 }
 
 // ../../node_modules/@angular/cdk/fesm2022/recycle-view-repeater-strategy-DoWdPqVw.mjs
@@ -478,15 +596,16 @@ var ArrayDataSource = class extends DataSource {
   connect() {
     return isObservable(this._data) ? this._data : of(this._data);
   }
-  disconnect() {
-  }
+  disconnect() {}
 };
 var _ViewRepeaterOperation;
-(function(_ViewRepeaterOperation2) {
-  _ViewRepeaterOperation2[_ViewRepeaterOperation2["REPLACED"] = 0] = "REPLACED";
-  _ViewRepeaterOperation2[_ViewRepeaterOperation2["INSERTED"] = 1] = "INSERTED";
-  _ViewRepeaterOperation2[_ViewRepeaterOperation2["MOVED"] = 2] = "MOVED";
-  _ViewRepeaterOperation2[_ViewRepeaterOperation2["REMOVED"] = 3] = "REMOVED";
+(function (_ViewRepeaterOperation2) {
+  _ViewRepeaterOperation2[(_ViewRepeaterOperation2["REPLACED"] = 0)] =
+    "REPLACED";
+  _ViewRepeaterOperation2[(_ViewRepeaterOperation2["INSERTED"] = 1)] =
+    "INSERTED";
+  _ViewRepeaterOperation2[(_ViewRepeaterOperation2["MOVED"] = 2)] = "MOVED";
+  _ViewRepeaterOperation2[(_ViewRepeaterOperation2["REMOVED"] = 3)] = "REMOVED";
 })(_ViewRepeaterOperation || (_ViewRepeaterOperation = {}));
 var _VIEW_REPEATER_STRATEGY = new InjectionToken("_ViewRepeater");
 var _RecycleViewRepeaterStrategy = class {
@@ -504,26 +623,45 @@ var _RecycleViewRepeaterStrategy = class {
    */
   _viewCache = [];
   /** Apply changes to the DOM. */
-  applyChanges(changes, viewContainerRef, itemContextFactory, itemValueResolver, itemViewChanged) {
+  applyChanges(
+    changes,
+    viewContainerRef,
+    itemContextFactory,
+    itemValueResolver,
+    itemViewChanged,
+  ) {
     changes.forEachOperation((record, adjustedPreviousIndex, currentIndex) => {
       let view;
       let operation;
       if (record.previousIndex == null) {
-        const viewArgsFactory = () => itemContextFactory(record, adjustedPreviousIndex, currentIndex);
-        view = this._insertView(viewArgsFactory, currentIndex, viewContainerRef, itemValueResolver(record));
-        operation = view ? _ViewRepeaterOperation.INSERTED : _ViewRepeaterOperation.REPLACED;
+        const viewArgsFactory = () =>
+          itemContextFactory(record, adjustedPreviousIndex, currentIndex);
+        view = this._insertView(
+          viewArgsFactory,
+          currentIndex,
+          viewContainerRef,
+          itemValueResolver(record),
+        );
+        operation = view
+          ? _ViewRepeaterOperation.INSERTED
+          : _ViewRepeaterOperation.REPLACED;
       } else if (currentIndex == null) {
         this._detachAndCacheView(adjustedPreviousIndex, viewContainerRef);
         operation = _ViewRepeaterOperation.REMOVED;
       } else {
-        view = this._moveView(adjustedPreviousIndex, currentIndex, viewContainerRef, itemValueResolver(record));
+        view = this._moveView(
+          adjustedPreviousIndex,
+          currentIndex,
+          viewContainerRef,
+          itemValueResolver(record),
+        );
         operation = _ViewRepeaterOperation.MOVED;
       }
       if (itemViewChanged) {
         itemViewChanged({
           context: view?.context,
           operation,
-          record
+          record,
         });
       }
     });
@@ -539,13 +677,20 @@ var _RecycleViewRepeaterStrategy = class {
    * one. Returns `undefined` if the item was inserted into a cached view.
    */
   _insertView(viewArgsFactory, currentIndex, viewContainerRef, value) {
-    const cachedView = this._insertViewFromCache(currentIndex, viewContainerRef);
+    const cachedView = this._insertViewFromCache(
+      currentIndex,
+      viewContainerRef,
+    );
     if (cachedView) {
       cachedView.context.$implicit = value;
       return void 0;
     }
     const viewArgs = viewArgsFactory();
-    return viewContainerRef.createEmbeddedView(viewArgs.templateRef, viewArgs.context, viewArgs.index);
+    return viewContainerRef.createEmbeddedView(
+      viewArgs.templateRef,
+      viewArgs.context,
+      viewArgs.index,
+    );
   }
   /** Detaches the view at the given index and inserts into the view cache. */
   _detachAndCacheView(index, viewContainerRef) {
@@ -632,8 +777,13 @@ var FixedSizeVirtualScrollStrategy = class {
    * @param maxBufferPx The amount of buffer (in pixels) to render when rendering more.
    */
   updateItemAndBufferSize(itemSize, minBufferPx, maxBufferPx) {
-    if (maxBufferPx < minBufferPx && (typeof ngDevMode === "undefined" || ngDevMode)) {
-      throw Error("CDK virtual scroll: maxBufferPx must be greater than or equal to minBufferPx");
+    if (
+      maxBufferPx < minBufferPx &&
+      (typeof ngDevMode === "undefined" || ngDevMode)
+    ) {
+      throw Error(
+        "CDK virtual scroll: maxBufferPx must be greater than or equal to minBufferPx",
+      );
     }
     this._itemSize = itemSize;
     this._minBufferPx = minBufferPx;
@@ -651,11 +801,9 @@ var FixedSizeVirtualScrollStrategy = class {
     this._updateRenderedRange();
   }
   /** @docs-private Implemented as part of VirtualScrollStrategy. */
-  onContentRendered() {
-  }
+  onContentRendered() {}
   /** @docs-private Implemented as part of VirtualScrollStrategy. */
-  onRenderedOffsetChanged() {
-  }
+  onRenderedOffsetChanged() {}
   /**
    * Scroll to the offset for the given index.
    * @param index The index of the element to scroll to.
@@ -671,7 +819,9 @@ var FixedSizeVirtualScrollStrategy = class {
     if (!this._viewport) {
       return;
     }
-    this._viewport.setTotalContentSize(this._viewport.getDataLength() * this._itemSize);
+    this._viewport.setTotalContentSize(
+      this._viewport.getDataLength() * this._itemSize,
+    );
   }
   /** Update the viewport's rendered range. */
   _updateRenderedRange() {
@@ -681,34 +831,55 @@ var FixedSizeVirtualScrollStrategy = class {
     const renderedRange = this._viewport.getRenderedRange();
     const newRange = {
       start: renderedRange.start,
-      end: renderedRange.end
+      end: renderedRange.end,
     };
     const viewportSize = this._viewport.getViewportSize();
     const dataLength = this._viewport.getDataLength();
     let scrollOffset = this._viewport.measureScrollOffset();
-    let firstVisibleIndex = this._itemSize > 0 ? scrollOffset / this._itemSize : 0;
+    let firstVisibleIndex =
+      this._itemSize > 0 ? scrollOffset / this._itemSize : 0;
     if (newRange.end > dataLength) {
       const maxVisibleItems = Math.ceil(viewportSize / this._itemSize);
-      const newVisibleIndex = Math.max(0, Math.min(firstVisibleIndex, dataLength - maxVisibleItems));
+      const newVisibleIndex = Math.max(
+        0,
+        Math.min(firstVisibleIndex, dataLength - maxVisibleItems),
+      );
       if (firstVisibleIndex != newVisibleIndex) {
         firstVisibleIndex = newVisibleIndex;
         scrollOffset = newVisibleIndex * this._itemSize;
         newRange.start = Math.floor(firstVisibleIndex);
       }
-      newRange.end = Math.max(0, Math.min(dataLength, newRange.start + maxVisibleItems));
+      newRange.end = Math.max(
+        0,
+        Math.min(dataLength, newRange.start + maxVisibleItems),
+      );
     }
     const startBuffer = scrollOffset - newRange.start * this._itemSize;
     if (startBuffer < this._minBufferPx && newRange.start != 0) {
-      const expandStart = Math.ceil((this._maxBufferPx - startBuffer) / this._itemSize);
+      const expandStart = Math.ceil(
+        (this._maxBufferPx - startBuffer) / this._itemSize,
+      );
       newRange.start = Math.max(0, newRange.start - expandStart);
-      newRange.end = Math.min(dataLength, Math.ceil(firstVisibleIndex + (viewportSize + this._minBufferPx) / this._itemSize));
+      newRange.end = Math.min(
+        dataLength,
+        Math.ceil(
+          firstVisibleIndex +
+            (viewportSize + this._minBufferPx) / this._itemSize,
+        ),
+      );
     } else {
-      const endBuffer = newRange.end * this._itemSize - (scrollOffset + viewportSize);
+      const endBuffer =
+        newRange.end * this._itemSize - (scrollOffset + viewportSize);
       if (endBuffer < this._minBufferPx && newRange.end != dataLength) {
-        const expandEnd = Math.ceil((this._maxBufferPx - endBuffer) / this._itemSize);
+        const expandEnd = Math.ceil(
+          (this._maxBufferPx - endBuffer) / this._itemSize,
+        );
         if (expandEnd > 0) {
           newRange.end = Math.min(dataLength, newRange.end + expandEnd);
-          newRange.start = Math.max(0, Math.floor(firstVisibleIndex - this._minBufferPx / this._itemSize));
+          newRange.start = Math.max(
+            0,
+            Math.floor(firstVisibleIndex - this._minBufferPx / this._itemSize),
+          );
         }
       }
     }
@@ -751,9 +922,17 @@ var CdkFixedSizeVirtualScroll = class _CdkFixedSizeVirtualScroll {
   }
   _maxBufferPx = 200;
   /** The scroll strategy used by this directive. */
-  _scrollStrategy = new FixedSizeVirtualScrollStrategy(this.itemSize, this.minBufferPx, this.maxBufferPx);
+  _scrollStrategy = new FixedSizeVirtualScrollStrategy(
+    this.itemSize,
+    this.minBufferPx,
+    this.maxBufferPx,
+  );
   ngOnChanges() {
-    this._scrollStrategy.updateItemAndBufferSize(this.itemSize, this.minBufferPx, this.maxBufferPx);
+    this._scrollStrategy.updateItemAndBufferSize(
+      this.itemSize,
+      this.minBufferPx,
+      this.maxBufferPx,
+    );
   }
   static ɵfac = function CdkFixedSizeVirtualScroll_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _CdkFixedSizeVirtualScroll)();
@@ -764,37 +943,60 @@ var CdkFixedSizeVirtualScroll = class _CdkFixedSizeVirtualScroll {
     inputs: {
       itemSize: "itemSize",
       minBufferPx: "minBufferPx",
-      maxBufferPx: "maxBufferPx"
+      maxBufferPx: "maxBufferPx",
     },
-    features: [ɵɵProvidersFeature([{
-      provide: VIRTUAL_SCROLL_STRATEGY,
-      useFactory: _fixedSizeVirtualScrollStrategyFactory,
-      deps: [forwardRef(() => _CdkFixedSizeVirtualScroll)]
-    }]), ɵɵNgOnChangesFeature]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: VIRTUAL_SCROLL_STRATEGY,
+          useFactory: _fixedSizeVirtualScrollStrategyFactory,
+          deps: [forwardRef(() => _CdkFixedSizeVirtualScroll)],
+        },
+      ]),
+      ɵɵNgOnChangesFeature,
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkFixedSizeVirtualScroll, [{
-    type: Directive,
-    args: [{
-      selector: "cdk-virtual-scroll-viewport[itemSize]",
-      providers: [{
-        provide: VIRTUAL_SCROLL_STRATEGY,
-        useFactory: _fixedSizeVirtualScrollStrategyFactory,
-        deps: [forwardRef(() => CdkFixedSizeVirtualScroll)]
-      }]
-    }]
-  }], null, {
-    itemSize: [{
-      type: Input
-    }],
-    minBufferPx: [{
-      type: Input
-    }],
-    maxBufferPx: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkFixedSizeVirtualScroll,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "cdk-virtual-scroll-viewport[itemSize]",
+              providers: [
+                {
+                  provide: VIRTUAL_SCROLL_STRATEGY,
+                  useFactory: _fixedSizeVirtualScrollStrategyFactory,
+                  deps: [forwardRef(() => CdkFixedSizeVirtualScroll)],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      null,
+      {
+        itemSize: [
+          {
+            type: Input,
+          },
+        ],
+        minBufferPx: [
+          {
+            type: Input,
+          },
+        ],
+        maxBufferPx: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 var DEFAULT_SCROLL_TIME = 20;
 var ScrollDispatcher = class _ScrollDispatcher {
@@ -802,8 +1004,7 @@ var ScrollDispatcher = class _ScrollDispatcher {
   _platform = inject(Platform);
   _renderer = inject(RendererFactory2).createRenderer(null, null);
   _cleanupGlobalListener;
-  constructor() {
-  }
+  constructor() {}
   /** Subject for notifying that a registered scrollable reference element has been scrolled. */
   _scrolled = new Subject();
   /** Keeps track of the amount of subscriptions to `scrolled`. Used for cleaning up afterwards. */
@@ -820,7 +1021,12 @@ var ScrollDispatcher = class _ScrollDispatcher {
    */
   register(scrollable) {
     if (!this.scrollContainers.has(scrollable)) {
-      this.scrollContainers.set(scrollable, scrollable.elementScrolled().subscribe(() => this._scrolled.next(scrollable)));
+      this.scrollContainers.set(
+        scrollable,
+        scrollable
+          .elementScrolled()
+          .subscribe(() => this._scrolled.next(scrollable)),
+      );
     }
   }
   /**
@@ -850,9 +1056,16 @@ var ScrollDispatcher = class _ScrollDispatcher {
     }
     return new Observable((observer) => {
       if (!this._cleanupGlobalListener) {
-        this._cleanupGlobalListener = this._ngZone.runOutsideAngular(() => this._renderer.listen("document", "scroll", () => this._scrolled.next()));
+        this._cleanupGlobalListener = this._ngZone.runOutsideAngular(() =>
+          this._renderer.listen("document", "scroll", () =>
+            this._scrolled.next(),
+          ),
+        );
       }
-      const subscription = auditTimeInMs > 0 ? this._scrolled.pipe(auditTime(auditTimeInMs)).subscribe(observer) : this._scrolled.subscribe(observer);
+      const subscription =
+        auditTimeInMs > 0
+          ? this._scrolled.pipe(auditTime(auditTimeInMs)).subscribe(observer)
+          : this._scrolled.subscribe(observer);
       this._scrolledCount++;
       return () => {
         subscription.unsubscribe();
@@ -878,7 +1091,9 @@ var ScrollDispatcher = class _ScrollDispatcher {
    */
   ancestorScrolled(elementOrElementRef, auditTimeInMs) {
     const ancestors = this.getAncestorScrollContainers(elementOrElementRef);
-    return this.scrolled(auditTimeInMs).pipe(filter((target) => !target || ancestors.indexOf(target) > -1));
+    return this.scrolled(auditTimeInMs).pipe(
+      filter((target) => !target || ancestors.indexOf(target) > -1),
+    );
   }
   /** Returns all registered Scrollables that contain the provided element. */
   getAncestorScrollContainers(elementOrElementRef) {
@@ -898,7 +1113,7 @@ var ScrollDispatcher = class _ScrollDispatcher {
       if (element == scrollableElement) {
         return true;
       }
-    } while (element = element.parentElement);
+    } while ((element = element.parentElement));
     return false;
   }
   static ɵfac = function ScrollDispatcher_Factory(__ngFactoryType__) {
@@ -907,33 +1122,46 @@ var ScrollDispatcher = class _ScrollDispatcher {
   static ɵprov = ɵɵdefineInjectable({
     token: _ScrollDispatcher,
     factory: _ScrollDispatcher.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ScrollDispatcher, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      ScrollDispatcher,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var CdkScrollable = class _CdkScrollable {
   elementRef = inject(ElementRef);
   scrollDispatcher = inject(ScrollDispatcher);
   ngZone = inject(NgZone);
   dir = inject(Directionality, {
-    optional: true
+    optional: true,
   });
   _scrollElement = this.elementRef.nativeElement;
   _destroyed = new Subject();
   _renderer = inject(Renderer2);
   _cleanupScroll;
   _elementScrolled = new Subject();
-  constructor() {
-  }
+  constructor() {}
   ngOnInit() {
-    this._cleanupScroll = this.ngZone.runOutsideAngular(() => this._renderer.listen(this._scrollElement, "scroll", (event) => this._elementScrolled.next(event)));
+    this._cleanupScroll = this.ngZone.runOutsideAngular(() =>
+      this._renderer.listen(this._scrollElement, "scroll", (event) =>
+        this._elementScrolled.next(event),
+      ),
+    );
     this.scrollDispatcher.register(this);
   }
   ngOnDestroy() {
@@ -1050,16 +1278,29 @@ var CdkScrollable = class _CdkScrollable {
   };
   static ɵdir = ɵɵdefineDirective({
     type: _CdkScrollable,
-    selectors: [["", "cdk-scrollable", ""], ["", "cdkScrollable", ""]]
+    selectors: [
+      ["", "cdk-scrollable", ""],
+      ["", "cdkScrollable", ""],
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkScrollable, [{
-    type: Directive,
-    args: [{
-      selector: "[cdk-scrollable], [cdkScrollable]"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkScrollable,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdk-scrollable], [cdkScrollable]",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var DEFAULT_RESIZE_TIME = 20;
 var ViewportRuler = class _ViewportRuler {
@@ -1071,7 +1312,7 @@ var ViewportRuler = class _ViewportRuler {
   _change = new Subject();
   /** Used to reference correct document/window */
   _document = inject(DOCUMENT, {
-    optional: true
+    optional: true,
   });
   constructor() {
     const ngZone = inject(NgZone);
@@ -1079,9 +1320,12 @@ var ViewportRuler = class _ViewportRuler {
     ngZone.runOutsideAngular(() => {
       if (this._platform.isBrowser) {
         const changeListener = (event) => this._change.next(event);
-        this._listeners = [renderer.listen("window", "resize", changeListener), renderer.listen("window", "orientationchange", changeListener)];
+        this._listeners = [
+          renderer.listen("window", "resize", changeListener),
+          renderer.listen("window", "orientationchange", changeListener),
+        ];
       }
-      this.change().subscribe(() => this._viewportSize = null);
+      this.change().subscribe(() => (this._viewportSize = null));
     });
   }
   ngOnDestroy() {
@@ -1095,7 +1339,7 @@ var ViewportRuler = class _ViewportRuler {
     }
     const output = {
       width: this._viewportSize.width,
-      height: this._viewportSize.height
+      height: this._viewportSize.height,
     };
     if (!this._platform.isBrowser) {
       this._viewportSize = null;
@@ -1105,17 +1349,14 @@ var ViewportRuler = class _ViewportRuler {
   /** Gets a DOMRect for the viewport's bounds. */
   getViewportRect() {
     const scrollPosition = this.getViewportScrollPosition();
-    const {
-      width,
-      height
-    } = this.getViewportSize();
+    const { width, height } = this.getViewportSize();
     return {
       top: scrollPosition.top,
       left: scrollPosition.left,
       bottom: scrollPosition.top + height,
       right: scrollPosition.left + width,
       height,
-      width
+      width,
     };
   }
   /** Gets the (top, left) scroll position of the viewport. */
@@ -1123,18 +1364,28 @@ var ViewportRuler = class _ViewportRuler {
     if (!this._platform.isBrowser) {
       return {
         top: 0,
-        left: 0
+        left: 0,
       };
     }
     const document2 = this._document;
     const window2 = this._getWindow();
     const documentElement = document2.documentElement;
     const documentRect = documentElement.getBoundingClientRect();
-    const top = -documentRect.top || document2.body.scrollTop || window2.scrollY || documentElement.scrollTop || 0;
-    const left = -documentRect.left || document2.body.scrollLeft || window2.scrollX || documentElement.scrollLeft || 0;
+    const top =
+      -documentRect.top ||
+      document2.body.scrollTop ||
+      window2.scrollY ||
+      documentElement.scrollTop ||
+      0;
+    const left =
+      -documentRect.left ||
+      document2.body.scrollLeft ||
+      window2.scrollX ||
+      documentElement.scrollLeft ||
+      0;
     return {
       top,
-      left
+      left,
     };
   }
   /**
@@ -1143,7 +1394,9 @@ var ViewportRuler = class _ViewportRuler {
    * @param throttleTime Time in milliseconds to throttle the stream.
    */
   change(throttleTime = DEFAULT_RESIZE_TIME) {
-    return throttleTime > 0 ? this._change.pipe(auditTime(throttleTime)) : this._change;
+    return throttleTime > 0
+      ? this._change.pipe(auditTime(throttleTime))
+      : this._change;
   }
   /** Use defaultView of injected document if available or fallback to global window reference */
   _getWindow() {
@@ -1152,13 +1405,15 @@ var ViewportRuler = class _ViewportRuler {
   /** Updates the cached viewport size. */
   _updateViewportSize() {
     const window2 = this._getWindow();
-    this._viewportSize = this._platform.isBrowser ? {
-      width: window2.innerWidth,
-      height: window2.innerHeight
-    } : {
-      width: 0,
-      height: 0
-    };
+    this._viewportSize = this._platform.isBrowser
+      ? {
+          width: window2.innerWidth,
+          height: window2.innerHeight,
+        }
+      : {
+          width: 0,
+          height: 0,
+        };
   }
   static ɵfac = function ViewportRuler_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _ViewportRuler)();
@@ -1166,16 +1421,26 @@ var ViewportRuler = class _ViewportRuler {
   static ɵprov = ɵɵdefineInjectable({
     token: _ViewportRuler,
     factory: _ViewportRuler.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ViewportRuler, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      ViewportRuler,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var VIRTUAL_SCROLLABLE = new InjectionToken("VIRTUAL_SCROLLABLE");
 var CdkVirtualScrollable = class _CdkVirtualScrollable extends CdkScrollable {
@@ -1189,33 +1454,46 @@ var CdkVirtualScrollable = class _CdkVirtualScrollable extends CdkScrollable {
    */
   measureViewportSize(orientation) {
     const viewportEl = this.elementRef.nativeElement;
-    return orientation === "horizontal" ? viewportEl.clientWidth : viewportEl.clientHeight;
+    return orientation === "horizontal"
+      ? viewportEl.clientWidth
+      : viewportEl.clientHeight;
   }
   static ɵfac = function CdkVirtualScrollable_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _CdkVirtualScrollable)();
   };
   static ɵdir = ɵɵdefineDirective({
     type: _CdkVirtualScrollable,
-    features: [ɵɵInheritDefinitionFeature]
+    features: [ɵɵInheritDefinitionFeature],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkVirtualScrollable, [{
-    type: Directive
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkVirtualScrollable,
+      [
+        {
+          type: Directive,
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 function rangesEqual(r1, r2) {
   return r1.start == r2.start && r1.end == r2.end;
 }
-var SCROLL_SCHEDULER = typeof requestAnimationFrame !== "undefined" ? animationFrameScheduler : asapScheduler;
+var SCROLL_SCHEDULER =
+  typeof requestAnimationFrame !== "undefined"
+    ? animationFrameScheduler
+    : asapScheduler;
 var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtualScrollable {
   elementRef = inject(ElementRef);
   _changeDetectorRef = inject(ChangeDetectorRef);
   _scrollStrategy = inject(VIRTUAL_SCROLL_STRATEGY, {
-    optional: true
+    optional: true,
   });
   scrollable = inject(VIRTUAL_SCROLLABLE, {
-    optional: true
+    optional: true,
   });
   _platform = inject(Platform);
   /** Emits when the viewport is detached from a CdkVirtualForOf. */
@@ -1243,7 +1521,11 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
   // depending on how the strategy calculates the scrolled index, it may come at a cost to
   // performance.
   /** Emits when the index of the first element visible in the viewport changes. */
-  scrolledIndexChange = new Observable((observer) => this._scrollStrategy.scrolledIndexChange.subscribe((index) => Promise.resolve().then(() => this.ngZone.run(() => observer.next(index)))));
+  scrolledIndexChange = new Observable((observer) =>
+    this._scrollStrategy.scrolledIndexChange.subscribe((index) =>
+      Promise.resolve().then(() => this.ngZone.run(() => observer.next(index))),
+    ),
+  );
   /** The element that wraps the rendered content. */
   _contentWrapper;
   /** A stream that emits whenever the rendered range changes. */
@@ -1264,7 +1546,7 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
   /** The currently rendered range of indices. */
   _renderedRange = {
     start: 0,
-    end: 0
+    end: 0,
   };
   /** The length of the data bound to this viewport (in number of items). */
   _dataLength = 0;
@@ -1290,8 +1572,13 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
   constructor() {
     super();
     const viewportRuler = inject(ViewportRuler);
-    if (!this._scrollStrategy && (typeof ngDevMode === "undefined" || ngDevMode)) {
-      throw Error('Error: cdk-virtual-scroll-viewport requires the "itemSize" property to be set.');
+    if (
+      !this._scrollStrategy &&
+      (typeof ngDevMode === "undefined" || ngDevMode)
+    ) {
+      throw Error(
+        'Error: cdk-virtual-scroll-viewport requires the "itemSize" property to be set.',
+      );
     }
     this._viewportChanges = viewportRuler.change().subscribe(() => {
       this.checkViewportSize();
@@ -1308,23 +1595,28 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
     if (this.scrollable === this) {
       super.ngOnInit();
     }
-    this.ngZone.runOutsideAngular(() => Promise.resolve().then(() => {
-      this._measureViewportSize();
-      this._scrollStrategy.attach(this);
-      this.scrollable.elementScrolled().pipe(
-        // Start off with a fake scroll event so we properly detect our initial position.
-        startWith(null),
-        // Collect multiple events into one until the next animation frame. This way if
-        // there are multiple scroll events in the same frame we only need to recheck
-        // our layout once.
-        auditTime(0, SCROLL_SCHEDULER),
-        // Usually `elementScrolled` is completed when the scrollable is destroyed, but
-        // that may not be the case if a `CdkVirtualScrollableElement` is used so we have
-        // to unsubscribe here just in case.
-        takeUntil(this._destroyed)
-      ).subscribe(() => this._scrollStrategy.onContentScrolled());
-      this._markChangeDetectionNeeded();
-    }));
+    this.ngZone.runOutsideAngular(() =>
+      Promise.resolve().then(() => {
+        this._measureViewportSize();
+        this._scrollStrategy.attach(this);
+        this.scrollable
+          .elementScrolled()
+          .pipe(
+            // Start off with a fake scroll event so we properly detect our initial position.
+            startWith(null),
+            // Collect multiple events into one until the next animation frame. This way if
+            // there are multiple scroll events in the same frame we only need to recheck
+            // our layout once.
+            auditTime(0, SCROLL_SCHEDULER),
+            // Usually `elementScrolled` is completed when the scrollable is destroyed, but
+            // that may not be the case if a `CdkVirtualScrollableElement` is used so we have
+            // to unsubscribe here just in case.
+            takeUntil(this._destroyed),
+          )
+          .subscribe(() => this._scrollStrategy.onContentScrolled());
+        this._markChangeDetectionNeeded();
+      }),
+    );
   }
   ngOnDestroy() {
     this.detach();
@@ -1342,14 +1634,16 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
     }
     this.ngZone.runOutsideAngular(() => {
       this._forOf = forOf;
-      this._forOf.dataStream.pipe(takeUntil(this._detachedSubject)).subscribe((data) => {
-        const newLength = data.length;
-        if (newLength !== this._dataLength) {
-          this._dataLength = newLength;
-          this._scrollStrategy.onDataLengthChanged();
-        }
-        this._doChangeDetection();
-      });
+      this._forOf.dataStream
+        .pipe(takeUntil(this._detachedSubject))
+        .subscribe((data) => {
+          const newLength = data.length;
+          if (newLength !== this._dataLength) {
+            this._dataLength = newLength;
+            this._scrollStrategy.onDataLengthChanged();
+          }
+          this._doChangeDetection();
+        });
     });
   }
   /** Detaches the current `CdkVirtualForOf`. */
@@ -1393,18 +1687,22 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
       if (this.appendOnly) {
         range = {
           start: 0,
-          end: Math.max(this._renderedRange.end, range.end)
+          end: Math.max(this._renderedRange.end, range.end),
         };
       }
-      this._renderedRangeSubject.next(this._renderedRange = range);
-      this._markChangeDetectionNeeded(() => this._scrollStrategy.onContentRendered());
+      this._renderedRangeSubject.next((this._renderedRange = range));
+      this._markChangeDetectionNeeded(() =>
+        this._scrollStrategy.onContentRendered(),
+      );
     }
   }
   /**
    * Gets the offset from the start of the viewport to the start of the rendered data (in pixels).
    */
   getOffsetToRenderedContentStart() {
-    return this._renderedContentOffsetNeedsRewrite ? null : this._renderedContentOffset;
+    return this._renderedContentOffsetNeedsRewrite
+      ? null
+      : this._renderedContentOffset;
   }
   /**
    * Sets the offset from the start of the viewport to either the start or end of the rendered data
@@ -1444,7 +1742,7 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
    */
   scrollToOffset(offset, behavior = "auto") {
     const options = {
-      behavior
+      behavior,
     };
     if (this.orientation === "horizontal") {
       options.start = offset;
@@ -1471,9 +1769,15 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
     if (this.scrollable == this) {
       measureScrollOffset = (_from) => super.measureScrollOffset(_from);
     } else {
-      measureScrollOffset = (_from) => this.scrollable.measureScrollOffset(_from);
+      measureScrollOffset = (_from) =>
+        this.scrollable.measureScrollOffset(_from);
     }
-    return Math.max(0, measureScrollOffset(from ?? (this.orientation === "horizontal" ? "start" : "top")) - this.measureViewportOffset());
+    return Math.max(
+      0,
+      measureScrollOffset(
+        from ?? (this.orientation === "horizontal" ? "start" : "top"),
+      ) - this.measureViewportOffset(),
+    );
   }
   /**
    * Measures the offset of the viewport from the scrolling container
@@ -1493,14 +1797,18 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
     } else {
       fromRect = this.orientation === "horizontal" ? "left" : "top";
     }
-    const scrollerClientRect = this.scrollable.measureBoundingClientRectWithScrollOffset(fromRect);
-    const viewportClientRect = this.elementRef.nativeElement.getBoundingClientRect()[fromRect];
+    const scrollerClientRect =
+      this.scrollable.measureBoundingClientRectWithScrollOffset(fromRect);
+    const viewportClientRect =
+      this.elementRef.nativeElement.getBoundingClientRect()[fromRect];
     return viewportClientRect - scrollerClientRect;
   }
   /** Measure the combined size of all of the rendered items. */
   measureRenderedContentSize() {
     const contentEl = this._contentWrapper.nativeElement;
-    return this.orientation === "horizontal" ? contentEl.offsetWidth : contentEl.offsetHeight;
+    return this.orientation === "horizontal"
+      ? contentEl.offsetWidth
+      : contentEl.offsetHeight;
   }
   /**
    * Measure the total combined size of the given range. Throws if the range includes items that are
@@ -1528,9 +1836,11 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
     }
     if (!this._isChangeDetectionPending) {
       this._isChangeDetectionPending = true;
-      this.ngZone.runOutsideAngular(() => Promise.resolve().then(() => {
-        this._doChangeDetection();
-      }));
+      this.ngZone.runOutsideAngular(() =>
+        Promise.resolve().then(() => {
+          this._doChangeDetection();
+        }),
+      );
     }
   }
   /** Run change detection. */
@@ -1540,23 +1850,29 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
     }
     this.ngZone.run(() => {
       this._changeDetectorRef.markForCheck();
-      this._contentWrapper.nativeElement.style.transform = this._renderedContentTransform;
-      afterNextRender(() => {
-        this._isChangeDetectionPending = false;
-        const runAfterChangeDetection = this._runAfterChangeDetection;
-        this._runAfterChangeDetection = [];
-        for (const fn of runAfterChangeDetection) {
-          fn();
-        }
-      }, {
-        injector: this._injector
-      });
+      this._contentWrapper.nativeElement.style.transform =
+        this._renderedContentTransform;
+      afterNextRender(
+        () => {
+          this._isChangeDetectionPending = false;
+          const runAfterChangeDetection = this._runAfterChangeDetection;
+          this._runAfterChangeDetection = [];
+          for (const fn of runAfterChangeDetection) {
+            fn();
+          }
+        },
+        {
+          injector: this._injector,
+        },
+      );
     });
   }
   /** Calculates the `style.width` and `style.height` for the spacer element. */
   _calculateSpacerSize() {
-    this._totalContentHeight = this.orientation === "horizontal" ? "" : `${this._totalContentSize}px`;
-    this._totalContentWidth = this.orientation === "horizontal" ? `${this._totalContentSize}px` : "";
+    this._totalContentHeight =
+      this.orientation === "horizontal" ? "" : `${this._totalContentSize}px`;
+    this._totalContentWidth =
+      this.orientation === "horizontal" ? `${this._totalContentSize}px` : "";
   }
   static ɵfac = function CdkVirtualScrollViewport_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _CdkVirtualScrollViewport)();
@@ -1570,32 +1886,52 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
       }
       if (rf & 2) {
         let _t;
-        ɵɵqueryRefresh(_t = ɵɵloadQuery()) && (ctx._contentWrapper = _t.first);
+        ɵɵqueryRefresh((_t = ɵɵloadQuery())) &&
+          (ctx._contentWrapper = _t.first);
       }
     },
     hostAttrs: [1, "cdk-virtual-scroll-viewport"],
     hostVars: 4,
     hostBindings: function CdkVirtualScrollViewport_HostBindings(rf, ctx) {
       if (rf & 2) {
-        ɵɵclassProp("cdk-virtual-scroll-orientation-horizontal", ctx.orientation === "horizontal")("cdk-virtual-scroll-orientation-vertical", ctx.orientation !== "horizontal");
+        ɵɵclassProp(
+          "cdk-virtual-scroll-orientation-horizontal",
+          ctx.orientation === "horizontal",
+        )(
+          "cdk-virtual-scroll-orientation-vertical",
+          ctx.orientation !== "horizontal",
+        );
       }
     },
     inputs: {
       orientation: "orientation",
-      appendOnly: [2, "appendOnly", "appendOnly", booleanAttribute]
+      appendOnly: [2, "appendOnly", "appendOnly", booleanAttribute],
     },
     outputs: {
-      scrolledIndexChange: "scrolledIndexChange"
+      scrolledIndexChange: "scrolledIndexChange",
     },
-    features: [ɵɵProvidersFeature([{
-      provide: CdkScrollable,
-      useFactory: (virtualScrollable, viewport) => virtualScrollable || viewport,
-      deps: [[new Optional(), new Inject(VIRTUAL_SCROLLABLE)], _CdkVirtualScrollViewport]
-    }]), ɵɵInheritDefinitionFeature],
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: CdkScrollable,
+          useFactory: (virtualScrollable, viewport) =>
+            virtualScrollable || viewport,
+          deps: [
+            [new Optional(), new Inject(VIRTUAL_SCROLLABLE)],
+            _CdkVirtualScrollViewport,
+          ],
+        },
+      ]),
+      ɵɵInheritDefinitionFeature,
+    ],
     ngContentSelectors: _c1,
     decls: 4,
     vars: 4,
-    consts: [["contentWrapper", ""], [1, "cdk-virtual-scroll-content-wrapper"], [1, "cdk-virtual-scroll-spacer"]],
+    consts: [
+      ["contentWrapper", ""],
+      [1, "cdk-virtual-scroll-content-wrapper"],
+      [1, "cdk-virtual-scroll-spacer"],
+    ],
     template: function CdkVirtualScrollViewport_Template(rf, ctx) {
       if (rf & 1) {
         ɵɵprojectionDef();
@@ -1606,54 +1942,93 @@ var CdkVirtualScrollViewport = class _CdkVirtualScrollViewport extends CdkVirtua
       }
       if (rf & 2) {
         ɵɵadvance(3);
-        ɵɵstyleProp("width", ctx._totalContentWidth)("height", ctx._totalContentHeight);
+        ɵɵstyleProp("width", ctx._totalContentWidth)(
+          "height",
+          ctx._totalContentHeight,
+        );
       }
     },
-    styles: ["cdk-virtual-scroll-viewport{display:block;position:relative;transform:translateZ(0)}.cdk-virtual-scrollable{overflow:auto;will-change:scroll-position;contain:strict}.cdk-virtual-scroll-content-wrapper{position:absolute;top:0;left:0;contain:content}[dir=rtl] .cdk-virtual-scroll-content-wrapper{right:0;left:auto}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper{min-height:100%}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-left:0;padding-right:0;margin-left:0;margin-right:0;border-left-width:0;border-right-width:0;outline:none}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper{min-width:100%}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-top-width:0;border-bottom-width:0;outline:none}.cdk-virtual-scroll-spacer{height:1px;transform-origin:0 0;flex:0 0 auto}[dir=rtl] .cdk-virtual-scroll-spacer{transform-origin:100% 0}\n"],
+    styles: [
+      "cdk-virtual-scroll-viewport{display:block;position:relative;transform:translateZ(0)}.cdk-virtual-scrollable{overflow:auto;will-change:scroll-position;contain:strict}.cdk-virtual-scroll-content-wrapper{position:absolute;top:0;left:0;contain:content}[dir=rtl] .cdk-virtual-scroll-content-wrapper{right:0;left:auto}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper{min-height:100%}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-left:0;padding-right:0;margin-left:0;margin-right:0;border-left-width:0;border-right-width:0;outline:none}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper{min-width:100%}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-top-width:0;border-bottom-width:0;outline:none}.cdk-virtual-scroll-spacer{height:1px;transform-origin:0 0;flex:0 0 auto}[dir=rtl] .cdk-virtual-scroll-spacer{transform-origin:100% 0}\n",
+    ],
     encapsulation: 2,
-    changeDetection: 0
+    changeDetection: 0,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkVirtualScrollViewport, [{
-    type: Component,
-    args: [{
-      selector: "cdk-virtual-scroll-viewport",
-      host: {
-        "class": "cdk-virtual-scroll-viewport",
-        "[class.cdk-virtual-scroll-orientation-horizontal]": 'orientation === "horizontal"',
-        "[class.cdk-virtual-scroll-orientation-vertical]": 'orientation !== "horizontal"'
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkVirtualScrollViewport,
+      [
+        {
+          type: Component,
+          args: [
+            {
+              selector: "cdk-virtual-scroll-viewport",
+              host: {
+                class: "cdk-virtual-scroll-viewport",
+                "[class.cdk-virtual-scroll-orientation-horizontal]":
+                  'orientation === "horizontal"',
+                "[class.cdk-virtual-scroll-orientation-vertical]":
+                  'orientation !== "horizontal"',
+              },
+              encapsulation: ViewEncapsulation.None,
+              changeDetection: ChangeDetectionStrategy.OnPush,
+              providers: [
+                {
+                  provide: CdkScrollable,
+                  useFactory: (virtualScrollable, viewport) =>
+                    virtualScrollable || viewport,
+                  deps: [
+                    [new Optional(), new Inject(VIRTUAL_SCROLLABLE)],
+                    CdkVirtualScrollViewport,
+                  ],
+                },
+              ],
+              template:
+                '<!--\n  Wrap the rendered content in an element that will be used to offset it based on the scroll\n  position.\n-->\n<div #contentWrapper class="cdk-virtual-scroll-content-wrapper">\n  <ng-content></ng-content>\n</div>\n<!--\n  Spacer used to force the scrolling container to the correct size for the *total* number of items\n  so that the scrollbar captures the size of the entire data set.\n-->\n<div class="cdk-virtual-scroll-spacer"\n     [style.width]="_totalContentWidth" [style.height]="_totalContentHeight"></div>\n',
+              styles: [
+                "cdk-virtual-scroll-viewport{display:block;position:relative;transform:translateZ(0)}.cdk-virtual-scrollable{overflow:auto;will-change:scroll-position;contain:strict}.cdk-virtual-scroll-content-wrapper{position:absolute;top:0;left:0;contain:content}[dir=rtl] .cdk-virtual-scroll-content-wrapper{right:0;left:auto}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper{min-height:100%}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-left:0;padding-right:0;margin-left:0;margin-right:0;border-left-width:0;border-right-width:0;outline:none}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper{min-width:100%}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-top-width:0;border-bottom-width:0;outline:none}.cdk-virtual-scroll-spacer{height:1px;transform-origin:0 0;flex:0 0 auto}[dir=rtl] .cdk-virtual-scroll-spacer{transform-origin:100% 0}\n",
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        orientation: [
+          {
+            type: Input,
+          },
+        ],
+        appendOnly: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        scrolledIndexChange: [
+          {
+            type: Output,
+          },
+        ],
+        _contentWrapper: [
+          {
+            type: ViewChild,
+            args: [
+              "contentWrapper",
+              {
+                static: true,
+              },
+            ],
+          },
+        ],
       },
-      encapsulation: ViewEncapsulation.None,
-      changeDetection: ChangeDetectionStrategy.OnPush,
-      providers: [{
-        provide: CdkScrollable,
-        useFactory: (virtualScrollable, viewport) => virtualScrollable || viewport,
-        deps: [[new Optional(), new Inject(VIRTUAL_SCROLLABLE)], CdkVirtualScrollViewport]
-      }],
-      template: '<!--\n  Wrap the rendered content in an element that will be used to offset it based on the scroll\n  position.\n-->\n<div #contentWrapper class="cdk-virtual-scroll-content-wrapper">\n  <ng-content></ng-content>\n</div>\n<!--\n  Spacer used to force the scrolling container to the correct size for the *total* number of items\n  so that the scrollbar captures the size of the entire data set.\n-->\n<div class="cdk-virtual-scroll-spacer"\n     [style.width]="_totalContentWidth" [style.height]="_totalContentHeight"></div>\n',
-      styles: ["cdk-virtual-scroll-viewport{display:block;position:relative;transform:translateZ(0)}.cdk-virtual-scrollable{overflow:auto;will-change:scroll-position;contain:strict}.cdk-virtual-scroll-content-wrapper{position:absolute;top:0;left:0;contain:content}[dir=rtl] .cdk-virtual-scroll-content-wrapper{right:0;left:auto}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper{min-height:100%}.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-horizontal .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-left:0;padding-right:0;margin-left:0;margin-right:0;border-left-width:0;border-right-width:0;outline:none}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper{min-width:100%}.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>dl:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ol:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>table:not([cdkVirtualFor]),.cdk-virtual-scroll-orientation-vertical .cdk-virtual-scroll-content-wrapper>ul:not([cdkVirtualFor]){padding-top:0;padding-bottom:0;margin-top:0;margin-bottom:0;border-top-width:0;border-bottom-width:0;outline:none}.cdk-virtual-scroll-spacer{height:1px;transform-origin:0 0;flex:0 0 auto}[dir=rtl] .cdk-virtual-scroll-spacer{transform-origin:100% 0}\n"]
-    }]
-  }], () => [], {
-    orientation: [{
-      type: Input
-    }],
-    appendOnly: [{
-      type: Input,
-      args: [{
-        transform: booleanAttribute
-      }]
-    }],
-    scrolledIndexChange: [{
-      type: Output
-    }],
-    _contentWrapper: [{
-      type: ViewChild,
-      args: ["contentWrapper", {
-        static: true
-      }]
-    }]
-  });
+    );
 })();
 function getOffset(orientation, direction, node) {
   const el = node;
@@ -1672,7 +2047,7 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
   _differs = inject(IterableDiffers);
   _viewRepeater = inject(_VIEW_REPEATER_STRATEGY);
   _viewport = inject(CdkVirtualScrollViewport, {
-    skipSelf: true
+    skipSelf: true,
   });
   /** Emits when the rendered view of the data changes. */
   viewChange = new Subject();
@@ -1687,7 +2062,11 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
     if (isDataSource(value)) {
       this._dataSourceChanges.next(value);
     } else {
-      this._dataSourceChanges.next(new ArrayDataSource(isObservable(value) ? value : Array.from(value || [])));
+      this._dataSourceChanges.next(
+        new ArrayDataSource(
+          isObservable(value) ? value : Array.from(value || []),
+        ),
+      );
     }
   }
   _cdkVirtualForOf;
@@ -1700,7 +2079,13 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
   }
   set cdkVirtualForTrackBy(fn) {
     this._needsUpdate = true;
-    this._cdkVirtualForTrackBy = fn ? (index, item) => fn(index + (this._renderedRange ? this._renderedRange.start : 0), item) : void 0;
+    this._cdkVirtualForTrackBy = fn
+      ? (index, item) =>
+          fn(
+            index + (this._renderedRange ? this._renderedRange.start : 0),
+            item,
+          )
+      : void 0;
   }
   _cdkVirtualForTrackBy;
   /** The template used to stamp out new elements. */
@@ -1731,7 +2116,7 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
     // us a data stream that emits the latest data from whatever the current `DataSource` is.
     switchMap(([prev, cur]) => this._changeDataSource(prev, cur)),
     // Replay the last emitted data when someone subscribes.
-    shareReplay(1)
+    shareReplay(1),
   );
   /** The differ used to calculate changes to the data. */
   _differ = null;
@@ -1750,13 +2135,15 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
       this._data = data;
       this._onRenderedDataChange();
     });
-    this._viewport.renderedRangeStream.pipe(takeUntil(this._destroyed)).subscribe((range) => {
-      this._renderedRange = range;
-      if (this.viewChange.observers.length) {
-        ngZone.run(() => this.viewChange.next(this._renderedRange));
-      }
-      this._onRenderedDataChange();
-    });
+    this._viewport.renderedRangeStream
+      .pipe(takeUntil(this._destroyed))
+      .subscribe((range) => {
+        this._renderedRange = range;
+        if (this.viewChange.observers.length) {
+          ngZone.run(() => this.viewChange.next(this._renderedRange));
+        }
+        this._onRenderedDataChange();
+      });
     this._viewport.attach(this);
   }
   /**
@@ -1768,7 +2155,11 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
     if (range.start >= range.end) {
       return 0;
     }
-    if ((range.start < this._renderedRange.start || range.end > this._renderedRange.end) && (typeof ngDevMode === "undefined" || ngDevMode)) {
+    if (
+      (range.start < this._renderedRange.start ||
+        range.end > this._renderedRange.end) &&
+      (typeof ngDevMode === "undefined" || ngDevMode)
+    ) {
       throw Error(`Error: attempted to measure an item that isn't rendered.`);
     }
     const renderedStartIndex = range.start - this._renderedRange.start;
@@ -1789,7 +2180,10 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
         break;
       }
     }
-    return firstNode && lastNode ? getOffset(orientation, "end", lastNode) - getOffset(orientation, "start", firstNode) : 0;
+    return firstNode && lastNode
+      ? getOffset(orientation, "end", lastNode) -
+          getOffset(orientation, "start", firstNode)
+      : 0;
   }
   ngDoCheck() {
     if (this._differ && this._needsUpdate) {
@@ -1816,11 +2210,18 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
     if (!this._renderedRange) {
       return;
     }
-    this._renderedItems = this._data.slice(this._renderedRange.start, this._renderedRange.end);
+    this._renderedItems = this._data.slice(
+      this._renderedRange.start,
+      this._renderedRange.end,
+    );
     if (!this._differ) {
-      this._differ = this._differs.find(this._renderedItems).create((index, item) => {
-        return this.cdkVirtualForTrackBy ? this.cdkVirtualForTrackBy(index, item) : item;
-      });
+      this._differ = this._differs
+        .find(this._renderedItems)
+        .create((index, item) => {
+          return this.cdkVirtualForTrackBy
+            ? this.cdkVirtualForTrackBy(index, item)
+            : item;
+        });
     }
     this._needsUpdate = true;
   }
@@ -1846,7 +2247,13 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
   }
   /** Apply changes to the DOM. */
   _applyChanges(changes) {
-    this._viewRepeater.applyChanges(changes, this._viewContainerRef, (record, _adjustedPreviousIndex, currentIndex) => this._getEmbeddedViewArgs(record, currentIndex), (record) => record.item);
+    this._viewRepeater.applyChanges(
+      changes,
+      this._viewContainerRef,
+      (record, _adjustedPreviousIndex, currentIndex) =>
+        this._getEmbeddedViewArgs(record, currentIndex),
+      (record) => record.item,
+    );
     changes.forEachIdentityChange((record) => {
       const view = this._viewContainerRef.get(record.currentIndex);
       view.context.$implicit = record.item;
@@ -1880,9 +2287,9 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
         first: false,
         last: false,
         odd: false,
-        even: false
+        even: false,
       },
-      index
+      index,
     };
   }
   static ngTemplateContextGuard(directive, context) {
@@ -1898,73 +2305,119 @@ var CdkVirtualForOf = class _CdkVirtualForOf {
       cdkVirtualForOf: "cdkVirtualForOf",
       cdkVirtualForTrackBy: "cdkVirtualForTrackBy",
       cdkVirtualForTemplate: "cdkVirtualForTemplate",
-      cdkVirtualForTemplateCacheSize: "cdkVirtualForTemplateCacheSize"
+      cdkVirtualForTemplateCacheSize: "cdkVirtualForTemplateCacheSize",
     },
-    features: [ɵɵProvidersFeature([{
-      provide: _VIEW_REPEATER_STRATEGY,
-      useClass: _RecycleViewRepeaterStrategy
-    }])]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: _VIEW_REPEATER_STRATEGY,
+          useClass: _RecycleViewRepeaterStrategy,
+        },
+      ]),
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkVirtualForOf, [{
-    type: Directive,
-    args: [{
-      selector: "[cdkVirtualFor][cdkVirtualForOf]",
-      providers: [{
-        provide: _VIEW_REPEATER_STRATEGY,
-        useClass: _RecycleViewRepeaterStrategy
-      }]
-    }]
-  }], () => [], {
-    cdkVirtualForOf: [{
-      type: Input
-    }],
-    cdkVirtualForTrackBy: [{
-      type: Input
-    }],
-    cdkVirtualForTemplate: [{
-      type: Input
-    }],
-    cdkVirtualForTemplateCacheSize: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkVirtualForOf,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdkVirtualFor][cdkVirtualForOf]",
+              providers: [
+                {
+                  provide: _VIEW_REPEATER_STRATEGY,
+                  useClass: _RecycleViewRepeaterStrategy,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        cdkVirtualForOf: [
+          {
+            type: Input,
+          },
+        ],
+        cdkVirtualForTrackBy: [
+          {
+            type: Input,
+          },
+        ],
+        cdkVirtualForTemplate: [
+          {
+            type: Input,
+          },
+        ],
+        cdkVirtualForTemplateCacheSize: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 var CdkVirtualScrollableElement = class _CdkVirtualScrollableElement extends CdkVirtualScrollable {
   constructor() {
     super();
   }
   measureBoundingClientRectWithScrollOffset(from) {
-    return this.getElementRef().nativeElement.getBoundingClientRect()[from] - this.measureScrollOffset(from);
+    return (
+      this.getElementRef().nativeElement.getBoundingClientRect()[from] -
+      this.measureScrollOffset(from)
+    );
   }
-  static ɵfac = function CdkVirtualScrollableElement_Factory(__ngFactoryType__) {
+  static ɵfac = function CdkVirtualScrollableElement_Factory(
+    __ngFactoryType__,
+  ) {
     return new (__ngFactoryType__ || _CdkVirtualScrollableElement)();
   };
   static ɵdir = ɵɵdefineDirective({
     type: _CdkVirtualScrollableElement,
     selectors: [["", "cdkVirtualScrollingElement", ""]],
     hostAttrs: [1, "cdk-virtual-scrollable"],
-    features: [ɵɵProvidersFeature([{
-      provide: VIRTUAL_SCROLLABLE,
-      useExisting: _CdkVirtualScrollableElement
-    }]), ɵɵInheritDefinitionFeature]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: VIRTUAL_SCROLLABLE,
+          useExisting: _CdkVirtualScrollableElement,
+        },
+      ]),
+      ɵɵInheritDefinitionFeature,
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkVirtualScrollableElement, [{
-    type: Directive,
-    args: [{
-      selector: "[cdkVirtualScrollingElement]",
-      providers: [{
-        provide: VIRTUAL_SCROLLABLE,
-        useExisting: CdkVirtualScrollableElement
-      }],
-      host: {
-        "class": "cdk-virtual-scrollable"
-      }
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkVirtualScrollableElement,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdkVirtualScrollingElement]",
+              providers: [
+                {
+                  provide: VIRTUAL_SCROLLABLE,
+                  useExisting: CdkVirtualScrollableElement,
+                },
+              ],
+              host: {
+                class: "cdk-virtual-scrollable",
+              },
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var CdkVirtualScrollableWindow = class _CdkVirtualScrollableWindow extends CdkVirtualScrollable {
   constructor() {
@@ -1982,23 +2435,40 @@ var CdkVirtualScrollableWindow = class _CdkVirtualScrollableWindow extends CdkVi
   static ɵdir = ɵɵdefineDirective({
     type: _CdkVirtualScrollableWindow,
     selectors: [["cdk-virtual-scroll-viewport", "scrollWindow", ""]],
-    features: [ɵɵProvidersFeature([{
-      provide: VIRTUAL_SCROLLABLE,
-      useExisting: _CdkVirtualScrollableWindow
-    }]), ɵɵInheritDefinitionFeature]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: VIRTUAL_SCROLLABLE,
+          useExisting: _CdkVirtualScrollableWindow,
+        },
+      ]),
+      ɵɵInheritDefinitionFeature,
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkVirtualScrollableWindow, [{
-    type: Directive,
-    args: [{
-      selector: "cdk-virtual-scroll-viewport[scrollWindow]",
-      providers: [{
-        provide: VIRTUAL_SCROLLABLE,
-        useExisting: CdkVirtualScrollableWindow
-      }]
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkVirtualScrollableWindow,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "cdk-virtual-scroll-viewport[scrollWindow]",
+              providers: [
+                {
+                  provide: VIRTUAL_SCROLLABLE,
+                  useExisting: CdkVirtualScrollableWindow,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var CdkScrollableModule = class _CdkScrollableModule {
   static ɵfac = function CdkScrollableModule_Factory(__ngFactoryType__) {
@@ -2007,18 +2477,28 @@ var CdkScrollableModule = class _CdkScrollableModule {
   static ɵmod = ɵɵdefineNgModule({
     type: _CdkScrollableModule,
     imports: [CdkScrollable],
-    exports: [CdkScrollable]
+    exports: [CdkScrollable],
   });
   static ɵinj = ɵɵdefineInjector({});
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkScrollableModule, [{
-    type: NgModule,
-    args: [{
-      exports: [CdkScrollable],
-      imports: [CdkScrollable]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkScrollableModule,
+      [
+        {
+          type: NgModule,
+          args: [
+            {
+              exports: [CdkScrollable],
+              imports: [CdkScrollable],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var ScrollingModule = class _ScrollingModule {
   static ɵfac = function ScrollingModule_Factory(__ngFactoryType__) {
@@ -2026,21 +2506,63 @@ var ScrollingModule = class _ScrollingModule {
   };
   static ɵmod = ɵɵdefineNgModule({
     type: _ScrollingModule,
-    imports: [BidiModule, CdkScrollableModule, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollableWindow, CdkVirtualScrollableElement],
-    exports: [BidiModule, CdkScrollableModule, CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport, CdkVirtualScrollableWindow, CdkVirtualScrollableElement]
+    imports: [
+      BidiModule,
+      CdkScrollableModule,
+      CdkVirtualScrollViewport,
+      CdkFixedSizeVirtualScroll,
+      CdkVirtualForOf,
+      CdkVirtualScrollableWindow,
+      CdkVirtualScrollableElement,
+    ],
+    exports: [
+      BidiModule,
+      CdkScrollableModule,
+      CdkFixedSizeVirtualScroll,
+      CdkVirtualForOf,
+      CdkVirtualScrollViewport,
+      CdkVirtualScrollableWindow,
+      CdkVirtualScrollableElement,
+    ],
   });
   static ɵinj = ɵɵdefineInjector({
-    imports: [BidiModule, CdkScrollableModule, BidiModule, CdkScrollableModule]
+    imports: [BidiModule, CdkScrollableModule, BidiModule, CdkScrollableModule],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(ScrollingModule, [{
-    type: NgModule,
-    args: [{
-      imports: [BidiModule, CdkScrollableModule, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollableWindow, CdkVirtualScrollableElement],
-      exports: [BidiModule, CdkScrollableModule, CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport, CdkVirtualScrollableWindow, CdkVirtualScrollableElement]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      ScrollingModule,
+      [
+        {
+          type: NgModule,
+          args: [
+            {
+              imports: [
+                BidiModule,
+                CdkScrollableModule,
+                CdkVirtualScrollViewport,
+                CdkFixedSizeVirtualScroll,
+                CdkVirtualForOf,
+                CdkVirtualScrollableWindow,
+                CdkVirtualScrollableElement,
+              ],
+              exports: [
+                BidiModule,
+                CdkScrollableModule,
+                CdkFixedSizeVirtualScroll,
+                CdkVirtualForOf,
+                CdkVirtualScrollViewport,
+                CdkVirtualScrollableWindow,
+                CdkVirtualScrollableElement,
+              ],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 
 // ../../node_modules/@angular/cdk/fesm2022/id-generator-Dw_9dSDu.mjs
@@ -2066,16 +2588,26 @@ var _IdGenerator = class __IdGenerator {
   static ɵprov = ɵɵdefineInjectable({
     token: __IdGenerator,
     factory: __IdGenerator.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(_IdGenerator, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      _IdGenerator,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 
 // ../../node_modules/@angular/cdk/fesm2022/array-I1yfCXUO.mjs
@@ -2094,7 +2626,11 @@ function deepCloneNode(node) {
   }
   if (nodeName === "canvas") {
     transferCanvasData(node, clone);
-  } else if (nodeName === "input" || nodeName === "select" || nodeName === "textarea") {
+  } else if (
+    nodeName === "input" ||
+    nodeName === "select" ||
+    nodeName === "textarea"
+  ) {
     transferInputData(node, clone);
   }
   transferData("canvas", node, clone, transferCanvasData);
@@ -2124,8 +2660,7 @@ function transferCanvasData(source, clone) {
   if (context) {
     try {
       context.drawImage(source, 0, 0);
-    } catch {
-    }
+    } catch {}
   }
 }
 function getMutableClientRect(element) {
@@ -2138,16 +2673,11 @@ function getMutableClientRect(element) {
     width: rect.width,
     height: rect.height,
     x: rect.x,
-    y: rect.y
+    y: rect.y,
   };
 }
 function isInsideClientRect(clientRect, x, y) {
-  const {
-    top,
-    bottom,
-    left,
-    right
-  } = clientRect;
+  const { top, bottom, left, right } = clientRect;
   return y >= top && y <= bottom && x >= left && x <= right;
 }
 function adjustDomRect(domRect, top, left) {
@@ -2157,17 +2687,15 @@ function adjustDomRect(domRect, top, left) {
   domRect.right = domRect.left + domRect.width;
 }
 function isPointerNearDomRect(rect, threshold, pointerX, pointerY) {
-  const {
-    top,
-    right,
-    bottom,
-    left,
-    width,
-    height
-  } = rect;
+  const { top, right, bottom, left, width, height } = rect;
   const xThreshold = width * threshold;
   const yThreshold = height * threshold;
-  return pointerY > top - yThreshold && pointerY < bottom + yThreshold && pointerX > left - xThreshold && pointerX < right + xThreshold;
+  return (
+    pointerY > top - yThreshold &&
+    pointerY < bottom + yThreshold &&
+    pointerX > left - xThreshold &&
+    pointerX < right + xThreshold
+  );
 }
 var ParentPositionTracker = class {
   _document;
@@ -2184,15 +2712,15 @@ var ParentPositionTracker = class {
   cache(elements) {
     this.clear();
     this.positions.set(this._document, {
-      scrollPosition: this.getViewportScrollPosition()
+      scrollPosition: this.getViewportScrollPosition(),
     });
     elements.forEach((element) => {
       this.positions.set(element, {
         scrollPosition: {
           top: element.scrollTop,
-          left: element.scrollLeft
+          left: element.scrollLeft,
         },
-        clientRect: getMutableClientRect(element)
+        clientRect: getMutableClientRect(element),
       });
     });
   }
@@ -2225,7 +2753,7 @@ var ParentPositionTracker = class {
     scrollPosition.left = newLeft;
     return {
       top: topDifference,
-      left: leftDifference
+      left: leftDifference,
     };
   }
   /**
@@ -2237,13 +2765,16 @@ var ParentPositionTracker = class {
   getViewportScrollPosition() {
     return {
       top: window.scrollY,
-      left: window.scrollX
+      left: window.scrollX,
     };
   }
 };
 function getRootNode(viewRef, _document) {
   const rootNodes = viewRef.rootNodes;
-  if (rootNodes.length === 1 && rootNodes[0].nodeType === _document.ELEMENT_NODE) {
+  if (
+    rootNodes.length === 1 &&
+    rootNodes[0].nodeType === _document.ELEMENT_NODE
+  ) {
     return rootNodes[0];
   }
   const wrapper = _document.createElement("div");
@@ -2255,7 +2786,11 @@ function extendStyles(dest, source, importantProperties2) {
     if (source.hasOwnProperty(key)) {
       const value = source[key];
       if (value) {
-        dest.setProperty(key, value, importantProperties2?.has(key) ? "important" : "");
+        dest.setProperty(
+          key,
+          value,
+          importantProperties2?.has(key) ? "important" : "",
+        );
       } else {
         dest.removeProperty(key);
       }
@@ -2272,19 +2807,25 @@ function toggleNativeDragInteractions(element, enable) {
     "user-select": userSelect,
     "-ms-user-select": userSelect,
     "-webkit-user-select": userSelect,
-    "-moz-user-select": userSelect
+    "-moz-user-select": userSelect,
   });
 }
 function toggleVisibility(element, enable, importantProperties2) {
-  extendStyles(element.style, {
-    position: enable ? "" : "fixed",
-    top: enable ? "" : "0",
-    opacity: enable ? "" : "0",
-    left: enable ? "" : "-999em"
-  }, importantProperties2);
+  extendStyles(
+    element.style,
+    {
+      position: enable ? "" : "fixed",
+      top: enable ? "" : "0",
+      opacity: enable ? "" : "0",
+      left: enable ? "" : "-999em",
+    },
+    importantProperties2,
+  );
 }
 function combineTransforms(transform, initialTransform) {
-  return initialTransform && initialTransform != "none" ? transform + " " + initialTransform : transform;
+  return initialTransform && initialTransform != "none"
+    ? transform + " " + initialTransform
+    : transform;
 }
 function matchElementSize(target, sourceRect) {
   target.style.width = `${sourceRect.width}px`;
@@ -2300,15 +2841,26 @@ function parseCssTimeUnitsToMs(value) {
 }
 function getTransformTransitionDurationInMs(element) {
   const computedStyle = getComputedStyle(element);
-  const transitionedProperties = parseCssPropertyValue(computedStyle, "transition-property");
-  const property = transitionedProperties.find((prop) => prop === "transform" || prop === "all");
+  const transitionedProperties = parseCssPropertyValue(
+    computedStyle,
+    "transition-property",
+  );
+  const property = transitionedProperties.find(
+    (prop) => prop === "transform" || prop === "all",
+  );
   if (!property) {
     return 0;
   }
   const propertyIndex = transitionedProperties.indexOf(property);
-  const rawDurations = parseCssPropertyValue(computedStyle, "transition-duration");
+  const rawDurations = parseCssPropertyValue(
+    computedStyle,
+    "transition-duration",
+  );
   const rawDelays = parseCssPropertyValue(computedStyle, "transition-delay");
-  return parseCssTimeUnitsToMs(rawDurations[propertyIndex]) + parseCssTimeUnitsToMs(rawDelays[propertyIndex]);
+  return (
+    parseCssTimeUnitsToMs(rawDurations[propertyIndex]) +
+    parseCssTimeUnitsToMs(rawDelays[propertyIndex])
+  );
 }
 function parseCssPropertyValue(computedStyle, name) {
   const value = computedStyle.getPropertyValue(name);
@@ -2316,7 +2868,7 @@ function parseCssPropertyValue(computedStyle, name) {
 }
 var importantProperties = /* @__PURE__ */ new Set([
   // Needs to be important, because some `mat-table` sets `position: sticky !important`. See #22781.
-  "position"
+  "position",
 ]);
 var PreviewRef = class {
   _document;
@@ -2336,7 +2888,18 @@ var PreviewRef = class {
   get element() {
     return this._preview;
   }
-  constructor(_document, _rootElement, _direction, _initialDomRect, _previewTemplate, _previewClass, _pickupPositionOnPage, _initialTransform, _zIndex, _renderer) {
+  constructor(
+    _document,
+    _rootElement,
+    _direction,
+    _initialDomRect,
+    _previewTemplate,
+    _previewClass,
+    _pickupPositionOnPage,
+    _initialTransform,
+    _zIndex,
+    _renderer,
+  ) {
     this._document = _document;
     this._rootElement = _rootElement;
     this._direction = _direction;
@@ -2382,14 +2945,20 @@ var PreviewRef = class {
     let preview;
     if (previewTemplate && previewConfig) {
       const rootRect = previewConfig.matchSize ? this._initialDomRect : null;
-      const viewRef = previewConfig.viewContainer.createEmbeddedView(previewTemplate, previewConfig.context);
+      const viewRef = previewConfig.viewContainer.createEmbeddedView(
+        previewTemplate,
+        previewConfig.context,
+      );
       viewRef.detectChanges();
       preview = getRootNode(viewRef, this._document);
       this._previewEmbeddedView = viewRef;
       if (previewConfig.matchSize) {
         matchElementSize(preview, rootRect);
       } else {
-        preview.style.transform = getTransform(this._pickupPositionOnPage.x, this._pickupPositionOnPage.y);
+        preview.style.transform = getTransform(
+          this._pickupPositionOnPage.x,
+          this._pickupPositionOnPage.y,
+        );
       }
     } else {
       preview = deepCloneNode(this._rootElement);
@@ -2398,21 +2967,25 @@ var PreviewRef = class {
         preview.style.transform = this._initialTransform;
       }
     }
-    extendStyles(preview.style, {
-      // It's important that we disable the pointer events on the preview, because
-      // it can throw off the `document.elementFromPoint` calls in the `CdkDropList`.
-      "pointer-events": "none",
-      // If the preview has a margin, it can throw off our positioning so we reset it. The reset
-      // value for `margin-right` needs to be `auto` when opened as a popover, because our
-      // positioning is always top/left based, but native popover seems to position itself
-      // to the top/right if `<html>` or `<body>` have `dir="rtl"` (see #29604). Setting it
-      // to `auto` pushed it to the top/left corner in RTL and is a noop in LTR.
-      "margin": supportsPopover(preview) ? "0 auto 0 0" : "0",
-      "position": "fixed",
-      "top": "0",
-      "left": "0",
-      "z-index": this._zIndex + ""
-    }, importantProperties);
+    extendStyles(
+      preview.style,
+      {
+        // It's important that we disable the pointer events on the preview, because
+        // it can throw off the `document.elementFromPoint` calls in the `CdkDropList`.
+        "pointer-events": "none",
+        // If the preview has a margin, it can throw off our positioning so we reset it. The reset
+        // value for `margin-right` needs to be `auto` when opened as a popover, because our
+        // positioning is always top/left based, but native popover seems to position itself
+        // to the top/right if `<html>` or `<body>` have `dir="rtl"` (see #29604). Setting it
+        // to `auto` pushed it to the top/left corner in RTL and is a noop in LTR.
+        margin: supportsPopover(preview) ? "0 auto 0 0" : "0",
+        position: "fixed",
+        top: "0",
+        left: "0",
+        "z-index": this._zIndex + "",
+      },
+      importantProperties,
+    );
     toggleNativeDragInteractions(preview, false);
     preview.classList.add("cdk-drag-preview");
     preview.setAttribute("popover", "manual");
@@ -2431,19 +3004,19 @@ function supportsPopover(element) {
   return "showPopover" in element;
 }
 var passiveEventListenerOptions = {
-  passive: true
+  passive: true,
 };
 var activeEventListenerOptions = {
-  passive: false
+  passive: false,
 };
 var activeCapturingEventOptions$1 = {
   passive: false,
-  capture: true
+  capture: true,
 };
 var MOUSE_EVENT_IGNORE_TIME = 800;
 var dragImportantProperties = /* @__PURE__ */ new Set([
   // Needs to be important, because some `mat-table` sets `position: sticky !important`. See #22781.
-  "position"
+  "position",
 ]);
 var DragRef = class {
   _config;
@@ -2479,12 +3052,12 @@ var DragRef = class {
    */
   _passiveTransform = {
     x: 0,
-    y: 0
+    y: 0,
   };
   /** CSS `transform` that is applied to the element while it's being dragged. */
   _activeTransform = {
     x: 0,
-    y: 0
+    y: 0,
   };
   /** Inline `transform` value that the element had before the first dragging sequence. */
   _initialTransform;
@@ -2585,13 +3158,17 @@ var DragRef = class {
   scale = 1;
   /** Whether starting to drag this element is disabled. */
   get disabled() {
-    return this._disabled || !!(this._dropContainer && this._dropContainer.disabled);
+    return (
+      this._disabled || !!(this._dropContainer && this._dropContainer.disabled)
+    );
   }
   set disabled(value) {
     if (value !== this._disabled) {
       this._disabled = value;
       this._toggleNativeDragInteractions();
-      this._handles.forEach((handle) => toggleNativeDragInteractions(handle, value));
+      this._handles.forEach((handle) =>
+        toggleNativeDragInteractions(handle, value),
+      );
     }
   }
   _disabled = false;
@@ -2623,7 +3200,15 @@ var DragRef = class {
    * Should return a point describing where the item should be rendered.
    */
   constrainPosition;
-  constructor(element, _config, _document, _ngZone, _viewportRuler, _dragDropRegistry, _renderer) {
+  constructor(
+    element,
+    _config,
+    _document,
+    _ngZone,
+    _viewportRuler,
+    _dragDropRegistry,
+    _renderer,
+  ) {
     this._config = _config;
     this._document = _document;
     this._ngZone = _ngZone;
@@ -2650,12 +3235,16 @@ var DragRef = class {
    * While dragging this is the placeholder, otherwise it's the root element.
    */
   getVisibleElement() {
-    return this.isDragging() ? this.getPlaceholderElement() : this.getRootElement();
+    return this.isDragging()
+      ? this.getPlaceholderElement()
+      : this.getRootElement();
   }
   /** Registers the handles that can be used to drag the element. */
   withHandles(handles) {
     this._handles = handles.map((handle) => coerceElement(handle));
-    this._handles.forEach((handle) => toggleNativeDragInteractions(handle, this.disabled));
+    this._handles.forEach((handle) =>
+      toggleNativeDragInteractions(handle, this.disabled),
+    );
     this._toggleNativeDragInteractions();
     const disabledHandles = /* @__PURE__ */ new Set();
     this._disabledHandles.forEach((handle) => {
@@ -2691,11 +3280,36 @@ var DragRef = class {
     const element = coerceElement(rootElement);
     if (element !== this._rootElement) {
       this._removeRootElementListeners();
-      this._rootElementCleanups = this._ngZone.runOutsideAngular(() => [_bindEventWithOptions(this._renderer, element, "mousedown", this._pointerDown, activeEventListenerOptions), _bindEventWithOptions(this._renderer, element, "touchstart", this._pointerDown, passiveEventListenerOptions), _bindEventWithOptions(this._renderer, element, "dragstart", this._nativeDragStart, activeEventListenerOptions)]);
+      this._rootElementCleanups = this._ngZone.runOutsideAngular(() => [
+        _bindEventWithOptions(
+          this._renderer,
+          element,
+          "mousedown",
+          this._pointerDown,
+          activeEventListenerOptions,
+        ),
+        _bindEventWithOptions(
+          this._renderer,
+          element,
+          "touchstart",
+          this._pointerDown,
+          passiveEventListenerOptions,
+        ),
+        _bindEventWithOptions(
+          this._renderer,
+          element,
+          "dragstart",
+          this._nativeDragStart,
+          activeEventListenerOptions,
+        ),
+      ]);
       this._initialTransform = void 0;
       this._rootElement = element;
     }
-    if (typeof SVGElement !== "undefined" && this._rootElement instanceof SVGElement) {
+    if (
+      typeof SVGElement !== "undefined" &&
+      this._rootElement instanceof SVGElement
+    ) {
       this._ownerSVGElement = this._rootElement.ownerSVGElement;
     }
     return this;
@@ -2704,10 +3318,14 @@ var DragRef = class {
    * Element to which the draggable's position will be constrained.
    */
   withBoundaryElement(boundaryElement) {
-    this._boundaryElement = boundaryElement ? coerceElement(boundaryElement) : null;
+    this._boundaryElement = boundaryElement
+      ? coerceElement(boundaryElement)
+      : null;
     this._resizeSubscription.unsubscribe();
     if (boundaryElement) {
-      this._resizeSubscription = this._viewportRuler.change(10).subscribe(() => this._containInsideBoundaryOnResize());
+      this._resizeSubscription = this._viewportRuler
+        .change(10)
+        .subscribe(() => this._containInsideBoundaryOnResize());
     }
     return this;
   }
@@ -2740,22 +3358,31 @@ var DragRef = class {
     this._dropContainer = void 0;
     this._resizeSubscription.unsubscribe();
     this._parentPositions.clear();
-    this._boundaryElement = this._rootElement = this._ownerSVGElement = this._placeholderTemplate = this._previewTemplate = this._anchor = this._parentDragRef = null;
+    this._boundaryElement =
+      this._rootElement =
+      this._ownerSVGElement =
+      this._placeholderTemplate =
+      this._previewTemplate =
+      this._anchor =
+      this._parentDragRef =
+        null;
   }
   /** Checks whether the element is currently being dragged. */
   isDragging() {
-    return this._hasStartedDragging() && this._dragDropRegistry.isDragging(this);
+    return (
+      this._hasStartedDragging() && this._dragDropRegistry.isDragging(this)
+    );
   }
   /** Resets a standalone drag item to its initial position. */
   reset() {
     this._rootElement.style.transform = this._initialTransform || "";
     this._activeTransform = {
       x: 0,
-      y: 0
+      y: 0,
     };
     this._passiveTransform = {
       x: 0,
-      y: 0
+      y: 0,
     };
   }
   /**
@@ -2763,7 +3390,10 @@ var DragRef = class {
    * @param handle Handle element that should be disabled.
    */
   disableHandle(handle) {
-    if (!this._disabledHandles.has(handle) && this._handles.indexOf(handle) > -1) {
+    if (
+      !this._disabledHandles.has(handle) &&
+      this._handles.indexOf(handle) > -1
+    ) {
       this._disabledHandles.add(handle);
       toggleNativeDragInteractions(handle, true);
     }
@@ -2791,10 +3421,12 @@ var DragRef = class {
    * Gets the current position in pixels the draggable outside of a drop container.
    */
   getFreeDragPosition() {
-    const position = this.isDragging() ? this._activeTransform : this._passiveTransform;
+    const position = this.isDragging()
+      ? this._activeTransform
+      : this._passiveTransform;
     return {
       x: position.x,
-      y: position.y
+      y: position.y,
     };
   }
   /**
@@ -2804,7 +3436,7 @@ var DragRef = class {
   setFreeDragPosition(value) {
     this._activeTransform = {
       x: 0,
-      y: 0
+      y: 0,
     };
     this._passiveTransform.x = value.x;
     this._passiveTransform.y = value.y;
@@ -2825,7 +3457,10 @@ var DragRef = class {
   _sortFromLastPointerPosition() {
     const position = this._lastKnownPointerPosition;
     if (position && this._dropContainer) {
-      this._updateActiveDropContainer(this._getConstrainedPointerPosition(position), position);
+      this._updateActiveDropContainer(
+        this._getConstrainedPointerPosition(position),
+        position,
+      );
     }
   }
   /** Unsubscribes from the global subscriptions. */
@@ -2852,7 +3487,11 @@ var DragRef = class {
     this.beforeStarted.next();
     if (this._handles.length) {
       const targetHandle = this._getTargetHandle(event);
-      if (targetHandle && !this._disabledHandles.has(targetHandle) && !this.disabled) {
+      if (
+        targetHandle &&
+        !this._disabledHandles.has(targetHandle) &&
+        !this.disabled
+      ) {
         this._initializeDragSequence(targetHandle, event);
       }
     } else if (!this.disabled) {
@@ -2863,17 +3502,26 @@ var DragRef = class {
   _pointerMove = (event) => {
     const pointerPosition = this._getPointerPositionOnPage(event);
     if (!this._hasStartedDragging()) {
-      const distanceX = Math.abs(pointerPosition.x - this._pickupPositionOnPage.x);
-      const distanceY = Math.abs(pointerPosition.y - this._pickupPositionOnPage.y);
-      const isOverThreshold = distanceX + distanceY >= this._config.dragStartThreshold;
+      const distanceX = Math.abs(
+        pointerPosition.x - this._pickupPositionOnPage.x,
+      );
+      const distanceY = Math.abs(
+        pointerPosition.y - this._pickupPositionOnPage.y,
+      );
+      const isOverThreshold =
+        distanceX + distanceY >= this._config.dragStartThreshold;
       if (isOverThreshold) {
-        const isDelayElapsed = Date.now() >= this._dragStartTime + this._getDragStartDelay(event);
+        const isDelayElapsed =
+          Date.now() >= this._dragStartTime + this._getDragStartDelay(event);
         const container = this._dropContainer;
         if (!isDelayElapsed) {
           this._endDragSequence(event);
           return;
         }
-        if (!container || !container.isDragging() && !container.isReceiving()) {
+        if (
+          !container ||
+          (!container.isDragging() && !container.isReceiving())
+        ) {
           if (event.cancelable) {
             event.preventDefault();
           }
@@ -2886,17 +3534,25 @@ var DragRef = class {
     if (event.cancelable) {
       event.preventDefault();
     }
-    const constrainedPointerPosition = this._getConstrainedPointerPosition(pointerPosition);
+    const constrainedPointerPosition =
+      this._getConstrainedPointerPosition(pointerPosition);
     this._hasMoved = true;
     this._lastKnownPointerPosition = pointerPosition;
     this._updatePointerDirectionDelta(constrainedPointerPosition);
     if (this._dropContainer) {
-      this._updateActiveDropContainer(constrainedPointerPosition, pointerPosition);
+      this._updateActiveDropContainer(
+        constrainedPointerPosition,
+        pointerPosition,
+      );
     } else {
-      const offset = this.constrainPosition ? this._initialDomRect : this._pickupPositionOnPage;
+      const offset = this.constrainPosition
+        ? this._initialDomRect
+        : this._pickupPositionOnPage;
       const activeTransform = this._activeTransform;
-      activeTransform.x = constrainedPointerPosition.x - offset.x + this._passiveTransform.x;
-      activeTransform.y = constrainedPointerPosition.y - offset.y + this._passiveTransform.y;
+      activeTransform.x =
+        constrainedPointerPosition.x - offset.x + this._passiveTransform.x;
+      activeTransform.y =
+        constrainedPointerPosition.y - offset.y + this._passiveTransform.y;
       this._applyRootElementTransform(activeTransform.x, activeTransform.y);
     }
     if (this._moveEvents.observers.length) {
@@ -2906,7 +3562,7 @@ var DragRef = class {
           pointerPosition: constrainedPointerPosition,
           event,
           distance: this._getDragDistance(constrainedPointerPosition),
-          delta: this._pointerDirectionDelta
+          delta: this._pointerDirectionDelta,
         });
       });
     }
@@ -2927,14 +3583,15 @@ var DragRef = class {
     this._dragDropRegistry.stopDragging(this);
     this._toggleNativeDragInteractions();
     if (this._handles) {
-      this._rootElement.style.webkitTapHighlightColor = this._rootElementTapHighlight;
+      this._rootElement.style.webkitTapHighlightColor =
+        this._rootElementTapHighlight;
     }
     if (!this._hasStartedDragging()) {
       return;
     }
     this.released.next({
       source: this,
-      event
+      event,
     });
     if (this._dropContainer) {
       this._dropContainer._stopScrolling();
@@ -2952,7 +3609,7 @@ var DragRef = class {
           source: this,
           distance: this._getDragDistance(pointerPosition),
           dropPoint: pointerPosition,
-          event
+          event,
         });
       });
       this._cleanupCachedDimensions();
@@ -2969,23 +3626,49 @@ var DragRef = class {
     const dropContainer = this._dropContainer;
     if (shadowRoot) {
       this._ngZone.runOutsideAngular(() => {
-        this._cleanupShadowRootSelectStart = _bindEventWithOptions(this._renderer, shadowRoot, "selectstart", shadowDomSelectStart, activeCapturingEventOptions$1);
+        this._cleanupShadowRootSelectStart = _bindEventWithOptions(
+          this._renderer,
+          shadowRoot,
+          "selectstart",
+          shadowDomSelectStart,
+          activeCapturingEventOptions$1,
+        );
       });
     }
     if (dropContainer) {
       const element = this._rootElement;
       const parent = element.parentNode;
-      const placeholder = this._placeholder = this._createPlaceholderElement();
-      const anchor = this._anchor = this._anchor || this._document.createComment(typeof ngDevMode === "undefined" || ngDevMode ? "cdk-drag-anchor" : "");
+      const placeholder = (this._placeholder =
+        this._createPlaceholderElement());
+      const anchor = (this._anchor =
+        this._anchor ||
+        this._document.createComment(
+          typeof ngDevMode === "undefined" || ngDevMode
+            ? "cdk-drag-anchor"
+            : "",
+        ));
       parent.insertBefore(anchor, element);
       this._initialTransform = element.style.transform || "";
-      this._preview = new PreviewRef(this._document, this._rootElement, this._direction, this._initialDomRect, this._previewTemplate || null, this.previewClass || null, this._pickupPositionOnPage, this._initialTransform, this._config.zIndex || 1e3, this._renderer);
+      this._preview = new PreviewRef(
+        this._document,
+        this._rootElement,
+        this._direction,
+        this._initialDomRect,
+        this._previewTemplate || null,
+        this.previewClass || null,
+        this._pickupPositionOnPage,
+        this._initialTransform,
+        this._config.zIndex || 1e3,
+        this._renderer,
+      );
       this._preview.attach(this._getPreviewInsertionPoint(parent, shadowRoot));
       toggleVisibility(element, false, dragImportantProperties);
-      this._document.body.appendChild(parent.replaceChild(placeholder, element));
+      this._document.body.appendChild(
+        parent.replaceChild(placeholder, element),
+      );
       this.started.next({
         source: this,
-        event
+        event,
       });
       dropContainer.start();
       this._initialContainer = dropContainer;
@@ -2993,11 +3676,13 @@ var DragRef = class {
     } else {
       this.started.next({
         source: this,
-        event
+        event,
       });
       this._initialContainer = this._initialIndex = void 0;
     }
-    this._parentPositions.cache(dropContainer ? dropContainer.getScrollableParents() : []);
+    this._parentPositions.cache(
+      dropContainer ? dropContainer.getScrollableParents() : [],
+    );
   }
   /**
    * Sets up the different variables and subscriptions
@@ -3014,12 +3699,22 @@ var DragRef = class {
     const isAuxiliaryMouseButton = !isTouchSequence && event.button !== 0;
     const rootElement = this._rootElement;
     const target = _getEventTarget(event);
-    const isSyntheticEvent = !isTouchSequence && this._lastTouchEventTime && this._lastTouchEventTime + MOUSE_EVENT_IGNORE_TIME > Date.now();
-    const isFakeEvent = isTouchSequence ? isFakeTouchstartFromScreenReader(event) : isFakeMousedownFromScreenReader(event);
+    const isSyntheticEvent =
+      !isTouchSequence &&
+      this._lastTouchEventTime &&
+      this._lastTouchEventTime + MOUSE_EVENT_IGNORE_TIME > Date.now();
+    const isFakeEvent = isTouchSequence
+      ? isFakeTouchstartFromScreenReader(event)
+      : isFakeMousedownFromScreenReader(event);
     if (target && target.draggable && event.type === "mousedown") {
       event.preventDefault();
     }
-    if (isDragging || isAuxiliaryMouseButton || isSyntheticEvent || isFakeEvent) {
+    if (
+      isDragging ||
+      isAuxiliaryMouseButton ||
+      isSyntheticEvent ||
+      isFakeEvent
+    ) {
       return;
     }
     if (this._handles.length) {
@@ -3031,25 +3726,40 @@ var DragRef = class {
     this._hasStartedDragging.set(this._hasMoved);
     this._removeListeners();
     this._initialDomRect = this._rootElement.getBoundingClientRect();
-    this._pointerMoveSubscription = this._dragDropRegistry.pointerMove.subscribe(this._pointerMove);
-    this._pointerUpSubscription = this._dragDropRegistry.pointerUp.subscribe(this._pointerUp);
-    this._scrollSubscription = this._dragDropRegistry.scrolled(this._getShadowRoot()).subscribe((scrollEvent) => this._updateOnScroll(scrollEvent));
+    this._pointerMoveSubscription =
+      this._dragDropRegistry.pointerMove.subscribe(this._pointerMove);
+    this._pointerUpSubscription = this._dragDropRegistry.pointerUp.subscribe(
+      this._pointerUp,
+    );
+    this._scrollSubscription = this._dragDropRegistry
+      .scrolled(this._getShadowRoot())
+      .subscribe((scrollEvent) => this._updateOnScroll(scrollEvent));
     if (this._boundaryElement) {
       this._boundaryRect = getMutableClientRect(this._boundaryElement);
     }
     const previewTemplate = this._previewTemplate;
-    this._pickupPositionInElement = previewTemplate && previewTemplate.template && !previewTemplate.matchSize ? {
-      x: 0,
-      y: 0
-    } : this._getPointerPositionInElement(this._initialDomRect, referenceElement, event);
-    const pointerPosition = this._pickupPositionOnPage = this._lastKnownPointerPosition = this._getPointerPositionOnPage(event);
+    this._pickupPositionInElement =
+      previewTemplate && previewTemplate.template && !previewTemplate.matchSize
+        ? {
+            x: 0,
+            y: 0,
+          }
+        : this._getPointerPositionInElement(
+            this._initialDomRect,
+            referenceElement,
+            event,
+          );
+    const pointerPosition =
+      (this._pickupPositionOnPage =
+      this._lastKnownPointerPosition =
+        this._getPointerPositionOnPage(event));
     this._pointerDirectionDelta = {
       x: 0,
-      y: 0
+      y: 0,
     };
     this._pointerPositionAtLastDirectionChange = {
       x: pointerPosition.x,
-      y: pointerPosition.y
+      y: pointerPosition.y,
     };
     this._dragStartTime = Date.now();
     this._dragDropRegistry.startDragging(this, event);
@@ -3060,18 +3770,25 @@ var DragRef = class {
     this._anchor.parentNode.replaceChild(this._rootElement, this._anchor);
     this._destroyPreview();
     this._destroyPlaceholder();
-    this._initialDomRect = this._boundaryRect = this._previewRect = this._initialTransform = void 0;
+    this._initialDomRect =
+      this._boundaryRect =
+      this._previewRect =
+      this._initialTransform =
+        void 0;
     this._ngZone.run(() => {
       const container = this._dropContainer;
       const currentIndex = container.getItemIndex(this);
       const pointerPosition = this._getPointerPositionOnPage(event);
       const distance = this._getDragDistance(pointerPosition);
-      const isPointerOverContainer = container._isOverContainer(pointerPosition.x, pointerPosition.y);
+      const isPointerOverContainer = container._isOverContainer(
+        pointerPosition.x,
+        pointerPosition.y,
+      );
       this.ended.next({
         source: this,
         distance,
         dropPoint: pointerPosition,
-        event
+        event,
       });
       this.dropped.next({
         item: this,
@@ -3082,9 +3799,18 @@ var DragRef = class {
         isPointerOverContainer,
         distance,
         dropPoint: pointerPosition,
-        event
+        event,
       });
-      container.drop(this, currentIndex, this._initialIndex, this._initialContainer, isPointerOverContainer, distance, pointerPosition, event);
+      container.drop(
+        this,
+        currentIndex,
+        this._initialIndex,
+        this._initialContainer,
+        isPointerOverContainer,
+        distance,
+        pointerPosition,
+        event,
+      );
       this._dropContainer = this._initialContainer;
     });
   }
@@ -3092,32 +3818,41 @@ var DragRef = class {
    * Updates the item's position in its drop container, or moves it
    * into a new one, depending on its current drag position.
    */
-  _updateActiveDropContainer({
-    x,
-    y
-  }, {
-    x: rawX,
-    y: rawY
-  }) {
-    let newContainer = this._initialContainer._getSiblingContainerFromPosition(this, x, y);
-    if (!newContainer && this._dropContainer !== this._initialContainer && this._initialContainer._isOverContainer(x, y)) {
+  _updateActiveDropContainer({ x, y }, { x: rawX, y: rawY }) {
+    let newContainer = this._initialContainer._getSiblingContainerFromPosition(
+      this,
+      x,
+      y,
+    );
+    if (
+      !newContainer &&
+      this._dropContainer !== this._initialContainer &&
+      this._initialContainer._isOverContainer(x, y)
+    ) {
       newContainer = this._initialContainer;
     }
     if (newContainer && newContainer !== this._dropContainer) {
       this._ngZone.run(() => {
         this.exited.next({
           item: this,
-          container: this._dropContainer
+          container: this._dropContainer,
         });
         this._dropContainer.exit(this);
         this._dropContainer = newContainer;
-        this._dropContainer.enter(this, x, y, newContainer === this._initialContainer && // If we're re-entering the initial container and sorting is disabled,
-        // put item the into its starting index to begin with.
-        newContainer.sortingDisabled ? this._initialIndex : void 0);
+        this._dropContainer.enter(
+          this,
+          x,
+          y,
+          newContainer === this._initialContainer && // If we're re-entering the initial container and sorting is disabled,
+            // put item the into its starting index to begin with.
+            newContainer.sortingDisabled
+            ? this._initialIndex
+            : void 0,
+        );
         this.entered.next({
           item: this,
           container: newContainer,
-          currentIndex: newContainer.getItemIndex(this)
+          currentIndex: newContainer.getItemIndex(this),
         });
       });
     }
@@ -3127,7 +3862,10 @@ var DragRef = class {
       if (this.constrainPosition) {
         this._applyPreviewTransform(x, y);
       } else {
-        this._applyPreviewTransform(x - this._pickupPositionInElement.x, y - this._pickupPositionInElement.y);
+        this._applyPreviewTransform(
+          x - this._pickupPositionInElement.x,
+          y - this._pickupPositionInElement.y,
+        );
       }
     }
   }
@@ -3149,24 +3887,37 @@ var DragRef = class {
     return this._ngZone.runOutsideAngular(() => {
       return new Promise((resolve) => {
         const handler = (event) => {
-          if (!event || this._preview && _getEventTarget(event) === this._preview.element && event.propertyName === "transform") {
+          if (
+            !event ||
+            (this._preview &&
+              _getEventTarget(event) === this._preview.element &&
+              event.propertyName === "transform")
+          ) {
             cleanupListener();
             resolve();
             clearTimeout(timeout);
           }
         };
         const timeout = setTimeout(handler, duration * 1.5);
-        const cleanupListener = this._preview.addEventListener("transitionend", handler);
+        const cleanupListener = this._preview.addEventListener(
+          "transitionend",
+          handler,
+        );
       });
     });
   }
   /** Creates an element that will be shown instead of the current element while dragging. */
   _createPlaceholderElement() {
     const placeholderConfig = this._placeholderTemplate;
-    const placeholderTemplate = placeholderConfig ? placeholderConfig.template : null;
+    const placeholderTemplate = placeholderConfig
+      ? placeholderConfig.template
+      : null;
     let placeholder;
     if (placeholderTemplate) {
-      this._placeholderRef = placeholderConfig.viewContainer.createEmbeddedView(placeholderTemplate, placeholderConfig.context);
+      this._placeholderRef = placeholderConfig.viewContainer.createEmbeddedView(
+        placeholderTemplate,
+        placeholderConfig.context,
+      );
       this._placeholderRef.detectChanges();
       placeholder = getRootNode(this._placeholderRef, this._document);
     } else {
@@ -3182,33 +3933,37 @@ var DragRef = class {
    * @param event Event that initiated the dragging.
    */
   _getPointerPositionInElement(elementRect, referenceElement, event) {
-    const handleElement = referenceElement === this._rootElement ? null : referenceElement;
-    const referenceRect = handleElement ? handleElement.getBoundingClientRect() : elementRect;
+    const handleElement =
+      referenceElement === this._rootElement ? null : referenceElement;
+    const referenceRect = handleElement
+      ? handleElement.getBoundingClientRect()
+      : elementRect;
     const point = isTouchEvent(event) ? event.targetTouches[0] : event;
     const scrollPosition = this._getViewportScrollPosition();
     const x = point.pageX - referenceRect.left - scrollPosition.left;
     const y = point.pageY - referenceRect.top - scrollPosition.top;
     return {
       x: referenceRect.left - elementRect.left + x,
-      y: referenceRect.top - elementRect.top + y
+      y: referenceRect.top - elementRect.top + y,
     };
   }
   /** Determines the point of the page that was touched by the user. */
   _getPointerPositionOnPage(event) {
     const scrollPosition = this._getViewportScrollPosition();
-    const point = isTouchEvent(event) ? (
-      // `touches` will be empty for start/end events so we have to fall back to `changedTouches`.
-      // Also note that on real devices we're guaranteed for either `touches` or `changedTouches`
-      // to have a value, but Firefox in device emulation mode has a bug where both can be empty
-      // for `touchstart` and `touchend` so we fall back to a dummy object in order to avoid
-      // throwing an error. The value returned here will be incorrect, but since this only
-      // breaks inside a developer tool and the value is only used for secondary information,
-      // we can get away with it. See https://bugzilla.mozilla.org/show_bug.cgi?id=1615824.
-      event.touches[0] || event.changedTouches[0] || {
-        pageX: 0,
-        pageY: 0
-      }
-    ) : event;
+    const point = isTouchEvent(event)
+      ? // `touches` will be empty for start/end events so we have to fall back to `changedTouches`.
+        // Also note that on real devices we're guaranteed for either `touches` or `changedTouches`
+        // to have a value, but Firefox in device emulation mode has a bug where both can be empty
+        // for `touchstart` and `touchend` so we fall back to a dummy object in order to avoid
+        // throwing an error. The value returned here will be incorrect, but since this only
+        // breaks inside a developer tool and the value is only used for secondary information,
+        // we can get away with it. See https://bugzilla.mozilla.org/show_bug.cgi?id=1615824.
+        event.touches[0] ||
+        event.changedTouches[0] || {
+          pageX: 0,
+          pageY: 0,
+        }
+      : event;
     const x = point.pageX - scrollPosition.left;
     const y = point.pageY - scrollPosition.top;
     if (this._ownerSVGElement) {
@@ -3222,34 +3977,41 @@ var DragRef = class {
     }
     return {
       x,
-      y
+      y,
     };
   }
   /** Gets the pointer position on the page, accounting for any position constraints. */
   _getConstrainedPointerPosition(point) {
-    const dropContainerLock = this._dropContainer ? this._dropContainer.lockAxis : null;
-    let {
-      x,
-      y
-    } = this.constrainPosition ? this.constrainPosition(point, this, this._initialDomRect, this._pickupPositionInElement) : point;
+    const dropContainerLock = this._dropContainer
+      ? this._dropContainer.lockAxis
+      : null;
+    let { x, y } = this.constrainPosition
+      ? this.constrainPosition(
+          point,
+          this,
+          this._initialDomRect,
+          this._pickupPositionInElement,
+        )
+      : point;
     if (this.lockAxis === "x" || dropContainerLock === "x") {
-      y = this._pickupPositionOnPage.y - (this.constrainPosition ? this._pickupPositionInElement.y : 0);
+      y =
+        this._pickupPositionOnPage.y -
+        (this.constrainPosition ? this._pickupPositionInElement.y : 0);
     } else if (this.lockAxis === "y" || dropContainerLock === "y") {
-      x = this._pickupPositionOnPage.x - (this.constrainPosition ? this._pickupPositionInElement.x : 0);
+      x =
+        this._pickupPositionOnPage.x -
+        (this.constrainPosition ? this._pickupPositionInElement.x : 0);
     }
     if (this._boundaryRect) {
-      const {
-        x: pickupX,
-        y: pickupY
-      } = !this.constrainPosition ? this._pickupPositionInElement : {
-        x: 0,
-        y: 0
-      };
+      const { x: pickupX, y: pickupY } = !this.constrainPosition
+        ? this._pickupPositionInElement
+        : {
+            x: 0,
+            y: 0,
+          };
       const boundaryRect = this._boundaryRect;
-      const {
-        width: previewWidth,
-        height: previewHeight
-      } = this._getPreviewRect();
+      const { width: previewWidth, height: previewHeight } =
+        this._getPreviewRect();
       const minY = boundaryRect.top + pickupY;
       const maxY = boundaryRect.bottom - (previewHeight - pickupY);
       const minX = boundaryRect.left + pickupX;
@@ -3259,15 +4021,12 @@ var DragRef = class {
     }
     return {
       x,
-      y
+      y,
     };
   }
   /** Updates the current drag delta, based on the user's current pointer position on the page. */
   _updatePointerDirectionDelta(pointerPositionOnPage) {
-    const {
-      x,
-      y
-    } = pointerPositionOnPage;
+    const { x, y } = pointerPositionOnPage;
     const delta = this._pointerDirectionDelta;
     const positionSinceLastChange = this._pointerPositionAtLastDirectionChange;
     const changeX = Math.abs(x - positionSinceLastChange.x);
@@ -3308,7 +4067,8 @@ var DragRef = class {
     const transform = getTransform(x * scale, y * scale);
     const styles = this._rootElement.style;
     if (this._initialTransform == null) {
-      this._initialTransform = styles.transform && styles.transform != "none" ? styles.transform : "";
+      this._initialTransform =
+        styles.transform && styles.transform != "none" ? styles.transform : "";
     }
     styles.transform = combineTransforms(transform, this._initialTransform);
   }
@@ -3318,7 +4078,9 @@ var DragRef = class {
    * @param y New transform value along the Y axis.
    */
   _applyPreviewTransform(x, y) {
-    const initialTransform = this._previewTemplate?.template ? void 0 : this._initialTransform;
+    const initialTransform = this._previewTemplate?.template
+      ? void 0
+      : this._initialTransform;
     const transform = getTransform(x, y);
     this._preview.setTransform(combineTransforms(transform, initialTransform));
   }
@@ -3331,12 +4093,12 @@ var DragRef = class {
     if (pickupPosition) {
       return {
         x: currentPosition.x - pickupPosition.x,
-        y: currentPosition.y - pickupPosition.y
+        y: currentPosition.y - pickupPosition.y,
       };
     }
     return {
       x: 0,
-      y: 0
+      y: 0,
     };
   }
   /** Cleans up any cached element dimensions that we don't need after dragging has stopped. */
@@ -3349,16 +4111,16 @@ var DragRef = class {
    * If not, the position is adjusted so that the element fits again.
    */
   _containInsideBoundaryOnResize() {
-    let {
-      x,
-      y
-    } = this._passiveTransform;
-    if (x === 0 && y === 0 || this.isDragging() || !this._boundaryElement) {
+    let { x, y } = this._passiveTransform;
+    if ((x === 0 && y === 0) || this.isDragging() || !this._boundaryElement) {
       return;
     }
     const elementRect = this._rootElement.getBoundingClientRect();
     const boundaryRect = this._boundaryElement.getBoundingClientRect();
-    if (boundaryRect.width === 0 && boundaryRect.height === 0 || elementRect.width === 0 && elementRect.height === 0) {
+    if (
+      (boundaryRect.width === 0 && boundaryRect.height === 0) ||
+      (elementRect.width === 0 && elementRect.height === 0)
+    ) {
       return;
     }
     const leftOverflow = boundaryRect.left - elementRect.left;
@@ -3388,7 +4150,7 @@ var DragRef = class {
     if (x !== this._passiveTransform.x || y !== this._passiveTransform.y) {
       this.setFreeDragPosition({
         y,
-        x
+        x,
       });
     }
   }
@@ -3407,21 +4169,35 @@ var DragRef = class {
     const scrollDifference = this._parentPositions.handleScroll(event);
     if (scrollDifference) {
       const target = _getEventTarget(event);
-      if (this._boundaryRect && target !== this._boundaryElement && target.contains(this._boundaryElement)) {
-        adjustDomRect(this._boundaryRect, scrollDifference.top, scrollDifference.left);
+      if (
+        this._boundaryRect &&
+        target !== this._boundaryElement &&
+        target.contains(this._boundaryElement)
+      ) {
+        adjustDomRect(
+          this._boundaryRect,
+          scrollDifference.top,
+          scrollDifference.left,
+        );
       }
       this._pickupPositionOnPage.x += scrollDifference.left;
       this._pickupPositionOnPage.y += scrollDifference.top;
       if (!this._dropContainer) {
         this._activeTransform.x -= scrollDifference.left;
         this._activeTransform.y -= scrollDifference.top;
-        this._applyRootElementTransform(this._activeTransform.x, this._activeTransform.y);
+        this._applyRootElementTransform(
+          this._activeTransform.x,
+          this._activeTransform.y,
+        );
       }
     }
   }
   /** Gets the scroll position of the viewport. */
   _getViewportScrollPosition() {
-    return this._parentPositions.positions.get(this._document)?.scrollPosition || this._parentPositions.getViewportScrollPosition();
+    return (
+      this._parentPositions.positions.get(this._document)?.scrollPosition ||
+      this._parentPositions.getViewportScrollPosition()
+    );
   }
   /**
    * Lazily resolves and returns the shadow root of the element. We do this in a function, rather
@@ -3443,14 +4219,26 @@ var DragRef = class {
     }
     if (previewContainer === "global") {
       const documentRef = this._document;
-      return shadowRoot || documentRef.fullscreenElement || documentRef.webkitFullscreenElement || documentRef.mozFullScreenElement || documentRef.msFullscreenElement || documentRef.body;
+      return (
+        shadowRoot ||
+        documentRef.fullscreenElement ||
+        documentRef.webkitFullscreenElement ||
+        documentRef.mozFullScreenElement ||
+        documentRef.msFullscreenElement ||
+        documentRef.body
+      );
     }
     return coerceElement(previewContainer);
   }
   /** Lazily resolves and returns the dimensions of the preview. */
   _getPreviewRect() {
-    if (!this._previewRect || !this._previewRect.width && !this._previewRect.height) {
-      this._previewRect = this._preview ? this._preview.getBoundingClientRect() : this._initialDomRect;
+    if (
+      !this._previewRect ||
+      (!this._previewRect.width && !this._previewRect.height)
+    ) {
+      this._previewRect = this._preview
+        ? this._preview.getBoundingClientRect()
+        : this._initialDomRect;
     }
     return this._previewRect;
   }
@@ -3458,7 +4246,11 @@ var DragRef = class {
   _nativeDragStart = (event) => {
     if (this._handles.length) {
       const targetHandle = this._getTargetHandle(event);
-      if (targetHandle && !this._disabledHandles.has(targetHandle) && !this.disabled) {
+      if (
+        targetHandle &&
+        !this._disabledHandles.has(targetHandle) &&
+        !this.disabled
+      ) {
         event.preventDefault();
       }
     } else if (!this.disabled) {
@@ -3468,7 +4260,10 @@ var DragRef = class {
   /** Gets a handle that is the target of an event. */
   _getTargetHandle(event) {
     return this._handles.find((handle) => {
-      return event.target && (event.target === handle || handle.contains(event.target));
+      return (
+        event.target &&
+        (event.target === handle || handle.contains(event.target))
+      );
     });
   }
 };
@@ -3494,7 +4289,12 @@ function moveItemInArray(array, fromIndex, toIndex) {
   }
   array[to] = target;
 }
-function transferArrayItem(currentArray, targetArray, currentIndex, targetIndex) {
+function transferArrayItem(
+  currentArray,
+  targetArray,
+  currentIndex,
+  targetIndex,
+) {
   const from = clamp(currentIndex, currentArray.length - 1);
   const to = clamp(targetIndex, targetArray.length);
   if (currentArray.length) {
@@ -3539,7 +4339,7 @@ var SingleAxisSortStrategy = class {
   _previousSwap = {
     drag: null,
     delta: 0,
-    overlaps: false
+    overlaps: false,
   };
   /**
    * To be called when the drag sequence starts.
@@ -3557,18 +4357,33 @@ var SingleAxisSortStrategy = class {
    */
   sort(item, pointerX, pointerY, pointerDelta) {
     const siblings = this._itemPositions;
-    const newIndex = this._getItemIndexFromPointerPosition(item, pointerX, pointerY, pointerDelta);
+    const newIndex = this._getItemIndexFromPointerPosition(
+      item,
+      pointerX,
+      pointerY,
+      pointerDelta,
+    );
     if (newIndex === -1 && siblings.length > 0) {
       return null;
     }
     const isHorizontal = this.orientation === "horizontal";
-    const currentIndex = siblings.findIndex((currentItem) => currentItem.drag === item);
+    const currentIndex = siblings.findIndex(
+      (currentItem) => currentItem.drag === item,
+    );
     const siblingAtNewPosition = siblings[newIndex];
     const currentPosition = siblings[currentIndex].clientRect;
     const newPosition = siblingAtNewPosition.clientRect;
     const delta = currentIndex > newIndex ? 1 : -1;
-    const itemOffset = this._getItemOffsetPx(currentPosition, newPosition, delta);
-    const siblingOffset = this._getSiblingOffsetPx(currentIndex, siblings, delta);
+    const itemOffset = this._getItemOffsetPx(
+      currentPosition,
+      newPosition,
+      delta,
+    );
+    const siblingOffset = this._getSiblingOffsetPx(
+      currentIndex,
+      siblings,
+      delta,
+    );
     const oldOrder = siblings.slice();
     moveItemInArray(siblings, currentIndex, newIndex);
     siblings.forEach((sibling, index) => {
@@ -3577,23 +4392,37 @@ var SingleAxisSortStrategy = class {
       }
       const isDraggedItem = sibling.drag === item;
       const offset = isDraggedItem ? itemOffset : siblingOffset;
-      const elementToOffset = isDraggedItem ? item.getPlaceholderElement() : sibling.drag.getRootElement();
+      const elementToOffset = isDraggedItem
+        ? item.getPlaceholderElement()
+        : sibling.drag.getRootElement();
       sibling.offset += offset;
-      const transformAmount = Math.round(sibling.offset * (1 / sibling.drag.scale));
+      const transformAmount = Math.round(
+        sibling.offset * (1 / sibling.drag.scale),
+      );
       if (isHorizontal) {
-        elementToOffset.style.transform = combineTransforms(`translate3d(${transformAmount}px, 0, 0)`, sibling.initialTransform);
+        elementToOffset.style.transform = combineTransforms(
+          `translate3d(${transformAmount}px, 0, 0)`,
+          sibling.initialTransform,
+        );
         adjustDomRect(sibling.clientRect, 0, offset);
       } else {
-        elementToOffset.style.transform = combineTransforms(`translate3d(0, ${transformAmount}px, 0)`, sibling.initialTransform);
+        elementToOffset.style.transform = combineTransforms(
+          `translate3d(0, ${transformAmount}px, 0)`,
+          sibling.initialTransform,
+        );
         adjustDomRect(sibling.clientRect, offset, 0);
       }
     });
-    this._previousSwap.overlaps = isInsideClientRect(newPosition, pointerX, pointerY);
+    this._previousSwap.overlaps = isInsideClientRect(
+      newPosition,
+      pointerX,
+      pointerY,
+    );
     this._previousSwap.drag = siblingAtNewPosition.drag;
     this._previousSwap.delta = isHorizontal ? pointerDelta.x : pointerDelta.y;
     return {
       previousIndex: currentIndex,
-      currentIndex: newIndex
+      currentIndex: newIndex,
     };
   }
   /**
@@ -3605,11 +4434,12 @@ var SingleAxisSortStrategy = class {
    *   out automatically.
    */
   enter(item, pointerX, pointerY, index) {
-    const newIndex = index == null || index < 0 ? (
-      // We use the coordinates of where the item entered the drop
-      // zone to figure out at which index it should be inserted.
-      this._getItemIndexFromPointerPosition(item, pointerX, pointerY)
-    ) : index;
+    const newIndex =
+      index == null || index < 0
+        ? // We use the coordinates of where the item entered the drop
+          // zone to figure out at which index it should be inserted.
+          this._getItemIndexFromPointerPosition(item, pointerX, pointerY)
+        : index;
     const activeDraggables = this._activeDraggables;
     const currentIndex = activeDraggables.indexOf(item);
     const placeholder = item.getPlaceholderElement();
@@ -3617,13 +4447,22 @@ var SingleAxisSortStrategy = class {
     if (newPositionReference === item) {
       newPositionReference = activeDraggables[newIndex + 1];
     }
-    if (!newPositionReference && (newIndex == null || newIndex === -1 || newIndex < activeDraggables.length - 1) && this._shouldEnterAsFirstChild(pointerX, pointerY)) {
+    if (
+      !newPositionReference &&
+      (newIndex == null ||
+        newIndex === -1 ||
+        newIndex < activeDraggables.length - 1) &&
+      this._shouldEnterAsFirstChild(pointerX, pointerY)
+    ) {
       newPositionReference = activeDraggables[0];
     }
     if (currentIndex > -1) {
       activeDraggables.splice(currentIndex, 1);
     }
-    if (newPositionReference && !this._dragDropRegistry.isDragging(newPositionReference)) {
+    if (
+      newPositionReference &&
+      !this._dragDropRegistry.isDragging(newPositionReference)
+    ) {
       const element = newPositionReference.getRootElement();
       element.parentElement.insertBefore(placeholder, element);
       activeDraggables.splice(newIndex, 0, item);
@@ -3648,7 +4487,9 @@ var SingleAxisSortStrategy = class {
     this._activeDraggables?.forEach((item) => {
       const rootElement = item.getRootElement();
       if (rootElement) {
-        const initialTransform = this._itemPositions.find((p) => p.drag === item)?.initialTransform;
+        const initialTransform = this._itemPositions.find(
+          (p) => p.drag === item,
+        )?.initialTransform;
         rootElement.style.transform = initialTransform || "";
       }
     });
@@ -3667,19 +4508,18 @@ var SingleAxisSortStrategy = class {
   }
   /** Gets the index of a specific item. */
   getItemIndex(item) {
-    const items = this.orientation === "horizontal" && this.direction === "rtl" ? this._itemPositions.slice().reverse() : this._itemPositions;
+    const items =
+      this.orientation === "horizontal" && this.direction === "rtl"
+        ? this._itemPositions.slice().reverse()
+        : this._itemPositions;
     return items.findIndex((currentItem) => currentItem.drag === item);
   }
   /** Used to notify the strategy that the scroll position has changed. */
   updateOnScroll(topDifference, leftDifference) {
-    this._itemPositions.forEach(({
-      clientRect
-    }) => {
+    this._itemPositions.forEach(({ clientRect }) => {
       adjustDomRect(clientRect, topDifference, leftDifference);
     });
-    this._itemPositions.forEach(({
-      drag
-    }) => {
+    this._itemPositions.forEach(({ drag }) => {
       if (this._dragDropRegistry.isDragging(drag)) {
         drag._sortFromLastPointerPosition();
       }
@@ -3691,17 +4531,21 @@ var SingleAxisSortStrategy = class {
   /** Refreshes the position cache of the items and sibling containers. */
   _cacheItemPositions() {
     const isHorizontal = this.orientation === "horizontal";
-    this._itemPositions = this._activeDraggables.map((drag) => {
-      const elementToMeasure = drag.getVisibleElement();
-      return {
-        drag,
-        offset: 0,
-        initialTransform: elementToMeasure.style.transform || "",
-        clientRect: getMutableClientRect(elementToMeasure)
-      };
-    }).sort((a, b) => {
-      return isHorizontal ? a.clientRect.left - b.clientRect.left : a.clientRect.top - b.clientRect.top;
-    });
+    this._itemPositions = this._activeDraggables
+      .map((drag) => {
+        const elementToMeasure = drag.getVisibleElement();
+        return {
+          drag,
+          offset: 0,
+          initialTransform: elementToMeasure.style.transform || "",
+          clientRect: getMutableClientRect(elementToMeasure),
+        };
+      })
+      .sort((a, b) => {
+        return isHorizontal
+          ? a.clientRect.left - b.clientRect.left
+          : a.clientRect.top - b.clientRect.top;
+      });
   }
   /**
    * Gets the offset in pixels by which the item that is being dragged should be moved.
@@ -3711,9 +4555,13 @@ var SingleAxisSortStrategy = class {
    */
   _getItemOffsetPx(currentPosition, newPosition, delta) {
     const isHorizontal = this.orientation === "horizontal";
-    let itemOffset = isHorizontal ? newPosition.left - currentPosition.left : newPosition.top - currentPosition.top;
+    let itemOffset = isHorizontal
+      ? newPosition.left - currentPosition.left
+      : newPosition.top - currentPosition.top;
     if (delta === -1) {
-      itemOffset += isHorizontal ? newPosition.width - currentPosition.width : newPosition.height - currentPosition.height;
+      itemOffset += isHorizontal
+        ? newPosition.width - currentPosition.width
+        : newPosition.height - currentPosition.height;
     }
     return itemOffset;
   }
@@ -3727,14 +4575,17 @@ var SingleAxisSortStrategy = class {
     const isHorizontal = this.orientation === "horizontal";
     const currentPosition = siblings[currentIndex].clientRect;
     const immediateSibling = siblings[currentIndex + delta * -1];
-    let siblingOffset = currentPosition[isHorizontal ? "width" : "height"] * delta;
+    let siblingOffset =
+      currentPosition[isHorizontal ? "width" : "height"] * delta;
     if (immediateSibling) {
       const start = isHorizontal ? "left" : "top";
       const end = isHorizontal ? "right" : "bottom";
       if (delta === -1) {
-        siblingOffset -= immediateSibling.clientRect[start] - currentPosition[end];
+        siblingOffset -=
+          immediateSibling.clientRect[start] - currentPosition[end];
       } else {
-        siblingOffset += currentPosition[start] - immediateSibling.clientRect[end];
+        siblingOffset +=
+          currentPosition[start] - immediateSibling.clientRect[end];
       }
     }
     return siblingOffset;
@@ -3753,10 +4604,14 @@ var SingleAxisSortStrategy = class {
     const reversed = itemPositions[0].drag !== this._activeDraggables[0];
     if (reversed) {
       const lastItemRect = itemPositions[itemPositions.length - 1].clientRect;
-      return isHorizontal ? pointerX >= lastItemRect.right : pointerY >= lastItemRect.bottom;
+      return isHorizontal
+        ? pointerX >= lastItemRect.right
+        : pointerY >= lastItemRect.bottom;
     } else {
       const firstItemRect = itemPositions[0].clientRect;
-      return isHorizontal ? pointerX <= firstItemRect.left : pointerY <= firstItemRect.top;
+      return isHorizontal
+        ? pointerX <= firstItemRect.left
+        : pointerY <= firstItemRect.top;
     }
   }
   /**
@@ -3768,24 +4623,27 @@ var SingleAxisSortStrategy = class {
    */
   _getItemIndexFromPointerPosition(item, pointerX, pointerY, delta) {
     const isHorizontal = this.orientation === "horizontal";
-    const index = this._itemPositions.findIndex(({
-      drag,
-      clientRect
-    }) => {
+    const index = this._itemPositions.findIndex(({ drag, clientRect }) => {
       if (drag === item) {
         return false;
       }
       if (delta) {
         const direction = isHorizontal ? delta.x : delta.y;
-        if (drag === this._previousSwap.drag && this._previousSwap.overlaps && direction === this._previousSwap.delta) {
+        if (
+          drag === this._previousSwap.drag &&
+          this._previousSwap.overlaps &&
+          direction === this._previousSwap.delta
+        ) {
           return false;
         }
       }
-      return isHorizontal ? (
-        // Round these down since most browsers report client rects with
-        // sub-pixel precision, whereas the pointer coordinates are rounded to pixels.
-        pointerX >= Math.floor(clientRect.left) && pointerX < Math.floor(clientRect.right)
-      ) : pointerY >= Math.floor(clientRect.top) && pointerY < Math.floor(clientRect.bottom);
+      return isHorizontal
+        ? // Round these down since most browsers report client rects with
+          // sub-pixel precision, whereas the pointer coordinates are rounded to pixels.
+          pointerX >= Math.floor(clientRect.left) &&
+            pointerX < Math.floor(clientRect.right)
+        : pointerY >= Math.floor(clientRect.top) &&
+            pointerY < Math.floor(clientRect.bottom);
     });
     return index === -1 || !this._sortPredicate(index, item) ? -1 : index;
   }
@@ -3814,7 +4672,7 @@ var MixedSortStrategy = class {
     drag: null,
     deltaX: 0,
     deltaY: 0,
-    overlaps: false
+    overlaps: false,
   };
   /**
    * Keeps track of the relationship between a node and its next sibling. This information
@@ -3846,13 +4704,22 @@ var MixedSortStrategy = class {
    * @param pointerDelta Direction in which the pointer is moving along each axis.
    */
   sort(item, pointerX, pointerY, pointerDelta) {
-    const newIndex = this._getItemIndexFromPointerPosition(item, pointerX, pointerY);
+    const newIndex = this._getItemIndexFromPointerPosition(
+      item,
+      pointerX,
+      pointerY,
+    );
     const previousSwap = this._previousSwap;
     if (newIndex === -1 || this._activeItems[newIndex] === item) {
       return null;
     }
     const toSwapWith = this._activeItems[newIndex];
-    if (previousSwap.drag === toSwapWith && previousSwap.overlaps && previousSwap.deltaX === pointerDelta.x && previousSwap.deltaY === pointerDelta.y) {
+    if (
+      previousSwap.drag === toSwapWith &&
+      previousSwap.overlaps &&
+      previousSwap.deltaX === pointerDelta.x &&
+      previousSwap.deltaY === pointerDelta.y
+    ) {
       return null;
     }
     const previousIndex = this.getItemIndex(item);
@@ -3864,14 +4731,19 @@ var MixedSortStrategy = class {
       overlapElement.before(current);
     }
     moveItemInArray(this._activeItems, previousIndex, newIndex);
-    const newOverlapElement = this._getRootNode().elementFromPoint(pointerX, pointerY);
+    const newOverlapElement = this._getRootNode().elementFromPoint(
+      pointerX,
+      pointerY,
+    );
     previousSwap.deltaX = pointerDelta.x;
     previousSwap.deltaY = pointerDelta.y;
     previousSwap.drag = toSwapWith;
-    previousSwap.overlaps = overlapElement === newOverlapElement || overlapElement.contains(newOverlapElement);
+    previousSwap.overlaps =
+      overlapElement === newOverlapElement ||
+      overlapElement.contains(newOverlapElement);
     return {
       previousIndex,
-      currentIndex: newIndex
+      currentIndex: newIndex,
     };
   }
   /**
@@ -3883,7 +4755,10 @@ var MixedSortStrategy = class {
    *   out automatically.
    */
   enter(item, pointerX, pointerY, index) {
-    let enterIndex = index == null || index < 0 ? this._getItemIndexFromPointerPosition(item, pointerX, pointerY) : index;
+    let enterIndex =
+      index == null || index < 0
+        ? this._getItemIndexFromPointerPosition(item, pointerX, pointerY)
+        : index;
     if (enterIndex === -1) {
       enterIndex = this._getClosestItemIndexToPointer(item, pointerX, pointerY);
     }
@@ -3961,11 +4836,16 @@ var MixedSortStrategy = class {
    * @param delta Direction in which the user is moving their pointer.
    */
   _getItemIndexFromPointerPosition(item, pointerX, pointerY) {
-    const elementAtPoint = this._getRootNode().elementFromPoint(Math.floor(pointerX), Math.floor(pointerY));
-    const index = elementAtPoint ? this._activeItems.findIndex((item2) => {
-      const root = item2.getRootElement();
-      return elementAtPoint === root || root.contains(elementAtPoint);
-    }) : -1;
+    const elementAtPoint = this._getRootNode().elementFromPoint(
+      Math.floor(pointerX),
+      Math.floor(pointerY),
+    );
+    const index = elementAtPoint
+      ? this._activeItems.findIndex((item2) => {
+          const root = item2.getRootElement();
+          return elementAtPoint === root || root.contains(elementAtPoint);
+        })
+      : -1;
     return index === -1 || !this._sortPredicate(index, item) ? -1 : index;
   }
   /** Lazily resolves the list's root node. */
@@ -3993,10 +4873,7 @@ var MixedSortStrategy = class {
     for (let i = 0; i < this._activeItems.length; i++) {
       const current = this._activeItems[i];
       if (current !== item) {
-        const {
-          x,
-          y
-        } = current.getRootElement().getBoundingClientRect();
+        const { x, y } = current.getRootElement().getBoundingClientRect();
         const distance = Math.hypot(pointerX - x, pointerY - y);
         if (distance < minDistance) {
           minDistance = distance;
@@ -4010,16 +4887,22 @@ var MixedSortStrategy = class {
 var DROP_PROXIMITY_THRESHOLD = 0.05;
 var SCROLL_PROXIMITY_THRESHOLD = 0.05;
 var AutoScrollVerticalDirection;
-(function(AutoScrollVerticalDirection2) {
-  AutoScrollVerticalDirection2[AutoScrollVerticalDirection2["NONE"] = 0] = "NONE";
-  AutoScrollVerticalDirection2[AutoScrollVerticalDirection2["UP"] = 1] = "UP";
-  AutoScrollVerticalDirection2[AutoScrollVerticalDirection2["DOWN"] = 2] = "DOWN";
+(function (AutoScrollVerticalDirection2) {
+  AutoScrollVerticalDirection2[(AutoScrollVerticalDirection2["NONE"] = 0)] =
+    "NONE";
+  AutoScrollVerticalDirection2[(AutoScrollVerticalDirection2["UP"] = 1)] = "UP";
+  AutoScrollVerticalDirection2[(AutoScrollVerticalDirection2["DOWN"] = 2)] =
+    "DOWN";
 })(AutoScrollVerticalDirection || (AutoScrollVerticalDirection = {}));
 var AutoScrollHorizontalDirection;
-(function(AutoScrollHorizontalDirection2) {
-  AutoScrollHorizontalDirection2[AutoScrollHorizontalDirection2["NONE"] = 0] = "NONE";
-  AutoScrollHorizontalDirection2[AutoScrollHorizontalDirection2["LEFT"] = 1] = "LEFT";
-  AutoScrollHorizontalDirection2[AutoScrollHorizontalDirection2["RIGHT"] = 2] = "RIGHT";
+(function (AutoScrollHorizontalDirection2) {
+  AutoScrollHorizontalDirection2[(AutoScrollHorizontalDirection2["NONE"] = 0)] =
+    "NONE";
+  AutoScrollHorizontalDirection2[(AutoScrollHorizontalDirection2["LEFT"] = 1)] =
+    "LEFT";
+  AutoScrollHorizontalDirection2[
+    (AutoScrollHorizontalDirection2["RIGHT"] = 2)
+  ] = "RIGHT";
 })(AutoScrollHorizontalDirection || (AutoScrollHorizontalDirection = {}));
 var DropListRef = class {
   _dragDropRegistry;
@@ -4108,7 +4991,7 @@ var DropListRef = class {
     this._dragDropRegistry = _dragDropRegistry;
     this._ngZone = _ngZone;
     this._viewportRuler = _viewportRuler;
-    const coercedElement = this.element = coerceElement(element);
+    const coercedElement = (this.element = coerceElement(element));
     this._document = _document;
     this.withOrientation("vertical").withElementContainer(coercedElement);
     _dragDropRegistry.registerDropContainer(this);
@@ -4159,7 +5042,7 @@ var DropListRef = class {
     this.entered.next({
       item,
       container: this,
-      currentIndex: this.getItemIndex(item)
+      currentIndex: this.getItemIndex(item),
     });
   }
   /**
@@ -4170,7 +5053,7 @@ var DropListRef = class {
     this._reset();
     this.exited.next({
       item,
-      container: this
+      container: this,
     });
   }
   /**
@@ -4186,7 +5069,16 @@ var DropListRef = class {
    *
    * @breaking-change 15.0.0 `previousIndex` and `event` parameters to become required.
    */
-  drop(item, currentIndex, previousIndex, previousContainer, isPointerOverContainer, distance, dropPoint, event = {}) {
+  drop(
+    item,
+    currentIndex,
+    previousIndex,
+    previousContainer,
+    isPointerOverContainer,
+    distance,
+    dropPoint,
+    event = {},
+  ) {
     this._reset();
     this.dropped.next({
       item,
@@ -4197,7 +5089,7 @@ var DropListRef = class {
       isPointerOverContainer,
       distance,
       dropPoint,
-      event
+      event,
     });
   }
   /**
@@ -4241,7 +5133,10 @@ var DropListRef = class {
    */
   withOrientation(orientation) {
     if (orientation === "mixed") {
-      this._sortStrategy = new MixedSortStrategy(this._document, this._dragDropRegistry);
+      this._sortStrategy = new MixedSortStrategy(
+        this._document,
+        this._dragDropRegistry,
+      );
     } else {
       const strategy = new SingleAxisSortStrategy(this._dragDropRegistry);
       strategy.direction = this._direction;
@@ -4249,7 +5144,9 @@ var DropListRef = class {
       this._sortStrategy = strategy;
     }
     this._sortStrategy.withElementContainer(this._container);
-    this._sortStrategy.withSortPredicate((index, item) => this.sortPredicate(index, item, this));
+    this._sortStrategy.withSortPredicate((index, item) =>
+      this.sortPredicate(index, item, this),
+    );
     return this;
   }
   /**
@@ -4258,7 +5155,10 @@ var DropListRef = class {
    */
   withScrollableParents(elements) {
     const element = this._container;
-    this._scrollableElements = elements.indexOf(element) === -1 ? [element, ...elements] : elements.slice();
+    this._scrollableElements =
+      elements.indexOf(element) === -1
+        ? [element, ...elements]
+        : elements.slice();
     return this;
   }
   /**
@@ -4273,8 +5173,14 @@ var DropListRef = class {
       return this;
     }
     const element = coerceElement(this.element);
-    if ((typeof ngDevMode === "undefined" || ngDevMode) && container !== element && !element.contains(container)) {
-      throw new Error("Invalid DOM structure for drop list. Alternate container element must be a descendant of the drop list.");
+    if (
+      (typeof ngDevMode === "undefined" || ngDevMode) &&
+      container !== element &&
+      !element.contains(container)
+    ) {
+      throw new Error(
+        "Invalid DOM structure for drop list. Alternate container element must be a descendant of the drop list.",
+      );
     }
     const oldContainerIndex = this._scrollableElements.indexOf(this._container);
     const newContainerIndex = this._scrollableElements.indexOf(container);
@@ -4301,7 +5207,9 @@ var DropListRef = class {
    * @param item Item whose index should be determined.
    */
   getItemIndex(item) {
-    return this._isDragging ? this._sortStrategy.getItemIndex(item) : this._draggables.indexOf(item);
+    return this._isDragging
+      ? this._sortStrategy.getItemIndex(item)
+      : this._draggables.indexOf(item);
   }
   /**
    * Whether the list is able to receive the item that
@@ -4318,16 +5226,30 @@ var DropListRef = class {
    * @param pointerDelta Direction in which the pointer is moving along each axis.
    */
   _sortItem(item, pointerX, pointerY, pointerDelta) {
-    if (this.sortingDisabled || !this._domRect || !isPointerNearDomRect(this._domRect, DROP_PROXIMITY_THRESHOLD, pointerX, pointerY)) {
+    if (
+      this.sortingDisabled ||
+      !this._domRect ||
+      !isPointerNearDomRect(
+        this._domRect,
+        DROP_PROXIMITY_THRESHOLD,
+        pointerX,
+        pointerY,
+      )
+    ) {
       return;
     }
-    const result = this._sortStrategy.sort(item, pointerX, pointerY, pointerDelta);
+    const result = this._sortStrategy.sort(
+      item,
+      pointerX,
+      pointerY,
+      pointerDelta,
+    );
     if (result) {
       this.sorted.next({
         previousIndex: result.previousIndex,
         currentIndex: result.currentIndex,
         container: this,
-        item
+        item,
       });
     }
   }
@@ -4348,35 +5270,57 @@ var DropListRef = class {
       if (element === this._document || !position.clientRect || scrollNode) {
         return;
       }
-      if (isPointerNearDomRect(position.clientRect, DROP_PROXIMITY_THRESHOLD, pointerX, pointerY)) {
-        [verticalScrollDirection, horizontalScrollDirection] = getElementScrollDirections(element, position.clientRect, this._direction, pointerX, pointerY);
+      if (
+        isPointerNearDomRect(
+          position.clientRect,
+          DROP_PROXIMITY_THRESHOLD,
+          pointerX,
+          pointerY,
+        )
+      ) {
+        [verticalScrollDirection, horizontalScrollDirection] =
+          getElementScrollDirections(
+            element,
+            position.clientRect,
+            this._direction,
+            pointerX,
+            pointerY,
+          );
         if (verticalScrollDirection || horizontalScrollDirection) {
           scrollNode = element;
         }
       }
     });
     if (!verticalScrollDirection && !horizontalScrollDirection) {
-      const {
-        width,
-        height
-      } = this._viewportRuler.getViewportSize();
+      const { width, height } = this._viewportRuler.getViewportSize();
       const domRect = {
         width,
         height,
         top: 0,
         right: width,
         bottom: height,
-        left: 0
+        left: 0,
       };
       verticalScrollDirection = getVerticalScrollDirection(domRect, pointerY);
-      horizontalScrollDirection = getHorizontalScrollDirection(domRect, pointerX);
+      horizontalScrollDirection = getHorizontalScrollDirection(
+        domRect,
+        pointerX,
+      );
       scrollNode = window;
     }
-    if (scrollNode && (verticalScrollDirection !== this._verticalScrollDirection || horizontalScrollDirection !== this._horizontalScrollDirection || scrollNode !== this._scrollNode)) {
+    if (
+      scrollNode &&
+      (verticalScrollDirection !== this._verticalScrollDirection ||
+        horizontalScrollDirection !== this._horizontalScrollDirection ||
+        scrollNode !== this._scrollNode)
+    ) {
       this._verticalScrollDirection = verticalScrollDirection;
       this._horizontalScrollDirection = horizontalScrollDirection;
       this._scrollNode = scrollNode;
-      if ((verticalScrollDirection || horizontalScrollDirection) && scrollNode) {
+      if (
+        (verticalScrollDirection || horizontalScrollDirection) &&
+        scrollNode
+      ) {
         this._ngZone.runOutsideAngular(this._startScrollInterval);
       } else {
         this._stopScrolling();
@@ -4392,16 +5336,24 @@ var DropListRef = class {
     const styles = this._container.style;
     this.beforeStarted.next();
     this._isDragging = true;
-    if ((typeof ngDevMode === "undefined" || ngDevMode) && // Prevent the check from running on apps not using an alternate container. Ideally we
-    // would always run it, but introducing it at this stage would be a breaking change.
-    this._container !== coerceElement(this.element)) {
+    if (
+      (typeof ngDevMode === "undefined" || ngDevMode) && // Prevent the check from running on apps not using an alternate container. Ideally we
+      // would always run it, but introducing it at this stage would be a breaking change.
+      this._container !== coerceElement(this.element)
+    ) {
       for (const drag of this._draggables) {
-        if (!drag.isDragging() && drag.getVisibleElement().parentNode !== this._container) {
-          throw new Error("Invalid DOM structure for drop list. All items must be placed directly inside of the element container.");
+        if (
+          !drag.isDragging() &&
+          drag.getVisibleElement().parentNode !== this._container
+        ) {
+          throw new Error(
+            "Invalid DOM structure for drop list. All items must be placed directly inside of the element container.",
+          );
         }
       }
     }
-    this._initialScrollSnap = styles.msScrollSnapType || styles.scrollSnapType || "";
+    this._initialScrollSnap =
+      styles.msScrollSnapType || styles.scrollSnapType || "";
     styles.scrollSnapType = styles.msScrollSnapType = "none";
     this._sortStrategy.start(this._draggables);
     this._cacheParentPositions();
@@ -4411,7 +5363,9 @@ var DropListRef = class {
   /** Caches the positions of the configured scrollable parents. */
   _cacheParentPositions() {
     this._parentPositions.cache(this._scrollableElements);
-    this._domRect = this._parentPositions.positions.get(this._container).clientRect;
+    this._domRect = this._parentPositions.positions.get(
+      this._container,
+    ).clientRect;
   }
   /** Resets the container to its initial state. */
   _reset() {
@@ -4427,20 +5381,29 @@ var DropListRef = class {
   /** Starts the interval that'll auto-scroll the element. */
   _startScrollInterval = () => {
     this._stopScrolling();
-    interval(0, animationFrameScheduler).pipe(takeUntil(this._stopScrollTimers)).subscribe(() => {
-      const node = this._scrollNode;
-      const scrollStep = this.autoScrollStep;
-      if (this._verticalScrollDirection === AutoScrollVerticalDirection.UP) {
-        node.scrollBy(0, -scrollStep);
-      } else if (this._verticalScrollDirection === AutoScrollVerticalDirection.DOWN) {
-        node.scrollBy(0, scrollStep);
-      }
-      if (this._horizontalScrollDirection === AutoScrollHorizontalDirection.LEFT) {
-        node.scrollBy(-scrollStep, 0);
-      } else if (this._horizontalScrollDirection === AutoScrollHorizontalDirection.RIGHT) {
-        node.scrollBy(scrollStep, 0);
-      }
-    });
+    interval(0, animationFrameScheduler)
+      .pipe(takeUntil(this._stopScrollTimers))
+      .subscribe(() => {
+        const node = this._scrollNode;
+        const scrollStep = this.autoScrollStep;
+        if (this._verticalScrollDirection === AutoScrollVerticalDirection.UP) {
+          node.scrollBy(0, -scrollStep);
+        } else if (
+          this._verticalScrollDirection === AutoScrollVerticalDirection.DOWN
+        ) {
+          node.scrollBy(0, scrollStep);
+        }
+        if (
+          this._horizontalScrollDirection === AutoScrollHorizontalDirection.LEFT
+        ) {
+          node.scrollBy(-scrollStep, 0);
+        } else if (
+          this._horizontalScrollDirection ===
+          AutoScrollHorizontalDirection.RIGHT
+        ) {
+          node.scrollBy(scrollStep, 0);
+        }
+      });
   };
   /**
    * Checks whether the user's pointer is positioned over the container.
@@ -4467,14 +5430,21 @@ var DropListRef = class {
    * @param y Position of the item along the Y axis.
    */
   _canReceive(item, x, y) {
-    if (!this._domRect || !isInsideClientRect(this._domRect, x, y) || !this.enterPredicate(item, this)) {
+    if (
+      !this._domRect ||
+      !isInsideClientRect(this._domRect, x, y) ||
+      !this.enterPredicate(item, this)
+    ) {
       return false;
     }
     const elementFromPoint = this._getShadowRoot().elementFromPoint(x, y);
     if (!elementFromPoint) {
       return false;
     }
-    return elementFromPoint === this._container || this._container.contains(elementFromPoint);
+    return (
+      elementFromPoint === this._container ||
+      this._container.contains(elementFromPoint)
+    );
   }
   /**
    * Called by one of the connected drop lists when a dragging sequence has started.
@@ -4482,16 +5452,21 @@ var DropListRef = class {
    */
   _startReceiving(sibling, items) {
     const activeSiblings = this._activeSiblings;
-    if (!activeSiblings.has(sibling) && items.every((item) => {
-      return this.enterPredicate(item, this) || this._draggables.indexOf(item) > -1;
-    })) {
+    if (
+      !activeSiblings.has(sibling) &&
+      items.every((item) => {
+        return (
+          this.enterPredicate(item, this) || this._draggables.indexOf(item) > -1
+        );
+      })
+    ) {
       activeSiblings.add(sibling);
       this._cacheParentPositions();
       this._listenToScrollEvents();
       this.receivingStarted.next({
         initiator: sibling,
         receiver: this,
-        items
+        items,
       });
     }
   }
@@ -4504,7 +5479,7 @@ var DropListRef = class {
     this._viewportScrollSubscription.unsubscribe();
     this.receivingStopped.next({
       initiator: sibling,
-      receiver: this
+      receiver: this,
     });
   }
   /**
@@ -4512,16 +5487,21 @@ var DropListRef = class {
    * Used for updating the internal state of the list.
    */
   _listenToScrollEvents() {
-    this._viewportScrollSubscription = this._dragDropRegistry.scrolled(this._getShadowRoot()).subscribe((event) => {
-      if (this.isDragging()) {
-        const scrollDifference = this._parentPositions.handleScroll(event);
-        if (scrollDifference) {
-          this._sortStrategy.updateOnScroll(scrollDifference.top, scrollDifference.left);
+    this._viewportScrollSubscription = this._dragDropRegistry
+      .scrolled(this._getShadowRoot())
+      .subscribe((event) => {
+        if (this.isDragging()) {
+          const scrollDifference = this._parentPositions.handleScroll(event);
+          if (scrollDifference) {
+            this._sortStrategy.updateOnScroll(
+              scrollDifference.top,
+              scrollDifference.left,
+            );
+          }
+        } else if (this.isReceiving()) {
+          this._cacheParentPositions();
         }
-      } else if (this.isReceiving()) {
-        this._cacheParentPositions();
-      }
-    });
+      });
   }
   /**
    * Lazily resolves and returns the shadow root of the element. We do this in a function, rather
@@ -4538,30 +5518,29 @@ var DropListRef = class {
   }
   /** Notifies any siblings that may potentially receive the item. */
   _notifyReceivingSiblings() {
-    const draggedItems = this._sortStrategy.getActiveItemsSnapshot().filter((item) => item.isDragging());
-    this._siblings.forEach((sibling) => sibling._startReceiving(this, draggedItems));
+    const draggedItems = this._sortStrategy
+      .getActiveItemsSnapshot()
+      .filter((item) => item.isDragging());
+    this._siblings.forEach((sibling) =>
+      sibling._startReceiving(this, draggedItems),
+    );
   }
 };
 function getVerticalScrollDirection(clientRect, pointerY) {
-  const {
-    top,
-    bottom,
-    height
-  } = clientRect;
+  const { top, bottom, height } = clientRect;
   const yThreshold = height * SCROLL_PROXIMITY_THRESHOLD;
   if (pointerY >= top - yThreshold && pointerY <= top + yThreshold) {
     return AutoScrollVerticalDirection.UP;
-  } else if (pointerY >= bottom - yThreshold && pointerY <= bottom + yThreshold) {
+  } else if (
+    pointerY >= bottom - yThreshold &&
+    pointerY <= bottom + yThreshold
+  ) {
     return AutoScrollVerticalDirection.DOWN;
   }
   return AutoScrollVerticalDirection.NONE;
 }
 function getHorizontalScrollDirection(clientRect, pointerX) {
-  const {
-    left,
-    right,
-    width
-  } = clientRect;
+  const { left, right, width } = clientRect;
   const xThreshold = width * SCROLL_PROXIMITY_THRESHOLD;
   if (pointerX >= left - xThreshold && pointerX <= left + xThreshold) {
     return AutoScrollHorizontalDirection.LEFT;
@@ -4570,7 +5549,13 @@ function getHorizontalScrollDirection(clientRect, pointerX) {
   }
   return AutoScrollHorizontalDirection.NONE;
 }
-function getElementScrollDirections(element, clientRect, direction, pointerX, pointerY) {
+function getElementScrollDirections(
+  element,
+  clientRect,
+  direction,
+  pointerX,
+  pointerY,
+) {
   const computedVertical = getVerticalScrollDirection(clientRect, pointerY);
   const computedHorizontal = getHorizontalScrollDirection(clientRect, pointerX);
   let verticalScrollDirection = AutoScrollVerticalDirection.NONE;
@@ -4608,11 +5593,11 @@ function getElementScrollDirections(element, clientRect, direction, pointerX, po
   return [verticalScrollDirection, horizontalScrollDirection];
 }
 var capturingEventOptions = {
-  capture: true
+  capture: true,
 };
 var activeCapturingEventOptions = {
   passive: false,
-  capture: true
+  capture: true,
 };
 var _ResetsLoader = class __ResetsLoader {
   static ɵfac = function _ResetsLoader_Factory(__ngFactoryType__) {
@@ -4624,26 +5609,39 @@ var _ResetsLoader = class __ResetsLoader {
     hostAttrs: ["cdk-drag-resets-container", ""],
     decls: 0,
     vars: 0,
-    template: function _ResetsLoader_Template(rf, ctx) {
-    },
-    styles: ["@layer cdk-resets{.cdk-drag-preview{background:none;border:none;padding:0;color:inherit;inset:auto}}.cdk-drag-placeholder *,.cdk-drag-preview *{pointer-events:none !important}\n"],
+    template: function _ResetsLoader_Template(rf, ctx) {},
+    styles: [
+      "@layer cdk-resets{.cdk-drag-preview{background:none;border:none;padding:0;color:inherit;inset:auto}}.cdk-drag-placeholder *,.cdk-drag-preview *{pointer-events:none !important}\n",
+    ],
     encapsulation: 2,
-    changeDetection: 0
+    changeDetection: 0,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(_ResetsLoader, [{
-    type: Component,
-    args: [{
-      encapsulation: ViewEncapsulation.None,
-      template: "",
-      changeDetection: ChangeDetectionStrategy.OnPush,
-      host: {
-        "cdk-drag-resets-container": ""
-      },
-      styles: ["@layer cdk-resets{.cdk-drag-preview{background:none;border:none;padding:0;color:inherit;inset:auto}}.cdk-drag-placeholder *,.cdk-drag-preview *{pointer-events:none !important}\n"]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      _ResetsLoader,
+      [
+        {
+          type: Component,
+          args: [
+            {
+              encapsulation: ViewEncapsulation.None,
+              template: "",
+              changeDetection: ChangeDetectionStrategy.OnPush,
+              host: {
+                "cdk-drag-resets-container": "",
+              },
+              styles: [
+                "@layer cdk-resets{.cdk-drag-preview{background:none;border:none;padding:0;color:inherit;inset:auto}}.cdk-drag-placeholder *,.cdk-drag-preview *{pointer-events:none !important}\n",
+              ],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var DragDropRegistry = class _DragDropRegistry {
   _ngZone = inject(NgZone);
@@ -4686,8 +5684,7 @@ var DragDropRegistry = class _DragDropRegistry {
    * @breaking-change 13.0.0
    */
   scroll = new Subject();
-  constructor() {
-  }
+  constructor() {}
   /** Adds a drop container to the registry. */
   registerDropContainer(drop) {
     if (!this._dropInstances.has(drop)) {
@@ -4700,7 +5697,13 @@ var DragDropRegistry = class _DragDropRegistry {
     if (this._dragInstances.size === 1) {
       this._ngZone.runOutsideAngular(() => {
         this._cleanupDocumentTouchmove?.();
-        this._cleanupDocumentTouchmove = _bindEventWithOptions(this._renderer, this._document, "touchmove", this._persistentTouchmoveListener, activeCapturingEventOptions);
+        this._cleanupDocumentTouchmove = _bindEventWithOptions(
+          this._renderer,
+          this._document,
+          "touchmove",
+          this._persistentTouchmoveListener,
+          activeCapturingEventOptions,
+        );
       });
     }
   }
@@ -4738,18 +5741,37 @@ var DragDropRegistry = class _DragDropRegistry {
         // on Safari so we need to prevent the selection event as well. Alternatively this can
         // be done by setting `user-select: none` on the `body`, however it has causes a style
         // recalculation which can be expensive on pages with a lot of elements.
-        ["selectstart", this._preventDefaultWhileDragging, activeCapturingEventOptions]
+        [
+          "selectstart",
+          this._preventDefaultWhileDragging,
+          activeCapturingEventOptions,
+        ],
       ];
       if (isTouchEvent2) {
-        toBind.push(["touchend", endEventHandler, capturingEventOptions], ["touchcancel", endEventHandler, capturingEventOptions]);
+        toBind.push(
+          ["touchend", endEventHandler, capturingEventOptions],
+          ["touchcancel", endEventHandler, capturingEventOptions],
+        );
       } else {
         toBind.push(["mouseup", endEventHandler, capturingEventOptions]);
       }
       if (!isTouchEvent2) {
-        toBind.push(["mousemove", (e) => this.pointerMove.next(e), activeCapturingEventOptions]);
+        toBind.push([
+          "mousemove",
+          (e) => this.pointerMove.next(e),
+          activeCapturingEventOptions,
+        ]);
       }
       this._ngZone.runOutsideAngular(() => {
-        this._globalListeners = toBind.map(([name, handler, options]) => _bindEventWithOptions(this._renderer, this._document, name, handler, options));
+        this._globalListeners = toBind.map(([name, handler, options]) =>
+          _bindEventWithOptions(
+            this._renderer,
+            this._document,
+            name,
+            handler,
+            options,
+          ),
+        );
       });
     }
   }
@@ -4781,18 +5803,26 @@ var DragDropRegistry = class _DragDropRegistry {
   scrolled(shadowRoot) {
     const streams = [this.scroll];
     if (shadowRoot && shadowRoot !== this._document) {
-      streams.push(new Observable((observer) => {
-        return this._ngZone.runOutsideAngular(() => {
-          const cleanup = _bindEventWithOptions(this._renderer, shadowRoot, "scroll", (event) => {
-            if (this._activeDragInstances().length) {
-              observer.next(event);
-            }
-          }, capturingEventOptions);
-          return () => {
-            cleanup();
-          };
-        });
-      }));
+      streams.push(
+        new Observable((observer) => {
+          return this._ngZone.runOutsideAngular(() => {
+            const cleanup = _bindEventWithOptions(
+              this._renderer,
+              shadowRoot,
+              "scroll",
+              (event) => {
+                if (this._activeDragInstances().length) {
+                  observer.next(event);
+                }
+              },
+              capturingEventOptions,
+            );
+            return () => {
+              cleanup();
+            };
+          });
+        }),
+      );
     }
     return merge(...streams);
   }
@@ -4821,7 +5851,9 @@ var DragDropRegistry = class _DragDropRegistry {
   }
   ngOnDestroy() {
     this._dragInstances.forEach((instance) => this.removeDragItem(instance));
-    this._dropInstances.forEach((instance) => this.removeDropContainer(instance));
+    this._dropInstances.forEach((instance) =>
+      this.removeDropContainer(instance),
+    );
     this._domNodesToDirectives = null;
     this._clearGlobalListeners();
     this.pointerMove.complete();
@@ -4856,20 +5888,30 @@ var DragDropRegistry = class _DragDropRegistry {
   static ɵprov = ɵɵdefineInjectable({
     token: _DragDropRegistry,
     factory: _DragDropRegistry.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(DragDropRegistry, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      DragDropRegistry,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var DEFAULT_CONFIG = {
   dragStartThreshold: 5,
-  pointerDirectionChangeThreshold: 5
+  pointerDirectionChangeThreshold: 5,
 };
 var DragDrop = class _DragDrop {
   _document = inject(DOCUMENT);
@@ -4877,22 +5919,35 @@ var DragDrop = class _DragDrop {
   _viewportRuler = inject(ViewportRuler);
   _dragDropRegistry = inject(DragDropRegistry);
   _renderer = inject(RendererFactory2).createRenderer(null, null);
-  constructor() {
-  }
+  constructor() {}
   /**
    * Turns an element into a draggable item.
    * @param element Element to which to attach the dragging functionality.
    * @param config Object used to configure the dragging behavior.
    */
   createDrag(element, config = DEFAULT_CONFIG) {
-    return new DragRef(element, config, this._document, this._ngZone, this._viewportRuler, this._dragDropRegistry, this._renderer);
+    return new DragRef(
+      element,
+      config,
+      this._document,
+      this._ngZone,
+      this._viewportRuler,
+      this._dragDropRegistry,
+      this._renderer,
+    );
   }
   /**
    * Turns an element into a drop list.
    * @param element Element to which to attach the drop list functionality.
    */
   createDropList(element) {
-    return new DropListRef(element, this._dragDropRegistry, this._document, this._ngZone, this._viewportRuler);
+    return new DropListRef(
+      element,
+      this._dragDropRegistry,
+      this._document,
+      this._ngZone,
+      this._viewportRuler,
+    );
   }
   static ɵfac = function DragDrop_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _DragDrop)();
@@ -4900,21 +5955,33 @@ var DragDrop = class _DragDrop {
   static ɵprov = ɵɵdefineInjectable({
     token: _DragDrop,
     factory: _DragDrop.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(DragDrop, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      DragDrop,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 var CDK_DRAG_PARENT = new InjectionToken("CDK_DRAG_PARENT");
 function assertElementNode(node, name) {
   if (node.nodeType !== 1) {
-    throw Error(`${name} must be attached to an element node. Currently attached to "${node.nodeName}".`);
+    throw Error(
+      `${name} must be attached to an element node. Currently attached to "${node.nodeName}".`,
+    );
   }
 }
 var CDK_DRAG_HANDLE = new InjectionToken("CdkDragHandle");
@@ -4922,7 +5989,7 @@ var CdkDragHandle = class _CdkDragHandle {
   element = inject(ElementRef);
   _parentDrag = inject(CDK_DRAG_PARENT, {
     optional: true,
-    skipSelf: true
+    skipSelf: true,
   });
   _dragDropRegistry = inject(DragDropRegistry);
   /** Emits when the state of the handle has changed. */
@@ -4968,36 +6035,56 @@ var CdkDragHandle = class _CdkDragHandle {
     selectors: [["", "cdkDragHandle", ""]],
     hostAttrs: [1, "cdk-drag-handle"],
     inputs: {
-      disabled: [2, "cdkDragHandleDisabled", "disabled", booleanAttribute]
+      disabled: [2, "cdkDragHandleDisabled", "disabled", booleanAttribute],
     },
-    features: [ɵɵProvidersFeature([{
-      provide: CDK_DRAG_HANDLE,
-      useExisting: _CdkDragHandle
-    }])]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: CDK_DRAG_HANDLE,
+          useExisting: _CdkDragHandle,
+        },
+      ]),
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkDragHandle, [{
-    type: Directive,
-    args: [{
-      selector: "[cdkDragHandle]",
-      host: {
-        "class": "cdk-drag-handle"
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkDragHandle,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdkDragHandle]",
+              host: {
+                class: "cdk-drag-handle",
+              },
+              providers: [
+                {
+                  provide: CDK_DRAG_HANDLE,
+                  useExisting: CdkDragHandle,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        disabled: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDragHandleDisabled",
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
       },
-      providers: [{
-        provide: CDK_DRAG_HANDLE,
-        useExisting: CdkDragHandle
-      }]
-    }]
-  }], () => [], {
-    disabled: [{
-      type: Input,
-      args: [{
-        alias: "cdkDragHandleDisabled",
-        transform: booleanAttribute
-      }]
-    }]
-  });
+    );
 })();
 var CDK_DRAG_CONFIG = new InjectionToken("CDK_DRAG_CONFIG");
 var CDK_DROP_LIST = new InjectionToken("CdkDropList");
@@ -5005,21 +6092,21 @@ var CdkDrag = class _CdkDrag {
   element = inject(ElementRef);
   dropContainer = inject(CDK_DROP_LIST, {
     optional: true,
-    skipSelf: true
+    skipSelf: true,
   });
   _ngZone = inject(NgZone);
   _viewContainerRef = inject(ViewContainerRef);
   _dir = inject(Directionality, {
-    optional: true
+    optional: true,
   });
   _changeDetectorRef = inject(ChangeDetectorRef);
   _selfHandle = inject(CDK_DRAG_HANDLE, {
     optional: true,
-    self: true
+    self: true,
   });
   _parentDrag = inject(CDK_DRAG_PARENT, {
     optional: true,
-    skipSelf: true
+    skipSelf: true,
   });
   _dragDropRegistry = inject(DragDropRegistry);
   _destroyed = new Subject();
@@ -5057,7 +6144,9 @@ var CdkDrag = class _CdkDrag {
   freeDragPosition;
   /** Whether starting to drag this element is disabled. */
   get disabled() {
-    return this._disabled || !!(this.dropContainer && this.dropContainer.disabled);
+    return (
+      this._disabled || !!(this.dropContainer && this.dropContainer.disabled)
+    );
   }
   set disabled(value) {
     this._disabled = value;
@@ -5109,13 +6198,17 @@ var CdkDrag = class _CdkDrag {
    * because this event will fire for every pixel that the user has dragged.
    */
   moved = new Observable((observer) => {
-    const subscription = this._dragRef.moved.pipe(map((movedEvent) => ({
-      source: this,
-      pointerPosition: movedEvent.pointerPosition,
-      event: movedEvent.event,
-      delta: movedEvent.delta,
-      distance: movedEvent.distance
-    }))).subscribe(observer);
+    const subscription = this._dragRef.moved
+      .pipe(
+        map((movedEvent) => ({
+          source: this,
+          pointerPosition: movedEvent.pointerPosition,
+          event: movedEvent.event,
+          delta: movedEvent.delta,
+          distance: movedEvent.distance,
+        })),
+      )
+      .subscribe(observer);
     return () => {
       subscription.unsubscribe();
     };
@@ -5124,25 +6217,36 @@ var CdkDrag = class _CdkDrag {
   constructor() {
     const dropContainer = this.dropContainer;
     const config = inject(CDK_DRAG_CONFIG, {
-      optional: true
+      optional: true,
     });
     const dragDrop = inject(DragDrop);
     this._dragRef = dragDrop.createDrag(this.element, {
-      dragStartThreshold: config && config.dragStartThreshold != null ? config.dragStartThreshold : 5,
-      pointerDirectionChangeThreshold: config && config.pointerDirectionChangeThreshold != null ? config.pointerDirectionChangeThreshold : 5,
-      zIndex: config?.zIndex
+      dragStartThreshold:
+        config && config.dragStartThreshold != null
+          ? config.dragStartThreshold
+          : 5,
+      pointerDirectionChangeThreshold:
+        config && config.pointerDirectionChangeThreshold != null
+          ? config.pointerDirectionChangeThreshold
+          : 5,
+      zIndex: config?.zIndex,
     });
     this._dragRef.data = this;
-    this._dragDropRegistry.registerDirectiveNode(this.element.nativeElement, this);
+    this._dragDropRegistry.registerDirectiveNode(
+      this.element.nativeElement,
+      this,
+    );
     if (config) {
       this._assignDefaults(config);
     }
     if (dropContainer) {
       this._dragRef._withDropContainer(dropContainer._dropListRef);
       dropContainer.addItem(this);
-      dropContainer._dropListRef.beforeStarted.pipe(takeUntil(this._destroyed)).subscribe(() => {
-        this._dragRef.scale = this.scale;
-      });
+      dropContainer._dropListRef.beforeStarted
+        .pipe(takeUntil(this._destroyed))
+        .subscribe(() => {
+          this._dragRef.scale = this.scale;
+        });
     }
     this._syncInputs(this._dragRef);
     this._handleEvents(this._dragRef);
@@ -5176,16 +6280,19 @@ var CdkDrag = class _CdkDrag {
     this._dragRef.setFreeDragPosition(value);
   }
   ngAfterViewInit() {
-    afterNextRender(() => {
-      this._updateRootElement();
-      this._setupHandlesListener();
-      this._dragRef.scale = this.scale;
-      if (this.freeDragPosition) {
-        this._dragRef.setFreeDragPosition(this.freeDragPosition);
-      }
-    }, {
-      injector: this._injector
-    });
+    afterNextRender(
+      () => {
+        this._updateRootElement();
+        this._setupHandlesListener();
+        this._dragRef.scale = this.scale;
+        if (this.freeDragPosition) {
+          this._dragRef.setFreeDragPosition(this.freeDragPosition);
+        }
+      },
+      {
+        injector: this._injector,
+      },
+    );
   }
   ngOnChanges(changes) {
     const rootSelectorChange = changes["rootElementSelector"];
@@ -5194,7 +6301,11 @@ var CdkDrag = class _CdkDrag {
       this._updateRootElement();
     }
     this._dragRef.scale = this.scale;
-    if (positionChange && !positionChange.firstChange && this.freeDragPosition) {
+    if (
+      positionChange &&
+      !positionChange.firstChange &&
+      this.freeDragPosition
+    ) {
       this._dragRef.setFreeDragPosition(this.freeDragPosition);
     }
   }
@@ -5244,10 +6355,11 @@ var CdkDrag = class _CdkDrag {
     const element = this.element.nativeElement;
     let rootElement = element;
     if (this.rootElementSelector) {
-      rootElement = element.closest !== void 0 ? element.closest(this.rootElementSelector) : (
-        // Comment tag doesn't have closest method, so use parent's one.
-        element.parentElement?.closest(this.rootElementSelector)
-      );
+      rootElement =
+        element.closest !== void 0
+          ? element.closest(this.rootElementSelector)
+          : // Comment tag doesn't have closest method, so use parent's one.
+            element.parentElement?.closest(this.rootElementSelector);
     }
     if (rootElement && (typeof ngDevMode === "undefined" || ngDevMode)) {
       assertElementNode(rootElement, "cdkDrag");
@@ -5271,24 +6383,35 @@ var CdkDrag = class _CdkDrag {
       if (!ref.isDragging()) {
         const dir = this._dir;
         const dragStartDelay = this.dragStartDelay;
-        const placeholder = this._placeholderTemplate ? {
-          template: this._placeholderTemplate.templateRef,
-          context: this._placeholderTemplate.data,
-          viewContainer: this._viewContainerRef
-        } : null;
-        const preview = this._previewTemplate ? {
-          template: this._previewTemplate.templateRef,
-          context: this._previewTemplate.data,
-          matchSize: this._previewTemplate.matchSize,
-          viewContainer: this._viewContainerRef
-        } : null;
+        const placeholder = this._placeholderTemplate
+          ? {
+              template: this._placeholderTemplate.templateRef,
+              context: this._placeholderTemplate.data,
+              viewContainer: this._viewContainerRef,
+            }
+          : null;
+        const preview = this._previewTemplate
+          ? {
+              template: this._previewTemplate.templateRef,
+              context: this._previewTemplate.data,
+              matchSize: this._previewTemplate.matchSize,
+              viewContainer: this._viewContainerRef,
+            }
+          : null;
         ref.disabled = this.disabled;
         ref.lockAxis = this.lockAxis;
         ref.scale = this.scale;
-        ref.dragStartDelay = typeof dragStartDelay === "object" && dragStartDelay ? dragStartDelay : coerceNumberProperty(dragStartDelay);
+        ref.dragStartDelay =
+          typeof dragStartDelay === "object" && dragStartDelay
+            ? dragStartDelay
+            : coerceNumberProperty(dragStartDelay);
         ref.constrainPosition = this.constrainPosition;
         ref.previewClass = this.previewClass;
-        ref.withBoundaryElement(this._getBoundaryElement()).withPlaceholderTemplate(placeholder).withPreviewTemplate(preview).withPreviewContainer(this.previewContainer || "global");
+        ref
+          .withBoundaryElement(this._getBoundaryElement())
+          .withPlaceholderTemplate(placeholder)
+          .withPreviewTemplate(preview)
+          .withPreviewContainer(this.previewContainer || "global");
         if (dir) {
           ref.withDirection(dir.value);
         }
@@ -5301,7 +6424,8 @@ var CdkDrag = class _CdkDrag {
       }
       let parent = this.element.nativeElement.parentElement;
       while (parent) {
-        const parentDrag = this._dragDropRegistry.getDragDirectiveForNode(parent);
+        const parentDrag =
+          this._dragDropRegistry.getDragDirectiveForNode(parent);
         if (parentDrag) {
           ref.withParent(parentDrag._dragRef);
           break;
@@ -5315,14 +6439,14 @@ var CdkDrag = class _CdkDrag {
     ref.started.subscribe((startEvent) => {
       this.started.emit({
         source: this,
-        event: startEvent.event
+        event: startEvent.event,
       });
       this._changeDetectorRef.markForCheck();
     });
     ref.released.subscribe((releaseEvent) => {
       this.released.emit({
         source: this,
-        event: releaseEvent.event
+        event: releaseEvent.event,
       });
     });
     ref.ended.subscribe((endEvent) => {
@@ -5330,7 +6454,7 @@ var CdkDrag = class _CdkDrag {
         source: this,
         distance: endEvent.distance,
         dropPoint: endEvent.dropPoint,
-        event: endEvent.event
+        event: endEvent.event,
       });
       this._changeDetectorRef.markForCheck();
     });
@@ -5338,13 +6462,13 @@ var CdkDrag = class _CdkDrag {
       this.entered.emit({
         container: enterEvent.container.data,
         item: this,
-        currentIndex: enterEvent.currentIndex
+        currentIndex: enterEvent.currentIndex,
       });
     });
     ref.exited.subscribe((exitEvent) => {
       this.exited.emit({
         container: exitEvent.container.data,
-        item: this
+        item: this,
       });
     });
     ref.dropped.subscribe((dropEvent) => {
@@ -5357,7 +6481,7 @@ var CdkDrag = class _CdkDrag {
         item: this,
         distance: dropEvent.distance,
         dropPoint: dropEvent.dropPoint,
-        event: dropEvent.event
+        event: dropEvent.event,
       });
     });
   }
@@ -5371,7 +6495,7 @@ var CdkDrag = class _CdkDrag {
       boundaryElement,
       draggingDisabled,
       rootElementSelector,
-      previewContainer
+      previewContainer,
     } = config;
     this.disabled = draggingDisabled == null ? false : draggingDisabled;
     this.dragStartDelay = dragStartDelay || 0;
@@ -5396,25 +6520,31 @@ var CdkDrag = class _CdkDrag {
   }
   /** Sets up the listener that syncs the handles with the drag ref. */
   _setupHandlesListener() {
-    this._handles.pipe(
-      // Sync the new handles with the DragRef.
-      tap((handles) => {
-        const handleElements = handles.map((handle) => handle.element);
-        if (this._selfHandle && this.rootElementSelector) {
-          handleElements.push(this.element);
-        }
-        this._dragRef.withHandles(handleElements);
-      }),
-      // Listen if the state of any of the handles changes.
-      switchMap((handles) => {
-        return merge(...handles.map((item) => item._stateChanges.pipe(startWith(item))));
-      }),
-      takeUntil(this._destroyed)
-    ).subscribe((handleInstance) => {
-      const dragRef = this._dragRef;
-      const handle = handleInstance.element.nativeElement;
-      handleInstance.disabled ? dragRef.disableHandle(handle) : dragRef.enableHandle(handle);
-    });
+    this._handles
+      .pipe(
+        // Sync the new handles with the DragRef.
+        tap((handles) => {
+          const handleElements = handles.map((handle) => handle.element);
+          if (this._selfHandle && this.rootElementSelector) {
+            handleElements.push(this.element);
+          }
+          this._dragRef.withHandles(handleElements);
+        }),
+        // Listen if the state of any of the handles changes.
+        switchMap((handles) => {
+          return merge(
+            ...handles.map((item) => item._stateChanges.pipe(startWith(item))),
+          );
+        }),
+        takeUntil(this._destroyed),
+      )
+      .subscribe((handleInstance) => {
+        const dragRef = this._dragRef;
+        const handle = handleInstance.element.nativeElement;
+        handleInstance.disabled
+          ? dragRef.disableHandle(handle)
+          : dragRef.enableHandle(handle);
+      });
   }
   static ɵfac = function CdkDrag_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _CdkDrag)();
@@ -5426,7 +6556,10 @@ var CdkDrag = class _CdkDrag {
     hostVars: 4,
     hostBindings: function CdkDrag_HostBindings(rf, ctx) {
       if (rf & 2) {
-        ɵɵclassProp("cdk-drag-disabled", ctx.disabled)("cdk-drag-dragging", ctx._dragRef.isDragging());
+        ɵɵclassProp("cdk-drag-disabled", ctx.disabled)(
+          "cdk-drag-dragging",
+          ctx._dragRef.isDragging(),
+        );
       }
     },
     inputs: {
@@ -5440,7 +6573,7 @@ var CdkDrag = class _CdkDrag {
       constrainPosition: [0, "cdkDragConstrainPosition", "constrainPosition"],
       previewClass: [0, "cdkDragPreviewClass", "previewClass"],
       previewContainer: [0, "cdkDragPreviewContainer", "previewContainer"],
-      scale: [2, "cdkDragScale", "scale", numberAttribute]
+      scale: [2, "cdkDragScale", "scale", numberAttribute],
     },
     outputs: {
       started: "cdkDragStarted",
@@ -5449,111 +6582,168 @@ var CdkDrag = class _CdkDrag {
       entered: "cdkDragEntered",
       exited: "cdkDragExited",
       dropped: "cdkDragDropped",
-      moved: "cdkDragMoved"
+      moved: "cdkDragMoved",
     },
     exportAs: ["cdkDrag"],
-    features: [ɵɵProvidersFeature([{
-      provide: CDK_DRAG_PARENT,
-      useExisting: _CdkDrag
-    }]), ɵɵNgOnChangesFeature]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: CDK_DRAG_PARENT,
+          useExisting: _CdkDrag,
+        },
+      ]),
+      ɵɵNgOnChangesFeature,
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkDrag, [{
-    type: Directive,
-    args: [{
-      selector: "[cdkDrag]",
-      exportAs: "cdkDrag",
-      host: {
-        "class": "cdk-drag",
-        "[class.cdk-drag-disabled]": "disabled",
-        "[class.cdk-drag-dragging]": "_dragRef.isDragging()"
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkDrag,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdkDrag]",
+              exportAs: "cdkDrag",
+              host: {
+                class: "cdk-drag",
+                "[class.cdk-drag-disabled]": "disabled",
+                "[class.cdk-drag-dragging]": "_dragRef.isDragging()",
+              },
+              providers: [
+                {
+                  provide: CDK_DRAG_PARENT,
+                  useExisting: CdkDrag,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        data: [
+          {
+            type: Input,
+            args: ["cdkDragData"],
+          },
+        ],
+        lockAxis: [
+          {
+            type: Input,
+            args: ["cdkDragLockAxis"],
+          },
+        ],
+        rootElementSelector: [
+          {
+            type: Input,
+            args: ["cdkDragRootElement"],
+          },
+        ],
+        boundaryElement: [
+          {
+            type: Input,
+            args: ["cdkDragBoundary"],
+          },
+        ],
+        dragStartDelay: [
+          {
+            type: Input,
+            args: ["cdkDragStartDelay"],
+          },
+        ],
+        freeDragPosition: [
+          {
+            type: Input,
+            args: ["cdkDragFreeDragPosition"],
+          },
+        ],
+        disabled: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDragDisabled",
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        constrainPosition: [
+          {
+            type: Input,
+            args: ["cdkDragConstrainPosition"],
+          },
+        ],
+        previewClass: [
+          {
+            type: Input,
+            args: ["cdkDragPreviewClass"],
+          },
+        ],
+        previewContainer: [
+          {
+            type: Input,
+            args: ["cdkDragPreviewContainer"],
+          },
+        ],
+        scale: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDragScale",
+                transform: numberAttribute,
+              },
+            ],
+          },
+        ],
+        started: [
+          {
+            type: Output,
+            args: ["cdkDragStarted"],
+          },
+        ],
+        released: [
+          {
+            type: Output,
+            args: ["cdkDragReleased"],
+          },
+        ],
+        ended: [
+          {
+            type: Output,
+            args: ["cdkDragEnded"],
+          },
+        ],
+        entered: [
+          {
+            type: Output,
+            args: ["cdkDragEntered"],
+          },
+        ],
+        exited: [
+          {
+            type: Output,
+            args: ["cdkDragExited"],
+          },
+        ],
+        dropped: [
+          {
+            type: Output,
+            args: ["cdkDragDropped"],
+          },
+        ],
+        moved: [
+          {
+            type: Output,
+            args: ["cdkDragMoved"],
+          },
+        ],
       },
-      providers: [{
-        provide: CDK_DRAG_PARENT,
-        useExisting: CdkDrag
-      }]
-    }]
-  }], () => [], {
-    data: [{
-      type: Input,
-      args: ["cdkDragData"]
-    }],
-    lockAxis: [{
-      type: Input,
-      args: ["cdkDragLockAxis"]
-    }],
-    rootElementSelector: [{
-      type: Input,
-      args: ["cdkDragRootElement"]
-    }],
-    boundaryElement: [{
-      type: Input,
-      args: ["cdkDragBoundary"]
-    }],
-    dragStartDelay: [{
-      type: Input,
-      args: ["cdkDragStartDelay"]
-    }],
-    freeDragPosition: [{
-      type: Input,
-      args: ["cdkDragFreeDragPosition"]
-    }],
-    disabled: [{
-      type: Input,
-      args: [{
-        alias: "cdkDragDisabled",
-        transform: booleanAttribute
-      }]
-    }],
-    constrainPosition: [{
-      type: Input,
-      args: ["cdkDragConstrainPosition"]
-    }],
-    previewClass: [{
-      type: Input,
-      args: ["cdkDragPreviewClass"]
-    }],
-    previewContainer: [{
-      type: Input,
-      args: ["cdkDragPreviewContainer"]
-    }],
-    scale: [{
-      type: Input,
-      args: [{
-        alias: "cdkDragScale",
-        transform: numberAttribute
-      }]
-    }],
-    started: [{
-      type: Output,
-      args: ["cdkDragStarted"]
-    }],
-    released: [{
-      type: Output,
-      args: ["cdkDragReleased"]
-    }],
-    ended: [{
-      type: Output,
-      args: ["cdkDragEnded"]
-    }],
-    entered: [{
-      type: Output,
-      args: ["cdkDragEntered"]
-    }],
-    exited: [{
-      type: Output,
-      args: ["cdkDragExited"]
-    }],
-    dropped: [{
-      type: Output,
-      args: ["cdkDragDropped"]
-    }],
-    moved: [{
-      type: Output,
-      args: ["cdkDragMoved"]
-    }]
-  });
+    );
 })();
 var CDK_DROP_LIST_GROUP = new InjectionToken("CdkDropListGroup");
 var CdkDropListGroup = class _CdkDropListGroup {
@@ -5571,46 +6761,66 @@ var CdkDropListGroup = class _CdkDropListGroup {
     type: _CdkDropListGroup,
     selectors: [["", "cdkDropListGroup", ""]],
     inputs: {
-      disabled: [2, "cdkDropListGroupDisabled", "disabled", booleanAttribute]
+      disabled: [2, "cdkDropListGroupDisabled", "disabled", booleanAttribute],
     },
     exportAs: ["cdkDropListGroup"],
-    features: [ɵɵProvidersFeature([{
-      provide: CDK_DROP_LIST_GROUP,
-      useExisting: _CdkDropListGroup
-    }])]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: CDK_DROP_LIST_GROUP,
+          useExisting: _CdkDropListGroup,
+        },
+      ]),
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkDropListGroup, [{
-    type: Directive,
-    args: [{
-      selector: "[cdkDropListGroup]",
-      exportAs: "cdkDropListGroup",
-      providers: [{
-        provide: CDK_DROP_LIST_GROUP,
-        useExisting: CdkDropListGroup
-      }]
-    }]
-  }], null, {
-    disabled: [{
-      type: Input,
-      args: [{
-        alias: "cdkDropListGroupDisabled",
-        transform: booleanAttribute
-      }]
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkDropListGroup,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdkDropListGroup]",
+              exportAs: "cdkDropListGroup",
+              providers: [
+                {
+                  provide: CDK_DROP_LIST_GROUP,
+                  useExisting: CdkDropListGroup,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      null,
+      {
+        disabled: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDropListGroupDisabled",
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+      },
+    );
 })();
 var CdkDropList = class _CdkDropList {
   element = inject(ElementRef);
   _changeDetectorRef = inject(ChangeDetectorRef);
   _scrollDispatcher = inject(ScrollDispatcher);
   _dir = inject(Directionality, {
-    optional: true
+    optional: true,
   });
   _group = inject(CDK_DROP_LIST_GROUP, {
     optional: true,
-    skipSelf: true
+    skipSelf: true,
   });
   /** Refs that have been synced with the drop ref most recently. */
   _latestSortedRefs;
@@ -5641,7 +6851,7 @@ var CdkDropList = class _CdkDropList {
   lockAxis;
   /** Whether starting a dragging sequence from this container is disabled. */
   get disabled() {
-    return this._disabled || !!this._group && this._group.disabled;
+    return this._disabled || (!!this._group && this._group.disabled);
   }
   set disabled(value) {
     this._dropListRef.disabled = this._disabled = value;
@@ -5699,7 +6909,7 @@ var CdkDropList = class _CdkDropList {
   constructor() {
     const dragDrop = inject(DragDrop);
     const config = inject(CDK_DRAG_CONFIG, {
-      optional: true
+      optional: true,
     });
     if (typeof ngDevMode === "undefined" || ngDevMode) {
       assertElementNode(this.element.nativeElement, "cdkDropList");
@@ -5726,7 +6936,9 @@ var CdkDropList = class _CdkDropList {
   addItem(item) {
     this._unsortedItems.add(item);
     if (this._dropListRef.isDragging()) {
-      this._syncItemsWithRef(this.getSortedItems().map((item2) => item2._dragRef));
+      this._syncItemsWithRef(
+        this.getSortedItems().map((item2) => item2._dragRef),
+      );
     }
   }
   /** Removes an item from the drop list. */
@@ -5743,7 +6955,9 @@ var CdkDropList = class _CdkDropList {
   /** Gets the registered items in the list, sorted by their position in the DOM. */
   getSortedItems() {
     return Array.from(this._unsortedItems).sort((a, b) => {
-      const documentPosition = a._dragRef.getVisibleElement().compareDocumentPosition(b._dragRef.getVisibleElement());
+      const documentPosition = a._dragRef
+        .getVisibleElement()
+        .compareDocumentPosition(b._dragRef.getVisibleElement());
       return documentPosition & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
     });
   }
@@ -5764,14 +6978,23 @@ var CdkDropList = class _CdkDropList {
   /** Syncs the inputs of the CdkDropList with the options of the underlying DropListRef. */
   _setupInputSyncSubscription(ref) {
     if (this._dir) {
-      this._dir.change.pipe(startWith(this._dir.value), takeUntil(this._destroyed)).subscribe((value) => ref.withDirection(value));
+      this._dir.change
+        .pipe(startWith(this._dir.value), takeUntil(this._destroyed))
+        .subscribe((value) => ref.withDirection(value));
     }
     ref.beforeStarted.subscribe(() => {
       const siblings = coerceArray(this.connectedTo).map((drop) => {
         if (typeof drop === "string") {
-          const correspondingDropList = _CdkDropList._dropLists.find((list) => list.id === drop);
-          if (!correspondingDropList && (typeof ngDevMode === "undefined" || ngDevMode)) {
-            console.warn(`CdkDropList could not find connected drop list with id "${drop}"`);
+          const correspondingDropList = _CdkDropList._dropLists.find(
+            (list) => list.id === drop,
+          );
+          if (
+            !correspondingDropList &&
+            (typeof ngDevMode === "undefined" || ngDevMode)
+          ) {
+            console.warn(
+              `CdkDropList could not find connected drop list with id "${drop}"`,
+            );
           }
           return correspondingDropList;
         }
@@ -5785,14 +7008,20 @@ var CdkDropList = class _CdkDropList {
         });
       }
       if (!this._scrollableParentsResolved) {
-        const scrollableParents = this._scrollDispatcher.getAncestorScrollContainers(this.element).map((scrollable) => scrollable.getElementRef().nativeElement);
+        const scrollableParents = this._scrollDispatcher
+          .getAncestorScrollContainers(this.element)
+          .map((scrollable) => scrollable.getElementRef().nativeElement);
         this._dropListRef.withScrollableParents(scrollableParents);
         this._scrollableParentsResolved = true;
       }
       if (this.elementContainerSelector) {
-        const container = this.element.nativeElement.querySelector(this.elementContainerSelector);
+        const container = this.element.nativeElement.querySelector(
+          this.elementContainerSelector,
+        );
         if (!container && (typeof ngDevMode === "undefined" || ngDevMode)) {
-          throw new Error(`CdkDropList could not find an element container matching the selector "${this.elementContainerSelector}"`);
+          throw new Error(
+            `CdkDropList could not find an element container matching the selector "${this.elementContainerSelector}"`,
+          );
         }
         ref.withElementContainer(container);
       }
@@ -5801,26 +7030,34 @@ var CdkDropList = class _CdkDropList {
       ref.sortingDisabled = this.sortingDisabled;
       ref.autoScrollDisabled = this.autoScrollDisabled;
       ref.autoScrollStep = coerceNumberProperty(this.autoScrollStep, 2);
-      ref.connectedTo(siblings.filter((drop) => drop && drop !== this).map((list) => list._dropListRef)).withOrientation(this.orientation);
+      ref
+        .connectedTo(
+          siblings
+            .filter((drop) => drop && drop !== this)
+            .map((list) => list._dropListRef),
+        )
+        .withOrientation(this.orientation);
     });
   }
   /** Handles events from the underlying DropListRef. */
   _handleEvents(ref) {
     ref.beforeStarted.subscribe(() => {
-      this._syncItemsWithRef(this.getSortedItems().map((item) => item._dragRef));
+      this._syncItemsWithRef(
+        this.getSortedItems().map((item) => item._dragRef),
+      );
       this._changeDetectorRef.markForCheck();
     });
     ref.entered.subscribe((event) => {
       this.entered.emit({
         container: this,
         item: event.item.data,
-        currentIndex: event.currentIndex
+        currentIndex: event.currentIndex,
       });
     });
     ref.exited.subscribe((event) => {
       this.exited.emit({
         container: this,
-        item: event.item.data
+        item: event.item.data,
       });
       this._changeDetectorRef.markForCheck();
     });
@@ -5829,7 +7066,7 @@ var CdkDropList = class _CdkDropList {
         previousIndex: event.previousIndex,
         currentIndex: event.currentIndex,
         container: this,
-        item: event.item.data
+        item: event.item.data,
       });
     });
     ref.dropped.subscribe((dropEvent) => {
@@ -5842,11 +7079,13 @@ var CdkDropList = class _CdkDropList {
         isPointerOverContainer: dropEvent.isPointerOverContainer,
         distance: dropEvent.distance,
         dropPoint: dropEvent.dropPoint,
-        event: dropEvent.event
+        event: dropEvent.event,
       });
       this._changeDetectorRef.markForCheck();
     });
-    merge(ref.receivingStarted, ref.receivingStopped).subscribe(() => this._changeDetectorRef.markForCheck());
+    merge(ref.receivingStarted, ref.receivingStopped).subscribe(() =>
+      this._changeDetectorRef.markForCheck(),
+    );
   }
   /** Assigns the default input values based on a provided config object. */
   _assignDefaults(config) {
@@ -5855,11 +7094,12 @@ var CdkDropList = class _CdkDropList {
       draggingDisabled,
       sortingDisabled,
       listAutoScrollDisabled,
-      listOrientation
+      listOrientation,
     } = config;
     this.disabled = draggingDisabled == null ? false : draggingDisabled;
     this.sortingDisabled = sortingDisabled == null ? false : sortingDisabled;
-    this.autoScrollDisabled = listAutoScrollDisabled == null ? false : listAutoScrollDisabled;
+    this.autoScrollDisabled =
+      listAutoScrollDisabled == null ? false : listAutoScrollDisabled;
     this.orientation = listOrientation || "vertical";
     if (lockAxis) {
       this.lockAxis = lockAxis;
@@ -5881,7 +7121,10 @@ var CdkDropList = class _CdkDropList {
     hostBindings: function CdkDropList_HostBindings(rf, ctx) {
       if (rf & 2) {
         ɵɵattribute("id", ctx.id);
-        ɵɵclassProp("cdk-drop-list-disabled", ctx.disabled)("cdk-drop-list-dragging", ctx._dropListRef.isDragging())("cdk-drop-list-receiving", ctx._dropListRef.isReceiving());
+        ɵɵclassProp("cdk-drop-list-disabled", ctx.disabled)(
+          "cdk-drop-list-dragging",
+          ctx._dropListRef.isDragging(),
+        )("cdk-drop-list-receiving", ctx._dropListRef.isReceiving());
       }
     },
     inputs: {
@@ -5891,138 +7134,202 @@ var CdkDropList = class _CdkDropList {
       id: "id",
       lockAxis: [0, "cdkDropListLockAxis", "lockAxis"],
       disabled: [2, "cdkDropListDisabled", "disabled", booleanAttribute],
-      sortingDisabled: [2, "cdkDropListSortingDisabled", "sortingDisabled", booleanAttribute],
+      sortingDisabled: [
+        2,
+        "cdkDropListSortingDisabled",
+        "sortingDisabled",
+        booleanAttribute,
+      ],
       enterPredicate: [0, "cdkDropListEnterPredicate", "enterPredicate"],
       sortPredicate: [0, "cdkDropListSortPredicate", "sortPredicate"],
-      autoScrollDisabled: [2, "cdkDropListAutoScrollDisabled", "autoScrollDisabled", booleanAttribute],
+      autoScrollDisabled: [
+        2,
+        "cdkDropListAutoScrollDisabled",
+        "autoScrollDisabled",
+        booleanAttribute,
+      ],
       autoScrollStep: [0, "cdkDropListAutoScrollStep", "autoScrollStep"],
-      elementContainerSelector: [0, "cdkDropListElementContainer", "elementContainerSelector"]
+      elementContainerSelector: [
+        0,
+        "cdkDropListElementContainer",
+        "elementContainerSelector",
+      ],
     },
     outputs: {
       dropped: "cdkDropListDropped",
       entered: "cdkDropListEntered",
       exited: "cdkDropListExited",
-      sorted: "cdkDropListSorted"
+      sorted: "cdkDropListSorted",
     },
     exportAs: ["cdkDropList"],
-    features: [ɵɵProvidersFeature([
-      // Prevent child drop lists from picking up the same group as their parent.
-      {
-        provide: CDK_DROP_LIST_GROUP,
-        useValue: void 0
-      },
-      {
-        provide: CDK_DROP_LIST,
-        useExisting: _CdkDropList
-      }
-    ])]
-  });
-};
-(() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkDropList, [{
-    type: Directive,
-    args: [{
-      selector: "[cdkDropList], cdk-drop-list",
-      exportAs: "cdkDropList",
-      providers: [
+    features: [
+      ɵɵProvidersFeature([
         // Prevent child drop lists from picking up the same group as their parent.
         {
           provide: CDK_DROP_LIST_GROUP,
-          useValue: void 0
+          useValue: void 0,
         },
         {
           provide: CDK_DROP_LIST,
-          useExisting: CdkDropList
-        }
-      ],
-      host: {
-        "class": "cdk-drop-list",
-        "[attr.id]": "id",
-        "[class.cdk-drop-list-disabled]": "disabled",
-        "[class.cdk-drop-list-dragging]": "_dropListRef.isDragging()",
-        "[class.cdk-drop-list-receiving]": "_dropListRef.isReceiving()"
-      }
-    }]
-  }], () => [], {
-    connectedTo: [{
-      type: Input,
-      args: ["cdkDropListConnectedTo"]
-    }],
-    data: [{
-      type: Input,
-      args: ["cdkDropListData"]
-    }],
-    orientation: [{
-      type: Input,
-      args: ["cdkDropListOrientation"]
-    }],
-    id: [{
-      type: Input
-    }],
-    lockAxis: [{
-      type: Input,
-      args: ["cdkDropListLockAxis"]
-    }],
-    disabled: [{
-      type: Input,
-      args: [{
-        alias: "cdkDropListDisabled",
-        transform: booleanAttribute
-      }]
-    }],
-    sortingDisabled: [{
-      type: Input,
-      args: [{
-        alias: "cdkDropListSortingDisabled",
-        transform: booleanAttribute
-      }]
-    }],
-    enterPredicate: [{
-      type: Input,
-      args: ["cdkDropListEnterPredicate"]
-    }],
-    sortPredicate: [{
-      type: Input,
-      args: ["cdkDropListSortPredicate"]
-    }],
-    autoScrollDisabled: [{
-      type: Input,
-      args: [{
-        alias: "cdkDropListAutoScrollDisabled",
-        transform: booleanAttribute
-      }]
-    }],
-    autoScrollStep: [{
-      type: Input,
-      args: ["cdkDropListAutoScrollStep"]
-    }],
-    elementContainerSelector: [{
-      type: Input,
-      args: ["cdkDropListElementContainer"]
-    }],
-    dropped: [{
-      type: Output,
-      args: ["cdkDropListDropped"]
-    }],
-    entered: [{
-      type: Output,
-      args: ["cdkDropListEntered"]
-    }],
-    exited: [{
-      type: Output,
-      args: ["cdkDropListExited"]
-    }],
-    sorted: [{
-      type: Output,
-      args: ["cdkDropListSorted"]
-    }]
+          useExisting: _CdkDropList,
+        },
+      ]),
+    ],
   });
+};
+(() => {
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkDropList,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[cdkDropList], cdk-drop-list",
+              exportAs: "cdkDropList",
+              providers: [
+                // Prevent child drop lists from picking up the same group as their parent.
+                {
+                  provide: CDK_DROP_LIST_GROUP,
+                  useValue: void 0,
+                },
+                {
+                  provide: CDK_DROP_LIST,
+                  useExisting: CdkDropList,
+                },
+              ],
+              host: {
+                class: "cdk-drop-list",
+                "[attr.id]": "id",
+                "[class.cdk-drop-list-disabled]": "disabled",
+                "[class.cdk-drop-list-dragging]": "_dropListRef.isDragging()",
+                "[class.cdk-drop-list-receiving]": "_dropListRef.isReceiving()",
+              },
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        connectedTo: [
+          {
+            type: Input,
+            args: ["cdkDropListConnectedTo"],
+          },
+        ],
+        data: [
+          {
+            type: Input,
+            args: ["cdkDropListData"],
+          },
+        ],
+        orientation: [
+          {
+            type: Input,
+            args: ["cdkDropListOrientation"],
+          },
+        ],
+        id: [
+          {
+            type: Input,
+          },
+        ],
+        lockAxis: [
+          {
+            type: Input,
+            args: ["cdkDropListLockAxis"],
+          },
+        ],
+        disabled: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDropListDisabled",
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        sortingDisabled: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDropListSortingDisabled",
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        enterPredicate: [
+          {
+            type: Input,
+            args: ["cdkDropListEnterPredicate"],
+          },
+        ],
+        sortPredicate: [
+          {
+            type: Input,
+            args: ["cdkDropListSortPredicate"],
+          },
+        ],
+        autoScrollDisabled: [
+          {
+            type: Input,
+            args: [
+              {
+                alias: "cdkDropListAutoScrollDisabled",
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        autoScrollStep: [
+          {
+            type: Input,
+            args: ["cdkDropListAutoScrollStep"],
+          },
+        ],
+        elementContainerSelector: [
+          {
+            type: Input,
+            args: ["cdkDropListElementContainer"],
+          },
+        ],
+        dropped: [
+          {
+            type: Output,
+            args: ["cdkDropListDropped"],
+          },
+        ],
+        entered: [
+          {
+            type: Output,
+            args: ["cdkDropListEntered"],
+          },
+        ],
+        exited: [
+          {
+            type: Output,
+            args: ["cdkDropListExited"],
+          },
+        ],
+        sorted: [
+          {
+            type: Output,
+            args: ["cdkDropListSorted"],
+          },
+        ],
+      },
+    );
 })();
 var CDK_DRAG_PREVIEW = new InjectionToken("CdkDragPreview");
 var CdkDragPreview = class _CdkDragPreview {
   templateRef = inject(TemplateRef);
   _drag = inject(CDK_DRAG_PARENT, {
-    optional: true
+    optional: true,
   });
   /** Context data to be added to the preview template instance. */
   data;
@@ -6042,41 +7349,63 @@ var CdkDragPreview = class _CdkDragPreview {
     selectors: [["ng-template", "cdkDragPreview", ""]],
     inputs: {
       data: "data",
-      matchSize: [2, "matchSize", "matchSize", booleanAttribute]
+      matchSize: [2, "matchSize", "matchSize", booleanAttribute],
     },
-    features: [ɵɵProvidersFeature([{
-      provide: CDK_DRAG_PREVIEW,
-      useExisting: _CdkDragPreview
-    }])]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: CDK_DRAG_PREVIEW,
+          useExisting: _CdkDragPreview,
+        },
+      ]),
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkDragPreview, [{
-    type: Directive,
-    args: [{
-      selector: "ng-template[cdkDragPreview]",
-      providers: [{
-        provide: CDK_DRAG_PREVIEW,
-        useExisting: CdkDragPreview
-      }]
-    }]
-  }], () => [], {
-    data: [{
-      type: Input
-    }],
-    matchSize: [{
-      type: Input,
-      args: [{
-        transform: booleanAttribute
-      }]
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkDragPreview,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "ng-template[cdkDragPreview]",
+              providers: [
+                {
+                  provide: CDK_DRAG_PREVIEW,
+                  useExisting: CdkDragPreview,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        data: [
+          {
+            type: Input,
+          },
+        ],
+        matchSize: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+      },
+    );
 })();
 var CDK_DRAG_PLACEHOLDER = new InjectionToken("CdkDragPlaceholder");
 var CdkDragPlaceholder = class _CdkDragPlaceholder {
   templateRef = inject(TemplateRef);
   _drag = inject(CDK_DRAG_PARENT, {
-    optional: true
+    optional: true,
   });
   /** Context data to be added to the placeholder template instance. */
   data;
@@ -6093,54 +7422,104 @@ var CdkDragPlaceholder = class _CdkDragPlaceholder {
     type: _CdkDragPlaceholder,
     selectors: [["ng-template", "cdkDragPlaceholder", ""]],
     inputs: {
-      data: "data"
+      data: "data",
     },
-    features: [ɵɵProvidersFeature([{
-      provide: CDK_DRAG_PLACEHOLDER,
-      useExisting: _CdkDragPlaceholder
-    }])]
+    features: [
+      ɵɵProvidersFeature([
+        {
+          provide: CDK_DRAG_PLACEHOLDER,
+          useExisting: _CdkDragPlaceholder,
+        },
+      ]),
+    ],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CdkDragPlaceholder, [{
-    type: Directive,
-    args: [{
-      selector: "ng-template[cdkDragPlaceholder]",
-      providers: [{
-        provide: CDK_DRAG_PLACEHOLDER,
-        useExisting: CdkDragPlaceholder
-      }]
-    }]
-  }], () => [], {
-    data: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CdkDragPlaceholder,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "ng-template[cdkDragPlaceholder]",
+              providers: [
+                {
+                  provide: CDK_DRAG_PLACEHOLDER,
+                  useExisting: CdkDragPlaceholder,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        data: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
-var DRAG_DROP_DIRECTIVES = [CdkDropList, CdkDropListGroup, CdkDrag, CdkDragHandle, CdkDragPreview, CdkDragPlaceholder];
+var DRAG_DROP_DIRECTIVES = [
+  CdkDropList,
+  CdkDropListGroup,
+  CdkDrag,
+  CdkDragHandle,
+  CdkDragPreview,
+  CdkDragPlaceholder,
+];
 var DragDropModule = class _DragDropModule {
   static ɵfac = function DragDropModule_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _DragDropModule)();
   };
   static ɵmod = ɵɵdefineNgModule({
     type: _DragDropModule,
-    imports: [CdkDropList, CdkDropListGroup, CdkDrag, CdkDragHandle, CdkDragPreview, CdkDragPlaceholder],
-    exports: [CdkScrollableModule, CdkDropList, CdkDropListGroup, CdkDrag, CdkDragHandle, CdkDragPreview, CdkDragPlaceholder]
+    imports: [
+      CdkDropList,
+      CdkDropListGroup,
+      CdkDrag,
+      CdkDragHandle,
+      CdkDragPreview,
+      CdkDragPlaceholder,
+    ],
+    exports: [
+      CdkScrollableModule,
+      CdkDropList,
+      CdkDropListGroup,
+      CdkDrag,
+      CdkDragHandle,
+      CdkDragPreview,
+      CdkDragPlaceholder,
+    ],
   });
   static ɵinj = ɵɵdefineInjector({
     providers: [DragDrop],
-    imports: [CdkScrollableModule]
+    imports: [CdkScrollableModule],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(DragDropModule, [{
-    type: NgModule,
-    args: [{
-      imports: DRAG_DROP_DIRECTIVES,
-      exports: [CdkScrollableModule, ...DRAG_DROP_DIRECTIVES],
-      providers: [DragDrop]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      DragDropModule,
+      [
+        {
+          type: NgModule,
+          args: [
+            {
+              imports: DRAG_DROP_DIRECTIVES,
+              exports: [CdkScrollableModule, ...DRAG_DROP_DIRECTIVES],
+              providers: [DragDrop],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 export {
   CDK_DRAG_CONFIG,
@@ -6164,6 +7543,6 @@ export {
   copyArrayItem,
   moveItemInArray,
   transferArrayItem,
-  CdkScrollable as ɵɵCdkScrollable
+  CdkScrollable as ɵɵCdkScrollable,
 };
 //# sourceMappingURL=@angular_cdk_drag-drop.js.map

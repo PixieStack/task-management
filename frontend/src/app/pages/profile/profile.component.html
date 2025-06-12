@@ -3,83 +3,110 @@
     <h1>Profile Settings</h1>
     <p>Manage your personal information and account preferences</p>
   </div>
-  
+
   <div class="profile-content">
     <div class="profile-card">
       <div class="profile-sidebar">
         <div class="profile-picture-container">
           <div class="profile-picture" (click)="updateProfilePicture()">
-            <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile Picture">
-            <div *ngIf="!profilePicture" class="profile-initials">{{ username?.charAt(0) || 'U' }}</div>
+            <img
+              *ngIf="profilePicture"
+              [src]="profilePicture"
+              alt="Profile Picture"
+            />
+            <div *ngIf="!profilePicture" class="profile-initials">
+              {{ username?.charAt(0) || "U" }}
+            </div>
             <div class="upload-overlay">
               <i class="fas fa-camera"></i>
               <span>Change</span>
             </div>
           </div>
           <h2>{{ username }}</h2>
-          <p>{{ profileForm.get('occupation')?.value || 'Add your occupation' }}</p>
+          <p>
+            {{ profileForm.get("occupation")?.value || "Add your occupation" }}
+          </p>
         </div>
-        
+
         <div class="profile-nav">
           <ul>
-            <li [ngClass]="{'active': activeSection === 'personal'}" (click)="setActiveSection('personal')">
+            <li
+              [ngClass]="{ active: activeSection === 'personal' }"
+              (click)="setActiveSection('personal')"
+            >
               <i class="fas fa-user"></i> Personal Information
             </li>
-            <li [ngClass]="{'active': activeSection === 'security'}" (click)="setActiveSection('security')">
+            <li
+              [ngClass]="{ active: activeSection === 'security' }"
+              (click)="setActiveSection('security')"
+            >
               <i class="fas fa-lock"></i> Account Security
             </li>
           </ul>
         </div>
       </div>
-      
+
       <!-- PERSONAL INFORMATION SECTION -->
       <div class="profile-form-container" *ngIf="activeSection === 'personal'">
         <h3>Personal Information</h3>
         <p>Update your personal details and information</p>
-        
+
         <div class="success-message" *ngIf="success">
           <i class="fas fa-check-circle"></i>
           Profile updated successfully!
         </div>
-        
+
         <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
           <div class="form-row">
             <div class="form-group">
-              <label for="firstName">First Name <span class="required">*</span></label>
-              <input 
-                type="text" 
-                id="firstName" 
-                formControlName="firstName" 
-                [ngClass]="{'invalid': hasError('firstName', 'required')}"
+              <label for="firstName"
+                >First Name <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError('firstName', 'required')">
+              <input
+                type="text"
+                id="firstName"
+                formControlName="firstName"
+                [ngClass]="{ invalid: hasError('firstName', 'required') }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError('firstName', 'required')"
+              >
                 First name is required
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="lastName">Last Name <span class="required">*</span></label>
-              <input 
-                type="text" 
-                id="lastName" 
-                formControlName="lastName"
-                [ngClass]="{'invalid': hasError('lastName', 'required')}"
+              <label for="lastName"
+                >Last Name <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasError('lastName', 'required')">
+              <input
+                type="text"
+                id="lastName"
+                formControlName="lastName"
+                [ngClass]="{ invalid: hasError('lastName', 'required') }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasError('lastName', 'required')"
+              >
                 Last name is required
               </div>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="email">Email <span class="required">*</span></label>
-              <input 
-                type="email" 
-                id="email" 
+              <input
+                type="email"
+                id="email"
                 formControlName="email"
-                [ngClass]="{'invalid': hasError('email', 'required') || hasError('email', 'email')}"
-              >
+                [ngClass]="{
+                  invalid:
+                    hasError('email', 'required') || hasError('email', 'email'),
+                }"
+              />
               <div class="error-message" *ngIf="hasError('email', 'required')">
                 Email is required
               </div>
@@ -87,22 +114,22 @@
                 Please enter a valid email
               </div>
             </div>
-            
+
             <div class="form-group">
               <label for="phone">Phone Number</label>
-              <input 
-                type="tel" 
-                id="phone" 
+              <input
+                type="tel"
+                id="phone"
                 formControlName="phone"
-                [ngClass]="{'invalid': hasError('phone', 'pattern')}"
+                [ngClass]="{ invalid: hasError('phone', 'pattern') }"
                 placeholder="+1 (555) 123-4567"
-              >
+              />
               <div class="error-message" *ngIf="hasError('phone', 'pattern')">
                 Please enter a valid phone number
               </div>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="gender">Gender</label>
@@ -115,76 +142,104 @@
                 <option value="prefer-not-to-say">Prefer not to say</option>
               </select>
             </div>
-            
+
             <div class="form-group">
               <label for="dateOfBirth">Date of Birth</label>
-              <input type="date" id="dateOfBirth" formControlName="dateOfBirth">
+              <input
+                type="date"
+                id="dateOfBirth"
+                formControlName="dateOfBirth"
+              />
             </div>
           </div>
-          
+
           <div class="form-group full-width">
             <label for="address">Address</label>
-            <input type="text" id="address" formControlName="address" placeholder="Street address">
+            <input
+              type="text"
+              id="address"
+              formControlName="address"
+              placeholder="Street address"
+            />
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="city">City</label>
-              <input type="text" id="city" formControlName="city">
+              <input type="text" id="city" formControlName="city" />
             </div>
-            
+
             <div class="form-group">
               <label for="state">State/Province</label>
-              <input type="text" id="state" formControlName="state">
+              <input type="text" id="state" formControlName="state" />
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="zipCode">Zip/Postal Code</label>
-              <input type="text" id="zipCode" formControlName="zipCode">
+              <input type="text" id="zipCode" formControlName="zipCode" />
             </div>
-            
+
             <div class="form-group">
               <label for="country">Country</label>
               <select id="country" formControlName="country">
                 <option value="" disabled selected>Select country</option>
-                <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
+                <option *ngFor="let country of countries" [value]="country">
+                  {{ country }}
+                </option>
               </select>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="occupation">Occupation</label>
-              <input type="text" id="occupation" formControlName="occupation" placeholder="e.g. Software Developer">
+              <input
+                type="text"
+                id="occupation"
+                formControlName="occupation"
+                placeholder="e.g. Software Developer"
+              />
             </div>
-            
+
             <div class="form-group">
               <label for="company">Company/Organization</label>
-              <input type="text" id="company" formControlName="company" placeholder="e.g. Acme Inc.">
+              <input
+                type="text"
+                id="company"
+                formControlName="company"
+                placeholder="e.g. Acme Inc."
+              />
             </div>
           </div>
-          
+
           <div class="form-group full-width">
             <label for="bio">Bio</label>
-            <textarea 
-              id="bio" 
-              formControlName="bio" 
-              rows="4" 
+            <textarea
+              id="bio"
+              formControlName="bio"
+              rows="4"
               placeholder="Tell us about yourself"
-              [ngClass]="{'invalid': hasError('bio', 'maxlength')}"
+              [ngClass]="{ invalid: hasError('bio', 'maxlength') }"
             ></textarea>
-            <div class="character-count" [ngClass]="{'warning': profileForm.get('bio')?.value?.length > 400}">
-              {{ profileForm.get('bio')?.value?.length || 0 }}/500
+            <div
+              class="character-count"
+              [ngClass]="{
+                warning: profileForm.get('bio')?.value?.length > 400,
+              }"
+            >
+              {{ profileForm.get("bio")?.value?.length || 0 }}/500
             </div>
             <div class="error-message" *ngIf="hasError('bio', 'maxlength')">
               Bio cannot exceed 500 characters
             </div>
           </div>
-          
+
           <div class="form-actions">
-            <button type="button" class="btn-secondary" (click)="resetForm()">Cancel</button>
+            <button type="button" class="btn-secondary" (click)="resetForm()">
+              Cancel
+            </button>
             <button type="submit" class="btn-primary" [disabled]="loading">
               <span *ngIf="!loading">Save Changes</span>
               <span *ngIf="loading" class="loader"></span>
@@ -192,122 +247,201 @@
           </div>
         </form>
       </div>
-      
+
       <!-- ACCOUNT SECURITY SECTION -->
       <div class="security-form-container" *ngIf="activeSection === 'security'">
         <div class="section email-section">
           <h3>Email Address</h3>
           <p>Update your email address. You'll need to verify any new email.</p>
-          
+
           <div class="success-message" *ngIf="showEmailSuccess">
             <i class="fas fa-check-circle"></i>
-            Email updated successfully! A verification link has been sent to your new email.
+            Email updated successfully! A verification link has been sent to
+            your new email.
           </div>
-          
+
           <form [formGroup]="emailForm" (ngSubmit)="onEmailSubmit()">
             <div class="form-group">
               <label for="currentEmail">Current Email</label>
-              <input type="email" id="currentEmail" formControlName="currentEmail" [disabled]="true">
+              <input
+                type="email"
+                id="currentEmail"
+                formControlName="currentEmail"
+                [disabled]="true"
+              />
             </div>
-            
+
             <div class="form-group">
-              <label for="newEmail">New Email <span class="required">*</span></label>
-              <input 
-                type="email" 
-                id="newEmail" 
-                formControlName="newEmail"
-                [ngClass]="{'invalid': hasSecurityError(emailForm, 'newEmail', 'required') || hasSecurityError(emailForm, 'newEmail', 'email')}"
+              <label for="newEmail"
+                >New Email <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasSecurityError(emailForm, 'newEmail', 'required')">
+              <input
+                type="email"
+                id="newEmail"
+                formControlName="newEmail"
+                [ngClass]="{
+                  invalid:
+                    hasSecurityError(emailForm, 'newEmail', 'required') ||
+                    hasSecurityError(emailForm, 'newEmail', 'email'),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasSecurityError(emailForm, 'newEmail', 'required')"
+              >
                 New email is required
               </div>
-              <div class="error-message" *ngIf="hasSecurityError(emailForm, 'newEmail', 'email')">
+              <div
+                class="error-message"
+                *ngIf="hasSecurityError(emailForm, 'newEmail', 'email')"
+              >
                 Please enter a valid email
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="emailPassword">Confirm Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="emailPassword" 
-                formControlName="password"
-                [ngClass]="{'invalid': hasSecurityError(emailForm, 'password', 'required')}"
+              <label for="emailPassword"
+                >Confirm Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasSecurityError(emailForm, 'password', 'required')">
+              <input
+                type="password"
+                id="emailPassword"
+                formControlName="password"
+                [ngClass]="{
+                  invalid: hasSecurityError(emailForm, 'password', 'required'),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="hasSecurityError(emailForm, 'password', 'required')"
+              >
                 Password is required to confirm this change
               </div>
             </div>
-            
+
             <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="securityLoading.email">
+              <button
+                type="submit"
+                class="btn-primary"
+                [disabled]="securityLoading.email"
+              >
                 <span *ngIf="!securityLoading.email">Update Email</span>
                 <span *ngIf="securityLoading.email" class="loader"></span>
               </button>
             </div>
           </form>
         </div>
-        
+
         <div class="section password-section">
           <h3>Change Password</h3>
           <p>Update your password to maintain account security</p>
-          
+
           <div class="success-message" *ngIf="showPasswordSuccess">
             <i class="fas fa-check-circle"></i>
             Password updated successfully!
           </div>
-          
+
           <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()">
             <div class="form-group">
-              <label for="currentPassword">Current Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="currentPassword" 
-                formControlName="currentPassword"
-                [ngClass]="{'invalid': hasSecurityError(passwordForm, 'currentPassword', 'required')}"
+              <label for="currentPassword"
+                >Current Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasSecurityError(passwordForm, 'currentPassword', 'required')">
+              <input
+                type="password"
+                id="currentPassword"
+                formControlName="currentPassword"
+                [ngClass]="{
+                  invalid: hasSecurityError(
+                    passwordForm,
+                    'currentPassword',
+                    'required'
+                  ),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="
+                  hasSecurityError(passwordForm, 'currentPassword', 'required')
+                "
+              >
                 Current password is required
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="newPassword">New Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="newPassword" 
-                formControlName="newPassword"
-                [ngClass]="{'invalid': hasSecurityError(passwordForm, 'newPassword', 'required') || 
-                           hasSecurityError(passwordForm, 'newPassword', 'minlength') || 
-                           hasSecurityError(passwordForm, 'newPassword', 'pattern')}"
+              <label for="newPassword"
+                >New Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasSecurityError(passwordForm, 'newPassword', 'required')">
+              <input
+                type="password"
+                id="newPassword"
+                formControlName="newPassword"
+                [ngClass]="{
+                  invalid:
+                    hasSecurityError(passwordForm, 'newPassword', 'required') ||
+                    hasSecurityError(
+                      passwordForm,
+                      'newPassword',
+                      'minlength'
+                    ) ||
+                    hasSecurityError(passwordForm, 'newPassword', 'pattern'),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="
+                  hasSecurityError(passwordForm, 'newPassword', 'required')
+                "
+              >
                 New password is required
               </div>
-              <div class="error-message" *ngIf="hasSecurityError(passwordForm, 'newPassword', 'minlength')">
+              <div
+                class="error-message"
+                *ngIf="
+                  hasSecurityError(passwordForm, 'newPassword', 'minlength')
+                "
+              >
                 Password must be at least 8 characters
               </div>
-              <div class="error-message" *ngIf="hasSecurityError(passwordForm, 'newPassword', 'pattern')">
-                Password must include uppercase, lowercase, number, and special character
+              <div
+                class="error-message"
+                *ngIf="hasSecurityError(passwordForm, 'newPassword', 'pattern')"
+              >
+                Password must include uppercase, lowercase, number, and special
+                character
               </div>
             </div>
-            
+
             <div class="form-group">
-              <label for="confirmPassword">Confirm New Password <span class="required">*</span></label>
-              <input 
-                type="password" 
-                id="confirmPassword" 
-                formControlName="confirmPassword"
-                [ngClass]="{'invalid': hasSecurityError(passwordForm, 'confirmPassword', 'required') || hasPasswordMismatch()}"
+              <label for="confirmPassword"
+                >Confirm New Password <span class="required">*</span></label
               >
-              <div class="error-message" *ngIf="hasSecurityError(passwordForm, 'confirmPassword', 'required')">
+              <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                [ngClass]="{
+                  invalid:
+                    hasSecurityError(
+                      passwordForm,
+                      'confirmPassword',
+                      'required'
+                    ) || hasPasswordMismatch(),
+                }"
+              />
+              <div
+                class="error-message"
+                *ngIf="
+                  hasSecurityError(passwordForm, 'confirmPassword', 'required')
+                "
+              >
                 Please confirm your new password
               </div>
               <div class="error-message" *ngIf="hasPasswordMismatch()">
                 Passwords do not match
               </div>
             </div>
-            
+
             <div class="password-requirements">
               <h4>Password Requirements:</h4>
               <ul>
@@ -318,65 +452,134 @@
                 <li>At least one special character (!&#64;#$%^&*)</li>
               </ul>
             </div>
-            
+
             <div class="form-actions">
-              <button type="submit" class="btn-primary" [disabled]="securityLoading.password">
+              <button
+                type="submit"
+                class="btn-primary"
+                [disabled]="securityLoading.password"
+              >
                 <span *ngIf="!securityLoading.password">Update Password</span>
                 <span *ngIf="securityLoading.password" class="loader"></span>
               </button>
             </div>
           </form>
         </div>
-        
+
         <div class="section danger-section">
           <h3>Delete Account</h3>
-          <p class="warning">This action is permanent and cannot be undone. All your data will be erased.</p>
-          
-          <button type="button" class="btn-danger" (click)="toggleDeleteConfirmation()">
+          <p class="warning">
+            This action is permanent and cannot be undone. All your data will be
+            erased.
+          </p>
+
+          <button
+            type="button"
+            class="btn-danger"
+            (click)="toggleDeleteConfirmation()"
+          >
             Delete Account
           </button>
-          
+
           <div class="delete-confirmation" *ngIf="showDeleteConfirmation">
             <h4>Are you absolutely sure?</h4>
-            <p>This action cannot be undone. This will permanently delete your account and remove all associated data.</p>
-            
+            <p>
+              This action cannot be undone. This will permanently delete your
+              account and remove all associated data.
+            </p>
+
             <form [formGroup]="deleteAccountForm" (ngSubmit)="onDeleteSubmit()">
               <div class="form-group">
-                <label for="deletePassword">Enter your password <span class="required">*</span></label>
-                <input 
-                  type="password" 
-                  id="deletePassword" 
-                  formControlName="password"
-                  [ngClass]="{'invalid': hasSecurityError(deleteAccountForm, 'password', 'required')}"
+                <label for="deletePassword"
+                  >Enter your password <span class="required">*</span></label
                 >
-                <div class="error-message" *ngIf="hasSecurityError(deleteAccountForm, 'password', 'required')">
+                <input
+                  type="password"
+                  id="deletePassword"
+                  formControlName="password"
+                  [ngClass]="{
+                    invalid: hasSecurityError(
+                      deleteAccountForm,
+                      'password',
+                      'required'
+                    ),
+                  }"
+                />
+                <div
+                  class="error-message"
+                  *ngIf="
+                    hasSecurityError(deleteAccountForm, 'password', 'required')
+                  "
+                >
                   Password is required to confirm deletion
                 </div>
               </div>
-              
+
               <div class="form-group">
-                <label for="confirmPhrase">Type "DELETE" to confirm <span class="required">*</span></label>
-                <input 
-                  type="text" 
-                  id="confirmPhrase" 
-                  formControlName="confirmPhrase"
-                  [ngClass]="{'invalid': hasSecurityError(deleteAccountForm, 'confirmPhrase', 'required') || 
-                             hasSecurityError(deleteAccountForm, 'confirmPhrase', 'pattern')}"
+                <label for="confirmPhrase"
+                  >Type "DELETE" to confirm
+                  <span class="required">*</span></label
                 >
-                <div class="error-message" *ngIf="hasSecurityError(deleteAccountForm, 'confirmPhrase', 'required')">
+                <input
+                  type="text"
+                  id="confirmPhrase"
+                  formControlName="confirmPhrase"
+                  [ngClass]="{
+                    invalid:
+                      hasSecurityError(
+                        deleteAccountForm,
+                        'confirmPhrase',
+                        'required'
+                      ) ||
+                      hasSecurityError(
+                        deleteAccountForm,
+                        'confirmPhrase',
+                        'pattern'
+                      ),
+                  }"
+                />
+                <div
+                  class="error-message"
+                  *ngIf="
+                    hasSecurityError(
+                      deleteAccountForm,
+                      'confirmPhrase',
+                      'required'
+                    )
+                  "
+                >
                   Confirmation text is required
                 </div>
-                <div class="error-message" *ngIf="hasSecurityError(deleteAccountForm, 'confirmPhrase', 'pattern')">
+                <div
+                  class="error-message"
+                  *ngIf="
+                    hasSecurityError(
+                      deleteAccountForm,
+                      'confirmPhrase',
+                      'pattern'
+                    )
+                  "
+                >
                   You must type DELETE exactly (all caps)
                 </div>
               </div>
-              
+
               <div class="form-actions delete-actions">
-                <button type="button" class="btn-secondary" (click)="toggleDeleteConfirmation()">
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="toggleDeleteConfirmation()"
+                >
                   Cancel
                 </button>
-                <button type="submit" class="btn-danger" [disabled]="securityLoading.delete">
-                  <span *ngIf="!securityLoading.delete">Permanently Delete Account</span>
+                <button
+                  type="submit"
+                  class="btn-danger"
+                  [disabled]="securityLoading.delete"
+                >
+                  <span *ngIf="!securityLoading.delete"
+                    >Permanently Delete Account</span
+                  >
                   <span *ngIf="securityLoading.delete" class="loader"></span>
                 </button>
               </div>

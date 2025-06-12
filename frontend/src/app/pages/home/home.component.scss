@@ -2,7 +2,7 @@
   max-width: 1200px;
   margin: auto;
   padding: 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
   .hero-card {
     background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
@@ -42,7 +42,9 @@
         border-radius: 8px;
         cursor: pointer;
         box-shadow: 0 5px 15px rgba(230, 126, 34, 0.4);
-        transition: transform 0.2s ease, background-color 0.3s ease;
+        transition:
+          transform 0.2s ease,
+          background-color 0.3s ease;
 
         &:hover {
           background-color: #cf711f;
@@ -78,7 +80,9 @@
         padding: 1.5rem;
         text-align: center;
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
 
         &:hover {
           transform: translateY(-5px);
@@ -107,12 +111,24 @@
 }
 
 @keyframes float {
-  0% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0); }
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

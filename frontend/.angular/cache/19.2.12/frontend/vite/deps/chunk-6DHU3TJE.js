@@ -1,6 +1,4 @@
-import {
-  InjectionToken
-} from "./chunk-ADRWFWIR.js";
+import { InjectionToken } from "./chunk-ADRWFWIR.js";
 
 // ../node_modules/@angular/common/fesm2022/dom_tokens-rA0ACyx7.mjs
 var DOCUMENT = new InjectionToken(ngDevMode ? "DocumentToken" : "");
@@ -10,7 +8,10 @@ function parseCookieValue(cookieStr, name) {
   name = encodeURIComponent(name);
   for (const cookie of cookieStr.split(";")) {
     const eqIndex = cookie.indexOf("=");
-    const [cookieName, cookieValue] = eqIndex == -1 ? [cookie, ""] : [cookie.slice(0, eqIndex), cookie.slice(eqIndex + 1)];
+    const [cookieName, cookieValue] =
+      eqIndex == -1
+        ? [cookie, ""]
+        : [cookie.slice(0, eqIndex), cookie.slice(eqIndex + 1)];
     if (cookieName.trim() === name) {
       return decodeURIComponent(cookieValue);
     }
@@ -25,8 +26,7 @@ function isPlatformBrowser(platformId) {
 function isPlatformServer(platformId) {
   return platformId === PLATFORM_SERVER_ID;
 }
-var XhrFactory = class {
-};
+var XhrFactory = class {};
 
 export {
   DOCUMENT,
@@ -35,7 +35,7 @@ export {
   PLATFORM_SERVER_ID,
   isPlatformBrowser,
   isPlatformServer,
-  XhrFactory
+  XhrFactory,
 };
 /*! Bundled license information:
 

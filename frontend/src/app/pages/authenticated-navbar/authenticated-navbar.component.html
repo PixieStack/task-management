@@ -2,18 +2,25 @@
   <div class="navbar-brand">
     <h1>Task Manager</h1>
   </div>
-  
+
   <div class="user-profile">
     <div class="welcome-message">
-      <span class="greeting-emoji">{{ greetingEmoji }}</span> {{ greeting }}, {{ username }}
+      <span class="greeting-emoji">{{ greetingEmoji }}</span> {{ greeting }},
+      {{ username }}
     </div>
-    
+
     <div class="profile-dropdown-container">
       <div class="profile-picture" (click)="toggleProfileDropdown($event)">
-        <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile Picture">
-        <div *ngIf="!profilePicture" class="profile-initials">{{ username?.charAt(0) || 'U' }}</div>
+        <img
+          *ngIf="profilePicture"
+          [src]="profilePicture"
+          alt="Profile Picture"
+        />
+        <div *ngIf="!profilePicture" class="profile-initials">
+          {{ username?.charAt(0) || "U" }}
+        </div>
       </div>
-      
+
       <!-- Profile Dropdown Menu -->
       <div class="profile-dropdown" *ngIf="isProfileDropdownOpen">
         <div class="dropdown-header">
@@ -25,16 +32,24 @@
             <i class="fas fa-camera"></i> Change Photo
           </button>
         </div>
-        
+
         <div class="dropdown-menu">
           <ul>
             <li>
-              <a routerLink="/dashboard" routerLinkActive="active" (click)="closeProfileDropdown()">
+              <a
+                routerLink="/dashboard"
+                routerLinkActive="active"
+                (click)="closeProfileDropdown()"
+              >
                 <i class="fas fa-tachometer-alt"></i> Dashboard
               </a>
             </li>
             <li>
-              <a routerLink="/profile" routerLinkActive="active" (click)="closeProfileDropdown()">
+              <a
+                routerLink="/profile"
+                routerLinkActive="active"
+                (click)="closeProfileDropdown()"
+              >
                 <i class="fas fa-user-circle"></i> Account Settings
               </a>
             </li>

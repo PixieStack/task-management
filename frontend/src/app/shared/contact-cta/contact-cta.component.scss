@@ -16,7 +16,7 @@ $card-bg: #fff;
   min-height: 100vh;
   background-color: $bg-color;
   padding: 40px 20px;
-  
+
   .contact-card {
     background-color: $card-bg;
     border-radius: 12px;
@@ -25,13 +25,13 @@ $card-bg: #fff;
     max-width: 700px;
     overflow: hidden;
     margin: 0 auto; // Explicitly center the card
-    
+
     .card-header {
       background-color: white;
       padding: 30px 40px 0; // Equal padding left and right
       text-align: center;
       border-bottom: none;
-      
+
       h2 {
         font-size: 28px;
         font-weight: 700;
@@ -39,11 +39,11 @@ $card-bg: #fff;
         margin: 0 0 5px;
       }
     }
-    
+
     .card-body {
       padding: 20px 40px 40px; // Equal padding left and right
       box-sizing: border-box; // Ensure padding is included in width
-      
+
       .description {
         text-align: center;
         color: $text-light;
@@ -54,7 +54,7 @@ $card-bg: #fff;
         margin-left: auto;
         margin-right: auto;
       }
-      
+
       .alert {
         display: flex;
         align-items: center;
@@ -62,7 +62,7 @@ $card-bg: #fff;
         padding: 16px;
         margin-bottom: 30px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        
+
         .alert-icon {
           display: flex;
           align-items: center;
@@ -75,72 +75,76 @@ $card-bg: #fff;
           flex-shrink: 0;
           font-size: 16px;
         }
-        
+
         .alert-message {
           h4 {
             margin: 0 0 5px 0;
             font-size: 18px;
             font-weight: 600;
           }
-          
+
           p {
             margin: 0;
             font-size: 14px;
             line-height: 1.5;
           }
         }
-        
+
         &.success-alert {
           background-color: rgba($success-color, 0.05);
           border-left: 4px solid $success-color;
-          
+
           .alert-icon {
             background-color: $success-color;
             color: white;
           }
-          
-          h4, p {
+
+          h4,
+          p {
             color: darken($success-color, 10%);
           }
         }
-        
+
         &.error-alert {
           background-color: rgba($error-color, 0.05);
           border-left: 4px solid $error-color;
-          
+
           .alert-icon {
             background-color: $error-color;
             color: white;
           }
-          
-          h4, p {
+
+          h4,
+          p {
             color: darken($error-color, 5%);
           }
         }
       }
-      
+
       .contact-form {
         width: 100%; // Ensure form takes full width of its container
         margin: 0 auto; // Center the form
         box-sizing: border-box; // Include padding in width calculation
-        
+
         .form-row {
           display: flex;
           justify-content: space-between; // This evenly distributes the space
           margin: 0 0 5px 0; // Reset margins to prevent any offset
           width: 100%; // Ensure it takes full width
-          
+
           .form-group {
-            width: calc(50% - 25px); // Each group takes exactly half minus half the gap
+            width: calc(
+              50% - 25px
+            ); // Each group takes exactly half minus half the gap
             margin: 0; // Reset margins
             padding: 0; // Reset padding
             box-sizing: border-box; // Include any padding in width calculation
           }
         }
-        
+
         .form-group {
           margin-bottom: 25px;
-          
+
           label {
             display: block;
             margin-bottom: 10px;
@@ -148,8 +152,9 @@ $card-bg: #fff;
             color: $text-color;
             font-size: 15px;
           }
-          
-          input, textarea {
+
+          input,
+          textarea {
             width: 100%;
             padding: 14px 16px;
             border: 1px solid $border-color;
@@ -159,42 +164,42 @@ $card-bg: #fff;
             transition: all 0.3s ease;
             background-color: #fcfcfc;
             box-sizing: border-box; // Include padding in width calculation
-            
+
             &:focus {
               outline: none;
               border-color: $primary-color;
               box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
               background-color: white;
             }
-            
+
             &.input-error {
               border-color: $error-color;
               background-color: rgba($error-color, 0.02);
-              
+
               &:focus {
                 box-shadow: 0 0 0 3px rgba($error-color, 0.1);
               }
             }
-            
+
             &::placeholder {
               color: lighten($text-light, 20%);
               font-size: 15px;
             }
           }
-          
+
           textarea {
             resize: vertical;
             min-height: 120px;
             line-height: 1.6;
           }
-          
+
           .error-message {
             font-size: 12px;
             color: $error-color;
             margin-top: 6px;
             display: flex;
             align-items: center;
-            
+
             &:before {
               content: "!";
               display: inline-flex;
@@ -211,13 +216,13 @@ $card-bg: #fff;
             }
           }
         }
-        
+
         .button-container {
           display: flex;
           justify-content: center;
           margin-top: 20px;
           width: 100%; // Ensure it takes full width
-          
+
           .primary-button {
             display: block;
             width: 100%;
@@ -233,25 +238,25 @@ $card-bg: #fff;
             letter-spacing: 0.5px;
             text-transform: uppercase;
             box-shadow: 0 4px 10px rgba($primary-color, 0.3);
-            
+
             &:hover {
               background-color: $primary-hover;
               transform: translateY(-2px);
               box-shadow: 0 6px 15px rgba($primary-color, 0.35);
             }
-            
+
             &:active {
               transform: translateY(0);
               box-shadow: 0 4px 8px rgba($primary-color, 0.3);
             }
-            
+
             &:disabled {
               background-color: lighten($primary-color, 20%);
               cursor: not-allowed;
               transform: none;
               box-shadow: none;
             }
-            
+
             .loading-spinner {
               display: inline-block;
               width: 20px;
@@ -261,9 +266,11 @@ $card-bg: #fff;
               border-top-color: white;
               animation: spin 1s ease-in-out infinite;
             }
-            
+
             @keyframes spin {
-              to { transform: rotate(360deg); }
+              to {
+                transform: rotate(360deg);
+              }
             }
           }
         }
@@ -275,19 +282,21 @@ $card-bg: #fff;
 // Enhanced form field focus effect
 .form-group {
   position: relative;
-  
+
   &:after {
-    content: '';
+    content: "";
     position: absolute;
     bottom: 0;
     left: 50%;
     width: 0;
     height: 2px;
     background-color: $primary-color;
-    transition: width 0.3s ease, left 0.3s ease;
+    transition:
+      width 0.3s ease,
+      left 0.3s ease;
     z-index: 1;
   }
-  
+
   &:focus-within:after {
     width: 100%;
     left: 0;
@@ -302,29 +311,29 @@ $card-bg: #fff;
 @media (max-width: 768px) {
   .contact-cta-section {
     padding: 20px;
-    
+
     .contact-card {
       .card-header {
         padding: 25px 20px 0;
-        
+
         h2 {
           font-size: 24px;
         }
       }
-      
+
       .card-body {
         padding: 15px 20px 30px;
-        
+
         .description {
           font-size: 14px;
           max-width: 100%;
           margin-bottom: 25px;
         }
-        
+
         .contact-form {
           .form-row {
             flex-direction: column;
-            
+
             .form-group {
               width: 100%; // Full width on mobile
               margin: 0 0 20px 0;

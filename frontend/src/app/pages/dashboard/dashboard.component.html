@@ -1,4 +1,4 @@
-<div class="dashboard-container" [ngClass]="{'dark-mode': isDarkMode}">
+<div class="dashboard-container" [ngClass]="{ 'dark-mode': isDarkMode }">
   <div class="dashboard-content">
     <!-- Loading Overlay -->
     <div class="loading-overlay" *ngIf="isLoading">
@@ -9,7 +9,11 @@
     </div>
 
     <!-- Timer Alert Modal -->
-    <div class="timer-alert-overlay" *ngIf="showTimerAlert" (click)="dismissAlert()">
+    <div
+      class="timer-alert-overlay"
+      *ngIf="showTimerAlert"
+      (click)="dismissAlert()"
+    >
       <div class="timer-alert-modal" (click)="$event.stopPropagation()">
         <div class="alert-header">
           <div class="alert-icon">
@@ -20,13 +24,16 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-        
+
         <div class="alert-body" *ngIf="alertTask">
           <div class="task-info">
             <h3>{{ alertTask.title }}</h3>
             <p *ngIf="alertTask.description">{{ alertTask.description }}</p>
             <div class="task-meta">
-              <span class="priority-badge" [style.background-color]="getPriorityColor(alertTask.priority)">
+              <span
+                class="priority-badge"
+                [style.background-color]="getPriorityColor(alertTask.priority)"
+              >
                 {{ alertTask.priority }} Priority
               </span>
               <span class="time-badge">
@@ -36,7 +43,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="alert-actions">
           <button class="snooze-btn" (click)="snoozeTimer(5)">
             <i class="fas fa-snooze"></i>
@@ -77,61 +84,74 @@
           </div>
         </div>
       </div>
-      
+
       <div class="header-right">
-        <button class="theme-toggle" (click)="toggleDarkMode()" [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        <button
+          class="theme-toggle"
+          (click)="toggleDarkMode()"
+          [title]="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+        >
           <i class="fas" [ngClass]="isDarkMode ? 'fa-sun' : 'fa-moon'"></i>
         </button>
       </div>
     </header>
-    
+
     <!-- Search and filtering -->
     <div class="search-controls">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input 
-          type="text" 
-          [(ngModel)]="searchQuery" 
-          (input)="onSearchChange()" 
+        <input
+          type="text"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
           placeholder="Search tasks..."
+        />
+        <button
+          *ngIf="searchQuery"
+          (click)="clearSearch()"
+          class="clear-search"
         >
-        <button *ngIf="searchQuery" (click)="clearSearch()" class="clear-search">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      
+
       <div class="filter-controls">
         <select [(ngModel)]="selectedTag" (change)="onTagFilterChange()">
           <option value="all">All Tags</option>
-          <option *ngFor="let tag of availableTags" [value]="tag.name">{{ tag.name }}</option>
+          <option *ngFor="let tag of availableTags" [value]="tag.name">
+            {{ tag.name }}
+          </option>
         </select>
-        
-        <select [(ngModel)]="selectedPriority" (change)="onPriorityFilterChange()">
+
+        <select
+          [(ngModel)]="selectedPriority"
+          (change)="onPriorityFilterChange()"
+        >
           <option value="all">All Priorities</option>
           <option value="High">High Priority</option>
           <option value="Medium">Medium Priority</option>
           <option value="Low">Low Priority</option>
         </select>
       </div>
-      
+
       <div class="view-controls">
-        <button 
-          [ngClass]="{'active': activeView === 'list'}" 
+        <button
+          [ngClass]="{ active: activeView === 'list' }"
           (click)="changeView('list')"
           title="List View"
         >
           <i class="fas fa-list"></i>
         </button>
 
-        <button 
-          [ngClass]="{'active': activeView === 'calendar'}" 
+        <button
+          [ngClass]="{ active: activeView === 'calendar' }"
           (click)="changeView('calendar')"
           title="Calendar View"
         >
           <i class="fas fa-calendar-alt"></i>
         </button>
-        <button 
-          [ngClass]="{'active': activeView === 'analytics'}" 
+        <button
+          [ngClass]="{ active: activeView === 'analytics' }"
           (click)="changeView('analytics')"
           title="Analytics"
         >
@@ -139,9 +159,9 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Main Content Area based on active view -->
-    
+
     <!-- List View -->
     <div class="content-area" *ngIf="activeView === 'list'">
       <div class="list-header">
@@ -150,44 +170,67 @@
           <i class="fas fa-plus"></i> Add Task
         </button>
       </div>
-      
+
       <div class="tasks-list">
         <div *ngIf="filteredTasks.length === 0 && !isLoading" class="no-tasks">
           <i class="fas fa-tasks empty-icon"></i>
-          <p>{{ searchQuery || selectedTag !== 'all' || selectedPriority !== 'all' ? 'No tasks match your filters.' : "You don't have any tasks yet." }}</p>
-          <button class="add-task-btn" (click)="openAddTaskModal()" *ngIf="!searchQuery && selectedTag === 'all' && selectedPriority === 'all'">
+          <p>
+            {{
+              searchQuery || selectedTag !== "all" || selectedPriority !== "all"
+                ? "No tasks match your filters."
+                : "You don't have any tasks yet."
+            }}
+          </p>
+          <button
+            class="add-task-btn"
+            (click)="openAddTaskModal()"
+            *ngIf="
+              !searchQuery &&
+              selectedTag === 'all' &&
+              selectedPriority === 'all'
+            "
+          >
             <i class="fas fa-plus"></i> Add Your First Task
           </button>
-          <button class="clear-filters-btn" (click)="clearSearch()" *ngIf="searchQuery || selectedTag !== 'all' || selectedPriority !== 'all'">
+          <button
+            class="clear-filters-btn"
+            (click)="clearSearch()"
+            *ngIf="
+              searchQuery || selectedTag !== 'all' || selectedPriority !== 'all'
+            "
+          >
             <i class="fas fa-filter"></i> Clear Filters
           </button>
         </div>
-        
-        <div 
-          *ngFor="let task of filteredTasks; trackBy: trackByTaskId" 
-          class="task-card" 
+
+        <div
+          *ngFor="let task of filteredTasks; trackBy: trackByTaskId"
+          class="task-card"
           [ngClass]="getTimerStatusClass(task)"
           (click)="openTaskDetailsModal(task)"
         >
           <!-- Timer Progress Bar for Countdown Timers -->
-          <div class="timer-progress-bar" *ngIf="task.isTimerRunning && task.isCountdownTimer">
-            <div 
-              class="progress-fill" 
+          <div
+            class="timer-progress-bar"
+            *ngIf="task.isTimerRunning && task.isCountdownTimer"
+          >
+            <div
+              class="progress-fill"
               [style.width.%]="getTimerProgress(task)"
               [ngClass]="{
                 'progress-warning': isTimerNearCompletion(task),
-                'progress-danger': isTimerOvertime(task)
+                'progress-danger': isTimerOvertime(task),
               }"
             ></div>
           </div>
-          
+
           <div class="task-header">
             <div class="task-title">
               <h3>{{ task.title }}</h3>
               <div class="tag-container">
-                <span 
-                  *ngFor="let tag of task.tags" 
-                  class="tag" 
+                <span
+                  *ngFor="let tag of task.tags"
+                  class="tag"
                   [style.background-color]="getTagColor(tag) + '33'"
                   [style.color]="getTagColor(tag)"
                 >
@@ -195,66 +238,79 @@
                 </span>
               </div>
             </div>
-            <div class="task-badge priority" [style.background-color]="getPriorityColor(task.priority) + '33'" [style.color]="getPriorityColor(task.priority)">
+            <div
+              class="task-badge priority"
+              [style.background-color]="getPriorityColor(task.priority) + '33'"
+              [style.color]="getPriorityColor(task.priority)"
+            >
               {{ task.priority }}
             </div>
           </div>
-          
+
           <div class="task-details">
-            <p *ngIf="task.description" class="task-description">{{ task.description }}</p>
-            
+            <p *ngIf="task.description" class="task-description">
+              {{ task.description }}
+            </p>
+
             <div class="task-metadata">
               <div class="metadata-item">
                 <i class="fas fa-calendar-alt"></i>
-                <span>{{ task.dueDate | date:'mediumDate' }}</span>
+                <span>{{ task.dueDate | date: "mediumDate" }}</span>
               </div>
               <div class="metadata-item">
                 <i class="fas fa-clock"></i>
                 <span>{{ getTimerDisplayWithLabel(task) }}</span>
               </div>
-              <div class="metadata-item" *ngIf="task.isCountdownTimer && task.isTimerRunning">
+              <div
+                class="metadata-item"
+                *ngIf="task.isCountdownTimer && task.isTimerRunning"
+              >
                 <i class="fas fa-hourglass-half"></i>
-                <span class="countdown-display">{{ getRealTimeCountdown(task) }}</span>
+                <span class="countdown-display">{{
+                  getRealTimeCountdown(task)
+                }}</span>
               </div>
             </div>
           </div>
-          
+
           <div class="task-footer">
-            <div 
-              class="task-status" 
+            <div
+              class="task-status"
               [style.background-color]="getStatusColor(task.status) + '33'"
               [style.color]="getStatusColor(task.status)"
             >
               {{ task.status }}
             </div>
-            
+
             <div class="task-actions">
               <!-- Regular Timer Button -->
-              <button 
-                class="action-btn timer-btn" 
-                (click)="$event.stopPropagation(); startRegularTimer(task)" 
+              <button
+                class="action-btn timer-btn"
+                (click)="$event.stopPropagation(); startRegularTimer(task)"
                 *ngIf="!task.isTimerRunning"
                 title="Start Regular Timer"
               >
                 <i class="fas fa-play"></i>
               </button>
-              
+
               <!-- Countdown Timer Button -->
-              <button 
-                class="action-btn countdown-btn" 
-                (click)="$event.stopPropagation(); startCountdownTimer(task)" 
+              <button
+                class="action-btn countdown-btn"
+                (click)="$event.stopPropagation(); startCountdownTimer(task)"
                 *ngIf="!task.isTimerRunning && task.timeEstimate"
                 title="Start Countdown Timer"
               >
                 <i class="fas fa-hourglass-start"></i>
               </button>
-              
+
               <!-- Stop Timer Button -->
-              <button 
-                class="action-btn stop" 
-                (click)="$event.stopPropagation(); stopTimer(task)" 
+              <button
+                class="action-btn stop"
+                (click)="$event.stopPropagation(); stopTimer(task)"
                 *ngIf="task.isTimerRunning"
-                [title]="task.isCountdownTimer ? 'Stop Countdown' : 'Stop Timer'"
+                [title]="
+                  task.isCountdownTimer ? 'Stop Countdown' : 'Stop Timer'
+                "
               >
                 <i class="fas fa-stop"></i>
               </button>
@@ -263,7 +319,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Enhanced Calendar View -->
     <div class="content-area" *ngIf="activeView === 'calendar'">
       <div class="calendar-header">
@@ -271,7 +327,7 @@
           <button class="nav-btn" (click)="previousMonth()">
             <i class="fas fa-chevron-left"></i>
           </button>
-          <h2>{{ getCurrentMonth() | date:'MMMM yyyy' }}</h2>
+          <h2>{{ getCurrentMonth() | date: "MMMM yyyy" }}</h2>
           <button class="nav-btn" (click)="nextMonth()">
             <i class="fas fa-chevron-right"></i>
           </button>
@@ -280,7 +336,7 @@
           <i class="fas fa-plus"></i> Add Task
         </button>
       </div>
-      
+
       <div class="calendar-container">
         <div class="calendar-grid">
           <!-- Calendar Header -->
@@ -293,25 +349,30 @@
             <div class="calendar-day-header">Fri</div>
             <div class="calendar-day-header">Sat</div>
           </div>
-          
+
           <!-- Calendar Days -->
           <div class="calendar-body">
-            <div 
-              *ngFor="let day of getCalendarDays(); trackBy: trackByDate" 
+            <div
+              *ngFor="let day of getCalendarDays(); trackBy: trackByDate"
               class="calendar-day"
               [ngClass]="{
-                'today': isToday(day),
+                today: isToday(day),
                 'other-month': !isCurrentMonth(day),
-                'has-tasks': getTasksForCalendarDate(day).length > 0
+                'has-tasks': getTasksForCalendarDate(day).length > 0,
               }"
             >
               <div class="day-number">{{ day.getDate() }}</div>
-              
+
               <div class="day-tasks">
-                <div 
-                  *ngFor="let task of getTasksForCalendarDate(day).slice(0, 3); trackBy: trackByTaskId" 
+                <div
+                  *ngFor="
+                    let task of getTasksForCalendarDate(day).slice(0, 3);
+                    trackBy: trackByTaskId
+                  "
                   class="calendar-task"
-                  [ngClass]="'status-' + task.status.toLowerCase().replace(' ', '-')"
+                  [ngClass]="
+                    'status-' + task.status.toLowerCase().replace(' ', '-')
+                  "
                   (click)="openTaskDetailsModal(task)"
                   [style.border-left-color]="getPriorityColor(task.priority)"
                 >
@@ -323,9 +384,9 @@
                     <i class="fas fa-clock"></i>
                   </div>
                 </div>
-                
-                <div 
-                  *ngIf="getTasksForCalendarDate(day).length > 3" 
+
+                <div
+                  *ngIf="getTasksForCalendarDate(day).length > 3"
                   class="more-tasks"
                 >
                   +{{ getTasksForCalendarDate(day).length - 3 }} more
@@ -334,31 +395,47 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Upcoming Tasks Sidebar -->
         <div class="upcoming-tasks">
           <h3>Upcoming Tasks</h3>
           <div class="upcoming-tasks-list">
-            <div *ngFor="let task of filteredTasks.slice(0, 10); trackBy: trackByTaskId" class="upcoming-task-item" 
-                 [ngClass]="{'completed': task.status === 'Completed', 'overdue': isTaskOverdue(task), 'timer-running': task.isTimerRunning}">
+            <div
+              *ngFor="
+                let task of filteredTasks.slice(0, 10);
+                trackBy: trackByTaskId
+              "
+              class="upcoming-task-item"
+              [ngClass]="{
+                completed: task.status === 'Completed',
+                overdue: isTaskOverdue(task),
+                'timer-running': task.isTimerRunning,
+              }"
+            >
               <div class="task-date">
-                <div class="month">{{ task.dueDate | date:'MMM' }}</div>
-                <div class="day">{{ task.dueDate | date:'dd' }}</div>
+                <div class="month">{{ task.dueDate | date: "MMM" }}</div>
+                <div class="day">{{ task.dueDate | date: "dd" }}</div>
               </div>
               <div class="task-content">
                 <h4>{{ task.title }}</h4>
-                <p *ngIf="task.description">{{ task.description | slice:0:50 }}...</p>
+                <p *ngIf="task.description">
+                  {{ task.description | slice: 0 : 50 }}...
+                </p>
                 <div class="task-badges">
-                  <span 
-                    class="status-badge" 
-                    [style.background-color]="getStatusColor(task.status) + '33'"
+                  <span
+                    class="status-badge"
+                    [style.background-color]="
+                      getStatusColor(task.status) + '33'
+                    "
                     [style.color]="getStatusColor(task.status)"
                   >
                     {{ task.status }}
                   </span>
-                  <span 
-                    class="priority-badge" 
-                    [style.background-color]="getPriorityColor(task.priority) + '33'"
+                  <span
+                    class="priority-badge"
+                    [style.background-color]="
+                      getPriorityColor(task.priority) + '33'
+                    "
                     [style.color]="getPriorityColor(task.priority)"
                   >
                     {{ task.priority }}
@@ -369,11 +446,14 @@
                   </span>
                 </div>
               </div>
-              <button class="view-task-btn" (click)="openTaskDetailsModal(task)">
+              <button
+                class="view-task-btn"
+                (click)="openTaskDetailsModal(task)"
+              >
                 <i class="fas fa-eye"></i>
               </button>
             </div>
-            
+
             <div *ngIf="filteredTasks.length === 0" class="no-upcoming-tasks">
               <i class="fas fa-calendar-check"></i>
               <p>No upcoming tasks</p>
@@ -382,7 +462,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Analytics View -->
     <div class="content-area" *ngIf="activeView === 'analytics'">
       <div class="analytics-header">
@@ -391,7 +471,7 @@
           <i class="fas fa-download"></i> Export Data
         </button>
       </div>
-      
+
       <div class="analytics-dashboard">
         <div class="analytics-cards">
           <div class="analytics-card">
@@ -400,10 +480,12 @@
             </div>
             <div class="card-content">
               <h3>Total Tasks</h3>
-              <div class="card-value">{{ analytics?.total_tasks || tasks.length }}</div>
+              <div class="card-value">
+                {{ analytics?.total_tasks || tasks.length }}
+              </div>
             </div>
           </div>
-          
+
           <div class="analytics-card">
             <div class="card-icon">
               <i class="fas fa-check-circle"></i>
@@ -413,17 +495,19 @@
               <div class="card-value">{{ getCompletionRate() }}%</div>
             </div>
           </div>
-          
-                    <div class="analytics-card">
+
+          <div class="analytics-card">
             <div class="card-icon">
               <i class="fas fa-hourglass-half"></i>
             </div>
             <div class="card-content">
               <h3>Time Spent</h3>
-              <div class="card-value">{{ formatTimeDisplay(getTotalTimeSpent()) }}</div>
+              <div class="card-value">
+                {{ formatTimeDisplay(getTotalTimeSpent()) }}
+              </div>
             </div>
           </div>
-          
+
           <div class="analytics-card">
             <div class="card-icon">
               <i class="fas fa-exclamation-triangle"></i>
@@ -433,7 +517,7 @@
               <div class="card-value">{{ getOverdueTasksCount() }}</div>
             </div>
           </div>
-          
+
           <!-- New Time Tracking Analytics Card -->
           <div class="analytics-card">
             <div class="card-icon">
@@ -444,7 +528,7 @@
               <div class="card-value">{{ getActiveTimersCount() }}</div>
             </div>
           </div>
-          
+
           <!-- Time Efficiency Card -->
           <div class="analytics-card">
             <div class="card-icon">
@@ -452,13 +536,18 @@
             </div>
             <div class="card-content">
               <h3>Time Efficiency</h3>
-              <div class="card-value">{{ getTimeTrackingSummary().efficiency | number:'1.0-0' }}%</div>
+              <div class="card-value">
+                {{ getTimeTrackingSummary().efficiency | number: "1.0-0" }}%
+              </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Time Tracking Summary Section -->
-        <div class="time-tracking-summary" *ngIf="getTimeTrackingSummary() as summary">
+        <div
+          class="time-tracking-summary"
+          *ngIf="getTimeTrackingSummary() as summary"
+        >
           <h3>Time Tracking Overview</h3>
           <div class="summary-cards">
             <div class="summary-card">
@@ -470,7 +559,7 @@
                 <span>{{ formatTimeDisplay(summary.totalEstimated) }}</span>
               </div>
             </div>
-            
+
             <div class="summary-card">
               <div class="summary-icon">
                 <i class="fas fa-hourglass-half"></i>
@@ -480,17 +569,17 @@
                 <span>{{ formatTimeDisplay(summary.totalSpent) }}</span>
               </div>
             </div>
-            
+
             <div class="summary-card">
               <div class="summary-icon">
                 <i class="fas fa-tachometer-alt"></i>
               </div>
               <div class="summary-content">
                 <h4>Efficiency Rate</h4>
-                <span>{{ summary.efficiency | number:'1.0-0' }}%</span>
+                <span>{{ summary.efficiency | number: "1.0-0" }}%</span>
               </div>
             </div>
-            
+
             <div class="summary-card">
               <div class="summary-icon">
                 <i class="fas fa-play-circle"></i>
@@ -502,7 +591,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="charts-container">
           <div class="chart-card">
             <h3>Task Completion Trend</h3>
@@ -510,7 +599,7 @@
               <canvas #productivityCanvas></canvas>
             </div>
           </div>
-          
+
           <div class="chart-card">
             <h3>Task Distribution</h3>
             <div class="chart-container doughnut">
@@ -518,12 +607,17 @@
             </div>
           </div>
         </div>
-        
+
         <div class="pomodoro-container">
           <h3>Pomodoro Timer</h3>
           <div class="pomodoro-timer">
-            <div class="timer-display" [ngClass]="{'timer-active': !isPomodoroPaused}">
-              {{ pomodoroMinutes | number:'2.0-0' }}:{{ pomodoroSeconds | number:'2.0-0' }}
+            <div
+              class="timer-display"
+              [ngClass]="{ 'timer-active': !isPomodoroPaused }"
+            >
+              {{ pomodoroMinutes | number: "2.0-0" }}:{{
+                pomodoroSeconds | number: "2.0-0"
+              }}
             </div>
             <div class="timer-controls">
               <button (click)="startPomodoro()" *ngIf="isPomodoroPaused">
@@ -539,15 +633,21 @@
             <div class="session-info">
               <span *ngIf="pomodoroSessionCount % 2 === 0">Work Session</span>
               <span *ngIf="pomodoroSessionCount % 2 === 1">Break Time</span>
-              <span class="session-count">Session: {{ Math.ceil(pomodoroSessionCount / 2) }}</span>
+              <span class="session-count"
+                >Session: {{ Math.ceil(pomodoroSessionCount / 2) }}</span
+              >
             </div>
           </div>
         </div>
       </div>
     </div>
-    
+
     <!-- Add Task Modal -->
-    <div class="modal-overlay" *ngIf="isAddTaskModalOpen" (click)="closeAddTaskModal()">
+    <div
+      class="modal-overlay"
+      *ngIf="isAddTaskModalOpen"
+      (click)="closeAddTaskModal()"
+    >
       <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2>Add New Task</h2>
@@ -555,30 +655,30 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-        
+
         <div class="modal-body">
           <div class="form-group">
             <label for="taskTitle">Task Title</label>
-            <input 
-              type="text" 
-              id="taskTitle" 
-              [(ngModel)]="newTask.title" 
+            <input
+              type="text"
+              id="taskTitle"
+              [(ngModel)]="newTask.title"
               placeholder="Enter task title"
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="taskDescription">Description</label>
-            <textarea 
-              id="taskDescription" 
-              [(ngModel)]="newTask.description" 
+            <textarea
+              id="taskDescription"
+              [(ngModel)]="newTask.description"
               placeholder="Enter task description"
               rows="3"
               (input)="applySuggestedEstimate(newTask)"
             ></textarea>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="taskStatus">Status</label>
@@ -589,85 +689,116 @@
                 <option value="Completed">Completed</option>
               </select>
             </div>
-            
+
             <div class="form-group">
               <label for="taskPriority">Priority</label>
-              <select id="taskPriority" [(ngModel)]="newTask.priority" (change)="applySuggestedEstimate(newTask)">
+              <select
+                id="taskPriority"
+                [(ngModel)]="newTask.priority"
+                (change)="applySuggestedEstimate(newTask)"
+              >
                 <option value="Low">Low</option>
                 <option value="Medium">Medium</option>
                 <option value="High">High</option>
               </select>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="taskDueDate">Due Date</label>
-            <input 
-              type="date" 
-              id="taskDueDate" 
-              [(ngModel)]="newTask.dueDate"
-            >
+            <input type="date" id="taskDueDate" [(ngModel)]="newTask.dueDate" />
           </div>
-          
+
           <div class="form-group">
             <label>Tags</label>
             <div class="tags-selector">
-              <div 
-                *ngFor="let tag of availableTags" 
+              <div
+                *ngFor="let tag of availableTags"
                 class="tag-option"
-                [ngClass]="{'selected': newTask.tags.includes(tag.name)}"
+                [ngClass]="{ selected: newTask.tags.includes(tag.name) }"
                 (click)="toggleTaskTag(newTask, tag.name)"
-                [style.background-color]="newTask.tags.includes(tag.name) ? getTagColor(tag.name) : 'transparent'"
-                [style.color]="newTask.tags.includes(tag.name) ? '#fff' : getTagColor(tag.name)"
+                [style.background-color]="
+                  newTask.tags.includes(tag.name)
+                    ? getTagColor(tag.name)
+                    : 'transparent'
+                "
+                [style.color]="
+                  newTask.tags.includes(tag.name)
+                    ? '#fff'
+                    : getTagColor(tag.name)
+                "
                 [style.border-color]="getTagColor(tag.name)"
               >
                 {{ tag.name }}
               </div>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="taskTimeEstimate">
                 Time Estimate (minutes)
-                <button 
-                  type="button" 
-                  class="suggest-btn" 
+                <button
+                  type="button"
+                  class="suggest-btn"
                   (click)="applySuggestedEstimate(newTask)"
                   title="Auto-suggest time estimate"
                 >
                   <i class="fas fa-magic"></i>
                 </button>
               </label>
-              <input 
-                type="number" 
-                id="taskTimeEstimate" 
-                [(ngModel)]="newTask.timeEstimate" 
+              <input
+                type="number"
+                id="taskTimeEstimate"
+                [(ngModel)]="newTask.timeEstimate"
                 placeholder="0"
                 min="0"
+              />
+              <small class="hint"
+                >Suggested: {{ suggestTimeEstimate(newTask) }} minutes</small
               >
-              <small class="hint">Suggested: {{ suggestTimeEstimate(newTask) }} minutes</small>
             </div>
           </div>
         </div>
-        
+
         <div class="modal-footer">
-          <button class="cancel-btn" (click)="closeAddTaskModal()" [disabled]="isLoading">Cancel</button>
-          <button class="save-btn" (click)="addTask()" [disabled]="!newTask.title || isLoading">
+          <button
+            class="cancel-btn"
+            (click)="closeAddTaskModal()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+          <button
+            class="save-btn"
+            (click)="addTask()"
+            [disabled]="!newTask.title || isLoading"
+          >
             <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
             Save Task
           </button>
         </div>
       </div>
     </div>
-    
+
     <!-- Enhanced Task Details Modal -->
-    <div class="modal-overlay" *ngIf="isTaskDetailsModalOpen" (click)="closeTaskDetailsModal()">
-      <div class="modal-content task-details-modal" (click)="$event.stopPropagation()">
+    <div
+      class="modal-overlay"
+      *ngIf="isTaskDetailsModalOpen"
+      (click)="closeTaskDetailsModal()"
+    >
+      <div
+        class="modal-content task-details-modal"
+        (click)="$event.stopPropagation()"
+      >
         <div class="modal-header">
           <h2>Task Details</h2>
           <div>
-            <button class="delete-btn" (click)="deleteTask(selectedTask?.id)" [disabled]="isLoading">
+            <button
+              class="delete-btn"
+              (click)="deleteTask(selectedTask?.id)"
+              [disabled]="isLoading"
+            >
               <i class="fas fa-trash"></i>
             </button>
             <button class="close-modal" (click)="closeTaskDetailsModal()">
@@ -675,50 +806,59 @@
             </button>
           </div>
         </div>
-        
+
         <div class="modal-body" *ngIf="selectedTask">
           <!-- Timer Status Banner -->
-          <div class="timer-status-banner" *ngIf="selectedTask.isTimerRunning" [ngClass]="getTimerStatusClass(selectedTask)">
+          <div
+            class="timer-status-banner"
+            *ngIf="selectedTask.isTimerRunning"
+            [ngClass]="getTimerStatusClass(selectedTask)"
+          >
             <div class="status-content">
               <i class="fas fa-stopwatch"></i>
-              <span *ngIf="selectedTask.isCountdownTimer">Countdown Active: {{ getRealTimeCountdown(selectedTask) }}</span>
-              <span *ngIf="!selectedTask.isCountdownTimer">Timer Running: {{ getTimerDisplay(selectedTask) }}</span>
+              <span *ngIf="selectedTask.isCountdownTimer"
+                >Countdown Active:
+                {{ getRealTimeCountdown(selectedTask) }}</span
+              >
+              <span *ngIf="!selectedTask.isCountdownTimer"
+                >Timer Running: {{ getTimerDisplay(selectedTask) }}</span
+              >
             </div>
             <div class="timer-progress" *ngIf="selectedTask.isCountdownTimer">
               <div class="progress-bar">
-                <div 
-                  class="progress-fill" 
+                <div
+                  class="progress-fill"
                   [style.width.%]="getTimerProgress(selectedTask)"
                   [ngClass]="{
                     'progress-warning': isTimerNearCompletion(selectedTask),
-                    'progress-danger': isTimerOvertime(selectedTask)
+                    'progress-danger': isTimerOvertime(selectedTask),
                   }"
                 ></div>
               </div>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="editTaskTitle">Task Title</label>
-            <input 
-              type="text" 
-              id="editTaskTitle" 
-              [(ngModel)]="selectedTask.title" 
+            <input
+              type="text"
+              id="editTaskTitle"
+              [(ngModel)]="selectedTask.title"
               placeholder="Enter task title"
               required
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label for="editTaskDescription">Description</label>
-            <textarea 
-              id="editTaskDescription" 
-              [(ngModel)]="selectedTask.description" 
+            <textarea
+              id="editTaskDescription"
+              [(ngModel)]="selectedTask.description"
               placeholder="Enter task description"
               rows="3"
             ></textarea>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="editTaskStatus">Status</label>
@@ -729,7 +869,7 @@
                 <option value="Completed">Completed</option>
               </select>
             </div>
-            
+
             <div class="form-group">
               <label for="editTaskPriority">Priority</label>
               <select id="editTaskPriority" [(ngModel)]="selectedTask.priority">
@@ -739,62 +879,70 @@
               </select>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="editTaskDueDate">Due Date</label>
-            <input 
-              type="date" 
-              id="editTaskDueDate" 
+            <input
+              type="date"
+              id="editTaskDueDate"
               [(ngModel)]="selectedTask.dueDate"
-            >
+            />
           </div>
-          
+
           <div class="form-group">
             <label>Tags</label>
             <div class="tags-selector">
-              <div 
-                *ngFor="let tag of availableTags" 
+              <div
+                *ngFor="let tag of availableTags"
                 class="tag-option"
-                [ngClass]="{'selected': selectedTask.tags.includes(tag.name)}"
+                [ngClass]="{ selected: selectedTask.tags.includes(tag.name) }"
                 (click)="toggleTaskTag(selectedTask, tag.name)"
-                [style.background-color]="selectedTask.tags.includes(tag.name) ? getTagColor(tag.name) : 'transparent'"
-                [style.color]="selectedTask.tags.includes(tag.name) ? '#fff' : getTagColor(tag.name)"
+                [style.background-color]="
+                  selectedTask.tags.includes(tag.name)
+                    ? getTagColor(tag.name)
+                    : 'transparent'
+                "
+                [style.color]="
+                  selectedTask.tags.includes(tag.name)
+                    ? '#fff'
+                    : getTagColor(tag.name)
+                "
                 [style.border-color]="getTagColor(tag.name)"
               >
                 {{ tag.name }}
               </div>
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="editTaskTimeEstimate">Time Estimate (minutes)</label>
-              <input 
-                type="number" 
-                id="editTaskTimeEstimate" 
-                [(ngModel)]="selectedTask.timeEstimate" 
+              <input
+                type="number"
+                id="editTaskTimeEstimate"
+                [(ngModel)]="selectedTask.timeEstimate"
                 placeholder="0"
                 min="0"
-              >
+              />
             </div>
-            
+
             <div class="form-group">
               <label for="editTaskTimeSpent">Time Spent (minutes)</label>
-              <input 
-                type="number" 
-                id="editTaskTimeSpent" 
-                [(ngModel)]="selectedTask.timeSpent" 
+              <input
+                type="number"
+                id="editTaskTimeSpent"
+                [(ngModel)]="selectedTask.timeSpent"
                 placeholder="0"
                 min="0"
                 readonly
-              >
+              />
             </div>
           </div>
-          
+
           <!-- Enhanced Timer Controls -->
           <div class="timer-controls-container" *ngIf="selectedTask">
             <h4>Time Tracking</h4>
-            
+
             <div class="timer-display-section">
               <div class="timer-stats">
                 <div class="stat-item">
@@ -803,69 +951,105 @@
                 </div>
                 <div class="stat-item" *ngIf="selectedTask.isCountdownTimer">
                   <span class="label">Remaining:</span>
-                  <span class="value countdown-value">{{ getRealTimeCountdown(selectedTask) }}</span>
+                  <span class="value countdown-value">{{
+                    getRealTimeCountdown(selectedTask)
+                  }}</span>
                 </div>
                 <div class="stat-item">
                   <span class="label">Total Spent:</span>
-                  <span class="value">{{ formatTimeDisplay(selectedTask.timeSpent || 0) }}</span>
+                  <span class="value">{{
+                    formatTimeDisplay(selectedTask.timeSpent || 0)
+                  }}</span>
                 </div>
               </div>
             </div>
-            
+
             <div class="timer-controls">
               <!-- Regular Timer -->
-              <button 
-                class="timer-btn primary" 
-                (click)="startRegularTimer(selectedTask)" 
+              <button
+                class="timer-btn primary"
+                (click)="startRegularTimer(selectedTask)"
                 *ngIf="!selectedTask.isTimerRunning"
                 title="Start regular timer (counts up)"
               >
                 <i class="fas fa-play"></i> Start Timer
               </button>
-              
+
               <!-- Countdown Timer -->
-              <button 
-                class="timer-btn countdown" 
-                (click)="startCountdownTimer(selectedTask)" 
-                *ngIf="!selectedTask.isTimerRunning && selectedTask.timeEstimate"
+              <button
+                class="timer-btn countdown"
+                (click)="startCountdownTimer(selectedTask)"
+                *ngIf="
+                  !selectedTask.isTimerRunning && selectedTask.timeEstimate
+                "
                 title="Start countdown timer (counts down from estimate)"
               >
                 <i class="fas fa-hourglass-start"></i> Start Countdown
               </button>
-              
+
               <!-- Stop Timer -->
-              <button 
-                class="timer-btn stop" 
-                (click)="stopTimer(selectedTask)" 
+              <button
+                class="timer-btn stop"
+                (click)="stopTimer(selectedTask)"
                 *ngIf="selectedTask.isTimerRunning"
-                [title]="selectedTask.isCountdownTimer ? 'Stop countdown timer' : 'Stop regular timer'"
+                [title]="
+                  selectedTask.isCountdownTimer
+                    ? 'Stop countdown timer'
+                    : 'Stop regular timer'
+                "
               >
-                <i class="fas fa-stop"></i> 
-                {{ selectedTask.isCountdownTimer ? 'Stop Countdown' : 'Stop Timer' }}
+                <i class="fas fa-stop"></i>
+                {{
+                  selectedTask.isCountdownTimer
+                    ? "Stop Countdown"
+                    : "Stop Timer"
+                }}
               </button>
             </div>
-            
+
             <!-- Timer Help Text -->
             <div class="timer-help">
-              <small *ngIf="!selectedTask.timeEstimate && !selectedTask.isTimerRunning">
+              <small
+                *ngIf="
+                  !selectedTask.timeEstimate && !selectedTask.isTimerRunning
+                "
+              >
                 <i class="fas fa-info-circle"></i>
                 Set a time estimate to enable countdown timer
               </small>
-              <small *ngIf="selectedTask.isTimerRunning && selectedTask.isCountdownTimer">
+              <small
+                *ngIf="
+                  selectedTask.isTimerRunning && selectedTask.isCountdownTimer
+                "
+              >
                 <i class="fas fa-hourglass-half"></i>
                 Countdown timer is active - you'll be notified when time is up
               </small>
-              <small *ngIf="selectedTask.isTimerRunning && !selectedTask.isCountdownTimer">
+              <small
+                *ngIf="
+                  selectedTask.isTimerRunning && !selectedTask.isCountdownTimer
+                "
+              >
                 <i class="fas fa-stopwatch"></i>
                 Regular timer is running - tracking your work time
               </small>
             </div>
           </div>
         </div>
-        
+
         <div class="modal-footer">
-          <button class="cancel-btn" (click)="closeTaskDetailsModal()" [disabled]="isLoading">Cancel</button>
-          <button class="save-btn" (click)="updateTask()" [disabled]="!selectedTask?.title || isLoading">
+          <button
+            class="cancel-btn"
+            (click)="closeTaskDetailsModal()"
+            [disabled]="isLoading"
+          >
+            Cancel
+          </button>
+          <button
+            class="save-btn"
+            (click)="updateTask()"
+            [disabled]="!selectedTask?.title || isLoading"
+          >
             <i class="fas fa-spinner fa-spin" *ngIf="isLoading"></i>
             Update Task
           </button>

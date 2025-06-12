@@ -15,17 +15,30 @@
         <label for="username">Username</label>
         <div class="input-container">
           <i class="fas fa-user input-icon"></i>
-          <input 
-            id="username" 
-            type="text" 
-            formControlName="username" 
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
             placeholder="Choose a username"
-            [class.invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+            [class.invalid]="
+              registerForm.get('username')?.invalid &&
+              registerForm.get('username')?.touched
+            "
           />
         </div>
-        <div class="error-text" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
-          <span *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</span>
-          <span *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
+        <div
+          class="error-text"
+          *ngIf="
+            registerForm.get('username')?.invalid &&
+            registerForm.get('username')?.touched
+          "
+        >
+          <span *ngIf="registerForm.get('username')?.errors?.['required']"
+            >Username is required</span
+          >
+          <span *ngIf="registerForm.get('username')?.errors?.['minlength']"
+            >Username must be at least 3 characters</span
+          >
         </div>
       </div>
 
@@ -33,17 +46,30 @@
         <label for="email">Email</label>
         <div class="input-container">
           <i class="fas fa-envelope input-icon"></i>
-          <input 
-            id="email" 
-            type="email" 
-            formControlName="email" 
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
             placeholder="Enter your email"
-            [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            [class.invalid]="
+              registerForm.get('email')?.invalid &&
+              registerForm.get('email')?.touched
+            "
           />
         </div>
-        <div class="error-text" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
-          <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
-          <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+        <div
+          class="error-text"
+          *ngIf="
+            registerForm.get('email')?.invalid &&
+            registerForm.get('email')?.touched
+          "
+        >
+          <span *ngIf="registerForm.get('email')?.errors?.['required']"
+            >Email is required</span
+          >
+          <span *ngIf="registerForm.get('email')?.errors?.['email']"
+            >Please enter a valid email</span
+          >
         </div>
       </div>
 
@@ -51,35 +77,52 @@
         <label for="password">Password</label>
         <div class="input-container">
           <i class="fas fa-lock input-icon"></i>
-          <input 
-            id="password" 
-            [type]="showPassword ? 'text' : 'password'" 
-            formControlName="password" 
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
             placeholder="Create a password"
-            [class.invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+            [class.invalid]="
+              registerForm.get('password')?.invalid &&
+              registerForm.get('password')?.touched
+            "
           />
-          <i 
-            class="fas" 
+          <i
+            class="fas"
             [class.fa-eye]="!showPassword"
             [class.fa-eye-slash]="showPassword"
             (click)="togglePasswordVisibility()"
-            class="password-toggle">
+            class="password-toggle"
+          >
           </i>
         </div>
-        <div class="error-text" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-          <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
-          <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
-          <span *ngIf="registerForm.get('password')?.errors?.['weakPassword']">Password must include uppercase, lowercase, number, and special character</span>
+        <div
+          class="error-text"
+          *ngIf="
+            registerForm.get('password')?.invalid &&
+            registerForm.get('password')?.touched
+          "
+        >
+          <span *ngIf="registerForm.get('password')?.errors?.['required']"
+            >Password is required</span
+          >
+          <span *ngIf="registerForm.get('password')?.errors?.['minlength']"
+            >Password must be at least 8 characters</span
+          >
+          <span *ngIf="registerForm.get('password')?.errors?.['weakPassword']"
+            >Password must include uppercase, lowercase, number, and special
+            character</span
+          >
         </div>
-        
+
         <!-- Password strength indicator -->
         <div class="password-strength">
           <div class="strength-meter">
-            <div 
-              class="strength-meter-fill" 
+            <div
+              class="strength-meter-fill"
               [style.width.%]="passwordStrength.value"
-              [class]="passwordStrength.class">
-            </div>
+              [class]="passwordStrength.class"
+            ></div>
           </div>
           <div class="strength-text" [class]="passwordStrength.class">
             {{ passwordStrength.label }}
@@ -91,46 +134,64 @@
         <label for="confirmPassword">Confirm Password</label>
         <div class="input-container">
           <i class="fas fa-lock input-icon"></i>
-          <input 
-            id="confirmPassword" 
-            [type]="showConfirmPassword ? 'text' : 'password'" 
-            formControlName="confirmPassword" 
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
             placeholder="Confirm your password"
-            [class.invalid]="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched"
+            [class.invalid]="
+              registerForm.errors?.['passwordMismatch'] &&
+              registerForm.get('confirmPassword')?.touched
+            "
           />
-          <i 
-            class="fas" 
+          <i
+            class="fas"
             [class.fa-eye]="!showConfirmPassword"
             [class.fa-eye-slash]="showConfirmPassword"
             (click)="toggleConfirmPasswordVisibility()"
-            class="password-toggle">
+            class="password-toggle"
+          >
           </i>
         </div>
-        <div class="error-text" *ngIf="registerForm.get('confirmPassword')?.touched">
-          <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
-          <span *ngIf="registerForm.errors?.['passwordMismatch']">Passwords do not match</span>
+        <div
+          class="error-text"
+          *ngIf="registerForm.get('confirmPassword')?.touched"
+        >
+          <span
+            *ngIf="registerForm.get('confirmPassword')?.errors?.['required']"
+            >Please confirm your password</span
+          >
+          <span *ngIf="registerForm.errors?.['passwordMismatch']"
+            >Passwords do not match</span
+          >
         </div>
       </div>
 
       <div class="terms-container">
         <label class="checkbox-container">
-          <input type="checkbox" formControlName="termsAccepted">
+          <input type="checkbox" formControlName="termsAccepted" />
           <span class="checkmark"></span>
-          I agree to the <a href="terms" target="_blank">&nbsp;Terms of Service&nbsp;</a>&nbsp;and&nbsp;<a href="privacy" target="_blank">&nbsp;Privacy Policy</a>
+          I agree to the
+          <a href="terms" target="_blank">&nbsp;Terms of Service&nbsp;</a
+          >&nbsp;and&nbsp;<a href="privacy" target="_blank"
+            >&nbsp;Privacy Policy</a
+          >
         </label>
-        <div class="error-text" *ngIf="registerForm.get('termsAccepted')?.invalid && registerForm.get('termsAccepted')?.touched">
+        <div
+          class="error-text"
+          *ngIf="
+            registerForm.get('termsAccepted')?.invalid &&
+            registerForm.get('termsAccepted')?.touched
+          "
+        >
           <span>You must accept the terms to continue</span>
         </div>
       </div>
 
-      <button 
-        type="submit" 
-        class="btn btn-primary" 
-        [disabled]="isLoading"
-      >
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
         <span *ngIf="!isLoading">Create Account</span>
         <span class="spinner" *ngIf="isLoading"></span>
-    </button>
+      </button>
 
       <div class="auth-footer">
         <span>Already have an account?</span>

@@ -44,7 +44,7 @@ export interface TaskUpdate {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TaskService {
   private apiUrl = 'http://localhost:8000/tasks';
@@ -53,14 +53,14 @@ export class TaskService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   private getHeaders(): HttpHeaders {
     const token = this.authService.getToken();
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
     });
   }
 
@@ -69,19 +69,27 @@ export class TaskService {
   }
 
   createTask(task: TaskCreate): Observable<Task> {
-    return this.http.post<Task>(this.apiUrl, task, { headers: this.getHeaders() });
+    return this.http.post<Task>(this.apiUrl, task, {
+      headers: this.getHeaders(),
+    });
   }
 
   getTask(id: number): Observable<Task> {
-    return this.http.get<Task>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.get<Task>(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders(),
+    });
   }
 
   updateTask(id: number, task: TaskUpdate): Observable<Task> {
-    return this.http.put<Task>(`${this.apiUrl}/${id}`, task, { headers: this.getHeaders() });
+    return this.http.put<Task>(`${this.apiUrl}/${id}`, task, {
+      headers: this.getHeaders(),
+    });
   }
 
   deleteTask(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete(`${this.apiUrl}/${id}`, {
+      headers: this.getHeaders(),
+    });
   }
 
   // Local state management
@@ -96,6 +104,6 @@ export class TaskService {
 
   removeTaskFromState(taskId: number) {
     const currentTasks = this.tasksSubject.value;
-    this.tasksSubject.next(currentTasks.filter(task => task.id !== taskId));
+    this.tasksSubject.next(currentTasks.filter((task) => task.id !== taskId));
   }
 }

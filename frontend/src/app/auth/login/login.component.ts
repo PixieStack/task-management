@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 
@@ -9,7 +14,7 @@ import { AuthService } from '../../shared/services/auth.service';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
@@ -22,23 +27,24 @@ export class LoginComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
     // Get return URL from route parameters or default to '/dashboard'
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-    
+    this.returnUrl =
+      this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+
     // Redirect if already logged in
     if (this.authService.isLoggedIn()) {
       this.router.navigate([this.returnUrl]);
       return;
     }
-    
+
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      rememberMe: [false]
+      rememberMe: [false],
     });
   }
 
@@ -57,21 +63,20 @@ export class LoginComponent implements OnInit {
 
     const { email, password } = this.loginForm.value;
 
-    this.authService.login(email, password)
-      .subscribe({
-        next: () => {
-          this.isLoading = false;
-          this.router.navigateByUrl(this.returnUrl);
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.loginError = err.message || 'Login failed. Please try again.';
-        }
-      });
+    this.authService.login(email, password).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigateByUrl(this.returnUrl);
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.loginError = err.message || 'Login failed. Please try again.';
+      },
+    });
   }
 
   private markFormGroupTouched(formGroup: FormGroup): void {
-    Object.values(formGroup.controls).forEach(control => {
+    Object.values(formGroup.controls).forEach((control) => {
       control.markAsTouched();
       if ((control as any).controls) {
         this.markFormGroupTouched(control as FormGroup);

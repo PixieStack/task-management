@@ -15,61 +15,84 @@
         <label for="email">Email</label>
         <div class="input-container">
           <i class="fas fa-envelope input-icon"></i>
-          <input 
-            id="email" 
-            type="email" 
-            formControlName="email" 
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
             placeholder="Enter your email"
-            [class.invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            [class.invalid]="
+              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+            "
           />
         </div>
-        <div class="error-text" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
-          <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
-          <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
+        <div
+          class="error-text"
+          *ngIf="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+          "
+        >
+          <span *ngIf="loginForm.get('email')?.errors?.['required']"
+            >Email is required</span
+          >
+          <span *ngIf="loginForm.get('email')?.errors?.['email']"
+            >Please enter a valid email</span
+          >
         </div>
       </div>
 
       <div class="form-group">
         <div class="label-row">
           <label for="password">Password</label>
-          <a routerLink="/forgot-password" class="forgot-link">Forgot Password?</a>
+          <a routerLink="/forgot-password" class="forgot-link"
+            >Forgot Password?</a
+          >
         </div>
         <div class="input-container">
           <i class="fas fa-lock input-icon"></i>
-          <input 
-            id="password" 
-            [type]="showPassword ? 'text' : 'password'" 
-            formControlName="password" 
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
             placeholder="Enter your password"
-            [class.invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            [class.invalid]="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
           />
-          <i 
-            class="fas" 
+          <i
+            class="fas"
             [class.fa-eye]="!showPassword"
             [class.fa-eye-slash]="showPassword"
             (click)="togglePasswordVisibility()"
-            class="password-toggle">
+            class="password-toggle"
+          >
           </i>
         </div>
-        <div class="error-text" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
-          <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
-          <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
+        <div
+          class="error-text"
+          *ngIf="
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+          "
+        >
+          <span *ngIf="loginForm.get('password')?.errors?.['required']"
+            >Password is required</span
+          >
+          <span *ngIf="loginForm.get('password')?.errors?.['minlength']"
+            >Password must be at least 8 characters</span
+          >
         </div>
       </div>
 
       <div class="remember-me">
         <label class="checkbox-container">
-          <input type="checkbox" formControlName="rememberMe">
+          <input type="checkbox" formControlName="rememberMe" />
           <span class="checkmark"></span>
           Remember me
         </label>
       </div>
 
-      <button 
-        type="submit" 
-        class="btn btn-primary" 
-        [disabled]="isLoading"
-      >
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
         <span *ngIf="!isLoading">Sign In</span>
         <span class="spinner" *ngIf="isLoading"></span>
       </button>

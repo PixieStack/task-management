@@ -2,13 +2,18 @@
   <section class="intro">
     <h2>✨ Key Features</h2>
     <p>
-      We help you organize your tasks, track productivity, and manage your schedule using cutting-edge AI tools.
+      We help you organize your tasks, track productivity, and manage your
+      schedule using cutting-edge AI tools.
     </p>
   </section>
 
   <section class="feature-grid">
     <div class="card" *ngFor="let feature of features">
-      <img [src]="feature.icon" alt="{{ feature.title }} Icon" class="card-icon" />
+      <img
+        [src]="feature.icon"
+        alt="{{ feature.title }} Icon"
+        class="card-icon"
+      />
       <h3>{{ feature.title }}</h3>
       <p>{{ feature.description }}</p>
     </div>

@@ -36,7 +36,8 @@ export class KeyFeaturesComponent {
     {
       icon: 'https://cdn-icons-png.flaticon.com/512/2665/2665696.png',
       title: 'Everyday Tasks',
-      description: 'Grocery shopping, errands, cleaning, and other recurring tasks.',
+      description:
+        'Grocery shopping, errands, cleaning, and other recurring tasks.',
     },
     {
       icon: 'https://cdn-icons-png.flaticon.com/512/2936/2936875.png',

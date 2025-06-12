@@ -1,7 +1,4 @@
-import {
-  DOCUMENT,
-  isPlatformBrowser
-} from "./chunk-6DHU3TJE.js";
+import { DOCUMENT, isPlatformBrowser } from "./chunk-6DHU3TJE.js";
 import {
   ApplicationRef,
   Attribute,
@@ -59,16 +56,10 @@ import {
   ɵɵdirectiveInject,
   ɵɵinject,
   ɵɵinjectAttribute,
-  ɵɵstyleProp
+  ɵɵstyleProp,
 } from "./chunk-ADRWFWIR.js";
-import {
-  Subject
-} from "./chunk-GQGAQNC4.js";
-import {
-  __async,
-  __spreadProps,
-  __spreadValues
-} from "./chunk-WDMUDEB6.js";
+import { Subject } from "./chunk-GQGAQNC4.js";
+import { __async, __spreadProps, __spreadValues } from "./chunk-WDMUDEB6.js";
 
 // ../node_modules/@angular/common/fesm2022/location-Dq4mJT-A.mjs
 var _DOM = null;
@@ -78,8 +69,7 @@ function getDOM() {
 function setRootDomAdapter(adapter) {
   _DOM ??= adapter;
 }
-var DomAdapter = class {
-};
+var DomAdapter = class {};
 var PlatformLocation = class _PlatformLocation {
   historyGo(relativePosition) {
     throw new Error(ngDevMode ? "Not implemented" : "");
@@ -90,19 +80,31 @@ var PlatformLocation = class _PlatformLocation {
   static ɵprov = ɵɵdefineInjectable({
     token: _PlatformLocation,
     factory: () => (() => inject(BrowserPlatformLocation))(),
-    providedIn: "platform"
+    providedIn: "platform",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(PlatformLocation, [{
-    type: Injectable,
-    args: [{
-      providedIn: "platform",
-      useFactory: () => inject(BrowserPlatformLocation)
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      PlatformLocation,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "platform",
+              useFactory: () => inject(BrowserPlatformLocation),
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
-var LOCATION_INITIALIZED = new InjectionToken(ngDevMode ? "Location Initialized" : "");
+var LOCATION_INITIALIZED = new InjectionToken(
+  ngDevMode ? "Location Initialized" : "",
+);
 var BrowserPlatformLocation = class _BrowserPlatformLocation extends PlatformLocation {
   _location;
   _history;
@@ -173,17 +175,27 @@ var BrowserPlatformLocation = class _BrowserPlatformLocation extends PlatformLoc
   static ɵprov = ɵɵdefineInjectable({
     token: _BrowserPlatformLocation,
     factory: () => (() => new _BrowserPlatformLocation())(),
-    providedIn: "platform"
+    providedIn: "platform",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(BrowserPlatformLocation, [{
-    type: Injectable,
-    args: [{
-      providedIn: "platform",
-      useFactory: () => new BrowserPlatformLocation()
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      BrowserPlatformLocation,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "platform",
+              useFactory: () => new BrowserPlatformLocation(),
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 function joinWithSlash(start, end) {
   if (!start) return end;
@@ -195,7 +207,9 @@ function joinWithSlash(start, end) {
 }
 function stripTrailingSlash(url) {
   const pathEndIdx = url.search(/#|\?|$/);
-  return url[pathEndIdx - 1] === "/" ? url.slice(0, pathEndIdx - 1) + url.slice(pathEndIdx) : url;
+  return url[pathEndIdx - 1] === "/"
+    ? url.slice(0, pathEndIdx - 1) + url.slice(pathEndIdx)
+    : url;
 }
 function normalizeQueryParams(params) {
   return params && params[0] !== "?" ? `?${params}` : params;
@@ -210,17 +224,27 @@ var LocationStrategy = class _LocationStrategy {
   static ɵprov = ɵɵdefineInjectable({
     token: _LocationStrategy,
     factory: () => (() => inject(PathLocationStrategy))(),
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(LocationStrategy, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root",
-      useFactory: () => inject(PathLocationStrategy)
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      LocationStrategy,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+              useFactory: () => inject(PathLocationStrategy),
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var APP_BASE_HREF = new InjectionToken(ngDevMode ? "appBaseHref" : "");
 var PathLocationStrategy = class _PathLocationStrategy extends LocationStrategy {
@@ -230,7 +254,11 @@ var PathLocationStrategy = class _PathLocationStrategy extends LocationStrategy 
   constructor(_platformLocation, href) {
     super();
     this._platformLocation = _platformLocation;
-    this._baseHref = href ?? this._platformLocation.getBaseHrefFromDOM() ?? inject(DOCUMENT).location?.origin ?? "";
+    this._baseHref =
+      href ??
+      this._platformLocation.getBaseHrefFromDOM() ??
+      inject(DOCUMENT).location?.origin ??
+      "";
   }
   /** @docs-private */
   ngOnDestroy() {
@@ -239,7 +267,10 @@ var PathLocationStrategy = class _PathLocationStrategy extends LocationStrategy 
     }
   }
   onPopState(fn) {
-    this._removeListenerFns.push(this._platformLocation.onPopState(fn), this._platformLocation.onHashChange(fn));
+    this._removeListenerFns.push(
+      this._platformLocation.onPopState(fn),
+      this._platformLocation.onHashChange(fn),
+    );
   }
   getBaseHref() {
     return this._baseHref;
@@ -248,16 +279,22 @@ var PathLocationStrategy = class _PathLocationStrategy extends LocationStrategy 
     return joinWithSlash(this._baseHref, internal);
   }
   path(includeHash = false) {
-    const pathname = this._platformLocation.pathname + normalizeQueryParams(this._platformLocation.search);
+    const pathname =
+      this._platformLocation.pathname +
+      normalizeQueryParams(this._platformLocation.search);
     const hash = this._platformLocation.hash;
     return hash && includeHash ? `${pathname}${hash}` : pathname;
   }
   pushState(state, title, url, queryParams) {
-    const externalUrl = this.prepareExternalUrl(url + normalizeQueryParams(queryParams));
+    const externalUrl = this.prepareExternalUrl(
+      url + normalizeQueryParams(queryParams),
+    );
     this._platformLocation.pushState(state, title, externalUrl);
   }
   replaceState(state, title, url, queryParams) {
-    const externalUrl = this.prepareExternalUrl(url + normalizeQueryParams(queryParams));
+    const externalUrl = this.prepareExternalUrl(
+      url + normalizeQueryParams(queryParams),
+    );
     this._platformLocation.replaceState(state, title, externalUrl);
   }
   forward() {
@@ -273,31 +310,50 @@ var PathLocationStrategy = class _PathLocationStrategy extends LocationStrategy 
     this._platformLocation.historyGo?.(relativePosition);
   }
   static ɵfac = function PathLocationStrategy_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _PathLocationStrategy)(ɵɵinject(PlatformLocation), ɵɵinject(APP_BASE_HREF, 8));
+    return new (__ngFactoryType__ || _PathLocationStrategy)(
+      ɵɵinject(PlatformLocation),
+      ɵɵinject(APP_BASE_HREF, 8),
+    );
   };
   static ɵprov = ɵɵdefineInjectable({
     token: _PathLocationStrategy,
     factory: _PathLocationStrategy.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(PathLocationStrategy, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [{
-    type: PlatformLocation
-  }, {
-    type: void 0,
-    decorators: [{
-      type: Optional
-    }, {
-      type: Inject,
-      args: [APP_BASE_HREF]
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      PathLocationStrategy,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: PlatformLocation,
+        },
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Optional,
+            },
+            {
+              type: Inject,
+              args: [APP_BASE_HREF],
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var Location = class _Location {
   /** @internal */
@@ -313,13 +369,15 @@ var Location = class _Location {
   constructor(locationStrategy) {
     this._locationStrategy = locationStrategy;
     const baseHref = this._locationStrategy.getBaseHref();
-    this._basePath = _stripOrigin(stripTrailingSlash(_stripIndexHtml(baseHref)));
+    this._basePath = _stripOrigin(
+      stripTrailingSlash(_stripIndexHtml(baseHref)),
+    );
     this._locationStrategy.onPopState((ev) => {
       this._subject.next({
-        "url": this.path(true),
-        "pop": true,
-        "state": ev.state,
-        "type": ev.type
+        url: this.path(true),
+        pop: true,
+        state: ev.state,
+        type: ev.type,
       });
     });
   }
@@ -367,7 +425,9 @@ var Location = class _Location {
    * @returns The normalized URL string.
    */
   normalize(url) {
-    return _Location.stripTrailingSlash(_stripBasePath(this._basePath, _stripIndexHtml(url)));
+    return _Location.stripTrailingSlash(
+      _stripBasePath(this._basePath, _stripIndexHtml(url)),
+    );
   }
   /**
    * Normalizes an external URL path.
@@ -397,7 +457,10 @@ var Location = class _Location {
    */
   go(path, query = "", state = null) {
     this._locationStrategy.pushState(state, "", path, query);
-    this._notifyUrlChangeListeners(this.prepareExternalUrl(path + normalizeQueryParams(query)), state);
+    this._notifyUrlChangeListeners(
+      this.prepareExternalUrl(path + normalizeQueryParams(query)),
+      state,
+    );
   }
   /**
    * Changes the browser's URL to a normalized version of the given URL, and replaces
@@ -409,7 +472,10 @@ var Location = class _Location {
    */
   replaceState(path, query = "", state = null) {
     this._locationStrategy.replaceState(state, "", path, query);
-    this._notifyUrlChangeListeners(this.prepareExternalUrl(path + normalizeQueryParams(query)), state);
+    this._notifyUrlChangeListeners(
+      this.prepareExternalUrl(path + normalizeQueryParams(query)),
+      state,
+    );
   }
   /**
    * Navigates forward in the platform's history.
@@ -480,7 +546,7 @@ var Location = class _Location {
     return this._subject.subscribe({
       next: onNext,
       error: onThrow ?? void 0,
-      complete: onReturn ?? void 0
+      complete: onReturn ?? void 0,
     });
   }
   /**
@@ -517,20 +583,32 @@ var Location = class _Location {
   static ɵprov = ɵɵdefineInjectable({
     token: _Location,
     factory: () => createLocation(),
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(Location, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root",
-      // See #23917
-      useFactory: createLocation
-    }]
-  }], () => [{
-    type: LocationStrategy
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      Location,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+              // See #23917
+              useFactory: createLocation,
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: LocationStrategy,
+        },
+      ],
+      null,
+    );
 })();
 function createLocation() {
   return new Location(ɵɵinject(LocationStrategy));
@@ -576,7 +654,10 @@ var HashLocationStrategy = class _HashLocationStrategy extends LocationStrategy 
     }
   }
   onPopState(fn) {
-    this._removeListenerFns.push(this._platformLocation.onPopState(fn), this._platformLocation.onHashChange(fn));
+    this._removeListenerFns.push(
+      this._platformLocation.onPopState(fn),
+      this._platformLocation.onHashChange(fn),
+    );
   }
   getBaseHref() {
     return this._baseHref;
@@ -590,11 +671,15 @@ var HashLocationStrategy = class _HashLocationStrategy extends LocationStrategy 
     return url.length > 0 ? "#" + url : url;
   }
   pushState(state, title, path, queryParams) {
-    const url = this.prepareExternalUrl(path + normalizeQueryParams(queryParams)) || this._platformLocation.pathname;
+    const url =
+      this.prepareExternalUrl(path + normalizeQueryParams(queryParams)) ||
+      this._platformLocation.pathname;
     this._platformLocation.pushState(state, title, url);
   }
   replaceState(state, title, path, queryParams) {
-    const url = this.prepareExternalUrl(path + normalizeQueryParams(queryParams)) || this._platformLocation.pathname;
+    const url =
+      this.prepareExternalUrl(path + normalizeQueryParams(queryParams)) ||
+      this._platformLocation.pathname;
     this._platformLocation.replaceState(state, title, url);
   }
   forward() {
@@ -610,204 +695,221 @@ var HashLocationStrategy = class _HashLocationStrategy extends LocationStrategy 
     this._platformLocation.historyGo?.(relativePosition);
   }
   static ɵfac = function HashLocationStrategy_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _HashLocationStrategy)(ɵɵinject(PlatformLocation), ɵɵinject(APP_BASE_HREF, 8));
+    return new (__ngFactoryType__ || _HashLocationStrategy)(
+      ɵɵinject(PlatformLocation),
+      ɵɵinject(APP_BASE_HREF, 8),
+    );
   };
   static ɵprov = ɵɵdefineInjectable({
     token: _HashLocationStrategy,
-    factory: _HashLocationStrategy.ɵfac
+    factory: _HashLocationStrategy.ɵfac,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(HashLocationStrategy, [{
-    type: Injectable
-  }], () => [{
-    type: PlatformLocation
-  }, {
-    type: void 0,
-    decorators: [{
-      type: Optional
-    }, {
-      type: Inject,
-      args: [APP_BASE_HREF]
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      HashLocationStrategy,
+      [
+        {
+          type: Injectable,
+        },
+      ],
+      () => [
+        {
+          type: PlatformLocation,
+        },
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Optional,
+            },
+            {
+              type: Inject,
+              args: [APP_BASE_HREF],
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var CURRENCIES_EN = {
-  "ADP": [void 0, void 0, 0],
-  "AFN": [void 0, "؋", 0],
-  "ALL": [void 0, void 0, 0],
-  "AMD": [void 0, "֏", 2],
-  "AOA": [void 0, "Kz"],
-  "ARS": [void 0, "$"],
-  "AUD": ["A$", "$"],
-  "AZN": [void 0, "₼"],
-  "BAM": [void 0, "KM"],
-  "BBD": [void 0, "$"],
-  "BDT": [void 0, "৳"],
-  "BHD": [void 0, void 0, 3],
-  "BIF": [void 0, void 0, 0],
-  "BMD": [void 0, "$"],
-  "BND": [void 0, "$"],
-  "BOB": [void 0, "Bs"],
-  "BRL": ["R$"],
-  "BSD": [void 0, "$"],
-  "BWP": [void 0, "P"],
-  "BYN": [void 0, void 0, 2],
-  "BYR": [void 0, void 0, 0],
-  "BZD": [void 0, "$"],
-  "CAD": ["CA$", "$", 2],
-  "CHF": [void 0, void 0, 2],
-  "CLF": [void 0, void 0, 4],
-  "CLP": [void 0, "$", 0],
-  "CNY": ["CN¥", "¥"],
-  "COP": [void 0, "$", 2],
-  "CRC": [void 0, "₡", 2],
-  "CUC": [void 0, "$"],
-  "CUP": [void 0, "$"],
-  "CZK": [void 0, "Kč", 2],
-  "DJF": [void 0, void 0, 0],
-  "DKK": [void 0, "kr", 2],
-  "DOP": [void 0, "$"],
-  "EGP": [void 0, "E£"],
-  "ESP": [void 0, "₧", 0],
-  "EUR": ["€"],
-  "FJD": [void 0, "$"],
-  "FKP": [void 0, "£"],
-  "GBP": ["£"],
-  "GEL": [void 0, "₾"],
-  "GHS": [void 0, "GH₵"],
-  "GIP": [void 0, "£"],
-  "GNF": [void 0, "FG", 0],
-  "GTQ": [void 0, "Q"],
-  "GYD": [void 0, "$", 2],
-  "HKD": ["HK$", "$"],
-  "HNL": [void 0, "L"],
-  "HRK": [void 0, "kn"],
-  "HUF": [void 0, "Ft", 2],
-  "IDR": [void 0, "Rp", 2],
-  "ILS": ["₪"],
-  "INR": ["₹"],
-  "IQD": [void 0, void 0, 0],
-  "IRR": [void 0, void 0, 0],
-  "ISK": [void 0, "kr", 0],
-  "ITL": [void 0, void 0, 0],
-  "JMD": [void 0, "$"],
-  "JOD": [void 0, void 0, 3],
-  "JPY": ["¥", void 0, 0],
-  "KHR": [void 0, "៛"],
-  "KMF": [void 0, "CF", 0],
-  "KPW": [void 0, "₩", 0],
-  "KRW": ["₩", void 0, 0],
-  "KWD": [void 0, void 0, 3],
-  "KYD": [void 0, "$"],
-  "KZT": [void 0, "₸"],
-  "LAK": [void 0, "₭", 0],
-  "LBP": [void 0, "L£", 0],
-  "LKR": [void 0, "Rs"],
-  "LRD": [void 0, "$"],
-  "LTL": [void 0, "Lt"],
-  "LUF": [void 0, void 0, 0],
-  "LVL": [void 0, "Ls"],
-  "LYD": [void 0, void 0, 3],
-  "MGA": [void 0, "Ar", 0],
-  "MGF": [void 0, void 0, 0],
-  "MMK": [void 0, "K", 0],
-  "MNT": [void 0, "₮", 2],
-  "MRO": [void 0, void 0, 0],
-  "MUR": [void 0, "Rs", 2],
-  "MXN": ["MX$", "$"],
-  "MYR": [void 0, "RM"],
-  "NAD": [void 0, "$"],
-  "NGN": [void 0, "₦"],
-  "NIO": [void 0, "C$"],
-  "NOK": [void 0, "kr", 2],
-  "NPR": [void 0, "Rs"],
-  "NZD": ["NZ$", "$"],
-  "OMR": [void 0, void 0, 3],
-  "PHP": ["₱"],
-  "PKR": [void 0, "Rs", 2],
-  "PLN": [void 0, "zł"],
-  "PYG": [void 0, "₲", 0],
-  "RON": [void 0, "lei"],
-  "RSD": [void 0, void 0, 0],
-  "RUB": [void 0, "₽"],
-  "RWF": [void 0, "RF", 0],
-  "SBD": [void 0, "$"],
-  "SEK": [void 0, "kr", 2],
-  "SGD": [void 0, "$"],
-  "SHP": [void 0, "£"],
-  "SLE": [void 0, void 0, 2],
-  "SLL": [void 0, void 0, 0],
-  "SOS": [void 0, void 0, 0],
-  "SRD": [void 0, "$"],
-  "SSP": [void 0, "£"],
-  "STD": [void 0, void 0, 0],
-  "STN": [void 0, "Db"],
-  "SYP": [void 0, "£", 0],
-  "THB": [void 0, "฿"],
-  "TMM": [void 0, void 0, 0],
-  "TND": [void 0, void 0, 3],
-  "TOP": [void 0, "T$"],
-  "TRL": [void 0, void 0, 0],
-  "TRY": [void 0, "₺"],
-  "TTD": [void 0, "$"],
-  "TWD": ["NT$", "$", 2],
-  "TZS": [void 0, void 0, 2],
-  "UAH": [void 0, "₴"],
-  "UGX": [void 0, void 0, 0],
-  "USD": ["$"],
-  "UYI": [void 0, void 0, 0],
-  "UYU": [void 0, "$"],
-  "UYW": [void 0, void 0, 4],
-  "UZS": [void 0, void 0, 2],
-  "VEF": [void 0, "Bs", 2],
-  "VND": ["₫", void 0, 0],
-  "VUV": [void 0, void 0, 0],
-  "XAF": ["FCFA", void 0, 0],
-  "XCD": ["EC$", "$"],
-  "XOF": ["F CFA", void 0, 0],
-  "XPF": ["CFPF", void 0, 0],
-  "XXX": ["¤"],
-  "YER": [void 0, void 0, 0],
-  "ZAR": [void 0, "R"],
-  "ZMK": [void 0, void 0, 0],
-  "ZMW": [void 0, "ZK"],
-  "ZWD": [void 0, void 0, 0]
+  ADP: [void 0, void 0, 0],
+  AFN: [void 0, "؋", 0],
+  ALL: [void 0, void 0, 0],
+  AMD: [void 0, "֏", 2],
+  AOA: [void 0, "Kz"],
+  ARS: [void 0, "$"],
+  AUD: ["A$", "$"],
+  AZN: [void 0, "₼"],
+  BAM: [void 0, "KM"],
+  BBD: [void 0, "$"],
+  BDT: [void 0, "৳"],
+  BHD: [void 0, void 0, 3],
+  BIF: [void 0, void 0, 0],
+  BMD: [void 0, "$"],
+  BND: [void 0, "$"],
+  BOB: [void 0, "Bs"],
+  BRL: ["R$"],
+  BSD: [void 0, "$"],
+  BWP: [void 0, "P"],
+  BYN: [void 0, void 0, 2],
+  BYR: [void 0, void 0, 0],
+  BZD: [void 0, "$"],
+  CAD: ["CA$", "$", 2],
+  CHF: [void 0, void 0, 2],
+  CLF: [void 0, void 0, 4],
+  CLP: [void 0, "$", 0],
+  CNY: ["CN¥", "¥"],
+  COP: [void 0, "$", 2],
+  CRC: [void 0, "₡", 2],
+  CUC: [void 0, "$"],
+  CUP: [void 0, "$"],
+  CZK: [void 0, "Kč", 2],
+  DJF: [void 0, void 0, 0],
+  DKK: [void 0, "kr", 2],
+  DOP: [void 0, "$"],
+  EGP: [void 0, "E£"],
+  ESP: [void 0, "₧", 0],
+  EUR: ["€"],
+  FJD: [void 0, "$"],
+  FKP: [void 0, "£"],
+  GBP: ["£"],
+  GEL: [void 0, "₾"],
+  GHS: [void 0, "GH₵"],
+  GIP: [void 0, "£"],
+  GNF: [void 0, "FG", 0],
+  GTQ: [void 0, "Q"],
+  GYD: [void 0, "$", 2],
+  HKD: ["HK$", "$"],
+  HNL: [void 0, "L"],
+  HRK: [void 0, "kn"],
+  HUF: [void 0, "Ft", 2],
+  IDR: [void 0, "Rp", 2],
+  ILS: ["₪"],
+  INR: ["₹"],
+  IQD: [void 0, void 0, 0],
+  IRR: [void 0, void 0, 0],
+  ISK: [void 0, "kr", 0],
+  ITL: [void 0, void 0, 0],
+  JMD: [void 0, "$"],
+  JOD: [void 0, void 0, 3],
+  JPY: ["¥", void 0, 0],
+  KHR: [void 0, "៛"],
+  KMF: [void 0, "CF", 0],
+  KPW: [void 0, "₩", 0],
+  KRW: ["₩", void 0, 0],
+  KWD: [void 0, void 0, 3],
+  KYD: [void 0, "$"],
+  KZT: [void 0, "₸"],
+  LAK: [void 0, "₭", 0],
+  LBP: [void 0, "L£", 0],
+  LKR: [void 0, "Rs"],
+  LRD: [void 0, "$"],
+  LTL: [void 0, "Lt"],
+  LUF: [void 0, void 0, 0],
+  LVL: [void 0, "Ls"],
+  LYD: [void 0, void 0, 3],
+  MGA: [void 0, "Ar", 0],
+  MGF: [void 0, void 0, 0],
+  MMK: [void 0, "K", 0],
+  MNT: [void 0, "₮", 2],
+  MRO: [void 0, void 0, 0],
+  MUR: [void 0, "Rs", 2],
+  MXN: ["MX$", "$"],
+  MYR: [void 0, "RM"],
+  NAD: [void 0, "$"],
+  NGN: [void 0, "₦"],
+  NIO: [void 0, "C$"],
+  NOK: [void 0, "kr", 2],
+  NPR: [void 0, "Rs"],
+  NZD: ["NZ$", "$"],
+  OMR: [void 0, void 0, 3],
+  PHP: ["₱"],
+  PKR: [void 0, "Rs", 2],
+  PLN: [void 0, "zł"],
+  PYG: [void 0, "₲", 0],
+  RON: [void 0, "lei"],
+  RSD: [void 0, void 0, 0],
+  RUB: [void 0, "₽"],
+  RWF: [void 0, "RF", 0],
+  SBD: [void 0, "$"],
+  SEK: [void 0, "kr", 2],
+  SGD: [void 0, "$"],
+  SHP: [void 0, "£"],
+  SLE: [void 0, void 0, 2],
+  SLL: [void 0, void 0, 0],
+  SOS: [void 0, void 0, 0],
+  SRD: [void 0, "$"],
+  SSP: [void 0, "£"],
+  STD: [void 0, void 0, 0],
+  STN: [void 0, "Db"],
+  SYP: [void 0, "£", 0],
+  THB: [void 0, "฿"],
+  TMM: [void 0, void 0, 0],
+  TND: [void 0, void 0, 3],
+  TOP: [void 0, "T$"],
+  TRL: [void 0, void 0, 0],
+  TRY: [void 0, "₺"],
+  TTD: [void 0, "$"],
+  TWD: ["NT$", "$", 2],
+  TZS: [void 0, void 0, 2],
+  UAH: [void 0, "₴"],
+  UGX: [void 0, void 0, 0],
+  USD: ["$"],
+  UYI: [void 0, void 0, 0],
+  UYU: [void 0, "$"],
+  UYW: [void 0, void 0, 4],
+  UZS: [void 0, void 0, 2],
+  VEF: [void 0, "Bs", 2],
+  VND: ["₫", void 0, 0],
+  VUV: [void 0, void 0, 0],
+  XAF: ["FCFA", void 0, 0],
+  XCD: ["EC$", "$"],
+  XOF: ["F CFA", void 0, 0],
+  XPF: ["CFPF", void 0, 0],
+  XXX: ["¤"],
+  YER: [void 0, void 0, 0],
+  ZAR: [void 0, "R"],
+  ZMK: [void 0, void 0, 0],
+  ZMW: [void 0, "ZK"],
+  ZWD: [void 0, void 0, 0],
 };
 var NumberFormatStyle;
-(function(NumberFormatStyle2) {
-  NumberFormatStyle2[NumberFormatStyle2["Decimal"] = 0] = "Decimal";
-  NumberFormatStyle2[NumberFormatStyle2["Percent"] = 1] = "Percent";
-  NumberFormatStyle2[NumberFormatStyle2["Currency"] = 2] = "Currency";
-  NumberFormatStyle2[NumberFormatStyle2["Scientific"] = 3] = "Scientific";
+(function (NumberFormatStyle2) {
+  NumberFormatStyle2[(NumberFormatStyle2["Decimal"] = 0)] = "Decimal";
+  NumberFormatStyle2[(NumberFormatStyle2["Percent"] = 1)] = "Percent";
+  NumberFormatStyle2[(NumberFormatStyle2["Currency"] = 2)] = "Currency";
+  NumberFormatStyle2[(NumberFormatStyle2["Scientific"] = 3)] = "Scientific";
 })(NumberFormatStyle || (NumberFormatStyle = {}));
 var Plural;
-(function(Plural2) {
-  Plural2[Plural2["Zero"] = 0] = "Zero";
-  Plural2[Plural2["One"] = 1] = "One";
-  Plural2[Plural2["Two"] = 2] = "Two";
-  Plural2[Plural2["Few"] = 3] = "Few";
-  Plural2[Plural2["Many"] = 4] = "Many";
-  Plural2[Plural2["Other"] = 5] = "Other";
+(function (Plural2) {
+  Plural2[(Plural2["Zero"] = 0)] = "Zero";
+  Plural2[(Plural2["One"] = 1)] = "One";
+  Plural2[(Plural2["Two"] = 2)] = "Two";
+  Plural2[(Plural2["Few"] = 3)] = "Few";
+  Plural2[(Plural2["Many"] = 4)] = "Many";
+  Plural2[(Plural2["Other"] = 5)] = "Other";
 })(Plural || (Plural = {}));
 var FormStyle;
-(function(FormStyle2) {
-  FormStyle2[FormStyle2["Format"] = 0] = "Format";
-  FormStyle2[FormStyle2["Standalone"] = 1] = "Standalone";
+(function (FormStyle2) {
+  FormStyle2[(FormStyle2["Format"] = 0)] = "Format";
+  FormStyle2[(FormStyle2["Standalone"] = 1)] = "Standalone";
 })(FormStyle || (FormStyle = {}));
 var TranslationWidth;
-(function(TranslationWidth2) {
-  TranslationWidth2[TranslationWidth2["Narrow"] = 0] = "Narrow";
-  TranslationWidth2[TranslationWidth2["Abbreviated"] = 1] = "Abbreviated";
-  TranslationWidth2[TranslationWidth2["Wide"] = 2] = "Wide";
-  TranslationWidth2[TranslationWidth2["Short"] = 3] = "Short";
+(function (TranslationWidth2) {
+  TranslationWidth2[(TranslationWidth2["Narrow"] = 0)] = "Narrow";
+  TranslationWidth2[(TranslationWidth2["Abbreviated"] = 1)] = "Abbreviated";
+  TranslationWidth2[(TranslationWidth2["Wide"] = 2)] = "Wide";
+  TranslationWidth2[(TranslationWidth2["Short"] = 3)] = "Short";
 })(TranslationWidth || (TranslationWidth = {}));
 var FormatWidth;
-(function(FormatWidth2) {
-  FormatWidth2[FormatWidth2["Short"] = 0] = "Short";
-  FormatWidth2[FormatWidth2["Medium"] = 1] = "Medium";
-  FormatWidth2[FormatWidth2["Long"] = 2] = "Long";
-  FormatWidth2[FormatWidth2["Full"] = 3] = "Full";
+(function (FormatWidth2) {
+  FormatWidth2[(FormatWidth2["Short"] = 0)] = "Short";
+  FormatWidth2[(FormatWidth2["Medium"] = 1)] = "Medium";
+  FormatWidth2[(FormatWidth2["Long"] = 2)] = "Long";
+  FormatWidth2[(FormatWidth2["Full"] = 3)] = "Full";
 })(FormatWidth || (FormatWidth = {}));
 var NumberSymbol = {
   /**
@@ -881,36 +983,45 @@ var NumberSymbol = {
    * Group separator for currency values (fallback to `Group`).
    * Example: $2,345.67
    */
-  CurrencyGroup: 13
+  CurrencyGroup: 13,
 };
 var WeekDay;
-(function(WeekDay2) {
-  WeekDay2[WeekDay2["Sunday"] = 0] = "Sunday";
-  WeekDay2[WeekDay2["Monday"] = 1] = "Monday";
-  WeekDay2[WeekDay2["Tuesday"] = 2] = "Tuesday";
-  WeekDay2[WeekDay2["Wednesday"] = 3] = "Wednesday";
-  WeekDay2[WeekDay2["Thursday"] = 4] = "Thursday";
-  WeekDay2[WeekDay2["Friday"] = 5] = "Friday";
-  WeekDay2[WeekDay2["Saturday"] = 6] = "Saturday";
+(function (WeekDay2) {
+  WeekDay2[(WeekDay2["Sunday"] = 0)] = "Sunday";
+  WeekDay2[(WeekDay2["Monday"] = 1)] = "Monday";
+  WeekDay2[(WeekDay2["Tuesday"] = 2)] = "Tuesday";
+  WeekDay2[(WeekDay2["Wednesday"] = 3)] = "Wednesday";
+  WeekDay2[(WeekDay2["Thursday"] = 4)] = "Thursday";
+  WeekDay2[(WeekDay2["Friday"] = 5)] = "Friday";
+  WeekDay2[(WeekDay2["Saturday"] = 6)] = "Saturday";
 })(WeekDay || (WeekDay = {}));
 function getLocaleId(locale) {
   return findLocaleData(locale)[LocaleDataIndex.LocaleId];
 }
 function getLocaleDayPeriods(locale, formStyle, width) {
   const data = findLocaleData(locale);
-  const amPmData = [data[LocaleDataIndex.DayPeriodsFormat], data[LocaleDataIndex.DayPeriodsStandalone]];
+  const amPmData = [
+    data[LocaleDataIndex.DayPeriodsFormat],
+    data[LocaleDataIndex.DayPeriodsStandalone],
+  ];
   const amPm = getLastDefinedValue(amPmData, formStyle);
   return getLastDefinedValue(amPm, width);
 }
 function getLocaleDayNames(locale, formStyle, width) {
   const data = findLocaleData(locale);
-  const daysData = [data[LocaleDataIndex.DaysFormat], data[LocaleDataIndex.DaysStandalone]];
+  const daysData = [
+    data[LocaleDataIndex.DaysFormat],
+    data[LocaleDataIndex.DaysStandalone],
+  ];
   const days = getLastDefinedValue(daysData, formStyle);
   return getLastDefinedValue(days, width);
 }
 function getLocaleMonthNames(locale, formStyle, width) {
   const data = findLocaleData(locale);
-  const monthsData = [data[LocaleDataIndex.MonthsFormat], data[LocaleDataIndex.MonthsStandalone]];
+  const monthsData = [
+    data[LocaleDataIndex.MonthsFormat],
+    data[LocaleDataIndex.MonthsStandalone],
+  ];
   const months = getLastDefinedValue(monthsData, formStyle);
   return getLastDefinedValue(months, width);
 }
@@ -974,16 +1085,17 @@ function getLocaleCurrencies(locale) {
 var getLocalePluralCase2 = getLocalePluralCase;
 function checkFullData(data) {
   if (!data[LocaleDataIndex.ExtraData]) {
-    throw new Error(`Missing extra locale data for the locale "${data[LocaleDataIndex.LocaleId]}". Use "registerLocaleData" to load new data. See the "I18n guide" on angular.io to know more.`);
+    throw new Error(
+      `Missing extra locale data for the locale "${data[LocaleDataIndex.LocaleId]}". Use "registerLocaleData" to load new data. See the "I18n guide" on angular.io to know more.`,
+    );
   }
 }
 function getLocaleExtraDayPeriodRules(locale) {
   const data = findLocaleData(locale);
   checkFullData(data);
-  const rules = data[LocaleDataIndex.ExtraData][
-    2
+  const rules =
+    data[LocaleDataIndex.ExtraData][2] || [];
     /* ɵExtraLocaleDataIndex.ExtraDayPeriodsRules */
-  ] || [];
   return rules.map((rule) => {
     if (typeof rule === "string") {
       return extractTime(rule);
@@ -994,13 +1106,12 @@ function getLocaleExtraDayPeriodRules(locale) {
 function getLocaleExtraDayPeriods(locale, formStyle, width) {
   const data = findLocaleData(locale);
   checkFullData(data);
-  const dayPeriodsData = [data[LocaleDataIndex.ExtraData][
-    0
+  const dayPeriodsData = [
+    data[LocaleDataIndex.ExtraData][0],
     /* ɵExtraLocaleDataIndex.ExtraDayPeriodFormats */
-  ], data[LocaleDataIndex.ExtraData][
-    1
+    data[LocaleDataIndex.ExtraData][1],
     /* ɵExtraLocaleDataIndex.ExtraDayPeriodStandalone */
-  ]];
+  ];
   const dayPeriods = getLastDefinedValue(dayPeriodsData, formStyle) || [];
   return getLastDefinedValue(dayPeriods, width) || [];
 }
@@ -1020,38 +1131,39 @@ function extractTime(time) {
   const [h, m] = time.split(":");
   return {
     hours: +h,
-    minutes: +m
+    minutes: +m,
   };
 }
 function getCurrencySymbol(code, format, locale = "en") {
-  const currency = getLocaleCurrencies(locale)[code] || CURRENCIES_EN[code] || [];
-  const symbolNarrow = currency[
-    1
+  const currency =
+    getLocaleCurrencies(locale)[code] || CURRENCIES_EN[code] || [];
+  const symbolNarrow =
+    currency[1];
     /* ɵCurrencyIndex.SymbolNarrow */
-  ];
   if (format === "narrow" && typeof symbolNarrow === "string") {
     return symbolNarrow;
   }
-  return currency[
-    0
+  return (
+    currency[0] || code
     /* ɵCurrencyIndex.Symbol */
-  ] || code;
+  );
 }
 var DEFAULT_NB_OF_CURRENCY_DIGITS = 2;
 function getNumberOfCurrencyDigits(code) {
   let digits;
   const currency = CURRENCIES_EN[code];
   if (currency) {
-    digits = currency[
-      2
+    digits =
+      currency[2];
       /* ɵCurrencyIndex.NbOfDigits */
-    ];
   }
   return typeof digits === "number" ? digits : DEFAULT_NB_OF_CURRENCY_DIGITS;
 }
-var ISO8601_DATE_REGEX = /^(\d{4,})-?(\d\d)-?(\d\d)(?:T(\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(Z|([+-])(\d\d):?(\d\d))?)?$/;
+var ISO8601_DATE_REGEX =
+  /^(\d{4,})-?(\d\d)-?(\d\d)(?:T(\d\d)(?::?(\d\d)(?::?(\d\d)(?:\.(\d+))?)?)?(Z|([+-])(\d\d):?(\d\d))?)?$/;
 var NAMED_FORMATS = {};
-var DATE_FORMATS_SPLIT = /((?:[^BEGHLMOSWYZabcdhmswyz']+)|(?:'(?:[^']|'')*')|(?:G{1,5}|y{1,4}|Y{1,4}|M{1,5}|L{1,5}|w{1,2}|W{1}|d{1,2}|E{1,6}|c{1,6}|a{1,5}|b{1,5}|B{1,5}|h{1,2}|H{1,2}|m{1,2}|s{1,2}|S{1,3}|z{1,4}|Z{1,5}|O{1,4}))([\s\S]*)/;
+var DATE_FORMATS_SPLIT =
+  /((?:[^BEGHLMOSWYZabcdhmswyz']+)|(?:'(?:[^']|'')*')|(?:G{1,5}|y{1,4}|Y{1,4}|M{1,5}|L{1,5}|w{1,2}|W{1}|d{1,2}|E{1,6}|c{1,6}|a{1,5}|b{1,5}|B{1,5}|h{1,2}|H{1,2}|m{1,2}|s{1,2}|S{1,3}|z{1,4}|Z{1,5}|O{1,4}))([\s\S]*)/;
 function formatDate(value, format, locale, timezone) {
   let date = toDate(value);
   const namedFormat = getNamedFormat(locale, format);
@@ -1080,7 +1192,11 @@ function formatDate(value, format, locale, timezone) {
   let text = "";
   parts.forEach((value2) => {
     const dateFormatter = getDateFormatter(value2);
-    text += dateFormatter ? dateFormatter(date, locale, dateTimezoneOffset) : value2 === "''" ? "'" : value2.replace(/(^'|'$)/g, "").replace(/''/g, "'");
+    text += dateFormatter
+      ? dateFormatter(date, locale, dateTimezoneOffset)
+      : value2 === "''"
+        ? "'"
+        : value2.replace(/(^'|'$)/g, "").replace(/''/g, "'");
   });
   return text;
 }
@@ -1125,22 +1241,34 @@ function getNamedFormat(locale, format) {
     case "short":
       const shortTime = getNamedFormat(locale, "shortTime");
       const shortDate = getNamedFormat(locale, "shortDate");
-      formatValue = formatDateTime(getLocaleDateTimeFormat(locale, FormatWidth.Short), [shortTime, shortDate]);
+      formatValue = formatDateTime(
+        getLocaleDateTimeFormat(locale, FormatWidth.Short),
+        [shortTime, shortDate],
+      );
       break;
     case "medium":
       const mediumTime = getNamedFormat(locale, "mediumTime");
       const mediumDate = getNamedFormat(locale, "mediumDate");
-      formatValue = formatDateTime(getLocaleDateTimeFormat(locale, FormatWidth.Medium), [mediumTime, mediumDate]);
+      formatValue = formatDateTime(
+        getLocaleDateTimeFormat(locale, FormatWidth.Medium),
+        [mediumTime, mediumDate],
+      );
       break;
     case "long":
       const longTime = getNamedFormat(locale, "longTime");
       const longDate = getNamedFormat(locale, "longDate");
-      formatValue = formatDateTime(getLocaleDateTimeFormat(locale, FormatWidth.Long), [longTime, longDate]);
+      formatValue = formatDateTime(
+        getLocaleDateTimeFormat(locale, FormatWidth.Long),
+        [longTime, longDate],
+      );
       break;
     case "full":
       const fullTime = getNamedFormat(locale, "fullTime");
       const fullDate = getNamedFormat(locale, "fullDate");
-      formatValue = formatDateTime(getLocaleDateTimeFormat(locale, FormatWidth.Full), [fullTime, fullDate]);
+      formatValue = formatDateTime(
+        getLocaleDateTimeFormat(locale, FormatWidth.Full),
+        [fullTime, fullDate],
+      );
       break;
   }
   if (formatValue) {
@@ -1150,7 +1278,7 @@ function getNamedFormat(locale, format) {
 }
 function formatDateTime(str, opt_values) {
   if (opt_values) {
-    str = str.replace(/\{([^}]+)}/g, function(match, key) {
+    str = str.replace(/\{([^}]+)}/g, function (match, key) {
       return opt_values != null && key in opt_values ? opt_values[key] : match;
     });
   }
@@ -1158,7 +1286,7 @@ function formatDateTime(str, opt_values) {
 }
 function padNumber(num, digits, minusSign = "-", trim, negWrap) {
   let neg = "";
-  if (num < 0 || negWrap && num <= 0) {
+  if (num < 0 || (negWrap && num <= 0)) {
     if (negWrap) {
       num = -num + 1;
     } else {
@@ -1180,7 +1308,7 @@ function formatFractionalSeconds(milliseconds, digits) {
   return strMs.substring(0, digits);
 }
 function dateGetter(name, size, offset = 0, trim = false, negWrap = false) {
-  return function(date, locale) {
+  return function (date, locale) {
     let part = getDatePart(name, date);
     if (offset > 0 || part > -offset) {
       part += offset;
@@ -1219,7 +1347,7 @@ function getDatePart(part, date) {
   }
 }
 function dateStrGetter(name, width, form = FormStyle.Format, extended = false) {
-  return function(date, locale) {
+  return function (date, locale) {
     return getDateTranslation(date, locale, name, width, form, extended);
   };
 }
@@ -1238,8 +1366,11 @@ function getDateTranslation(date, locale, name, width, form, extended) {
         const index = rules.findIndex((rule) => {
           if (Array.isArray(rule)) {
             const [from, to] = rule;
-            const afterFrom = currentHours >= from.hours && currentMinutes >= from.minutes;
-            const beforeTo = currentHours < to.hours || currentHours === to.hours && currentMinutes < to.minutes;
+            const afterFrom =
+              currentHours >= from.hours && currentMinutes >= from.minutes;
+            const beforeTo =
+              currentHours < to.hours ||
+              (currentHours === to.hours && currentMinutes < to.minutes);
             if (from.hours < to.hours) {
               if (afterFrom && beforeTo) {
                 return true;
@@ -1248,7 +1379,10 @@ function getDateTranslation(date, locale, name, width, form, extended) {
               return true;
             }
           } else {
-            if (rule.hours === currentHours && rule.minutes === currentMinutes) {
+            if (
+              rule.hours === currentHours &&
+              rule.minutes === currentMinutes
+            ) {
               return true;
             }
           }
@@ -1258,7 +1392,9 @@ function getDateTranslation(date, locale, name, width, form, extended) {
           return dayPeriods[index];
         }
       }
-      return getLocaleDayPeriods(locale, form, width)[currentHours < 12 ? 0 : 1];
+      return getLocaleDayPeriods(locale, form, width)[
+        currentHours < 12 ? 0 : 1
+      ];
     case 3:
       return getLocaleEraNames(locale, width)[date.getFullYear() <= 0 ? 0 : 1];
     default:
@@ -1267,22 +1403,37 @@ function getDateTranslation(date, locale, name, width, form, extended) {
   }
 }
 function timeZoneGetter(width) {
-  return function(date, locale, offset) {
+  return function (date, locale, offset) {
     const zone = -1 * offset;
     const minusSign = getLocaleNumberSymbol(locale, NumberSymbol.MinusSign);
     const hours = zone > 0 ? Math.floor(zone / 60) : Math.ceil(zone / 60);
     switch (width) {
       case 0:
-        return (zone >= 0 ? "+" : "") + padNumber(hours, 2, minusSign) + padNumber(Math.abs(zone % 60), 2, minusSign);
+        return (
+          (zone >= 0 ? "+" : "") +
+          padNumber(hours, 2, minusSign) +
+          padNumber(Math.abs(zone % 60), 2, minusSign)
+        );
       case 1:
         return "GMT" + (zone >= 0 ? "+" : "") + padNumber(hours, 1, minusSign);
       case 2:
-        return "GMT" + (zone >= 0 ? "+" : "") + padNumber(hours, 2, minusSign) + ":" + padNumber(Math.abs(zone % 60), 2, minusSign);
+        return (
+          "GMT" +
+          (zone >= 0 ? "+" : "") +
+          padNumber(hours, 2, minusSign) +
+          ":" +
+          padNumber(Math.abs(zone % 60), 2, minusSign)
+        );
       case 3:
         if (offset === 0) {
           return "Z";
         } else {
-          return (zone >= 0 ? "+" : "") + padNumber(hours, 2, minusSign) + ":" + padNumber(Math.abs(zone % 60), 2, minusSign);
+          return (
+            (zone >= 0 ? "+" : "") +
+            padNumber(hours, 2, minusSign) +
+            ":" +
+            padNumber(Math.abs(zone % 60), 2, minusSign)
+          );
         }
       default:
         throw new Error(`Unknown zone width "${width}"`);
@@ -1293,18 +1444,27 @@ var JANUARY = 0;
 var THURSDAY = 4;
 function getFirstThursdayOfYear(year) {
   const firstDayOfYear = createDate(year, JANUARY, 1).getDay();
-  return createDate(year, 0, 1 + (firstDayOfYear <= THURSDAY ? THURSDAY : THURSDAY + 7) - firstDayOfYear);
+  return createDate(
+    year,
+    0,
+    1 + (firstDayOfYear <= THURSDAY ? THURSDAY : THURSDAY + 7) - firstDayOfYear,
+  );
 }
 function getThursdayThisIsoWeek(datetime) {
   const currentDay = datetime.getDay();
   const deltaToThursday = currentDay === 0 ? -3 : THURSDAY - currentDay;
-  return createDate(datetime.getFullYear(), datetime.getMonth(), datetime.getDate() + deltaToThursday);
+  return createDate(
+    datetime.getFullYear(),
+    datetime.getMonth(),
+    datetime.getDate() + deltaToThursday,
+  );
 }
 function weekGetter(size, monthBased = false) {
-  return function(date, locale) {
+  return function (date, locale) {
     let result;
     if (monthBased) {
-      const nbDaysBefore1stDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getDay() - 1;
+      const nbDaysBefore1stDayOfMonth =
+        new Date(date.getFullYear(), date.getMonth(), 1).getDay() - 1;
       const today = date.getDate();
       result = 1 + Math.floor((today + nbDaysBefore1stDayOfMonth) / 7);
     } else {
@@ -1313,14 +1473,23 @@ function weekGetter(size, monthBased = false) {
       const diff = thisThurs.getTime() - firstThurs.getTime();
       result = 1 + Math.round(diff / 6048e5);
     }
-    return padNumber(result, size, getLocaleNumberSymbol(locale, NumberSymbol.MinusSign));
+    return padNumber(
+      result,
+      size,
+      getLocaleNumberSymbol(locale, NumberSymbol.MinusSign),
+    );
   };
 }
 function weekNumberingYearGetter(size, trim = false) {
-  return function(date, locale) {
+  return function (date, locale) {
     const thisThurs = getThursdayThisIsoWeek(date);
     const weekNumberingYear = thisThurs.getFullYear();
-    return padNumber(weekNumberingYear, size, getLocaleNumberSymbol(locale, NumberSymbol.MinusSign), trim);
+    return padNumber(
+      weekNumberingYear,
+      size,
+      getLocaleNumberSymbol(locale, NumberSymbol.MinusSign),
+      trim,
+    );
   };
 }
 var DATE_FORMATS = {};
@@ -1397,13 +1566,21 @@ function getDateFormatter(format) {
       break;
     // Month of the year (January, ...), string, standalone
     case "LLL":
-      formatter = dateStrGetter(2, TranslationWidth.Abbreviated, FormStyle.Standalone);
+      formatter = dateStrGetter(
+        2,
+        TranslationWidth.Abbreviated,
+        FormStyle.Standalone,
+      );
       break;
     case "LLLL":
       formatter = dateStrGetter(2, TranslationWidth.Wide, FormStyle.Standalone);
       break;
     case "LLLLL":
-      formatter = dateStrGetter(2, TranslationWidth.Narrow, FormStyle.Standalone);
+      formatter = dateStrGetter(
+        2,
+        TranslationWidth.Narrow,
+        FormStyle.Standalone,
+      );
       break;
     // Week of the year (1, ... 52)
     case "w":
@@ -1429,16 +1606,28 @@ function getDateFormatter(format) {
       formatter = dateGetter(7, 1);
       break;
     case "ccc":
-      formatter = dateStrGetter(1, TranslationWidth.Abbreviated, FormStyle.Standalone);
+      formatter = dateStrGetter(
+        1,
+        TranslationWidth.Abbreviated,
+        FormStyle.Standalone,
+      );
       break;
     case "cccc":
       formatter = dateStrGetter(1, TranslationWidth.Wide, FormStyle.Standalone);
       break;
     case "ccccc":
-      formatter = dateStrGetter(1, TranslationWidth.Narrow, FormStyle.Standalone);
+      formatter = dateStrGetter(
+        1,
+        TranslationWidth.Narrow,
+        FormStyle.Standalone,
+      );
       break;
     case "cccccc":
-      formatter = dateStrGetter(1, TranslationWidth.Short, FormStyle.Standalone);
+      formatter = dateStrGetter(
+        1,
+        TranslationWidth.Short,
+        FormStyle.Standalone,
+      );
       break;
     // Day of the Week
     case "E":
@@ -1471,25 +1660,55 @@ function getDateFormatter(format) {
     case "b":
     case "bb":
     case "bbb":
-      formatter = dateStrGetter(0, TranslationWidth.Abbreviated, FormStyle.Standalone, true);
+      formatter = dateStrGetter(
+        0,
+        TranslationWidth.Abbreviated,
+        FormStyle.Standalone,
+        true,
+      );
       break;
     case "bbbb":
-      formatter = dateStrGetter(0, TranslationWidth.Wide, FormStyle.Standalone, true);
+      formatter = dateStrGetter(
+        0,
+        TranslationWidth.Wide,
+        FormStyle.Standalone,
+        true,
+      );
       break;
     case "bbbbb":
-      formatter = dateStrGetter(0, TranslationWidth.Narrow, FormStyle.Standalone, true);
+      formatter = dateStrGetter(
+        0,
+        TranslationWidth.Narrow,
+        FormStyle.Standalone,
+        true,
+      );
       break;
     // Extended period of the day (midnight, night, ...), standalone
     case "B":
     case "BB":
     case "BBB":
-      formatter = dateStrGetter(0, TranslationWidth.Abbreviated, FormStyle.Format, true);
+      formatter = dateStrGetter(
+        0,
+        TranslationWidth.Abbreviated,
+        FormStyle.Format,
+        true,
+      );
       break;
     case "BBBB":
-      formatter = dateStrGetter(0, TranslationWidth.Wide, FormStyle.Format, true);
+      formatter = dateStrGetter(
+        0,
+        TranslationWidth.Wide,
+        FormStyle.Format,
+        true,
+      );
       break;
     case "BBBBB":
-      formatter = dateStrGetter(0, TranslationWidth.Narrow, FormStyle.Format, true);
+      formatter = dateStrGetter(
+        0,
+        TranslationWidth.Narrow,
+        FormStyle.Format,
+        true,
+      );
       break;
     // Hour in AM/PM, (1-12)
     case "h":
@@ -1535,14 +1754,14 @@ function getDateFormatter(format) {
     case "ZZ":
     case "ZZZ":
       formatter = timeZoneGetter(
-        0
+        0,
         /* ZoneWidth.Short */
       );
       break;
     // Timezone ISO8601 extended format (-04:30)
     case "ZZZZZ":
       formatter = timeZoneGetter(
-        3
+        3,
         /* ZoneWidth.Extended */
       );
       break;
@@ -1555,7 +1774,7 @@ function getDateFormatter(format) {
     case "zz":
     case "zzz":
       formatter = timeZoneGetter(
-        1
+        1,
         /* ZoneWidth.ShortGMT */
       );
       break;
@@ -1565,7 +1784,7 @@ function getDateFormatter(format) {
     // Should be location, but fallback to format O instead because we don't have the data yet
     case "zzzz":
       formatter = timeZoneGetter(
-        2
+        2,
         /* ZoneWidth.Long */
       );
       break;
@@ -1577,7 +1796,8 @@ function getDateFormatter(format) {
 }
 function timezoneToOffset(timezone, fallback) {
   timezone = timezone.replace(/:/g, "");
-  const requestedTimezoneOffset = Date.parse("Jan 01, 1970 00:00:00 " + timezone) / 6e4;
+  const requestedTimezoneOffset =
+    Date.parse("Jan 01, 1970 00:00:00 " + timezone) / 6e4;
   return isNaN(requestedTimezoneOffset) ? fallback : requestedTimezoneOffset;
 }
 function addDateMinutes(date, minutes) {
@@ -1589,7 +1809,10 @@ function convertTimezoneToLocal(date, timezone, reverse) {
   const reverseValue = -1;
   const dateTimezoneOffset = date.getTimezoneOffset();
   const timezoneOffset = timezoneToOffset(timezone, dateTimezoneOffset);
-  return addDateMinutes(date, reverseValue * (timezoneOffset - dateTimezoneOffset));
+  return addDateMinutes(
+    date,
+    reverseValue * (timezoneOffset - dateTimezoneOffset),
+  );
 }
 function toDate(value) {
   if (isDate(value)) {
@@ -1609,7 +1832,7 @@ function toDate(value) {
       return new Date(parsedNb);
     }
     let match;
-    if (match = value.match(ISO8601_DATE_REGEX)) {
+    if ((match = value.match(ISO8601_DATE_REGEX))) {
       return isoStringToDate(match);
     }
   }
@@ -1629,7 +1852,12 @@ function isoStringToDate(match) {
     tzHour = Number(match[9] + match[10]);
     tzMin = Number(match[9] + match[11]);
   }
-  dateSetter.call(date, Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+  dateSetter.call(
+    date,
+    Number(match[1]),
+    Number(match[2]) - 1,
+    Number(match[3]),
+  );
   const h = Number(match[4] || 0) - tzHour;
   const m = Number(match[5] || 0) - tzMin;
   const s = Number(match[6] || 0);
@@ -1649,7 +1877,15 @@ var GROUP_SEP = ",";
 var DIGIT_CHAR = "#";
 var CURRENCY_CHAR = "¤";
 var PERCENT_CHAR = "%";
-function formatNumberToLocaleString(value, pattern, locale, groupSymbol, decimalSymbol, digitsInfo, isPercent = false) {
+function formatNumberToLocaleString(
+  value,
+  pattern,
+  locale,
+  groupSymbol,
+  decimalSymbol,
+  digitsInfo,
+  isPercent = false,
+) {
   let formattedText = "";
   let isZero = false;
   if (!isFinite(value)) {
@@ -1712,10 +1948,14 @@ function formatNumberToLocaleString(value, pattern, locale, groupSymbol, decimal
     }
     formattedText = groups.join(getLocaleNumberSymbol(locale, groupSymbol));
     if (decimals.length) {
-      formattedText += getLocaleNumberSymbol(locale, decimalSymbol) + decimals.join("");
+      formattedText +=
+        getLocaleNumberSymbol(locale, decimalSymbol) + decimals.join("");
     }
     if (exponent) {
-      formattedText += getLocaleNumberSymbol(locale, NumberSymbol.Exponential) + "+" + exponent;
+      formattedText +=
+        getLocaleNumberSymbol(locale, NumberSymbol.Exponential) +
+        "+" +
+        exponent;
     }
   }
   if (value < 0 && !isZero) {
@@ -1727,22 +1967,56 @@ function formatNumberToLocaleString(value, pattern, locale, groupSymbol, decimal
 }
 function formatCurrency(value, locale, currency, currencyCode, digitsInfo) {
   const format = getLocaleNumberFormat(locale, NumberFormatStyle.Currency);
-  const pattern = parseNumberFormat(format, getLocaleNumberSymbol(locale, NumberSymbol.MinusSign));
+  const pattern = parseNumberFormat(
+    format,
+    getLocaleNumberSymbol(locale, NumberSymbol.MinusSign),
+  );
   pattern.minFrac = getNumberOfCurrencyDigits(currencyCode);
   pattern.maxFrac = pattern.minFrac;
-  const res = formatNumberToLocaleString(value, pattern, locale, NumberSymbol.CurrencyGroup, NumberSymbol.CurrencyDecimal, digitsInfo);
+  const res = formatNumberToLocaleString(
+    value,
+    pattern,
+    locale,
+    NumberSymbol.CurrencyGroup,
+    NumberSymbol.CurrencyDecimal,
+    digitsInfo,
+  );
   return res.replace(CURRENCY_CHAR, currency).replace(CURRENCY_CHAR, "").trim();
 }
 function formatPercent(value, locale, digitsInfo) {
   const format = getLocaleNumberFormat(locale, NumberFormatStyle.Percent);
-  const pattern = parseNumberFormat(format, getLocaleNumberSymbol(locale, NumberSymbol.MinusSign));
-  const res = formatNumberToLocaleString(value, pattern, locale, NumberSymbol.Group, NumberSymbol.Decimal, digitsInfo, true);
-  return res.replace(new RegExp(PERCENT_CHAR, "g"), getLocaleNumberSymbol(locale, NumberSymbol.PercentSign));
+  const pattern = parseNumberFormat(
+    format,
+    getLocaleNumberSymbol(locale, NumberSymbol.MinusSign),
+  );
+  const res = formatNumberToLocaleString(
+    value,
+    pattern,
+    locale,
+    NumberSymbol.Group,
+    NumberSymbol.Decimal,
+    digitsInfo,
+    true,
+  );
+  return res.replace(
+    new RegExp(PERCENT_CHAR, "g"),
+    getLocaleNumberSymbol(locale, NumberSymbol.PercentSign),
+  );
 }
 function formatNumber(value, locale, digitsInfo) {
   const format = getLocaleNumberFormat(locale, NumberFormatStyle.Decimal);
-  const pattern = parseNumberFormat(format, getLocaleNumberSymbol(locale, NumberSymbol.MinusSign));
-  return formatNumberToLocaleString(value, pattern, locale, NumberSymbol.Group, NumberSymbol.Decimal, digitsInfo);
+  const pattern = parseNumberFormat(
+    format,
+    getLocaleNumberSymbol(locale, NumberSymbol.MinusSign),
+  );
+  return formatNumberToLocaleString(
+    value,
+    pattern,
+    locale,
+    NumberSymbol.Group,
+    NumberSymbol.Decimal,
+    digitsInfo,
+  );
 }
 function parseNumberFormat(format, minusSign = "-") {
   const p = {
@@ -1754,12 +2028,20 @@ function parseNumberFormat(format, minusSign = "-") {
     negPre: "",
     negSuf: "",
     gSize: 0,
-    lgSize: 0
+    lgSize: 0,
   };
   const patternParts = format.split(PATTERN_SEP);
   const positive = patternParts[0];
   const negative = patternParts[1];
-  const positiveParts = positive.indexOf(DECIMAL_SEP) !== -1 ? positive.split(DECIMAL_SEP) : [positive.substring(0, positive.lastIndexOf(ZERO_CHAR) + 1), positive.substring(positive.lastIndexOf(ZERO_CHAR) + 1)], integer = positiveParts[0], fraction = positiveParts[1] || "";
+  const positiveParts =
+      positive.indexOf(DECIMAL_SEP) !== -1
+        ? positive.split(DECIMAL_SEP)
+        : [
+            positive.substring(0, positive.lastIndexOf(ZERO_CHAR) + 1),
+            positive.substring(positive.lastIndexOf(ZERO_CHAR) + 1),
+          ],
+    integer = positiveParts[0],
+    fraction = positiveParts[1] || "";
   p.posPre = integer.substring(0, integer.indexOf(DIGIT_CHAR));
   for (let i = 0; i < fraction.length; i++) {
     const ch = fraction.charAt(i);
@@ -1775,7 +2057,8 @@ function parseNumberFormat(format, minusSign = "-") {
   p.gSize = groups[1] ? groups[1].length : 0;
   p.lgSize = groups[2] || groups[1] ? (groups[2] || groups[1]).length : 0;
   if (negative) {
-    const trunkLen = positive.length - p.posPre.length - p.posSuf.length, pos = negative.indexOf(DIGIT_CHAR);
+    const trunkLen = positive.length - p.posPre.length - p.posSuf.length,
+      pos = negative.indexOf(DIGIT_CHAR);
     p.negPre = negative.substring(0, pos).replace(/'/g, "");
     p.negSuf = negative.slice(pos + trunkLen).replace(/'/g, "");
   } else {
@@ -1803,7 +2086,9 @@ function toPercent(parsedNumber) {
 }
 function parseNumber(num) {
   let numStr = Math.abs(num) + "";
-  let exponent = 0, digits, integerLen;
+  let exponent = 0,
+    digits,
+    integerLen;
   let i, j, zeros;
   if ((integerLen = numStr.indexOf(DECIMAL_SEP)) > -1) {
     numStr = numStr.replace(DECIMAL_SEP, "");
@@ -1815,8 +2100,7 @@ function parseNumber(num) {
   } else if (integerLen < 0) {
     integerLen = numStr.length;
   }
-  for (i = 0; numStr.charAt(i) === ZERO_CHAR; i++) {
-  }
+  for (i = 0; numStr.charAt(i) === ZERO_CHAR; i++) {}
   if (i === (zeros = numStr.length)) {
     digits = [0];
     integerLen = 1;
@@ -1837,12 +2121,14 @@ function parseNumber(num) {
   return {
     digits,
     exponent,
-    integerLen
+    integerLen,
   };
 }
 function roundNumber(parsedNumber, minFrac, maxFrac) {
   if (minFrac > maxFrac) {
-    throw new Error(`The minimum number of digits after fraction (${minFrac}) is higher than the maximum (${maxFrac}).`);
+    throw new Error(
+      `The minimum number of digits after fraction (${minFrac}) is higher than the maximum (${maxFrac}).`,
+    );
   }
   let digits = parsedNumber.digits;
   let fractionLen = digits.length - parsedNumber.integerLen;
@@ -1857,7 +2143,7 @@ function roundNumber(parsedNumber, minFrac, maxFrac) {
   } else {
     fractionLen = Math.max(0, fractionLen);
     parsedNumber.integerLen = 1;
-    digits.length = Math.max(1, roundAt = fractionSize + 1);
+    digits.length = Math.max(1, (roundAt = fractionSize + 1));
     digits[0] = 0;
     for (let i = 1; i < roundAt; i++) digits[i] = 0;
   }
@@ -1876,7 +2162,7 @@ function roundNumber(parsedNumber, minFrac, maxFrac) {
   for (; fractionLen < Math.max(0, fractionSize); fractionLen++) digits.push(0);
   let dropTrailingZeros = fractionSize !== 0;
   const minLen = minFrac + parsedNumber.integerLen;
-  const carry = digits.reduceRight(function(carry2, d, i, digits2) {
+  const carry = digits.reduceRight(function (carry2, d, i, digits2) {
     d = d + carry2;
     digits2[i] = d < 10 ? d : d - 10;
     if (dropTrailingZeros) {
@@ -1911,22 +2197,33 @@ var NgLocalization = class _NgLocalization {
       if (__ngFactoryType__) {
         __ngConditionalFactory__ = new __ngFactoryType__();
       } else {
-        __ngConditionalFactory__ = ((locale) => new NgLocaleLocalization(locale))(ɵɵinject(LOCALE_ID));
+        __ngConditionalFactory__ = ((locale) =>
+          new NgLocaleLocalization(locale))(ɵɵinject(LOCALE_ID));
       }
       return __ngConditionalFactory__;
     },
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgLocalization, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root",
-      useFactory: (locale) => new NgLocaleLocalization(locale),
-      deps: [LOCALE_ID]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgLocalization,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+              useFactory: (locale) => new NgLocaleLocalization(locale),
+              deps: [LOCALE_ID],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 function getPluralCategory(value, cases, ngLocalization, locale) {
   let key = `=${value}`;
@@ -1966,23 +2263,37 @@ var NgLocaleLocalization = class _NgLocaleLocalization extends NgLocalization {
     }
   }
   static ɵfac = function NgLocaleLocalization_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgLocaleLocalization)(ɵɵinject(LOCALE_ID));
+    return new (__ngFactoryType__ || _NgLocaleLocalization)(
+      ɵɵinject(LOCALE_ID),
+    );
   };
   static ɵprov = ɵɵdefineInjectable({
     token: _NgLocaleLocalization,
-    factory: _NgLocaleLocalization.ɵfac
+    factory: _NgLocaleLocalization.ɵfac,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgLocaleLocalization, [{
-    type: Injectable
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [LOCALE_ID]
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgLocaleLocalization,
+      [
+        {
+          type: Injectable,
+        },
+      ],
+      () => [
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [LOCALE_ID],
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var WS_REGEXP = /\s+/;
 var EMPTY_ARRAY = [];
@@ -1997,10 +2308,12 @@ var NgClass = class _NgClass {
     this._renderer = _renderer;
   }
   set klass(value) {
-    this.initialClasses = value != null ? value.trim().split(WS_REGEXP) : EMPTY_ARRAY;
+    this.initialClasses =
+      value != null ? value.trim().split(WS_REGEXP) : EMPTY_ARRAY;
   }
   set ngClass(value) {
-    this.rawClass = typeof value === "string" ? value.trim().split(WS_REGEXP) : value;
+    this.rawClass =
+      typeof value === "string" ? value.trim().split(WS_REGEXP) : value;
   }
   /*
   The NgClass directive uses the custom change detection algorithm for its inputs. The custom
@@ -2052,7 +2365,7 @@ var NgClass = class _NgClass {
       this.stateMap.set(klass, {
         enabled: nextEnabled,
         changed: true,
-        touched: true
+        touched: true,
       });
     }
   }
@@ -2075,7 +2388,9 @@ var NgClass = class _NgClass {
   _toggleClass(klass, enabled) {
     if (ngDevMode) {
       if (typeof klass !== "string") {
-        throw new Error(`NgClass can only toggle CSS classes expressed as strings, got ${stringify(klass)}`);
+        throw new Error(
+          `NgClass can only toggle CSS classes expressed as strings, got ${stringify(klass)}`,
+        );
       }
     }
     klass = klass.trim();
@@ -2090,37 +2405,57 @@ var NgClass = class _NgClass {
     }
   }
   static ɵfac = function NgClass_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgClass)(ɵɵdirectiveInject(ElementRef), ɵɵdirectiveInject(Renderer2));
+    return new (__ngFactoryType__ || _NgClass)(
+      ɵɵdirectiveInject(ElementRef),
+      ɵɵdirectiveInject(Renderer2),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgClass,
     selectors: [["", "ngClass", ""]],
     inputs: {
       klass: [0, "class", "klass"],
-      ngClass: "ngClass"
-    }
+      ngClass: "ngClass",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgClass, [{
-    type: Directive,
-    args: [{
-      selector: "[ngClass]"
-    }]
-  }], () => [{
-    type: ElementRef
-  }, {
-    type: Renderer2
-  }], {
-    klass: [{
-      type: Input,
-      args: ["class"]
-    }],
-    ngClass: [{
-      type: Input,
-      args: ["ngClass"]
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgClass,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngClass]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ElementRef,
+        },
+        {
+          type: Renderer2,
+        },
+      ],
+      {
+        klass: [
+          {
+            type: Input,
+            args: ["class"],
+          },
+        ],
+        ngClass: [
+          {
+            type: Input,
+            args: ["ngClass"],
+          },
+        ],
+      },
+    );
 })();
 var NgComponentOutlet = class _NgComponentOutlet {
   _viewContainerRef;
@@ -2155,10 +2490,18 @@ var NgComponentOutlet = class _NgComponentOutlet {
     this._viewContainerRef = _viewContainerRef;
   }
   _needToReCreateNgModuleInstance(changes) {
-    return changes["ngComponentOutletNgModule"] !== void 0 || changes["ngComponentOutletNgModuleFactory"] !== void 0;
+    return (
+      changes["ngComponentOutletNgModule"] !== void 0 ||
+      changes["ngComponentOutletNgModuleFactory"] !== void 0
+    );
   }
   _needToReCreateComponentInstance(changes) {
-    return changes["ngComponentOutlet"] !== void 0 || changes["ngComponentOutletContent"] !== void 0 || changes["ngComponentOutletInjector"] !== void 0 || this._needToReCreateNgModuleInstance(changes);
+    return (
+      changes["ngComponentOutlet"] !== void 0 ||
+      changes["ngComponentOutletContent"] !== void 0 ||
+      changes["ngComponentOutletInjector"] !== void 0 ||
+      this._needToReCreateNgModuleInstance(changes)
+    );
   }
   /** @docs-private */
   ngOnChanges(changes) {
@@ -2167,22 +2510,32 @@ var NgComponentOutlet = class _NgComponentOutlet {
       this._inputsUsed.clear();
       this._componentRef = void 0;
       if (this.ngComponentOutlet) {
-        const injector = this.ngComponentOutletInjector || this._viewContainerRef.parentInjector;
+        const injector =
+          this.ngComponentOutletInjector ||
+          this._viewContainerRef.parentInjector;
         if (this._needToReCreateNgModuleInstance(changes)) {
           this._moduleRef?.destroy();
           if (this.ngComponentOutletNgModule) {
-            this._moduleRef = createNgModule(this.ngComponentOutletNgModule, getParentInjector(injector));
+            this._moduleRef = createNgModule(
+              this.ngComponentOutletNgModule,
+              getParentInjector(injector),
+            );
           } else if (this.ngComponentOutletNgModuleFactory) {
-            this._moduleRef = this.ngComponentOutletNgModuleFactory.create(getParentInjector(injector));
+            this._moduleRef = this.ngComponentOutletNgModuleFactory.create(
+              getParentInjector(injector),
+            );
           } else {
             this._moduleRef = void 0;
           }
         }
-        this._componentRef = this._viewContainerRef.createComponent(this.ngComponentOutlet, {
-          injector,
-          ngModuleRef: this._moduleRef,
-          projectableNodes: this.ngComponentOutletContent
-        });
+        this._componentRef = this._viewContainerRef.createComponent(
+          this.ngComponentOutlet,
+          {
+            injector,
+            ngModuleRef: this._moduleRef,
+            projectableNodes: this.ngComponentOutletContent,
+          },
+        );
       }
     }
   }
@@ -2207,13 +2560,18 @@ var NgComponentOutlet = class _NgComponentOutlet {
         componentRef.setInput(inputName, void 0);
         this._inputsUsed.delete(inputName);
       } else {
-        componentRef.setInput(inputName, this.ngComponentOutletInputs[inputName]);
+        componentRef.setInput(
+          inputName,
+          this.ngComponentOutletInputs[inputName],
+        );
         this._inputsUsed.set(inputName, false);
       }
     }
   }
   static ɵfac = function NgComponentOutlet_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgComponentOutlet)(ɵɵdirectiveInject(ViewContainerRef));
+    return new (__ngFactoryType__ || _NgComponentOutlet)(
+      ɵɵdirectiveInject(ViewContainerRef),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgComponentOutlet,
@@ -2224,41 +2582,65 @@ var NgComponentOutlet = class _NgComponentOutlet {
       ngComponentOutletInjector: "ngComponentOutletInjector",
       ngComponentOutletContent: "ngComponentOutletContent",
       ngComponentOutletNgModule: "ngComponentOutletNgModule",
-      ngComponentOutletNgModuleFactory: "ngComponentOutletNgModuleFactory"
+      ngComponentOutletNgModuleFactory: "ngComponentOutletNgModuleFactory",
     },
     exportAs: ["ngComponentOutlet"],
-    features: [ɵɵNgOnChangesFeature]
+    features: [ɵɵNgOnChangesFeature],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgComponentOutlet, [{
-    type: Directive,
-    args: [{
-      selector: "[ngComponentOutlet]",
-      exportAs: "ngComponentOutlet"
-    }]
-  }], () => [{
-    type: ViewContainerRef
-  }], {
-    ngComponentOutlet: [{
-      type: Input
-    }],
-    ngComponentOutletInputs: [{
-      type: Input
-    }],
-    ngComponentOutletInjector: [{
-      type: Input
-    }],
-    ngComponentOutletContent: [{
-      type: Input
-    }],
-    ngComponentOutletNgModule: [{
-      type: Input
-    }],
-    ngComponentOutletNgModuleFactory: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgComponentOutlet,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngComponentOutlet]",
+              exportAs: "ngComponentOutlet",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ViewContainerRef,
+        },
+      ],
+      {
+        ngComponentOutlet: [
+          {
+            type: Input,
+          },
+        ],
+        ngComponentOutletInputs: [
+          {
+            type: Input,
+          },
+        ],
+        ngComponentOutletInjector: [
+          {
+            type: Input,
+          },
+        ],
+        ngComponentOutletContent: [
+          {
+            type: Input,
+          },
+        ],
+        ngComponentOutletNgModule: [
+          {
+            type: Input,
+          },
+        ],
+        ngComponentOutletNgModuleFactory: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 function getParentInjector(injector) {
   const parentNgModule = injector.get(NgModuleRef$1);
@@ -2323,8 +2705,14 @@ var NgForOf = class _NgForOf {
    * @see {@link TrackByFunction}
    */
   set ngForTrackBy(fn) {
-    if ((typeof ngDevMode === "undefined" || ngDevMode) && fn != null && typeof fn !== "function") {
-      console.warn(`trackBy must be a function, but received ${JSON.stringify(fn)}. See https://angular.io/api/common/NgForOf#change-propagation for more information.`);
+    if (
+      (typeof ngDevMode === "undefined" || ngDevMode) &&
+      fn != null &&
+      typeof fn !== "function"
+    ) {
+      console.warn(
+        `trackBy must be a function, but received ${JSON.stringify(fn)}. See https://angular.io/api/common/NgForOf#change-propagation for more information.`,
+      );
     }
     this._trackByFn = fn;
   }
@@ -2384,9 +2772,15 @@ var NgForOf = class _NgForOf {
     const viewContainer = this._viewContainer;
     changes.forEachOperation((item, adjustedPreviousIndex, currentIndex) => {
       if (item.previousIndex == null) {
-        viewContainer.createEmbeddedView(this._template, new NgForOfContext(item.item, this._ngForOf, -1, -1), currentIndex === null ? void 0 : currentIndex);
+        viewContainer.createEmbeddedView(
+          this._template,
+          new NgForOfContext(item.item, this._ngForOf, -1, -1),
+          currentIndex === null ? void 0 : currentIndex,
+        );
       } else if (currentIndex == null) {
-        viewContainer.remove(adjustedPreviousIndex === null ? void 0 : adjustedPreviousIndex);
+        viewContainer.remove(
+          adjustedPreviousIndex === null ? void 0 : adjustedPreviousIndex,
+        );
       } else if (adjustedPreviousIndex !== null) {
         const view = viewContainer.get(adjustedPreviousIndex);
         viewContainer.move(view, currentIndex);
@@ -2415,7 +2809,11 @@ var NgForOf = class _NgForOf {
     return true;
   }
   static ɵfac = function NgForOf_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgForOf)(ɵɵdirectiveInject(ViewContainerRef), ɵɵdirectiveInject(TemplateRef), ɵɵdirectiveInject(IterableDiffers));
+    return new (__ngFactoryType__ || _NgForOf)(
+      ɵɵdirectiveInject(ViewContainerRef),
+      ɵɵdirectiveInject(TemplateRef),
+      ɵɵdirectiveInject(IterableDiffers),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgForOf,
@@ -2423,33 +2821,53 @@ var NgForOf = class _NgForOf {
     inputs: {
       ngForOf: "ngForOf",
       ngForTrackBy: "ngForTrackBy",
-      ngForTemplate: "ngForTemplate"
-    }
+      ngForTemplate: "ngForTemplate",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgForOf, [{
-    type: Directive,
-    args: [{
-      selector: "[ngFor][ngForOf]"
-    }]
-  }], () => [{
-    type: ViewContainerRef
-  }, {
-    type: TemplateRef
-  }, {
-    type: IterableDiffers
-  }], {
-    ngForOf: [{
-      type: Input
-    }],
-    ngForTrackBy: [{
-      type: Input
-    }],
-    ngForTemplate: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgForOf,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngFor][ngForOf]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ViewContainerRef,
+        },
+        {
+          type: TemplateRef,
+        },
+        {
+          type: IterableDiffers,
+        },
+      ],
+      {
+        ngForOf: [
+          {
+            type: Input,
+          },
+        ],
+        ngForTrackBy: [
+          {
+            type: Input,
+          },
+        ],
+        ngForTemplate: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 function applyViewChange(view, record) {
   view.context.$implicit = record.item;
@@ -2479,7 +2897,10 @@ var NgIf = class _NgIf {
    * A template to show if the condition expression evaluates to true.
    */
   set ngIfThen(templateRef) {
-    assertTemplate(templateRef, (typeof ngDevMode === "undefined" || ngDevMode) && "ngIfThen");
+    assertTemplate(
+      templateRef,
+      (typeof ngDevMode === "undefined" || ngDevMode) && "ngIfThen",
+    );
     this._thenTemplateRef = templateRef;
     this._thenViewRef = null;
     this._updateView();
@@ -2488,7 +2909,10 @@ var NgIf = class _NgIf {
    * A template to show if the condition expression evaluates to false.
    */
   set ngIfElse(templateRef) {
-    assertTemplate(templateRef, (typeof ngDevMode === "undefined" || ngDevMode) && "ngIfElse");
+    assertTemplate(
+      templateRef,
+      (typeof ngDevMode === "undefined" || ngDevMode) && "ngIfElse",
+    );
     this._elseTemplateRef = templateRef;
     this._elseViewRef = null;
     this._updateView();
@@ -2499,7 +2923,10 @@ var NgIf = class _NgIf {
         this._viewContainer.clear();
         this._elseViewRef = null;
         if (this._thenTemplateRef) {
-          this._thenViewRef = this._viewContainer.createEmbeddedView(this._thenTemplateRef, this._context);
+          this._thenViewRef = this._viewContainer.createEmbeddedView(
+            this._thenTemplateRef,
+            this._context,
+          );
         }
       }
     } else {
@@ -2507,7 +2934,10 @@ var NgIf = class _NgIf {
         this._viewContainer.clear();
         this._thenViewRef = null;
         if (this._elseTemplateRef) {
-          this._elseViewRef = this._viewContainer.createEmbeddedView(this._elseTemplateRef, this._context);
+          this._elseViewRef = this._viewContainer.createEmbeddedView(
+            this._elseTemplateRef,
+            this._context,
+          );
         }
       }
     }
@@ -2533,7 +2963,10 @@ var NgIf = class _NgIf {
     return true;
   }
   static ɵfac = function NgIf_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgIf)(ɵɵdirectiveInject(ViewContainerRef), ɵɵdirectiveInject(TemplateRef));
+    return new (__ngFactoryType__ || _NgIf)(
+      ɵɵdirectiveInject(ViewContainerRef),
+      ɵɵdirectiveInject(TemplateRef),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgIf,
@@ -2541,31 +2974,50 @@ var NgIf = class _NgIf {
     inputs: {
       ngIf: "ngIf",
       ngIfThen: "ngIfThen",
-      ngIfElse: "ngIfElse"
-    }
+      ngIfElse: "ngIfElse",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgIf, [{
-    type: Directive,
-    args: [{
-      selector: "[ngIf]"
-    }]
-  }], () => [{
-    type: ViewContainerRef
-  }, {
-    type: TemplateRef
-  }], {
-    ngIf: [{
-      type: Input
-    }],
-    ngIfThen: [{
-      type: Input
-    }],
-    ngIfElse: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgIf,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngIf]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ViewContainerRef,
+        },
+        {
+          type: TemplateRef,
+        },
+      ],
+      {
+        ngIf: [
+          {
+            type: Input,
+          },
+        ],
+        ngIfThen: [
+          {
+            type: Input,
+          },
+        ],
+        ngIfElse: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 var NgIfContext = class {
   $implicit = null;
@@ -2573,7 +3025,11 @@ var NgIfContext = class {
 };
 function assertTemplate(templateRef, property) {
   if (templateRef && !templateRef.createEmbeddedView) {
-    throw new RuntimeError(2020, (typeof ngDevMode === "undefined" || ngDevMode) && `${property} must be a TemplateRef, but received '${stringify(templateRef)}'.`);
+    throw new RuntimeError(
+      2020,
+      (typeof ngDevMode === "undefined" || ngDevMode) &&
+        `${property} must be a TemplateRef, but received '${stringify(templateRef)}'.`,
+    );
   }
 }
 var SwitchView = class {
@@ -2648,21 +3104,33 @@ var NgSwitch = class _NgSwitch {
     type: _NgSwitch,
     selectors: [["", "ngSwitch", ""]],
     inputs: {
-      ngSwitch: "ngSwitch"
-    }
+      ngSwitch: "ngSwitch",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgSwitch, [{
-    type: Directive,
-    args: [{
-      selector: "[ngSwitch]"
-    }]
-  }], null, {
-    ngSwitch: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgSwitch,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngSwitch]",
+            },
+          ],
+        },
+      ],
+      null,
+      {
+        ngSwitch: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 var NgSwitchCase = class _NgSwitchCase {
   ngSwitch;
@@ -2687,38 +3155,61 @@ var NgSwitchCase = class _NgSwitchCase {
     this._view.enforceState(this.ngSwitch._matchCase(this.ngSwitchCase));
   }
   static ɵfac = function NgSwitchCase_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgSwitchCase)(ɵɵdirectiveInject(ViewContainerRef), ɵɵdirectiveInject(TemplateRef), ɵɵdirectiveInject(NgSwitch, 9));
+    return new (__ngFactoryType__ || _NgSwitchCase)(
+      ɵɵdirectiveInject(ViewContainerRef),
+      ɵɵdirectiveInject(TemplateRef),
+      ɵɵdirectiveInject(NgSwitch, 9),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgSwitchCase,
     selectors: [["", "ngSwitchCase", ""]],
     inputs: {
-      ngSwitchCase: "ngSwitchCase"
-    }
+      ngSwitchCase: "ngSwitchCase",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgSwitchCase, [{
-    type: Directive,
-    args: [{
-      selector: "[ngSwitchCase]"
-    }]
-  }], () => [{
-    type: ViewContainerRef
-  }, {
-    type: TemplateRef
-  }, {
-    type: NgSwitch,
-    decorators: [{
-      type: Optional
-    }, {
-      type: Host
-    }]
-  }], {
-    ngSwitchCase: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgSwitchCase,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngSwitchCase]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ViewContainerRef,
+        },
+        {
+          type: TemplateRef,
+        },
+        {
+          type: NgSwitch,
+          decorators: [
+            {
+              type: Optional,
+            },
+            {
+              type: Host,
+            },
+          ],
+        },
+      ],
+      {
+        ngSwitchCase: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 var NgSwitchDefault = class _NgSwitchDefault {
   constructor(viewContainer, templateRef, ngSwitch) {
@@ -2728,34 +3219,58 @@ var NgSwitchDefault = class _NgSwitchDefault {
     ngSwitch._addDefault(new SwitchView(viewContainer, templateRef));
   }
   static ɵfac = function NgSwitchDefault_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgSwitchDefault)(ɵɵdirectiveInject(ViewContainerRef), ɵɵdirectiveInject(TemplateRef), ɵɵdirectiveInject(NgSwitch, 9));
+    return new (__ngFactoryType__ || _NgSwitchDefault)(
+      ɵɵdirectiveInject(ViewContainerRef),
+      ɵɵdirectiveInject(TemplateRef),
+      ɵɵdirectiveInject(NgSwitch, 9),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgSwitchDefault,
-    selectors: [["", "ngSwitchDefault", ""]]
+    selectors: [["", "ngSwitchDefault", ""]],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgSwitchDefault, [{
-    type: Directive,
-    args: [{
-      selector: "[ngSwitchDefault]"
-    }]
-  }], () => [{
-    type: ViewContainerRef
-  }, {
-    type: TemplateRef
-  }, {
-    type: NgSwitch,
-    decorators: [{
-      type: Optional
-    }, {
-      type: Host
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgSwitchDefault,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngSwitchDefault]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ViewContainerRef,
+        },
+        {
+          type: TemplateRef,
+        },
+        {
+          type: NgSwitch,
+          decorators: [
+            {
+              type: Optional,
+            },
+            {
+              type: Host,
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 function throwNgSwitchProviderNotFoundError(attrName, directiveName) {
-  throw new RuntimeError(2e3, `An element with the "${attrName}" attribute (matching the "${directiveName}" directive) must be located inside an element with the "ngSwitch" attribute (matching "NgSwitch" directive)`);
+  throw new RuntimeError(
+    2e3,
+    `An element with the "${attrName}" attribute (matching the "${directiveName}" directive) must be located inside an element with the "ngSwitch" attribute (matching "NgSwitch" directive)`,
+  );
 }
 var NgPlural = class _NgPlural {
   _localization;
@@ -2786,67 +3301,110 @@ var NgPlural = class _NgPlural {
     }
   }
   static ɵfac = function NgPlural_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgPlural)(ɵɵdirectiveInject(NgLocalization));
+    return new (__ngFactoryType__ || _NgPlural)(
+      ɵɵdirectiveInject(NgLocalization),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgPlural,
     selectors: [["", "ngPlural", ""]],
     inputs: {
-      ngPlural: "ngPlural"
-    }
+      ngPlural: "ngPlural",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgPlural, [{
-    type: Directive,
-    args: [{
-      selector: "[ngPlural]"
-    }]
-  }], () => [{
-    type: NgLocalization
-  }], {
-    ngPlural: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgPlural,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngPlural]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: NgLocalization,
+        },
+      ],
+      {
+        ngPlural: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 var NgPluralCase = class _NgPluralCase {
   value;
   constructor(value, template, viewContainer, ngPlural) {
     this.value = value;
     const isANumber = !isNaN(Number(value));
-    ngPlural.addCase(isANumber ? `=${value}` : value, new SwitchView(viewContainer, template));
+    ngPlural.addCase(
+      isANumber ? `=${value}` : value,
+      new SwitchView(viewContainer, template),
+    );
   }
   static ɵfac = function NgPluralCase_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgPluralCase)(ɵɵinjectAttribute("ngPluralCase"), ɵɵdirectiveInject(TemplateRef), ɵɵdirectiveInject(ViewContainerRef), ɵɵdirectiveInject(NgPlural, 1));
+    return new (__ngFactoryType__ || _NgPluralCase)(
+      ɵɵinjectAttribute("ngPluralCase"),
+      ɵɵdirectiveInject(TemplateRef),
+      ɵɵdirectiveInject(ViewContainerRef),
+      ɵɵdirectiveInject(NgPlural, 1),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgPluralCase,
-    selectors: [["", "ngPluralCase", ""]]
+    selectors: [["", "ngPluralCase", ""]],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgPluralCase, [{
-    type: Directive,
-    args: [{
-      selector: "[ngPluralCase]"
-    }]
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Attribute,
-      args: ["ngPluralCase"]
-    }]
-  }, {
-    type: TemplateRef
-  }, {
-    type: ViewContainerRef
-  }, {
-    type: NgPlural,
-    decorators: [{
-      type: Host
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgPluralCase,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngPluralCase]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Attribute,
+              args: ["ngPluralCase"],
+            },
+          ],
+        },
+        {
+          type: TemplateRef,
+        },
+        {
+          type: ViewContainerRef,
+        },
+        {
+          type: NgPlural,
+          decorators: [
+            {
+              type: Host,
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var NgStyle = class _NgStyle {
   _ngEl;
@@ -2875,47 +3433,77 @@ var NgStyle = class _NgStyle {
   }
   _setStyle(nameAndUnit, value) {
     const [name, unit] = nameAndUnit.split(".");
-    const flags = name.indexOf("-") === -1 ? void 0 : RendererStyleFlags2.DashCase;
+    const flags =
+      name.indexOf("-") === -1 ? void 0 : RendererStyleFlags2.DashCase;
     if (value != null) {
-      this._renderer.setStyle(this._ngEl.nativeElement, name, unit ? `${value}${unit}` : value, flags);
+      this._renderer.setStyle(
+        this._ngEl.nativeElement,
+        name,
+        unit ? `${value}${unit}` : value,
+        flags,
+      );
     } else {
       this._renderer.removeStyle(this._ngEl.nativeElement, name, flags);
     }
   }
   _applyChanges(changes) {
     changes.forEachRemovedItem((record) => this._setStyle(record.key, null));
-    changes.forEachAddedItem((record) => this._setStyle(record.key, record.currentValue));
-    changes.forEachChangedItem((record) => this._setStyle(record.key, record.currentValue));
+    changes.forEachAddedItem((record) =>
+      this._setStyle(record.key, record.currentValue),
+    );
+    changes.forEachChangedItem((record) =>
+      this._setStyle(record.key, record.currentValue),
+    );
   }
   static ɵfac = function NgStyle_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgStyle)(ɵɵdirectiveInject(ElementRef), ɵɵdirectiveInject(KeyValueDiffers), ɵɵdirectiveInject(Renderer2));
+    return new (__ngFactoryType__ || _NgStyle)(
+      ɵɵdirectiveInject(ElementRef),
+      ɵɵdirectiveInject(KeyValueDiffers),
+      ɵɵdirectiveInject(Renderer2),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgStyle,
     selectors: [["", "ngStyle", ""]],
     inputs: {
-      ngStyle: "ngStyle"
-    }
+      ngStyle: "ngStyle",
+    },
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgStyle, [{
-    type: Directive,
-    args: [{
-      selector: "[ngStyle]"
-    }]
-  }], () => [{
-    type: ElementRef
-  }, {
-    type: KeyValueDiffers
-  }, {
-    type: Renderer2
-  }], {
-    ngStyle: [{
-      type: Input,
-      args: ["ngStyle"]
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgStyle,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngStyle]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ElementRef,
+        },
+        {
+          type: KeyValueDiffers,
+        },
+        {
+          type: Renderer2,
+        },
+      ],
+      {
+        ngStyle: [
+          {
+            type: Input,
+            args: ["ngStyle"],
+          },
+        ],
+      },
+    );
 })();
 var NgTemplateOutlet = class _NgTemplateOutlet {
   _viewContainerRef;
@@ -2947,9 +3535,13 @@ var NgTemplateOutlet = class _NgTemplateOutlet {
         return;
       }
       const viewContext = this._createContextForwardProxy();
-      this._viewRef = viewContainerRef.createEmbeddedView(this.ngTemplateOutlet, viewContext, {
-        injector: this.ngTemplateOutletInjector ?? void 0
-      });
+      this._viewRef = viewContainerRef.createEmbeddedView(
+        this.ngTemplateOutlet,
+        viewContext,
+        {
+          injector: this.ngTemplateOutletInjector ?? void 0,
+        },
+      );
     }
   }
   /**
@@ -2958,7 +3550,9 @@ var NgTemplateOutlet = class _NgTemplateOutlet {
    * - the injector changed.
    */
   _shouldRecreateView(changes) {
-    return !!changes["ngTemplateOutlet"] || !!changes["ngTemplateOutletInjector"];
+    return (
+      !!changes["ngTemplateOutlet"] || !!changes["ngTemplateOutletInjector"]
+    );
   }
   /**
    * For a given outlet instance, we create a proxy object that delegates
@@ -2966,23 +3560,28 @@ var NgTemplateOutlet = class _NgTemplateOutlet {
    * the context object completely without having to destroy/re-create the view.
    */
   _createContextForwardProxy() {
-    return new Proxy({}, {
-      set: (_target, prop, newValue) => {
-        if (!this.ngTemplateOutletContext) {
-          return false;
-        }
-        return Reflect.set(this.ngTemplateOutletContext, prop, newValue);
+    return new Proxy(
+      {},
+      {
+        set: (_target, prop, newValue) => {
+          if (!this.ngTemplateOutletContext) {
+            return false;
+          }
+          return Reflect.set(this.ngTemplateOutletContext, prop, newValue);
+        },
+        get: (_target, prop, receiver) => {
+          if (!this.ngTemplateOutletContext) {
+            return void 0;
+          }
+          return Reflect.get(this.ngTemplateOutletContext, prop, receiver);
+        },
       },
-      get: (_target, prop, receiver) => {
-        if (!this.ngTemplateOutletContext) {
-          return void 0;
-        }
-        return Reflect.get(this.ngTemplateOutletContext, prop, receiver);
-      }
-    });
+    );
   }
   static ɵfac = function NgTemplateOutlet_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _NgTemplateOutlet)(ɵɵdirectiveInject(ViewContainerRef));
+    return new (__ngFactoryType__ || _NgTemplateOutlet)(
+      ɵɵdirectiveInject(ViewContainerRef),
+    );
   };
   static ɵdir = ɵɵdefineDirective({
     type: _NgTemplateOutlet,
@@ -2990,43 +3589,79 @@ var NgTemplateOutlet = class _NgTemplateOutlet {
     inputs: {
       ngTemplateOutletContext: "ngTemplateOutletContext",
       ngTemplateOutlet: "ngTemplateOutlet",
-      ngTemplateOutletInjector: "ngTemplateOutletInjector"
+      ngTemplateOutletInjector: "ngTemplateOutletInjector",
     },
-    features: [ɵɵNgOnChangesFeature]
+    features: [ɵɵNgOnChangesFeature],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgTemplateOutlet, [{
-    type: Directive,
-    args: [{
-      selector: "[ngTemplateOutlet]"
-    }]
-  }], () => [{
-    type: ViewContainerRef
-  }], {
-    ngTemplateOutletContext: [{
-      type: Input
-    }],
-    ngTemplateOutlet: [{
-      type: Input
-    }],
-    ngTemplateOutletInjector: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgTemplateOutlet,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "[ngTemplateOutlet]",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ViewContainerRef,
+        },
+      ],
+      {
+        ngTemplateOutletContext: [
+          {
+            type: Input,
+          },
+        ],
+        ngTemplateOutlet: [
+          {
+            type: Input,
+          },
+        ],
+        ngTemplateOutletInjector: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
-var COMMON_DIRECTIVES = [NgClass, NgComponentOutlet, NgForOf, NgIf, NgTemplateOutlet, NgStyle, NgSwitch, NgSwitchCase, NgSwitchDefault, NgPlural, NgPluralCase];
+var COMMON_DIRECTIVES = [
+  NgClass,
+  NgComponentOutlet,
+  NgForOf,
+  NgIf,
+  NgTemplateOutlet,
+  NgStyle,
+  NgSwitch,
+  NgSwitchCase,
+  NgSwitchDefault,
+  NgPlural,
+  NgPluralCase,
+];
 function invalidPipeArgumentError(type, value) {
-  return new RuntimeError(2100, ngDevMode && `InvalidPipeArgument: '${value}' for pipe '${stringify(type)}'`);
+  return new RuntimeError(
+    2100,
+    ngDevMode &&
+      `InvalidPipeArgument: '${value}' for pipe '${stringify(type)}'`,
+  );
 }
 var SubscribableStrategy = class {
   createSubscription(async, updateLatestValue) {
-    return untracked(() => async.subscribe({
-      next: updateLatestValue,
-      error: (e) => {
-        throw e;
-      }
-    }));
+    return untracked(() =>
+      async.subscribe({
+        next: updateLatestValue,
+        error: (e) => {
+          throw e;
+        },
+      }),
+    );
   }
   dispose(subscription) {
     untracked(() => subscription.unsubscribe());
@@ -3040,12 +3675,12 @@ var PromiseStrategy = class {
       (v) => updateLatestValue?.(v),
       (e) => {
         throw e;
-      }
+      },
     );
     return {
       unsubscribe: () => {
         updateLatestValue = null;
-      }
+      },
     };
   }
   dispose(subscription) {
@@ -3091,7 +3726,9 @@ var AsyncPipe = class _AsyncPipe {
   _subscribe(obj) {
     this._obj = obj;
     this._strategy = this._selectStrategy(obj);
-    this._subscription = this._strategy.createSubscription(obj, (value) => this._updateLatestValue(obj, value));
+    this._subscription = this._strategy.createSubscription(obj, (value) =>
+      this._updateLatestValue(obj, value),
+    );
   }
   _selectStrategy(obj) {
     if (isPromise(obj)) {
@@ -3117,24 +3754,38 @@ var AsyncPipe = class _AsyncPipe {
     }
   }
   static ɵfac = function AsyncPipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _AsyncPipe)(ɵɵdirectiveInject(ChangeDetectorRef, 16));
+    return new (__ngFactoryType__ || _AsyncPipe)(
+      ɵɵdirectiveInject(ChangeDetectorRef, 16),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "async",
     type: _AsyncPipe,
-    pure: false
+    pure: false,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(AsyncPipe, [{
-    type: Pipe,
-    args: [{
-      name: "async",
-      pure: false
-    }]
-  }], () => [{
-    type: ChangeDetectorRef
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      AsyncPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "async",
+              pure: false,
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: ChangeDetectorRef,
+        },
+      ],
+      null,
+    );
 })();
 var LowerCasePipe = class _LowerCasePipe {
   transform(value) {
@@ -3150,25 +3801,39 @@ var LowerCasePipe = class _LowerCasePipe {
   static ɵpipe = ɵɵdefinePipe({
     name: "lowercase",
     type: _LowerCasePipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(LowerCasePipe, [{
-    type: Pipe,
-    args: [{
-      name: "lowercase"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      LowerCasePipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "lowercase",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
-var unicodeWordMatch = /(?:[0-9A-Za-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0560-\u0588\u05D0-\u05EA\u05EF-\u05F2\u0620-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06E5\u06E6\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u0860-\u086A\u0870-\u0887\u0889-\u088E\u08A0-\u08C9\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u09FC\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C5D\u0C60\u0C61\u0C80\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D04-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D54-\u0D56\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E86-\u0E8A\u0E8C-\u0EA3\u0EA5\u0EA7-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u1711\u171F-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1878\u1880-\u1884\u1887-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4C\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1C80-\u1C88\u1C90-\u1CBA\u1CBD-\u1CBF\u1CE9-\u1CEC\u1CEE-\u1CF3\u1CF5\u1CF6\u1CFA\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183\u2184\u2C00-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005\u3006\u3031-\u3035\u303B\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312F\u3131-\u318E\u31A0-\u31BF\u31F0-\u31FF\u3400-\u4DBF\u4E00-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7CA\uA7D0\uA7D1\uA7D3\uA7D5-\uA7D9\uA7F2-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA8FE\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB69\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]|\uD800[\uDC00-\uDC0B\uDC0D-\uDC26\uDC28-\uDC3A\uDC3C\uDC3D\uDC3F-\uDC4D\uDC50-\uDC5D\uDC80-\uDCFA\uDE80-\uDE9C\uDEA0-\uDED0\uDF00-\uDF1F\uDF2D-\uDF40\uDF42-\uDF49\uDF50-\uDF75\uDF80-\uDF9D\uDFA0-\uDFC3\uDFC8-\uDFCF]|\uD801[\uDC00-\uDC9D\uDCB0-\uDCD3\uDCD8-\uDCFB\uDD00-\uDD27\uDD30-\uDD63\uDD70-\uDD7A\uDD7C-\uDD8A\uDD8C-\uDD92\uDD94\uDD95\uDD97-\uDDA1\uDDA3-\uDDB1\uDDB3-\uDDB9\uDDBB\uDDBC\uDE00-\uDF36\uDF40-\uDF55\uDF60-\uDF67\uDF80-\uDF85\uDF87-\uDFB0\uDFB2-\uDFBA]|\uD802[\uDC00-\uDC05\uDC08\uDC0A-\uDC35\uDC37\uDC38\uDC3C\uDC3F-\uDC55\uDC60-\uDC76\uDC80-\uDC9E\uDCE0-\uDCF2\uDCF4\uDCF5\uDD00-\uDD15\uDD20-\uDD39\uDD80-\uDDB7\uDDBE\uDDBF\uDE00\uDE10-\uDE13\uDE15-\uDE17\uDE19-\uDE35\uDE60-\uDE7C\uDE80-\uDE9C\uDEC0-\uDEC7\uDEC9-\uDEE4\uDF00-\uDF35\uDF40-\uDF55\uDF60-\uDF72\uDF80-\uDF91]|\uD803[\uDC00-\uDC48\uDC80-\uDCB2\uDCC0-\uDCF2\uDD00-\uDD23\uDE80-\uDEA9\uDEB0\uDEB1\uDF00-\uDF1C\uDF27\uDF30-\uDF45\uDF70-\uDF81\uDFB0-\uDFC4\uDFE0-\uDFF6]|\uD804[\uDC03-\uDC37\uDC71\uDC72\uDC75\uDC83-\uDCAF\uDCD0-\uDCE8\uDD03-\uDD26\uDD44\uDD47\uDD50-\uDD72\uDD76\uDD83-\uDDB2\uDDC1-\uDDC4\uDDDA\uDDDC\uDE00-\uDE11\uDE13-\uDE2B\uDE80-\uDE86\uDE88\uDE8A-\uDE8D\uDE8F-\uDE9D\uDE9F-\uDEA8\uDEB0-\uDEDE\uDF05-\uDF0C\uDF0F\uDF10\uDF13-\uDF28\uDF2A-\uDF30\uDF32\uDF33\uDF35-\uDF39\uDF3D\uDF50\uDF5D-\uDF61]|\uD805[\uDC00-\uDC34\uDC47-\uDC4A\uDC5F-\uDC61\uDC80-\uDCAF\uDCC4\uDCC5\uDCC7\uDD80-\uDDAE\uDDD8-\uDDDB\uDE00-\uDE2F\uDE44\uDE80-\uDEAA\uDEB8\uDF00-\uDF1A\uDF40-\uDF46]|\uD806[\uDC00-\uDC2B\uDCA0-\uDCDF\uDCFF-\uDD06\uDD09\uDD0C-\uDD13\uDD15\uDD16\uDD18-\uDD2F\uDD3F\uDD41\uDDA0-\uDDA7\uDDAA-\uDDD0\uDDE1\uDDE3\uDE00\uDE0B-\uDE32\uDE3A\uDE50\uDE5C-\uDE89\uDE9D\uDEB0-\uDEF8]|\uD807[\uDC00-\uDC08\uDC0A-\uDC2E\uDC40\uDC72-\uDC8F\uDD00-\uDD06\uDD08\uDD09\uDD0B-\uDD30\uDD46\uDD60-\uDD65\uDD67\uDD68\uDD6A-\uDD89\uDD98\uDEE0-\uDEF2\uDFB0]|\uD808[\uDC00-\uDF99]|\uD809[\uDC80-\uDD43]|\uD80B[\uDF90-\uDFF0]|[\uD80C\uD81C-\uD820\uD822\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879\uD880-\uD883][\uDC00-\uDFFF]|\uD80D[\uDC00-\uDC2E]|\uD811[\uDC00-\uDE46]|\uD81A[\uDC00-\uDE38\uDE40-\uDE5E\uDE70-\uDEBE\uDED0-\uDEED\uDF00-\uDF2F\uDF40-\uDF43\uDF63-\uDF77\uDF7D-\uDF8F]|\uD81B[\uDE40-\uDE7F\uDF00-\uDF4A\uDF50\uDF93-\uDF9F\uDFE0\uDFE1\uDFE3]|\uD821[\uDC00-\uDFF7]|\uD823[\uDC00-\uDCD5\uDD00-\uDD08]|\uD82B[\uDFF0-\uDFF3\uDFF5-\uDFFB\uDFFD\uDFFE]|\uD82C[\uDC00-\uDD22\uDD50-\uDD52\uDD64-\uDD67\uDD70-\uDEFB]|\uD82F[\uDC00-\uDC6A\uDC70-\uDC7C\uDC80-\uDC88\uDC90-\uDC99]|\uD835[\uDC00-\uDC54\uDC56-\uDC9C\uDC9E\uDC9F\uDCA2\uDCA5\uDCA6\uDCA9-\uDCAC\uDCAE-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDD05\uDD07-\uDD0A\uDD0D-\uDD14\uDD16-\uDD1C\uDD1E-\uDD39\uDD3B-\uDD3E\uDD40-\uDD44\uDD46\uDD4A-\uDD50\uDD52-\uDEA5\uDEA8-\uDEC0\uDEC2-\uDEDA\uDEDC-\uDEFA\uDEFC-\uDF14\uDF16-\uDF34\uDF36-\uDF4E\uDF50-\uDF6E\uDF70-\uDF88\uDF8A-\uDFA8\uDFAA-\uDFC2\uDFC4-\uDFCB]|\uD837[\uDF00-\uDF1E]|\uD838[\uDD00-\uDD2C\uDD37-\uDD3D\uDD4E\uDE90-\uDEAD\uDEC0-\uDEEB]|\uD839[\uDFE0-\uDFE6\uDFE8-\uDFEB\uDFED\uDFEE\uDFF0-\uDFFE]|\uD83A[\uDC00-\uDCC4\uDD00-\uDD43\uDD4B]|\uD83B[\uDE00-\uDE03\uDE05-\uDE1F\uDE21\uDE22\uDE24\uDE27\uDE29-\uDE32\uDE34-\uDE37\uDE39\uDE3B\uDE42\uDE47\uDE49\uDE4B\uDE4D-\uDE4F\uDE51\uDE52\uDE54\uDE57\uDE59\uDE5B\uDE5D\uDE5F\uDE61\uDE62\uDE64\uDE67-\uDE6A\uDE6C-\uDE72\uDE74-\uDE77\uDE79-\uDE7C\uDE7E\uDE80-\uDE89\uDE8B-\uDE9B\uDEA1-\uDEA3\uDEA5-\uDEA9\uDEAB-\uDEBB]|\uD869[\uDC00-\uDEDF\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF38\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0]|\uD87E[\uDC00-\uDE1D]|\uD884[\uDC00-\uDF4A])\S*/g;
+var unicodeWordMatch =
+  /(?:[0-9A-Za-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0370-\u0374\u0376\u0377\u037A-\u037D\u037F\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u052F\u0531-\u0556\u0559\u0560-\u0588\u05D0-\u05EA\u05EF-\u05F2\u0620-\u064A\u066E\u066F\u0671-\u06D3\u06D5\u06E5\u06E6\u06EE\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0815\u081A\u0824\u0828\u0840-\u0858\u0860-\u086A\u0870-\u0887\u0889-\u088E\u08A0-\u08C9\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0980\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC\u09DD\u09DF-\u09E1\u09F0\u09F1\u09FC\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0\u0AE1\u0AF9\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D\u0B5C\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C39\u0C3D\u0C58-\u0C5A\u0C5D\u0C60\u0C61\u0C80\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDD\u0CDE\u0CE0\u0CE1\u0CF1\u0CF2\u0D04-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D\u0D4E\u0D54-\u0D56\u0D5F-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E30\u0E32\u0E33\u0E40-\u0E46\u0E81\u0E82\u0E84\u0E86-\u0E8A\u0E8C-\u0EA3\u0EA5\u0EA7-\u0EB0\u0EB2\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8C\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F5\u13F8-\u13FD\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16F1-\u16F8\u1700-\u1711\u171F-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1878\u1880-\u1884\u1887-\u18A8\u18AA\u18B0-\u18F5\u1900-\u191E\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A16\u1A20-\u1A54\u1AA7\u1B05-\u1B33\u1B45-\u1B4C\u1B83-\u1BA0\u1BAE\u1BAF\u1BBA-\u1BE5\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1C80-\u1C88\u1C90-\u1CBA\u1CBD-\u1CBF\u1CE9-\u1CEC\u1CEE-\u1CF3\u1CF5\u1CF6\u1CFA\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2183\u2184\u2C00-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2E2F\u3005\u3006\u3031-\u3035\u303B\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312F\u3131-\u318E\u31A0-\u31BF\u31F0-\u31FF\u3400-\u4DBF\u4E00-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA67F-\uA69D\uA6A0-\uA6E5\uA717-\uA71F\uA722-\uA788\uA78B-\uA7CA\uA7D0\uA7D1\uA7D3\uA7D5-\uA7D9\uA7F2-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA8F2-\uA8F7\uA8FB\uA8FD\uA8FE\uA90A-\uA925\uA930-\uA946\uA960-\uA97C\uA984-\uA9B2\uA9CF\uA9E0-\uA9E4\uA9E6-\uA9EF\uA9FA-\uA9FE\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAA60-\uAA76\uAA7A\uAA7E-\uAAAF\uAAB1\uAAB5\uAAB6\uAAB9-\uAABD\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEA\uAAF2-\uAAF4\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uAB30-\uAB5A\uAB5C-\uAB69\uAB70-\uABE2\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]|\uD800[\uDC00-\uDC0B\uDC0D-\uDC26\uDC28-\uDC3A\uDC3C\uDC3D\uDC3F-\uDC4D\uDC50-\uDC5D\uDC80-\uDCFA\uDE80-\uDE9C\uDEA0-\uDED0\uDF00-\uDF1F\uDF2D-\uDF40\uDF42-\uDF49\uDF50-\uDF75\uDF80-\uDF9D\uDFA0-\uDFC3\uDFC8-\uDFCF]|\uD801[\uDC00-\uDC9D\uDCB0-\uDCD3\uDCD8-\uDCFB\uDD00-\uDD27\uDD30-\uDD63\uDD70-\uDD7A\uDD7C-\uDD8A\uDD8C-\uDD92\uDD94\uDD95\uDD97-\uDDA1\uDDA3-\uDDB1\uDDB3-\uDDB9\uDDBB\uDDBC\uDE00-\uDF36\uDF40-\uDF55\uDF60-\uDF67\uDF80-\uDF85\uDF87-\uDFB0\uDFB2-\uDFBA]|\uD802[\uDC00-\uDC05\uDC08\uDC0A-\uDC35\uDC37\uDC38\uDC3C\uDC3F-\uDC55\uDC60-\uDC76\uDC80-\uDC9E\uDCE0-\uDCF2\uDCF4\uDCF5\uDD00-\uDD15\uDD20-\uDD39\uDD80-\uDDB7\uDDBE\uDDBF\uDE00\uDE10-\uDE13\uDE15-\uDE17\uDE19-\uDE35\uDE60-\uDE7C\uDE80-\uDE9C\uDEC0-\uDEC7\uDEC9-\uDEE4\uDF00-\uDF35\uDF40-\uDF55\uDF60-\uDF72\uDF80-\uDF91]|\uD803[\uDC00-\uDC48\uDC80-\uDCB2\uDCC0-\uDCF2\uDD00-\uDD23\uDE80-\uDEA9\uDEB0\uDEB1\uDF00-\uDF1C\uDF27\uDF30-\uDF45\uDF70-\uDF81\uDFB0-\uDFC4\uDFE0-\uDFF6]|\uD804[\uDC03-\uDC37\uDC71\uDC72\uDC75\uDC83-\uDCAF\uDCD0-\uDCE8\uDD03-\uDD26\uDD44\uDD47\uDD50-\uDD72\uDD76\uDD83-\uDDB2\uDDC1-\uDDC4\uDDDA\uDDDC\uDE00-\uDE11\uDE13-\uDE2B\uDE80-\uDE86\uDE88\uDE8A-\uDE8D\uDE8F-\uDE9D\uDE9F-\uDEA8\uDEB0-\uDEDE\uDF05-\uDF0C\uDF0F\uDF10\uDF13-\uDF28\uDF2A-\uDF30\uDF32\uDF33\uDF35-\uDF39\uDF3D\uDF50\uDF5D-\uDF61]|\uD805[\uDC00-\uDC34\uDC47-\uDC4A\uDC5F-\uDC61\uDC80-\uDCAF\uDCC4\uDCC5\uDCC7\uDD80-\uDDAE\uDDD8-\uDDDB\uDE00-\uDE2F\uDE44\uDE80-\uDEAA\uDEB8\uDF00-\uDF1A\uDF40-\uDF46]|\uD806[\uDC00-\uDC2B\uDCA0-\uDCDF\uDCFF-\uDD06\uDD09\uDD0C-\uDD13\uDD15\uDD16\uDD18-\uDD2F\uDD3F\uDD41\uDDA0-\uDDA7\uDDAA-\uDDD0\uDDE1\uDDE3\uDE00\uDE0B-\uDE32\uDE3A\uDE50\uDE5C-\uDE89\uDE9D\uDEB0-\uDEF8]|\uD807[\uDC00-\uDC08\uDC0A-\uDC2E\uDC40\uDC72-\uDC8F\uDD00-\uDD06\uDD08\uDD09\uDD0B-\uDD30\uDD46\uDD60-\uDD65\uDD67\uDD68\uDD6A-\uDD89\uDD98\uDEE0-\uDEF2\uDFB0]|\uD808[\uDC00-\uDF99]|\uD809[\uDC80-\uDD43]|\uD80B[\uDF90-\uDFF0]|[\uD80C\uD81C-\uD820\uD822\uD840-\uD868\uD86A-\uD86C\uD86F-\uD872\uD874-\uD879\uD880-\uD883][\uDC00-\uDFFF]|\uD80D[\uDC00-\uDC2E]|\uD811[\uDC00-\uDE46]|\uD81A[\uDC00-\uDE38\uDE40-\uDE5E\uDE70-\uDEBE\uDED0-\uDEED\uDF00-\uDF2F\uDF40-\uDF43\uDF63-\uDF77\uDF7D-\uDF8F]|\uD81B[\uDE40-\uDE7F\uDF00-\uDF4A\uDF50\uDF93-\uDF9F\uDFE0\uDFE1\uDFE3]|\uD821[\uDC00-\uDFF7]|\uD823[\uDC00-\uDCD5\uDD00-\uDD08]|\uD82B[\uDFF0-\uDFF3\uDFF5-\uDFFB\uDFFD\uDFFE]|\uD82C[\uDC00-\uDD22\uDD50-\uDD52\uDD64-\uDD67\uDD70-\uDEFB]|\uD82F[\uDC00-\uDC6A\uDC70-\uDC7C\uDC80-\uDC88\uDC90-\uDC99]|\uD835[\uDC00-\uDC54\uDC56-\uDC9C\uDC9E\uDC9F\uDCA2\uDCA5\uDCA6\uDCA9-\uDCAC\uDCAE-\uDCB9\uDCBB\uDCBD-\uDCC3\uDCC5-\uDD05\uDD07-\uDD0A\uDD0D-\uDD14\uDD16-\uDD1C\uDD1E-\uDD39\uDD3B-\uDD3E\uDD40-\uDD44\uDD46\uDD4A-\uDD50\uDD52-\uDEA5\uDEA8-\uDEC0\uDEC2-\uDEDA\uDEDC-\uDEFA\uDEFC-\uDF14\uDF16-\uDF34\uDF36-\uDF4E\uDF50-\uDF6E\uDF70-\uDF88\uDF8A-\uDFA8\uDFAA-\uDFC2\uDFC4-\uDFCB]|\uD837[\uDF00-\uDF1E]|\uD838[\uDD00-\uDD2C\uDD37-\uDD3D\uDD4E\uDE90-\uDEAD\uDEC0-\uDEEB]|\uD839[\uDFE0-\uDFE6\uDFE8-\uDFEB\uDFED\uDFEE\uDFF0-\uDFFE]|\uD83A[\uDC00-\uDCC4\uDD00-\uDD43\uDD4B]|\uD83B[\uDE00-\uDE03\uDE05-\uDE1F\uDE21\uDE22\uDE24\uDE27\uDE29-\uDE32\uDE34-\uDE37\uDE39\uDE3B\uDE42\uDE47\uDE49\uDE4B\uDE4D-\uDE4F\uDE51\uDE52\uDE54\uDE57\uDE59\uDE5B\uDE5D\uDE5F\uDE61\uDE62\uDE64\uDE67-\uDE6A\uDE6C-\uDE72\uDE74-\uDE77\uDE79-\uDE7C\uDE7E\uDE80-\uDE89\uDE8B-\uDE9B\uDEA1-\uDEA3\uDEA5-\uDEA9\uDEAB-\uDEBB]|\uD869[\uDC00-\uDEDF\uDF00-\uDFFF]|\uD86D[\uDC00-\uDF38\uDF40-\uDFFF]|\uD86E[\uDC00-\uDC1D\uDC20-\uDFFF]|\uD873[\uDC00-\uDEA1\uDEB0-\uDFFF]|\uD87A[\uDC00-\uDFE0]|\uD87E[\uDC00-\uDE1D]|\uD884[\uDC00-\uDF4A])\S*/g;
 var TitleCasePipe = class _TitleCasePipe {
   transform(value) {
     if (value == null) return null;
     if (typeof value !== "string") {
       throw invalidPipeArgumentError(_TitleCasePipe, value);
     }
-    return value.replace(unicodeWordMatch, (txt) => txt[0].toUpperCase() + txt.slice(1).toLowerCase());
+    return value.replace(
+      unicodeWordMatch,
+      (txt) => txt[0].toUpperCase() + txt.slice(1).toLowerCase(),
+    );
   }
   static ɵfac = function TitleCasePipe_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _TitleCasePipe)();
@@ -3176,16 +3841,26 @@ var TitleCasePipe = class _TitleCasePipe {
   static ɵpipe = ɵɵdefinePipe({
     name: "titlecase",
     type: _TitleCasePipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(TitleCasePipe, [{
-    type: Pipe,
-    args: [{
-      name: "titlecase"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      TitleCasePipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "titlecase",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var UpperCasePipe = class _UpperCasePipe {
   transform(value) {
@@ -3201,20 +3876,34 @@ var UpperCasePipe = class _UpperCasePipe {
   static ɵpipe = ɵɵdefinePipe({
     name: "uppercase",
     type: _UpperCasePipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(UpperCasePipe, [{
-    type: Pipe,
-    args: [{
-      name: "uppercase"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      UpperCasePipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "uppercase",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var DEFAULT_DATE_FORMAT = "mediumDate";
-var DATE_PIPE_DEFAULT_TIMEZONE = new InjectionToken(ngDevMode ? "DATE_PIPE_DEFAULT_TIMEZONE" : "");
-var DATE_PIPE_DEFAULT_OPTIONS = new InjectionToken(ngDevMode ? "DATE_PIPE_DEFAULT_OPTIONS" : "");
+var DATE_PIPE_DEFAULT_TIMEZONE = new InjectionToken(
+  ngDevMode ? "DATE_PIPE_DEFAULT_TIMEZONE" : "",
+);
+var DATE_PIPE_DEFAULT_OPTIONS = new InjectionToken(
+  ngDevMode ? "DATE_PIPE_DEFAULT_OPTIONS" : "",
+);
 var DatePipe = class _DatePipe {
   locale;
   defaultTimezone;
@@ -3227,51 +3916,82 @@ var DatePipe = class _DatePipe {
   transform(value, format, timezone, locale) {
     if (value == null || value === "" || value !== value) return null;
     try {
-      const _format = format ?? this.defaultOptions?.dateFormat ?? DEFAULT_DATE_FORMAT;
-      const _timezone = timezone ?? this.defaultOptions?.timezone ?? this.defaultTimezone ?? void 0;
+      const _format =
+        format ?? this.defaultOptions?.dateFormat ?? DEFAULT_DATE_FORMAT;
+      const _timezone =
+        timezone ??
+        this.defaultOptions?.timezone ??
+        this.defaultTimezone ??
+        void 0;
       return formatDate(value, _format, locale || this.locale, _timezone);
     } catch (error) {
       throw invalidPipeArgumentError(_DatePipe, error.message);
     }
   }
   static ɵfac = function DatePipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _DatePipe)(ɵɵdirectiveInject(LOCALE_ID, 16), ɵɵdirectiveInject(DATE_PIPE_DEFAULT_TIMEZONE, 24), ɵɵdirectiveInject(DATE_PIPE_DEFAULT_OPTIONS, 24));
+    return new (__ngFactoryType__ || _DatePipe)(
+      ɵɵdirectiveInject(LOCALE_ID, 16),
+      ɵɵdirectiveInject(DATE_PIPE_DEFAULT_TIMEZONE, 24),
+      ɵɵdirectiveInject(DATE_PIPE_DEFAULT_OPTIONS, 24),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "date",
     type: _DatePipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(DatePipe, [{
-    type: Pipe,
-    args: [{
-      name: "date"
-    }]
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [LOCALE_ID]
-    }]
-  }, {
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [DATE_PIPE_DEFAULT_TIMEZONE]
-    }, {
-      type: Optional
-    }]
-  }, {
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [DATE_PIPE_DEFAULT_OPTIONS]
-    }, {
-      type: Optional
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      DatePipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "date",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [LOCALE_ID],
+            },
+          ],
+        },
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [DATE_PIPE_DEFAULT_TIMEZONE],
+            },
+            {
+              type: Optional,
+            },
+          ],
+        },
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [DATE_PIPE_DEFAULT_OPTIONS],
+            },
+            {
+              type: Optional,
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var _INTERPOLATION_REGEXP = /#/g;
 var I18nPluralPipe = class _I18nPluralPipe {
@@ -3291,27 +4011,46 @@ var I18nPluralPipe = class _I18nPluralPipe {
     if (typeof pluralMap !== "object" || pluralMap === null) {
       throw invalidPipeArgumentError(_I18nPluralPipe, pluralMap);
     }
-    const key = getPluralCategory(value, Object.keys(pluralMap), this._localization, locale);
+    const key = getPluralCategory(
+      value,
+      Object.keys(pluralMap),
+      this._localization,
+      locale,
+    );
     return pluralMap[key].replace(_INTERPOLATION_REGEXP, value.toString());
   }
   static ɵfac = function I18nPluralPipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _I18nPluralPipe)(ɵɵdirectiveInject(NgLocalization, 16));
+    return new (__ngFactoryType__ || _I18nPluralPipe)(
+      ɵɵdirectiveInject(NgLocalization, 16),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "i18nPlural",
     type: _I18nPluralPipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(I18nPluralPipe, [{
-    type: Pipe,
-    args: [{
-      name: "i18nPlural"
-    }]
-  }], () => [{
-    type: NgLocalization
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      I18nPluralPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "i18nPlural",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: NgLocalization,
+        },
+      ],
+      null,
+    );
 })();
 var I18nSelectPipe = class _I18nSelectPipe {
   /**
@@ -3338,16 +4077,26 @@ var I18nSelectPipe = class _I18nSelectPipe {
   static ɵpipe = ɵɵdefinePipe({
     name: "i18nSelect",
     type: _I18nSelectPipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(I18nSelectPipe, [{
-    type: Pipe,
-    args: [{
-      name: "i18nSelect"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      I18nSelectPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "i18nSelect",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var JsonPipe = class _JsonPipe {
   /**
@@ -3362,22 +4111,32 @@ var JsonPipe = class _JsonPipe {
   static ɵpipe = ɵɵdefinePipe({
     name: "json",
     type: _JsonPipe,
-    pure: false
+    pure: false,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(JsonPipe, [{
-    type: Pipe,
-    args: [{
-      name: "json",
-      pure: false
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      JsonPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "json",
+              pure: false,
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 function makeKeyValuePair(key, value) {
   return {
     key,
-    value
+    value,
   };
 }
 var KeyValuePipe = class _KeyValuePipe {
@@ -3389,7 +4148,7 @@ var KeyValuePipe = class _KeyValuePipe {
   keyValues = [];
   compareFn = defaultComparator;
   transform(input, compareFn = defaultComparator) {
-    if (!input || !(input instanceof Map) && typeof input !== "object") {
+    if (!input || (!(input instanceof Map) && typeof input !== "object")) {
       return null;
     }
     this.differ ??= this.differs.find(input).create();
@@ -3410,24 +4169,38 @@ var KeyValuePipe = class _KeyValuePipe {
     return this.keyValues;
   }
   static ɵfac = function KeyValuePipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _KeyValuePipe)(ɵɵdirectiveInject(KeyValueDiffers, 16));
+    return new (__ngFactoryType__ || _KeyValuePipe)(
+      ɵɵdirectiveInject(KeyValueDiffers, 16),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "keyvalue",
     type: _KeyValuePipe,
-    pure: false
+    pure: false,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(KeyValuePipe, [{
-    type: Pipe,
-    args: [{
-      name: "keyvalue",
-      pure: false
-    }]
-  }], () => [{
-    type: KeyValueDiffers
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      KeyValuePipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "keyvalue",
+              pure: false,
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: KeyValueDiffers,
+        },
+      ],
+      null,
+    );
 })();
 function defaultComparator(keyValueA, keyValueB) {
   const a = keyValueA.key;
@@ -3464,27 +4237,43 @@ var DecimalPipe = class _DecimalPipe {
     }
   }
   static ɵfac = function DecimalPipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _DecimalPipe)(ɵɵdirectiveInject(LOCALE_ID, 16));
+    return new (__ngFactoryType__ || _DecimalPipe)(
+      ɵɵdirectiveInject(LOCALE_ID, 16),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "number",
     type: _DecimalPipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(DecimalPipe, [{
-    type: Pipe,
-    args: [{
-      name: "number"
-    }]
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [LOCALE_ID]
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      DecimalPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "number",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [LOCALE_ID],
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var PercentPipe = class _PercentPipe {
   _locale;
@@ -3518,27 +4307,43 @@ var PercentPipe = class _PercentPipe {
     }
   }
   static ɵfac = function PercentPipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _PercentPipe)(ɵɵdirectiveInject(LOCALE_ID, 16));
+    return new (__ngFactoryType__ || _PercentPipe)(
+      ɵɵdirectiveInject(LOCALE_ID, 16),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "percent",
     type: _PercentPipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(PercentPipe, [{
-    type: Pipe,
-    args: [{
-      name: "percent"
-    }]
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [LOCALE_ID]
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      PercentPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "percent",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [LOCALE_ID],
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 var CurrencyPipe = class _CurrencyPipe {
   _locale;
@@ -3547,19 +4352,35 @@ var CurrencyPipe = class _CurrencyPipe {
     this._locale = _locale;
     this._defaultCurrencyCode = _defaultCurrencyCode;
   }
-  transform(value, currencyCode = this._defaultCurrencyCode, display = "symbol", digitsInfo, locale) {
+  transform(
+    value,
+    currencyCode = this._defaultCurrencyCode,
+    display = "symbol",
+    digitsInfo,
+    locale,
+  ) {
     if (!isValue(value)) return null;
     locale ||= this._locale;
     if (typeof display === "boolean") {
-      if ((typeof ngDevMode === "undefined" || ngDevMode) && console && console.warn) {
-        console.warn(`Warning: the currency pipe has been changed in Angular v5. The symbolDisplay option (third parameter) is now a string instead of a boolean. The accepted values are "code", "symbol" or "symbol-narrow".`);
+      if (
+        (typeof ngDevMode === "undefined" || ngDevMode) &&
+        console &&
+        console.warn
+      ) {
+        console.warn(
+          `Warning: the currency pipe has been changed in Angular v5. The symbolDisplay option (third parameter) is now a string instead of a boolean. The accepted values are "code", "symbol" or "symbol-narrow".`,
+        );
       }
       display = display ? "symbol" : "code";
     }
     let currency = currencyCode || this._defaultCurrencyCode;
     if (display !== "code") {
       if (display === "symbol" || display === "symbol-narrow") {
-        currency = getCurrencySymbol(currency, display === "symbol" ? "wide" : "narrow", locale);
+        currency = getCurrencySymbol(
+          currency,
+          display === "symbol" ? "wide" : "narrow",
+          locale,
+        );
       } else {
         currency = display;
       }
@@ -3572,33 +4393,53 @@ var CurrencyPipe = class _CurrencyPipe {
     }
   }
   static ɵfac = function CurrencyPipe_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _CurrencyPipe)(ɵɵdirectiveInject(LOCALE_ID, 16), ɵɵdirectiveInject(DEFAULT_CURRENCY_CODE, 16));
+    return new (__ngFactoryType__ || _CurrencyPipe)(
+      ɵɵdirectiveInject(LOCALE_ID, 16),
+      ɵɵdirectiveInject(DEFAULT_CURRENCY_CODE, 16),
+    );
   };
   static ɵpipe = ɵɵdefinePipe({
     name: "currency",
     type: _CurrencyPipe,
-    pure: true
+    pure: true,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CurrencyPipe, [{
-    type: Pipe,
-    args: [{
-      name: "currency"
-    }]
-  }], () => [{
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [LOCALE_ID]
-    }]
-  }, {
-    type: void 0,
-    decorators: [{
-      type: Inject,
-      args: [DEFAULT_CURRENCY_CODE]
-    }]
-  }], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CurrencyPipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "currency",
+            },
+          ],
+        },
+      ],
+      () => [
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [LOCALE_ID],
+            },
+          ],
+        },
+        {
+          type: void 0,
+          decorators: [
+            {
+              type: Inject,
+              args: [DEFAULT_CURRENCY_CODE],
+            },
+          ],
+        },
+      ],
+      null,
+    );
 })();
 function isValue(value) {
   return !(value == null || value === "" || value !== value);
@@ -3627,38 +4468,122 @@ var SlicePipe = class _SlicePipe {
   static ɵpipe = ɵɵdefinePipe({
     name: "slice",
     type: _SlicePipe,
-    pure: false
+    pure: false,
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(SlicePipe, [{
-    type: Pipe,
-    args: [{
-      name: "slice",
-      pure: false
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      SlicePipe,
+      [
+        {
+          type: Pipe,
+          args: [
+            {
+              name: "slice",
+              pure: false,
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
-var COMMON_PIPES = [AsyncPipe, UpperCasePipe, LowerCasePipe, JsonPipe, SlicePipe, DecimalPipe, PercentPipe, TitleCasePipe, CurrencyPipe, DatePipe, I18nPluralPipe, I18nSelectPipe, KeyValuePipe];
+var COMMON_PIPES = [
+  AsyncPipe,
+  UpperCasePipe,
+  LowerCasePipe,
+  JsonPipe,
+  SlicePipe,
+  DecimalPipe,
+  PercentPipe,
+  TitleCasePipe,
+  CurrencyPipe,
+  DatePipe,
+  I18nPluralPipe,
+  I18nSelectPipe,
+  KeyValuePipe,
+];
 var CommonModule = class _CommonModule {
   static ɵfac = function CommonModule_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || _CommonModule)();
   };
   static ɵmod = ɵɵdefineNgModule({
     type: _CommonModule,
-    imports: [NgClass, NgComponentOutlet, NgForOf, NgIf, NgTemplateOutlet, NgStyle, NgSwitch, NgSwitchCase, NgSwitchDefault, NgPlural, NgPluralCase, AsyncPipe, UpperCasePipe, LowerCasePipe, JsonPipe, SlicePipe, DecimalPipe, PercentPipe, TitleCasePipe, CurrencyPipe, DatePipe, I18nPluralPipe, I18nSelectPipe, KeyValuePipe],
-    exports: [NgClass, NgComponentOutlet, NgForOf, NgIf, NgTemplateOutlet, NgStyle, NgSwitch, NgSwitchCase, NgSwitchDefault, NgPlural, NgPluralCase, AsyncPipe, UpperCasePipe, LowerCasePipe, JsonPipe, SlicePipe, DecimalPipe, PercentPipe, TitleCasePipe, CurrencyPipe, DatePipe, I18nPluralPipe, I18nSelectPipe, KeyValuePipe]
+    imports: [
+      NgClass,
+      NgComponentOutlet,
+      NgForOf,
+      NgIf,
+      NgTemplateOutlet,
+      NgStyle,
+      NgSwitch,
+      NgSwitchCase,
+      NgSwitchDefault,
+      NgPlural,
+      NgPluralCase,
+      AsyncPipe,
+      UpperCasePipe,
+      LowerCasePipe,
+      JsonPipe,
+      SlicePipe,
+      DecimalPipe,
+      PercentPipe,
+      TitleCasePipe,
+      CurrencyPipe,
+      DatePipe,
+      I18nPluralPipe,
+      I18nSelectPipe,
+      KeyValuePipe,
+    ],
+    exports: [
+      NgClass,
+      NgComponentOutlet,
+      NgForOf,
+      NgIf,
+      NgTemplateOutlet,
+      NgStyle,
+      NgSwitch,
+      NgSwitchCase,
+      NgSwitchDefault,
+      NgPlural,
+      NgPluralCase,
+      AsyncPipe,
+      UpperCasePipe,
+      LowerCasePipe,
+      JsonPipe,
+      SlicePipe,
+      DecimalPipe,
+      PercentPipe,
+      TitleCasePipe,
+      CurrencyPipe,
+      DatePipe,
+      I18nPluralPipe,
+      I18nSelectPipe,
+      KeyValuePipe,
+    ],
   });
   static ɵinj = ɵɵdefineInjector({});
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(CommonModule, [{
-    type: NgModule,
-    args: [{
-      imports: [COMMON_DIRECTIVES, COMMON_PIPES],
-      exports: [COMMON_DIRECTIVES, COMMON_PIPES]
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      CommonModule,
+      [
+        {
+          type: NgModule,
+          args: [
+            {
+              imports: [COMMON_DIRECTIVES, COMMON_PIPES],
+              exports: [COMMON_DIRECTIVES, COMMON_PIPES],
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 
 // ../node_modules/@angular/common/fesm2022/platform_navigation-B45Jeakb.mjs
@@ -3669,17 +4594,27 @@ var PlatformNavigation = class _PlatformNavigation {
   static ɵprov = ɵɵdefineInjectable({
     token: _PlatformNavigation,
     factory: () => (() => window.navigation)(),
-    providedIn: "platform"
+    providedIn: "platform",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(PlatformNavigation, [{
-    type: Injectable,
-    args: [{
-      providedIn: "platform",
-      useFactory: () => window.navigation
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      PlatformNavigation,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "platform",
+              useFactory: () => window.navigation,
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 
 // ../node_modules/@angular/common/fesm2022/common.mjs
@@ -3691,14 +4626,16 @@ var ViewportScroller = class _ViewportScroller {
   // De-sugared tree-shakable injection
   // See #23917
   /** @nocollapse */
-  static ɵprov = (
+  static ɵprov =
     /** @pureOrBreakMyCode */
     ɵɵdefineInjectable({
       token: _ViewportScroller,
       providedIn: "root",
-      factory: () => false ? new NullViewportScroller() : new BrowserViewportScroller(inject(DOCUMENT), window)
-    })
-  );
+      factory: () =>
+        false
+          ? new NullViewportScroller()
+          : new BrowserViewportScroller(inject(DOCUMENT), window),
+    });
 };
 var BrowserViewportScroller = class {
   document;
@@ -3774,17 +4711,27 @@ var BrowserViewportScroller = class {
   }
 };
 function findAnchorFromDocument(document, target) {
-  const documentResult = document.getElementById(target) || document.getElementsByName(target)[0];
+  const documentResult =
+    document.getElementById(target) || document.getElementsByName(target)[0];
   if (documentResult) {
     return documentResult;
   }
-  if (typeof document.createTreeWalker === "function" && document.body && typeof document.body.attachShadow === "function") {
-    const treeWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+  if (
+    typeof document.createTreeWalker === "function" &&
+    document.body &&
+    typeof document.body.attachShadow === "function"
+  ) {
+    const treeWalker = document.createTreeWalker(
+      document.body,
+      NodeFilter.SHOW_ELEMENT,
+    );
     let currentNode = treeWalker.currentNode;
     while (currentNode) {
       const shadowRoot = currentNode.shadowRoot;
       if (shadowRoot) {
-        const result = shadowRoot.getElementById(target) || shadowRoot.querySelector(`[name="${target}"]`);
+        const result =
+          shadowRoot.getElementById(target) ||
+          shadowRoot.querySelector(`[name="${target}"]`);
         if (result) {
           return result;
         }
@@ -3798,8 +4745,7 @@ var NullViewportScroller = class {
   /**
    * Empty implementation
    */
-  setOffset(offset) {
-  }
+  setOffset(offset) {}
   /**
    * Empty implementation
    */
@@ -3809,18 +4755,15 @@ var NullViewportScroller = class {
   /**
    * Empty implementation
    */
-  scrollToPosition(position) {
-  }
+  scrollToPosition(position) {}
   /**
    * Empty implementation
    */
-  scrollToAnchor(anchor) {
-  }
+  scrollToAnchor(anchor) {}
   /**
    * Empty implementation
    */
-  setHistoryScrollRestoration(scrollRestoration) {
-  }
+  setHistoryScrollRestoration(scrollRestoration) {}
 };
 var PLACEHOLDER_QUALITY = "20";
 function getUrl(src, win) {
@@ -3853,7 +4796,7 @@ function normalizeSrc(src) {
 var noopImageLoader = (config) => config.src;
 var IMAGE_LOADER = new InjectionToken(ngDevMode ? "ImageLoader" : "", {
   providedIn: "root",
-  factory: () => noopImageLoader
+  factory: () => noopImageLoader,
 });
 function createImageLoader(buildUrlFn, exampleUrls) {
   return function provideImageLoader(path) {
@@ -3865,24 +4808,42 @@ function createImageLoader(buildUrlFn, exampleUrls) {
       if (isAbsoluteUrl(config.src)) {
         throwUnexpectedAbsoluteUrlError(path, config.src);
       }
-      return buildUrlFn(path, __spreadProps(__spreadValues({}, config), {
-        src: normalizeSrc(config.src)
-      }));
+      return buildUrlFn(
+        path,
+        __spreadProps(__spreadValues({}, config), {
+          src: normalizeSrc(config.src),
+        }),
+      );
     };
-    const providers = [{
-      provide: IMAGE_LOADER,
-      useValue: loaderFn
-    }];
+    const providers = [
+      {
+        provide: IMAGE_LOADER,
+        useValue: loaderFn,
+      },
+    ];
     return providers;
   };
 }
 function throwInvalidPathError(path, exampleUrls) {
-  throw new RuntimeError(2959, ngDevMode && `Image loader has detected an invalid path (\`${path}\`). To fix this, supply a path using one of the following formats: ${exampleUrls.join(" or ")}`);
+  throw new RuntimeError(
+    2959,
+    ngDevMode &&
+      `Image loader has detected an invalid path (\`${path}\`). To fix this, supply a path using one of the following formats: ${exampleUrls.join(" or ")}`,
+  );
 }
 function throwUnexpectedAbsoluteUrlError(path, url) {
-  throw new RuntimeError(2959, ngDevMode && `Image loader has detected a \`<img>\` tag with an invalid \`ngSrc\` attribute: ${url}. This image loader expects \`ngSrc\` to be a relative URL - however the provided value is an absolute URL. To fix this, provide \`ngSrc\` as a path relative to the base URL configured for this loader (\`${path}\`).`);
+  throw new RuntimeError(
+    2959,
+    ngDevMode &&
+      `Image loader has detected a \`<img>\` tag with an invalid \`ngSrc\` attribute: ${url}. This image loader expects \`ngSrc\` to be a relative URL - however the provided value is an absolute URL. To fix this, provide \`ngSrc\` as a path relative to the base URL configured for this loader (\`${path}\`).`,
+  );
 }
-var provideCloudflareLoader = createImageLoader(createCloudflareUrl, ngDevMode ? ["https://<ZONE>/cdn-cgi/image/<OPTIONS>/<SOURCE-IMAGE>"] : void 0);
+var provideCloudflareLoader = createImageLoader(
+  createCloudflareUrl,
+  ngDevMode
+    ? ["https://<ZONE>/cdn-cgi/image/<OPTIONS>/<SOURCE-IMAGE>"]
+    : void 0,
+);
 function createCloudflareUrl(path, config) {
   let params = `format=auto`;
   if (config.width) {
@@ -3895,13 +4856,22 @@ function createCloudflareUrl(path, config) {
 }
 var cloudinaryLoaderInfo = {
   name: "Cloudinary",
-  testUrl: isCloudinaryUrl
+  testUrl: isCloudinaryUrl,
 };
 var CLOUDINARY_LOADER_REGEX = /https?\:\/\/[^\/]+\.cloudinary\.com\/.+/;
 function isCloudinaryUrl(url) {
   return CLOUDINARY_LOADER_REGEX.test(url);
 }
-var provideCloudinaryLoader = createImageLoader(createCloudinaryUrl, ngDevMode ? ["https://res.cloudinary.com/mysite", "https://mysite.cloudinary.com", "https://subdomain.mysite.com"] : void 0);
+var provideCloudinaryLoader = createImageLoader(
+  createCloudinaryUrl,
+  ngDevMode
+    ? [
+        "https://res.cloudinary.com/mysite",
+        "https://mysite.cloudinary.com",
+        "https://subdomain.mysite.com",
+      ]
+    : void 0,
+);
 function createCloudinaryUrl(path, config) {
   const quality = config.isPlaceholder ? "q_auto:low" : "q_auto";
   let params = `f_auto,${quality}`;
@@ -3915,18 +4885,20 @@ function createCloudinaryUrl(path, config) {
 }
 var imageKitLoaderInfo = {
   name: "ImageKit",
-  testUrl: isImageKitUrl
+  testUrl: isImageKitUrl,
 };
 var IMAGE_KIT_LOADER_REGEX = /https?\:\/\/[^\/]+\.imagekit\.io\/.+/;
 function isImageKitUrl(url) {
   return IMAGE_KIT_LOADER_REGEX.test(url);
 }
-var provideImageKitLoader = createImageLoader(createImagekitUrl, ngDevMode ? ["https://ik.imagekit.io/mysite", "https://subdomain.mysite.com"] : void 0);
+var provideImageKitLoader = createImageLoader(
+  createImagekitUrl,
+  ngDevMode
+    ? ["https://ik.imagekit.io/mysite", "https://subdomain.mysite.com"]
+    : void 0,
+);
 function createImagekitUrl(path, config) {
-  const {
-    src,
-    width
-  } = config;
+  const { src, width } = config;
   const params = [];
   if (width) {
     params.push(`w-${width}`);
@@ -3934,19 +4906,24 @@ function createImagekitUrl(path, config) {
   if (config.isPlaceholder) {
     params.push(`q-${PLACEHOLDER_QUALITY}`);
   }
-  const urlSegments = params.length ? [path, `tr:${params.join(",")}`, src] : [path, src];
+  const urlSegments = params.length
+    ? [path, `tr:${params.join(",")}`, src]
+    : [path, src];
   const url = new URL(urlSegments.join("/"));
   return url.href;
 }
 var imgixLoaderInfo = {
   name: "Imgix",
-  testUrl: isImgixUrl
+  testUrl: isImgixUrl,
 };
 var IMGIX_LOADER_REGEX = /https?\:\/\/[^\/]+\.imgix\.net\/.+/;
 function isImgixUrl(url) {
   return IMGIX_LOADER_REGEX.test(url);
 }
-var provideImgixLoader = createImageLoader(createImgixUrl, ngDevMode ? ["https://somepath.imgix.net/"] : void 0);
+var provideImgixLoader = createImageLoader(
+  createImgixUrl,
+  ngDevMode ? ["https://somepath.imgix.net/"] : void 0,
+);
 function createImgixUrl(path, config) {
   const url = new URL(`${path}/${config.src}`);
   url.searchParams.set("auto", "format");
@@ -3960,7 +4937,7 @@ function createImgixUrl(path, config) {
 }
 var netlifyLoaderInfo = {
   name: "Netlify",
-  testUrl: isNetlifyUrl
+  testUrl: isNetlifyUrl,
 };
 var NETLIFY_LOADER_REGEX = /https?\:\/\/[^\/]+\.netlify\.app\/.+/;
 function isNetlifyUrl(url) {
@@ -3968,7 +4945,11 @@ function isNetlifyUrl(url) {
 }
 function provideNetlifyLoader(path) {
   if (path && !isValidPath(path)) {
-    throw new RuntimeError(2959, ngDevMode && `Image loader has detected an invalid path (\`${path}\`). To fix this, supply either the full URL to the Netlify site, or leave it empty to use the current site.`);
+    throw new RuntimeError(
+      2959,
+      ngDevMode &&
+        `Image loader has detected an invalid path (\`${path}\`). To fix this, supply either the full URL to the Netlify site, or leave it empty to use the current site.`,
+    );
   }
   if (path) {
     const url = new URL(path);
@@ -3977,13 +4958,21 @@ function provideNetlifyLoader(path) {
   const loaderFn = (config) => {
     return createNetlifyUrl(config, path);
   };
-  const providers = [{
-    provide: IMAGE_LOADER,
-    useValue: loaderFn
-  }];
+  const providers = [
+    {
+      provide: IMAGE_LOADER,
+      useValue: loaderFn,
+    },
+  ];
   return providers;
 }
-var validParams = /* @__PURE__ */ new Map([["height", "h"], ["fit", "fit"], ["quality", "q"], ["q", "q"], ["position", "position"]]);
+var validParams = /* @__PURE__ */ new Map([
+  ["height", "h"],
+  ["fit", "fit"],
+  ["quality", "q"],
+  ["q", "q"],
+  ["position", "position"],
+]);
 function createNetlifyUrl(config, path) {
   const url = new URL(path ?? "https://a/");
   url.pathname = "/.netlify/images";
@@ -3994,7 +4983,8 @@ function createNetlifyUrl(config, path) {
   if (config.width) {
     url.searchParams.set("w", config.width.toString());
   }
-  const configQuality = config.loaderParams?.["quality"] ?? config.loaderParams?.["q"];
+  const configQuality =
+    config.loaderParams?.["quality"] ?? config.loaderParams?.["q"];
   if (config.isPlaceholder && !configQuality) {
     url.searchParams.set("q", PLACEHOLDER_QUALITY);
   }
@@ -4003,19 +4993,29 @@ function createNetlifyUrl(config, path) {
       url.searchParams.set(validParams.get(param), value.toString());
     } else {
       if (ngDevMode) {
-        console.warn(formatRuntimeError(2959, `The Netlify image loader has detected an \`<img>\` tag with the unsupported attribute "\`${param}\`".`));
+        console.warn(
+          formatRuntimeError(
+            2959,
+            `The Netlify image loader has detected an \`<img>\` tag with the unsupported attribute "\`${param}\`".`,
+          ),
+        );
       }
     }
   }
   return url.hostname === "a" ? url.href.replace(url.origin, "") : url.href;
 }
 function imgDirectiveDetails(ngSrc, includeNgSrc = true) {
-  const ngSrcInfo = includeNgSrc ? `(activated on an <img> element with the \`ngSrc="${ngSrc}"\`) ` : "";
+  const ngSrcInfo = includeNgSrc
+    ? `(activated on an <img> element with the \`ngSrc="${ngSrc}"\`) `
+    : "";
   return `The NgOptimizedImage directive ${ngSrcInfo}has detected that`;
 }
 function assertDevMode(checkName) {
   if (!ngDevMode) {
-    throw new RuntimeError(2958, `Unexpected invocation of the ${checkName} in the prod mode. Please make sure that the prod mode is enabled for production builds.`);
+    throw new RuntimeError(
+      2958,
+      `Unexpected invocation of the ${checkName} in the prod mode. Please make sure that the prod mode is enabled for production builds.`,
+    );
   }
 }
 var LCPImageObserver = class _LCPImageObserver {
@@ -4056,7 +5056,7 @@ var LCPImageObserver = class _LCPImageObserver {
     });
     observer.observe({
       type: "largest-contentful-paint",
-      buffered: true
+      buffered: true,
     });
     return observer;
   }
@@ -4066,9 +5066,12 @@ var LCPImageObserver = class _LCPImageObserver {
       priority: isPriority,
       modified: false,
       alreadyWarnedModified: false,
-      alreadyWarnedPriority: false
+      alreadyWarnedPriority: false,
     };
-    this.images.set(getUrl(rewrittenSrc, this.window).href, newObservedImageState);
+    this.images.set(
+      getUrl(rewrittenSrc, this.window).href,
+      newObservedImageState,
+    );
   }
   unregisterImage(rewrittenSrc) {
     if (!this.observer) return;
@@ -4095,27 +5098,53 @@ var LCPImageObserver = class _LCPImageObserver {
   static ɵprov = ɵɵdefineInjectable({
     token: _LCPImageObserver,
     factory: _LCPImageObserver.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(LCPImageObserver, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      LCPImageObserver,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 function logMissingPriorityError(ngSrc) {
   const directiveDetails = imgDirectiveDetails(ngSrc);
-  console.error(formatRuntimeError(2955, `${directiveDetails} this image is the Largest Contentful Paint (LCP) element but was not marked "priority". This image should be marked "priority" in order to prioritize its loading. To fix this, add the "priority" attribute.`));
+  console.error(
+    formatRuntimeError(
+      2955,
+      `${directiveDetails} this image is the Largest Contentful Paint (LCP) element but was not marked "priority". This image should be marked "priority" in order to prioritize its loading. To fix this, add the "priority" attribute.`,
+    ),
+  );
 }
 function logModifiedWarning(ngSrc) {
   const directiveDetails = imgDirectiveDetails(ngSrc);
-  console.warn(formatRuntimeError(2964, `${directiveDetails} this image is the Largest Contentful Paint (LCP) element and has had its "ngSrc" attribute modified. This can cause slower loading performance. It is recommended not to modify the "ngSrc" property on any image which could be the LCP element.`));
+  console.warn(
+    formatRuntimeError(
+      2964,
+      `${directiveDetails} this image is the Largest Contentful Paint (LCP) element and has had its "ngSrc" attribute modified. This can cause slower loading performance. It is recommended not to modify the "ngSrc" property on any image which could be the LCP element.`,
+    ),
+  );
 }
-var INTERNAL_PRECONNECT_CHECK_BLOCKLIST = /* @__PURE__ */ new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
-var PRECONNECT_CHECK_BLOCKLIST = new InjectionToken(ngDevMode ? "PRECONNECT_CHECK_BLOCKLIST" : "");
+var INTERNAL_PRECONNECT_CHECK_BLOCKLIST = /* @__PURE__ */ new Set([
+  "localhost",
+  "127.0.0.1",
+  "0.0.0.0",
+]);
+var PRECONNECT_CHECK_BLOCKLIST = new InjectionToken(
+  ngDevMode ? "PRECONNECT_CHECK_BLOCKLIST" : "",
+);
 var PreconnectLinkChecker = class _PreconnectLinkChecker {
   document = inject(DOCUMENT);
   /**
@@ -4132,7 +5161,7 @@ var PreconnectLinkChecker = class _PreconnectLinkChecker {
   constructor() {
     assertDevMode("preconnect link checker");
     const blocklist = inject(PRECONNECT_CHECK_BLOCKLIST, {
-      optional: true
+      optional: true,
     });
     if (blocklist) {
       this.populateBlocklist(blocklist);
@@ -4157,12 +5186,21 @@ var PreconnectLinkChecker = class _PreconnectLinkChecker {
   assertPreconnect(rewrittenSrc, originalNgSrc) {
     if (false) return;
     const imgUrl = getUrl(rewrittenSrc, this.window);
-    if (this.blocklist.has(imgUrl.hostname) || this.alreadySeen.has(imgUrl.origin)) return;
+    if (
+      this.blocklist.has(imgUrl.hostname) ||
+      this.alreadySeen.has(imgUrl.origin)
+    )
+      return;
     this.alreadySeen.add(imgUrl.origin);
     this.preconnectLinks ??= this.queryPreconnectLinks();
     if (!this.preconnectLinks.has(imgUrl.origin)) {
-      console.warn(formatRuntimeError(2956, `${imgDirectiveDetails(originalNgSrc)} there is no preconnect tag present for this image. Preconnecting to the origin(s) that serve priority images ensures that these images are delivered as soon as possible. To fix this, please add the following element into the <head> of the document:
-  <link rel="preconnect" href="${imgUrl.origin}">`));
+      console.warn(
+        formatRuntimeError(
+          2956,
+          `${imgDirectiveDetails(originalNgSrc)} there is no preconnect tag present for this image. Preconnecting to the origin(s) that serve priority images ensures that these images are delivered as soon as possible. To fix this, please add the following element into the <head> of the document:
+  <link rel="preconnect" href="${imgUrl.origin}">`,
+        ),
+      );
     }
   }
   queryPreconnectLinks() {
@@ -4184,16 +5222,26 @@ var PreconnectLinkChecker = class _PreconnectLinkChecker {
   static ɵprov = ɵɵdefineInjectable({
     token: _PreconnectLinkChecker,
     factory: _PreconnectLinkChecker.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(PreconnectLinkChecker, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      PreconnectLinkChecker,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      () => [],
+      null,
+    );
 })();
 function deepForEach(input, fn) {
   for (let value of input) {
@@ -4201,10 +5249,15 @@ function deepForEach(input, fn) {
   }
 }
 var DEFAULT_PRELOADED_IMAGES_LIMIT = 5;
-var PRELOADED_IMAGES = new InjectionToken(typeof ngDevMode === "undefined" || ngDevMode ? "NG_OPTIMIZED_PRELOADED_IMAGES" : "", {
-  providedIn: "root",
-  factory: () => /* @__PURE__ */ new Set()
-});
+var PRELOADED_IMAGES = new InjectionToken(
+  typeof ngDevMode === "undefined" || ngDevMode
+    ? "NG_OPTIMIZED_PRELOADED_IMAGES"
+    : "",
+  {
+    providedIn: "root",
+    factory: () => /* @__PURE__ */ new Set(),
+  },
+);
 var PreloadLinkCreator = class _PreloadLinkCreator {
   preloadedImages = inject(PRELOADED_IMAGES);
   document = inject(DOCUMENT);
@@ -4226,9 +5279,18 @@ var PreloadLinkCreator = class _PreloadLinkCreator {
    * @param sizes The value of the `sizes` attribute passed in to the `<img>` tag
    */
   createPreloadLinkTag(renderer, src, srcset, sizes) {
-    if (ngDevMode && !this.errorShown && this.preloadedImages.size >= DEFAULT_PRELOADED_IMAGES_LIMIT) {
+    if (
+      ngDevMode &&
+      !this.errorShown &&
+      this.preloadedImages.size >= DEFAULT_PRELOADED_IMAGES_LIMIT
+    ) {
       this.errorShown = true;
-      console.warn(formatRuntimeError(2961, `The \`NgOptimizedImage\` directive has detected that more than ${DEFAULT_PRELOADED_IMAGES_LIMIT} images were marked as priority. This might negatively affect an overall performance of the page. To fix this, remove the "priority" attribute from images with less priority.`));
+      console.warn(
+        formatRuntimeError(
+          2961,
+          `The \`NgOptimizedImage\` directive has detected that more than ${DEFAULT_PRELOADED_IMAGES_LIMIT} images were marked as priority. This might negatively affect an overall performance of the page. To fix this, remove the "priority" attribute from images with less priority.`,
+        ),
+      );
     }
     if (this.preloadedImages.has(src)) {
       return;
@@ -4253,16 +5315,26 @@ var PreloadLinkCreator = class _PreloadLinkCreator {
   static ɵprov = ɵɵdefineInjectable({
     token: _PreloadLinkCreator,
     factory: _PreloadLinkCreator.ɵfac,
-    providedIn: "root"
+    providedIn: "root",
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(PreloadLinkCreator, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], null, null);
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      PreloadLinkCreator,
+      [
+        {
+          type: Injectable,
+          args: [
+            {
+              providedIn: "root",
+            },
+          ],
+        },
+      ],
+      null,
+      null,
+    );
 })();
 var BASE64_IMG_MAX_LENGTH_IN_ERROR = 50;
 var VALID_WIDTH_DESCRIPTOR_SRCSET = /^((\s*\d+w\s*(,|$)){1,})$/;
@@ -4279,7 +5351,12 @@ var PLACEHOLDER_BLUR_AMOUNT = 15;
 var PLACEHOLDER_DIMENSION_LIMIT = 1e3;
 var DATA_URL_WARN_LIMIT = 4e3;
 var DATA_URL_ERROR_LIMIT = 1e4;
-var BUILT_IN_LOADERS = [imgixLoaderInfo, imageKitLoaderInfo, cloudinaryLoaderInfo, netlifyLoaderInfo];
+var BUILT_IN_LOADERS = [
+  imgixLoaderInfo,
+  imageKitLoaderInfo,
+  cloudinaryLoaderInfo,
+  netlifyLoaderInfo,
+];
 var PRIORITY_COUNT_THRESHOLD = 10;
 var IMGS_WITH_PRIORITY_ATTR_COUNT = 0;
 var NgOptimizedImage = class _NgOptimizedImage {
@@ -4406,7 +5483,9 @@ var NgOptimizedImage = class _NgOptimizedImage {
       assertNotBlobUrl(this);
       if (this.fill) {
         assertEmptyWidthAndHeight(this);
-        ngZone.runOutsideAngular(() => assertNonZeroRenderedHeight(this, this.imgElement, this.renderer));
+        ngZone.runOutsideAngular(() =>
+          assertNonZeroRenderedHeight(this, this.imgElement, this.renderer),
+        );
       } else {
         assertNonEmptyWidthAndHeight(this);
         if (this.height !== void 0) {
@@ -4415,7 +5494,9 @@ var NgOptimizedImage = class _NgOptimizedImage {
         if (this.width !== void 0) {
           assertGreaterThanZero(this, this.width, "width");
         }
-        ngZone.runOutsideAngular(() => assertNoImageDistortion(this, this.imgElement, this.renderer));
+        ngZone.runOutsideAngular(() =>
+          assertNoImageDistortion(this, this.imgElement, this.renderer),
+        );
       }
       assertValidLoadingInput(this);
       if (!this.ngSrcset) {
@@ -4426,7 +5507,11 @@ var NgOptimizedImage = class _NgOptimizedImage {
       assertNoNgSrcsetWithoutLoader(this, this.imageLoader);
       assertNoLoaderParamsWithoutLoader(this, this.imageLoader);
       ngZone.runOutsideAngular(() => {
-        this.lcpObserver.registerImage(this.getRewrittenSrc(), this.ngSrc, this.priority);
+        this.lcpObserver.registerImage(
+          this.getRewrittenSrc(),
+          this.ngSrc,
+          this.priority,
+        );
       });
       if (this.priority) {
         const checker = this.injector.get(PreconnectLinkChecker);
@@ -4460,19 +5545,38 @@ var NgOptimizedImage = class _NgOptimizedImage {
         this.setHostAttribute("sizes", this.sizes);
       }
     } else {
-      if (this.ngSrcset && VALID_WIDTH_DESCRIPTOR_SRCSET.test(this.ngSrcset) && this.getLoadingBehavior() === "lazy") {
+      if (
+        this.ngSrcset &&
+        VALID_WIDTH_DESCRIPTOR_SRCSET.test(this.ngSrcset) &&
+        this.getLoadingBehavior() === "lazy"
+      ) {
         this.setHostAttribute("sizes", "auto, 100vw");
       }
     }
     if (false) {
       const preloadLinkCreator = this.injector.get(PreloadLinkCreator);
-      preloadLinkCreator.createPreloadLinkTag(this.renderer, this.getRewrittenSrc(), rewrittenSrcset, this.sizes);
+      preloadLinkCreator.createPreloadLinkTag(
+        this.renderer,
+        this.getRewrittenSrc(),
+        rewrittenSrcset,
+        this.sizes,
+      );
     }
   }
   /** @docs-private */
   ngOnChanges(changes) {
     if (ngDevMode) {
-      assertNoPostInitInputChange(this, changes, ["ngSrcset", "width", "height", "priority", "fill", "loading", "sizes", "loaderParams", "disableOptimizedSrcset"]);
+      assertNoPostInitInputChange(this, changes, [
+        "ngSrcset",
+        "width",
+        "height",
+        "priority",
+        "fill",
+        "loading",
+        "sizes",
+        "loaderParams",
+        "disableOptimizedSrcset",
+      ]);
     }
     if (changes["ngSrc"] && !changes["ngSrc"].isFirstChange()) {
       const oldSrc = this._renderedSrc;
@@ -4510,7 +5614,7 @@ var NgOptimizedImage = class _NgOptimizedImage {
   getRewrittenSrc() {
     if (!this._renderedSrc) {
       const imgConfig = {
-        src: this.ngSrc
+        src: this.ngSrc,
       };
       this._renderedSrc = this.callImageLoader(imgConfig);
     }
@@ -4518,14 +5622,19 @@ var NgOptimizedImage = class _NgOptimizedImage {
   }
   getRewrittenSrcset() {
     const widthSrcSet = VALID_WIDTH_DESCRIPTOR_SRCSET.test(this.ngSrcset);
-    const finalSrcs = this.ngSrcset.split(",").filter((src) => src !== "").map((srcStr) => {
-      srcStr = srcStr.trim();
-      const width = widthSrcSet ? parseFloat(srcStr) : parseFloat(srcStr) * this.width;
-      return `${this.callImageLoader({
-        src: this.ngSrc,
-        width
-      })} ${srcStr}`;
-    });
+    const finalSrcs = this.ngSrcset
+      .split(",")
+      .filter((src) => src !== "")
+      .map((srcStr) => {
+        srcStr = srcStr.trim();
+        const width = widthSrcSet
+          ? parseFloat(srcStr)
+          : parseFloat(srcStr) * this.width;
+        return `${this.callImageLoader({
+          src: this.ngSrc,
+          width,
+        })} ${srcStr}`;
+      });
     return finalSrcs.join(", ");
   }
   getAutomaticSrcset() {
@@ -4536,17 +5645,20 @@ var NgOptimizedImage = class _NgOptimizedImage {
     }
   }
   getResponsiveSrcset() {
-    const {
-      breakpoints
-    } = this.config;
+    const { breakpoints } = this.config;
     let filteredBreakpoints = breakpoints;
     if (this.sizes?.trim() === "100vw") {
-      filteredBreakpoints = breakpoints.filter((bp) => bp >= VIEWPORT_BREAKPOINT_CUTOFF);
+      filteredBreakpoints = breakpoints.filter(
+        (bp) => bp >= VIEWPORT_BREAKPOINT_CUTOFF,
+      );
     }
-    const finalSrcs = filteredBreakpoints.map((bp) => `${this.callImageLoader({
-      src: this.ngSrc,
-      width: bp
-    })} ${bp}w`);
+    const finalSrcs = filteredBreakpoints.map(
+      (bp) =>
+        `${this.callImageLoader({
+          src: this.ngSrc,
+          width: bp,
+        })} ${bp}w`,
+    );
     return finalSrcs.join(", ");
   }
   updateSrcAndSrcset(forceSrcRecalc = false) {
@@ -4567,18 +5679,28 @@ var NgOptimizedImage = class _NgOptimizedImage {
     return rewrittenSrcset;
   }
   getFixedSrcset() {
-    const finalSrcs = DENSITY_SRCSET_MULTIPLIERS.map((multiplier) => `${this.callImageLoader({
-      src: this.ngSrc,
-      width: this.width * multiplier
-    })} ${multiplier}x`);
+    const finalSrcs = DENSITY_SRCSET_MULTIPLIERS.map(
+      (multiplier) =>
+        `${this.callImageLoader({
+          src: this.ngSrc,
+          width: this.width * multiplier,
+        })} ${multiplier}x`,
+    );
     return finalSrcs.join(", ");
   }
   shouldGenerateAutomaticSrcset() {
     let oversizedImage = false;
     if (!this.sizes) {
-      oversizedImage = this.width > FIXED_SRCSET_WIDTH_LIMIT || this.height > FIXED_SRCSET_HEIGHT_LIMIT;
+      oversizedImage =
+        this.width > FIXED_SRCSET_WIDTH_LIMIT ||
+        this.height > FIXED_SRCSET_HEIGHT_LIMIT;
     }
-    return !this.disableOptimizedSrcset && !this.srcset && this.imageLoader !== noopImageLoader && !oversizedImage;
+    return (
+      !this.disableOptimizedSrcset &&
+      !this.srcset &&
+      this.imageLoader !== noopImageLoader &&
+      !oversizedImage
+    );
   }
   /**
    * Returns an image url formatted for use with the CSS background-image property. Expects one of:
@@ -4586,14 +5708,12 @@ var NgOptimizedImage = class _NgOptimizedImage {
    * * A boolean. If true, calls the image loader to generate a small placeholder url.
    */
   generatePlaceholder(placeholderInput) {
-    const {
-      placeholderResolution
-    } = this.config;
+    const { placeholderResolution } = this.config;
     if (placeholderInput === true) {
       return `url(${this.callImageLoader({
         src: this.ngSrc,
         width: placeholderResolution,
-        isPlaceholder: true
+        isPlaceholder: true,
       })})`;
     } else if (typeof placeholderInput === "string") {
       return `url(${placeholderInput})`;
@@ -4634,7 +5754,24 @@ var NgOptimizedImage = class _NgOptimizedImage {
     hostVars: 18,
     hostBindings: function NgOptimizedImage_HostBindings(rf, ctx) {
       if (rf & 2) {
-        ɵɵstyleProp("position", ctx.fill ? "absolute" : null)("width", ctx.fill ? "100%" : null)("height", ctx.fill ? "100%" : null)("inset", ctx.fill ? "0" : null)("background-size", ctx.placeholder ? "cover" : null)("background-position", ctx.placeholder ? "50% 50%" : null)("background-repeat", ctx.placeholder ? "no-repeat" : null)("background-image", ctx.placeholder ? ctx.generatePlaceholder(ctx.placeholder) : null)("filter", ctx.placeholder && ctx.shouldBlurPlaceholder(ctx.placeholderConfig) ? "blur(15px)" : null);
+        ɵɵstyleProp("position", ctx.fill ? "absolute" : null)(
+          "width",
+          ctx.fill ? "100%" : null,
+        )("height", ctx.fill ? "100%" : null)("inset", ctx.fill ? "0" : null)(
+          "background-size",
+          ctx.placeholder ? "cover" : null,
+        )("background-position", ctx.placeholder ? "50% 50%" : null)(
+          "background-repeat",
+          ctx.placeholder ? "no-repeat" : null,
+        )(
+          "background-image",
+          ctx.placeholder ? ctx.generatePlaceholder(ctx.placeholder) : null,
+        )(
+          "filter",
+          ctx.placeholder && ctx.shouldBlurPlaceholder(ctx.placeholderConfig)
+            ? "blur(15px)"
+            : null,
+        );
       }
     },
     inputs: {
@@ -4646,99 +5783,157 @@ var NgOptimizedImage = class _NgOptimizedImage {
       loading: "loading",
       priority: [2, "priority", "priority", booleanAttribute],
       loaderParams: "loaderParams",
-      disableOptimizedSrcset: [2, "disableOptimizedSrcset", "disableOptimizedSrcset", booleanAttribute],
+      disableOptimizedSrcset: [
+        2,
+        "disableOptimizedSrcset",
+        "disableOptimizedSrcset",
+        booleanAttribute,
+      ],
       fill: [2, "fill", "fill", booleanAttribute],
       placeholder: [2, "placeholder", "placeholder", booleanOrUrlAttribute],
       placeholderConfig: "placeholderConfig",
       src: "src",
-      srcset: "srcset"
+      srcset: "srcset",
     },
-    features: [ɵɵNgOnChangesFeature]
+    features: [ɵɵNgOnChangesFeature],
   });
 };
 (() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(NgOptimizedImage, [{
-    type: Directive,
-    args: [{
-      selector: "img[ngSrc]",
-      host: {
-        "[style.position]": 'fill ? "absolute" : null',
-        "[style.width]": 'fill ? "100%" : null',
-        "[style.height]": 'fill ? "100%" : null',
-        "[style.inset]": 'fill ? "0" : null',
-        "[style.background-size]": 'placeholder ? "cover" : null',
-        "[style.background-position]": 'placeholder ? "50% 50%" : null',
-        "[style.background-repeat]": 'placeholder ? "no-repeat" : null',
-        "[style.background-image]": "placeholder ? generatePlaceholder(placeholder) : null",
-        "[style.filter]": `placeholder && shouldBlurPlaceholder(placeholderConfig) ? "blur(${PLACEHOLDER_BLUR_AMOUNT}px)" : null`
-      }
-    }]
-  }], () => [], {
-    ngSrc: [{
-      type: Input,
-      args: [{
-        required: true,
-        transform: unwrapSafeUrl
-      }]
-    }],
-    ngSrcset: [{
-      type: Input
-    }],
-    sizes: [{
-      type: Input
-    }],
-    width: [{
-      type: Input,
-      args: [{
-        transform: numberAttribute
-      }]
-    }],
-    height: [{
-      type: Input,
-      args: [{
-        transform: numberAttribute
-      }]
-    }],
-    loading: [{
-      type: Input
-    }],
-    priority: [{
-      type: Input,
-      args: [{
-        transform: booleanAttribute
-      }]
-    }],
-    loaderParams: [{
-      type: Input
-    }],
-    disableOptimizedSrcset: [{
-      type: Input,
-      args: [{
-        transform: booleanAttribute
-      }]
-    }],
-    fill: [{
-      type: Input,
-      args: [{
-        transform: booleanAttribute
-      }]
-    }],
-    placeholder: [{
-      type: Input,
-      args: [{
-        transform: booleanOrUrlAttribute
-      }]
-    }],
-    placeholderConfig: [{
-      type: Input
-    }],
-    src: [{
-      type: Input
-    }],
-    srcset: [{
-      type: Input
-    }]
-  });
+  (typeof ngDevMode === "undefined" || ngDevMode) &&
+    setClassMetadata(
+      NgOptimizedImage,
+      [
+        {
+          type: Directive,
+          args: [
+            {
+              selector: "img[ngSrc]",
+              host: {
+                "[style.position]": 'fill ? "absolute" : null',
+                "[style.width]": 'fill ? "100%" : null',
+                "[style.height]": 'fill ? "100%" : null',
+                "[style.inset]": 'fill ? "0" : null',
+                "[style.background-size]": 'placeholder ? "cover" : null',
+                "[style.background-position]": 'placeholder ? "50% 50%" : null',
+                "[style.background-repeat]": 'placeholder ? "no-repeat" : null',
+                "[style.background-image]":
+                  "placeholder ? generatePlaceholder(placeholder) : null",
+                "[style.filter]": `placeholder && shouldBlurPlaceholder(placeholderConfig) ? "blur(${PLACEHOLDER_BLUR_AMOUNT}px)" : null`,
+              },
+            },
+          ],
+        },
+      ],
+      () => [],
+      {
+        ngSrc: [
+          {
+            type: Input,
+            args: [
+              {
+                required: true,
+                transform: unwrapSafeUrl,
+              },
+            ],
+          },
+        ],
+        ngSrcset: [
+          {
+            type: Input,
+          },
+        ],
+        sizes: [
+          {
+            type: Input,
+          },
+        ],
+        width: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: numberAttribute,
+              },
+            ],
+          },
+        ],
+        height: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: numberAttribute,
+              },
+            ],
+          },
+        ],
+        loading: [
+          {
+            type: Input,
+          },
+        ],
+        priority: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        loaderParams: [
+          {
+            type: Input,
+          },
+        ],
+        disableOptimizedSrcset: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        fill: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: booleanAttribute,
+              },
+            ],
+          },
+        ],
+        placeholder: [
+          {
+            type: Input,
+            args: [
+              {
+                transform: booleanOrUrlAttribute,
+              },
+            ],
+          },
+        ],
+        placeholderConfig: [
+          {
+            type: Input,
+          },
+        ],
+        src: [
+          {
+            type: Input,
+          },
+        ],
+        srcset: [
+          {
+            type: Input,
+          },
+        ],
+      },
+    );
 })();
 function processConfig(config) {
   let sortedBreakpoints = {};
@@ -4749,12 +5944,18 @@ function processConfig(config) {
 }
 function assertNoConflictingSrc(dir) {
   if (dir.src) {
-    throw new RuntimeError(2950, `${imgDirectiveDetails(dir.ngSrc)} both \`src\` and \`ngSrc\` have been set. Supplying both of these attributes breaks lazy loading. The NgOptimizedImage directive sets \`src\` itself based on the value of \`ngSrc\`. To fix this, please remove the \`src\` attribute.`);
+    throw new RuntimeError(
+      2950,
+      `${imgDirectiveDetails(dir.ngSrc)} both \`src\` and \`ngSrc\` have been set. Supplying both of these attributes breaks lazy loading. The NgOptimizedImage directive sets \`src\` itself based on the value of \`ngSrc\`. To fix this, please remove the \`src\` attribute.`,
+    );
   }
 }
 function assertNoConflictingSrcset(dir) {
   if (dir.srcset) {
-    throw new RuntimeError(2951, `${imgDirectiveDetails(dir.ngSrc)} both \`srcset\` and \`ngSrcset\` have been set. Supplying both of these attributes breaks lazy loading. The NgOptimizedImage directive sets \`srcset\` itself based on the value of \`ngSrcset\`. To fix this, please remove the \`srcset\` attribute.`);
+    throw new RuntimeError(
+      2951,
+      `${imgDirectiveDetails(dir.ngSrc)} both \`srcset\` and \`ngSrcset\` have been set. Supplying both of these attributes breaks lazy loading. The NgOptimizedImage directive sets \`srcset\` itself based on the value of \`ngSrcset\`. To fix this, please remove the \`srcset\` attribute.`,
+    );
   }
 }
 function assertNotBase64Image(dir) {
@@ -4763,13 +5964,19 @@ function assertNotBase64Image(dir) {
     if (ngSrc.length > BASE64_IMG_MAX_LENGTH_IN_ERROR) {
       ngSrc = ngSrc.substring(0, BASE64_IMG_MAX_LENGTH_IN_ERROR) + "...";
     }
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc, false)} \`ngSrc\` is a Base64-encoded string (${ngSrc}). NgOptimizedImage does not support Base64-encoded strings. To fix this, disable the NgOptimizedImage directive for this element by removing \`ngSrc\` and using a standard \`src\` attribute instead.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc, false)} \`ngSrc\` is a Base64-encoded string (${ngSrc}). NgOptimizedImage does not support Base64-encoded strings. To fix this, disable the NgOptimizedImage directive for this element by removing \`ngSrc\` and using a standard \`src\` attribute instead.`,
+    );
   }
 }
 function assertNoComplexSizes(dir) {
   let sizes = dir.sizes;
   if (sizes?.match(/((\)|,)\s|^)\d+px/)) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc, false)} \`sizes\` was set to a string including pixel values. For automatic \`srcset\` generation, \`sizes\` must only include responsive values, such as \`sizes="50vw"\` or \`sizes="(min-width: 768px) 50vw, 100vw"\`. To fix this, modify the \`sizes\` attribute, or provide your own \`ngSrcset\` value directly.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc, false)} \`sizes\` was set to a string including pixel values. For automatic \`srcset\` generation, \`sizes\` must only include responsive values, such as \`sizes="50vw"\` or \`sizes="(min-width: 768px) 50vw, 100vw"\`. To fix this, modify the \`sizes\` attribute, or provide your own \`ngSrcset\` value directly.`,
+    );
   }
 }
 function assertValidPlaceholder(dir, imageLoader) {
@@ -4779,35 +5986,59 @@ function assertValidPlaceholder(dir, imageLoader) {
 }
 function assertNoPlaceholderConfigWithoutPlaceholder(dir) {
   if (dir.placeholderConfig && !dir.placeholder) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc, false)} \`placeholderConfig\` options were provided for an image that does not use the \`placeholder\` attribute, and will have no effect.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc, false)} \`placeholderConfig\` options were provided for an image that does not use the \`placeholder\` attribute, and will have no effect.`,
+    );
   }
 }
 function assertNoRelativePlaceholderWithoutLoader(dir, imageLoader) {
   if (dir.placeholder === true && imageLoader === noopImageLoader) {
-    throw new RuntimeError(2963, `${imgDirectiveDetails(dir.ngSrc)} the \`placeholder\` attribute is set to true but no image loader is configured (i.e. the default one is being used), which would result in the same image being used for the primary image and its placeholder. To fix this, provide a loader or remove the \`placeholder\` attribute from the image.`);
+    throw new RuntimeError(
+      2963,
+      `${imgDirectiveDetails(dir.ngSrc)} the \`placeholder\` attribute is set to true but no image loader is configured (i.e. the default one is being used), which would result in the same image being used for the primary image and its placeholder. To fix this, provide a loader or remove the \`placeholder\` attribute from the image.`,
+    );
   }
 }
 function assertNoOversizedDataUrl(dir) {
-  if (dir.placeholder && typeof dir.placeholder === "string" && dir.placeholder.startsWith("data:")) {
+  if (
+    dir.placeholder &&
+    typeof dir.placeholder === "string" &&
+    dir.placeholder.startsWith("data:")
+  ) {
     if (dir.placeholder.length > DATA_URL_ERROR_LIMIT) {
-      throw new RuntimeError(2965, `${imgDirectiveDetails(dir.ngSrc)} the \`placeholder\` attribute is set to a data URL which is longer than ${DATA_URL_ERROR_LIMIT} characters. This is strongly discouraged, as large inline placeholders directly increase the bundle size of Angular and hurt page load performance. To fix this, generate a smaller data URL placeholder.`);
+      throw new RuntimeError(
+        2965,
+        `${imgDirectiveDetails(dir.ngSrc)} the \`placeholder\` attribute is set to a data URL which is longer than ${DATA_URL_ERROR_LIMIT} characters. This is strongly discouraged, as large inline placeholders directly increase the bundle size of Angular and hurt page load performance. To fix this, generate a smaller data URL placeholder.`,
+      );
     }
     if (dir.placeholder.length > DATA_URL_WARN_LIMIT) {
-      console.warn(formatRuntimeError(2965, `${imgDirectiveDetails(dir.ngSrc)} the \`placeholder\` attribute is set to a data URL which is longer than ${DATA_URL_WARN_LIMIT} characters. This is discouraged, as large inline placeholders directly increase the bundle size of Angular and hurt page load performance. For better loading performance, generate a smaller data URL placeholder.`));
+      console.warn(
+        formatRuntimeError(
+          2965,
+          `${imgDirectiveDetails(dir.ngSrc)} the \`placeholder\` attribute is set to a data URL which is longer than ${DATA_URL_WARN_LIMIT} characters. This is discouraged, as large inline placeholders directly increase the bundle size of Angular and hurt page load performance. For better loading performance, generate a smaller data URL placeholder.`,
+        ),
+      );
     }
   }
 }
 function assertNotBlobUrl(dir) {
   const ngSrc = dir.ngSrc.trim();
   if (ngSrc.startsWith("blob:")) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} \`ngSrc\` was set to a blob URL (${ngSrc}). Blob URLs are not supported by the NgOptimizedImage directive. To fix this, disable the NgOptimizedImage directive for this element by removing \`ngSrc\` and using a regular \`src\` attribute instead.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} \`ngSrc\` was set to a blob URL (${ngSrc}). Blob URLs are not supported by the NgOptimizedImage directive. To fix this, disable the NgOptimizedImage directive for this element by removing \`ngSrc\` and using a regular \`src\` attribute instead.`,
+    );
   }
 }
 function assertNonEmptyInput(dir, name, value) {
   const isString = typeof value === "string";
   const isEmptyString = isString && value.trim() === "";
   if (!isString || isEmptyString) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} \`${name}\` has an invalid value (\`${value}\`). To fix this, change the value to a non-empty string.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} \`${name}\` has an invalid value (\`${value}\`). To fix this, change the value to a non-empty string.`,
+    );
   }
 }
 function assertValidNgSrcset(dir, value) {
@@ -4815,19 +6046,30 @@ function assertValidNgSrcset(dir, value) {
   assertNonEmptyInput(dir, "ngSrcset", value);
   const stringVal = value;
   const isValidWidthDescriptor = VALID_WIDTH_DESCRIPTOR_SRCSET.test(stringVal);
-  const isValidDensityDescriptor = VALID_DENSITY_DESCRIPTOR_SRCSET.test(stringVal);
+  const isValidDensityDescriptor =
+    VALID_DENSITY_DESCRIPTOR_SRCSET.test(stringVal);
   if (isValidDensityDescriptor) {
     assertUnderDensityCap(dir, stringVal);
   }
   const isValidSrcset = isValidWidthDescriptor || isValidDensityDescriptor;
   if (!isValidSrcset) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} \`ngSrcset\` has an invalid value (\`${value}\`). To fix this, supply \`ngSrcset\` using a comma-separated list of one or more width descriptors (e.g. "100w, 200w") or density descriptors (e.g. "1x, 2x").`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} \`ngSrcset\` has an invalid value (\`${value}\`). To fix this, supply \`ngSrcset\` using a comma-separated list of one or more width descriptors (e.g. "100w, 200w") or density descriptors (e.g. "1x, 2x").`,
+    );
   }
 }
 function assertUnderDensityCap(dir, value) {
-  const underDensityCap = value.split(",").every((num) => num === "" || parseFloat(num) <= ABSOLUTE_SRCSET_DENSITY_CAP);
+  const underDensityCap = value
+    .split(",")
+    .every(
+      (num) => num === "" || parseFloat(num) <= ABSOLUTE_SRCSET_DENSITY_CAP,
+    );
   if (!underDensityCap) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the \`ngSrcset\` contains an unsupported image density:\`${value}\`. NgOptimizedImage generally recommends a max image density of ${RECOMMENDED_SRCSET_DENSITY_CAP}x but supports image densities up to ${ABSOLUTE_SRCSET_DENSITY_CAP}x. The human eye cannot distinguish between image densities greater than ${RECOMMENDED_SRCSET_DENSITY_CAP}x - which makes them unnecessary for most use cases. Images that will be pinch-zoomed are typically the primary use case for ${ABSOLUTE_SRCSET_DENSITY_CAP}x images. Please remove the high density descriptor and try again.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} the \`ngSrcset\` contains an unsupported image density:\`${value}\`. NgOptimizedImage generally recommends a max image density of ${RECOMMENDED_SRCSET_DENSITY_CAP}x but supports image densities up to ${ABSOLUTE_SRCSET_DENSITY_CAP}x. The human eye cannot distinguish between image densities greater than ${RECOMMENDED_SRCSET_DENSITY_CAP}x - which makes them unnecessary for most use cases. Images that will be pinch-zoomed are typically the primary use case for ${ABSOLUTE_SRCSET_DENSITY_CAP}x images. Please remove the high density descriptor and try again.`,
+    );
   }
 }
 function postInitInputChangeError(dir, inputName) {
@@ -4837,7 +6079,10 @@ function postInitInputChangeError(dir, inputName) {
   } else {
     reason = `Changing the \`${inputName}\` would have no effect on the underlying image element, because the resource loading has already occurred.`;
   }
-  return new RuntimeError(2953, `${imgDirectiveDetails(dir.ngSrc)} \`${inputName}\` was updated after initialization. The NgOptimizedImage directive will not react to this input change. ${reason} To fix this, either switch \`${inputName}\` to a static value or wrap the image element in an @if that is gated on the necessary value.`);
+  return new RuntimeError(
+    2953,
+    `${imgDirectiveDetails(dir.ngSrc)} \`${inputName}\` was updated after initialization. The NgOptimizedImage directive will not react to this input change. ${reason} To fix this, either switch \`${inputName}\` to a static value or wrap the image element in an @if that is gated on the necessary value.`,
+  );
 }
 function assertNoPostInitInputChange(dir, changes, inputs) {
   inputs.forEach((input) => {
@@ -4845,7 +6090,7 @@ function assertNoPostInitInputChange(dir, changes, inputs) {
     if (isUpdated && !changes[input].isFirstChange()) {
       if (input === "ngSrc") {
         dir = {
-          ngSrc: changes[input].previousValue
+          ngSrc: changes[input].previousValue,
         };
       }
       throw postInitInputChangeError(dir, input);
@@ -4854,9 +6099,15 @@ function assertNoPostInitInputChange(dir, changes, inputs) {
 }
 function assertGreaterThanZero(dir, inputValue, inputName) {
   const validNumber = typeof inputValue === "number" && inputValue > 0;
-  const validString = typeof inputValue === "string" && /^\d+$/.test(inputValue.trim()) && parseInt(inputValue) > 0;
+  const validString =
+    typeof inputValue === "string" &&
+    /^\d+$/.test(inputValue.trim()) &&
+    parseInt(inputValue) > 0;
   if (!validNumber && !validString) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} \`${inputName}\` has an invalid value. To fix this, provide \`${inputName}\` as a number greater than 0.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} \`${inputName}\` has an invalid value. To fix this, provide \`${inputName}\` as a number greater than 0.`,
+    );
   }
 }
 function assertNoImageDistortion(dir, img, renderer) {
@@ -4876,36 +6127,59 @@ function assertNoImageDistortion(dir, img, renderer) {
       renderedHeight -= parseFloat(paddingTop) + parseFloat(paddingBottom);
     }
     const renderedAspectRatio = renderedWidth / renderedHeight;
-    const nonZeroRenderedDimensions = renderedWidth !== 0 && renderedHeight !== 0;
+    const nonZeroRenderedDimensions =
+      renderedWidth !== 0 && renderedHeight !== 0;
     const intrinsicWidth = img.naturalWidth;
     const intrinsicHeight = img.naturalHeight;
     const intrinsicAspectRatio = intrinsicWidth / intrinsicHeight;
     const suppliedWidth = dir.width;
     const suppliedHeight = dir.height;
     const suppliedAspectRatio = suppliedWidth / suppliedHeight;
-    const inaccurateDimensions = Math.abs(suppliedAspectRatio - intrinsicAspectRatio) > ASPECT_RATIO_TOLERANCE;
-    const stylingDistortion = nonZeroRenderedDimensions && Math.abs(intrinsicAspectRatio - renderedAspectRatio) > ASPECT_RATIO_TOLERANCE;
+    const inaccurateDimensions =
+      Math.abs(suppliedAspectRatio - intrinsicAspectRatio) >
+      ASPECT_RATIO_TOLERANCE;
+    const stylingDistortion =
+      nonZeroRenderedDimensions &&
+      Math.abs(intrinsicAspectRatio - renderedAspectRatio) >
+        ASPECT_RATIO_TOLERANCE;
     if (inaccurateDimensions) {
-      console.warn(formatRuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the aspect ratio of the image does not match the aspect ratio indicated by the width and height attributes. 
+      console.warn(
+        formatRuntimeError(
+          2952,
+          `${imgDirectiveDetails(dir.ngSrc)} the aspect ratio of the image does not match the aspect ratio indicated by the width and height attributes. 
 Intrinsic image size: ${intrinsicWidth}w x ${intrinsicHeight}h (aspect-ratio: ${round(intrinsicAspectRatio)}). 
 Supplied width and height attributes: ${suppliedWidth}w x ${suppliedHeight}h (aspect-ratio: ${round(suppliedAspectRatio)}). 
-To fix this, update the width and height attributes.`));
+To fix this, update the width and height attributes.`,
+        ),
+      );
     } else if (stylingDistortion) {
-      console.warn(formatRuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the aspect ratio of the rendered image does not match the image's intrinsic aspect ratio. 
+      console.warn(
+        formatRuntimeError(
+          2952,
+          `${imgDirectiveDetails(dir.ngSrc)} the aspect ratio of the rendered image does not match the image's intrinsic aspect ratio. 
 Intrinsic image size: ${intrinsicWidth}w x ${intrinsicHeight}h (aspect-ratio: ${round(intrinsicAspectRatio)}). 
 Rendered image size: ${renderedWidth}w x ${renderedHeight}h (aspect-ratio: ${round(renderedAspectRatio)}). 
-This issue can occur if "width" and "height" attributes are added to an image without updating the corresponding image styling. To fix this, adjust image styling. In most cases, adding "height: auto" or "width: auto" to the image styling will fix this issue.`));
+This issue can occur if "width" and "height" attributes are added to an image without updating the corresponding image styling. To fix this, adjust image styling. In most cases, adding "height: auto" or "width: auto" to the image styling will fix this issue.`,
+        ),
+      );
     } else if (!dir.ngSrcset && nonZeroRenderedDimensions) {
       const recommendedWidth = RECOMMENDED_SRCSET_DENSITY_CAP * renderedWidth;
       const recommendedHeight = RECOMMENDED_SRCSET_DENSITY_CAP * renderedHeight;
-      const oversizedWidth = intrinsicWidth - recommendedWidth >= OVERSIZED_IMAGE_TOLERANCE;
-      const oversizedHeight = intrinsicHeight - recommendedHeight >= OVERSIZED_IMAGE_TOLERANCE;
+      const oversizedWidth =
+        intrinsicWidth - recommendedWidth >= OVERSIZED_IMAGE_TOLERANCE;
+      const oversizedHeight =
+        intrinsicHeight - recommendedHeight >= OVERSIZED_IMAGE_TOLERANCE;
       if (oversizedWidth || oversizedHeight) {
-        console.warn(formatRuntimeError(2960, `${imgDirectiveDetails(dir.ngSrc)} the intrinsic image is significantly larger than necessary. 
+        console.warn(
+          formatRuntimeError(
+            2960,
+            `${imgDirectiveDetails(dir.ngSrc)} the intrinsic image is significantly larger than necessary. 
 Rendered image size: ${renderedWidth}w x ${renderedHeight}h. 
 Intrinsic image size: ${intrinsicWidth}w x ${intrinsicHeight}h. 
 Recommended intrinsic image size: ${recommendedWidth}w x ${recommendedHeight}h. 
-Note: Recommended intrinsic image size is calculated assuming a maximum DPR of ${RECOMMENDED_SRCSET_DENSITY_CAP}. To improve loading time, resize the image or consider using the "ngSrcset" and "sizes" attributes.`));
+Note: Recommended intrinsic image size is calculated assuming a maximum DPR of ${RECOMMENDED_SRCSET_DENSITY_CAP}. To improve loading time, resize the image or consider using the "ngSrcset" and "sizes" attributes.`,
+          ),
+        );
       }
     }
   };
@@ -4921,12 +6195,18 @@ function assertNonEmptyWidthAndHeight(dir) {
   if (dir.width === void 0) missingAttributes.push("width");
   if (dir.height === void 0) missingAttributes.push("height");
   if (missingAttributes.length > 0) {
-    throw new RuntimeError(2954, `${imgDirectiveDetails(dir.ngSrc)} these required attributes are missing: ${missingAttributes.map((attr) => `"${attr}"`).join(", ")}. Including "width" and "height" attributes will prevent image-related layout shifts. To fix this, include "width" and "height" attributes on the image tag or turn on "fill" mode with the \`fill\` attribute.`);
+    throw new RuntimeError(
+      2954,
+      `${imgDirectiveDetails(dir.ngSrc)} these required attributes are missing: ${missingAttributes.map((attr) => `"${attr}"`).join(", ")}. Including "width" and "height" attributes will prevent image-related layout shifts. To fix this, include "width" and "height" attributes on the image tag or turn on "fill" mode with the \`fill\` attribute.`,
+    );
   }
 }
 function assertEmptyWidthAndHeight(dir) {
   if (dir.width || dir.height) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the attributes \`height\` and/or \`width\` are present along with the \`fill\` attribute. Because \`fill\` mode causes an image to fill its containing element, the size attributes have no effect and should be removed.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} the attributes \`height\` and/or \`width\` are present along with the \`fill\` attribute. Because \`fill\` mode causes an image to fill its containing element, the size attributes have no effect and should be removed.`,
+    );
   }
 }
 function assertNonZeroRenderedHeight(dir, img, renderer) {
@@ -4935,7 +6215,12 @@ function assertNonZeroRenderedHeight(dir, img, renderer) {
     removeErrorListenerFn();
     const renderedHeight = img.clientHeight;
     if (dir.fill && renderedHeight === 0) {
-      console.warn(formatRuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the height of the fill-mode image is zero. This is likely because the containing element does not have the CSS 'position' property set to one of the following: "relative", "fixed", or "absolute". To fix this problem, make sure the container element has the CSS 'position' property defined and the height of the element is not zero.`));
+      console.warn(
+        formatRuntimeError(
+          2952,
+          `${imgDirectiveDetails(dir.ngSrc)} the height of the fill-mode image is zero. This is likely because the containing element does not have the CSS 'position' property set to one of the following: "relative", "fixed", or "absolute". To fix this problem, make sure the container element has the CSS 'position' property defined and the height of the element is not zero.`,
+        ),
+      );
     }
   };
   const removeLoadListenerFn = renderer.listen(img, "load", callback);
@@ -4947,11 +6232,17 @@ function assertNonZeroRenderedHeight(dir, img, renderer) {
 }
 function assertValidLoadingInput(dir) {
   if (dir.loading && dir.priority) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the \`loading\` attribute was used on an image that was marked "priority". Setting \`loading\` on priority images is not allowed because these images will always be eagerly loaded. To fix this, remove the “loading” attribute from the priority image.`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} the \`loading\` attribute was used on an image that was marked "priority". Setting \`loading\` on priority images is not allowed because these images will always be eagerly loaded. To fix this, remove the “loading” attribute from the priority image.`,
+    );
   }
   const validInputs = ["auto", "eager", "lazy"];
   if (typeof dir.loading === "string" && !validInputs.includes(dir.loading)) {
-    throw new RuntimeError(2952, `${imgDirectiveDetails(dir.ngSrc)} the \`loading\` attribute has an invalid value (\`${dir.loading}\`). To fix this, provide a valid value ("lazy", "eager", or "auto").`);
+    throw new RuntimeError(
+      2952,
+      `${imgDirectiveDetails(dir.ngSrc)} the \`loading\` attribute has an invalid value (\`${dir.loading}\`). To fix this, provide a valid value ("lazy", "eager", or "auto").`,
+    );
   }
 }
 function assertNotMissingBuiltInLoader(ngSrc, imageLoader) {
@@ -4964,18 +6255,33 @@ function assertNotMissingBuiltInLoader(ngSrc, imageLoader) {
       }
     }
     if (builtInLoaderName) {
-      console.warn(formatRuntimeError(2962, `NgOptimizedImage: It looks like your images may be hosted on the ${builtInLoaderName} CDN, but your app is not using Angular's built-in loader for that CDN. We recommend switching to use the built-in by calling \`provide${builtInLoaderName}Loader()\` in your \`providers\` and passing it your instance's base URL. If you don't want to use the built-in loader, define a custom loader function using IMAGE_LOADER to silence this warning.`));
+      console.warn(
+        formatRuntimeError(
+          2962,
+          `NgOptimizedImage: It looks like your images may be hosted on the ${builtInLoaderName} CDN, but your app is not using Angular's built-in loader for that CDN. We recommend switching to use the built-in by calling \`provide${builtInLoaderName}Loader()\` in your \`providers\` and passing it your instance's base URL. If you don't want to use the built-in loader, define a custom loader function using IMAGE_LOADER to silence this warning.`,
+        ),
+      );
     }
   }
 }
 function assertNoNgSrcsetWithoutLoader(dir, imageLoader) {
   if (dir.ngSrcset && imageLoader === noopImageLoader) {
-    console.warn(formatRuntimeError(2963, `${imgDirectiveDetails(dir.ngSrc)} the \`ngSrcset\` attribute is present but no image loader is configured (i.e. the default one is being used), which would result in the same image being used for all configured sizes. To fix this, provide a loader or remove the \`ngSrcset\` attribute from the image.`));
+    console.warn(
+      formatRuntimeError(
+        2963,
+        `${imgDirectiveDetails(dir.ngSrc)} the \`ngSrcset\` attribute is present but no image loader is configured (i.e. the default one is being used), which would result in the same image being used for all configured sizes. To fix this, provide a loader or remove the \`ngSrcset\` attribute from the image.`,
+      ),
+    );
   }
 }
 function assertNoLoaderParamsWithoutLoader(dir, imageLoader) {
   if (dir.loaderParams && imageLoader === noopImageLoader) {
-    console.warn(formatRuntimeError(2963, `${imgDirectiveDetails(dir.ngSrc)} the \`loaderParams\` attribute is present but no image loader is configured (i.e. the default one is being used), which means that the loaderParams data will not be consumed and will not affect the URL. To fix this, provide a custom loader or remove the \`loaderParams\` attribute from the image.`));
+    console.warn(
+      formatRuntimeError(
+        2963,
+        `${imgDirectiveDetails(dir.ngSrc)} the \`loaderParams\` attribute is present but no image loader is configured (i.e. the default one is being used), which means that the loaderParams data will not be consumed and will not affect the URL. To fix this, provide a custom loader or remove the \`loaderParams\` attribute from the image.`,
+      ),
+    );
   }
 }
 function assetPriorityCountBelowThreshold(appRef) {
@@ -4984,7 +6290,12 @@ function assetPriorityCountBelowThreshold(appRef) {
       IMGS_WITH_PRIORITY_ATTR_COUNT++;
       yield appRef.whenStable();
       if (IMGS_WITH_PRIORITY_ATTR_COUNT > PRIORITY_COUNT_THRESHOLD) {
-        console.warn(formatRuntimeError(2966, `NgOptimizedImage: The "priority" attribute is set to true more than ${PRIORITY_COUNT_THRESHOLD} times (${IMGS_WITH_PRIORITY_ATTR_COUNT} times). Marking too many images as "high" priority can hurt your application's LCP (https://web.dev/lcp). "Priority" should only be set on the image expected to be the page's LCP element.`));
+        console.warn(
+          formatRuntimeError(
+            2966,
+            `NgOptimizedImage: The "priority" attribute is set to true more than ${PRIORITY_COUNT_THRESHOLD} times (${IMGS_WITH_PRIORITY_ATTR_COUNT} times). Marking too many images as "high" priority can hurt your application's LCP (https://web.dev/lcp). "Priority" should only be set on the image expected to be the page's LCP element.`,
+          ),
+        );
       }
     } else {
       IMGS_WITH_PRIORITY_ATTR_COUNT++;
@@ -4995,8 +6306,16 @@ function assertPlaceholderDimensions(dir, imgElement) {
   const computedStyle = window.getComputedStyle(imgElement);
   let renderedWidth = parseFloat(computedStyle.getPropertyValue("width"));
   let renderedHeight = parseFloat(computedStyle.getPropertyValue("height"));
-  if (renderedWidth > PLACEHOLDER_DIMENSION_LIMIT || renderedHeight > PLACEHOLDER_DIMENSION_LIMIT) {
-    console.warn(formatRuntimeError(2967, `${imgDirectiveDetails(dir.ngSrc)} it uses a placeholder image, but at least one of the dimensions attribute (height or width) exceeds the limit of ${PLACEHOLDER_DIMENSION_LIMIT}px. To fix this, use a smaller image as a placeholder.`));
+  if (
+    renderedWidth > PLACEHOLDER_DIMENSION_LIMIT ||
+    renderedHeight > PLACEHOLDER_DIMENSION_LIMIT
+  ) {
+    console.warn(
+      formatRuntimeError(
+        2967,
+        `${imgDirectiveDetails(dir.ngSrc)} it uses a placeholder image, but at least one of the dimensions attribute (height or width) exceeds the limit of ${PLACEHOLDER_DIMENSION_LIMIT}px. To fix this, use a smaller image as a placeholder.`,
+      ),
+    );
   }
 }
 function callOnLoadIfImageIsLoaded(img, callback) {
@@ -5014,7 +6333,12 @@ function unwrapSafeUrl(value) {
   return unwrapSafeValue(value);
 }
 function booleanOrUrlAttribute(value) {
-  if (typeof value === "string" && value !== "true" && value !== "false" && value !== "") {
+  if (
+    typeof value === "string" &&
+    value !== "true" &&
+    value !== "false" &&
+    value !== ""
+  ) {
     return value;
   }
   return booleanAttribute(value);
@@ -5108,7 +6432,7 @@ export {
   provideImgixLoader,
   provideNetlifyLoader,
   PRECONNECT_CHECK_BLOCKLIST,
-  NgOptimizedImage
+  NgOptimizedImage,
 };
 /*! Bundled license information:
 

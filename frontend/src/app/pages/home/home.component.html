@@ -4,10 +4,15 @@
       <h1>Welcome to <span class="highlight">Task Manager</span></h1>
       <p>Your AI-powered productivity companion.</p>
       <p *ngIf="user">Welcome back, {{ user.name }}!</p>
-      <button class="btn-primary" (click)="onGetStarted()">🚀 Get Started</button>
+      <button class="btn-primary" (click)="onGetStarted()">
+        🚀 Get Started
+      </button>
     </div>
-   <img src="assets/tasks.avif" alt="Task Illustration" class="hero-illustration" />
-
+    <img
+      src="assets/tasks.avif"
+      alt="Task Illustration"
+      class="hero-illustration"
+    />
   </div>
 
   <div class="features-section">

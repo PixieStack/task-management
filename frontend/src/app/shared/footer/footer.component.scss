@@ -2,7 +2,7 @@
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
   color: #ecf0f1;
   margin-top: auto;
-  
+
   .footer-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -14,7 +14,7 @@
     grid-template-columns: 2fr 1fr 1fr 1fr;
     gap: 3rem;
     padding: 3rem 0;
-    
+
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
       gap: 2rem;
@@ -40,7 +40,7 @@
       .social-links {
         display: flex;
         gap: 1rem;
-        
+
         @media (max-width: 768px) {
           justify-content: center;
         }
@@ -55,8 +55,8 @@
         background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
         transition: all 0.3s ease;
-        cursor: pointer; 
-        
+        cursor: pointer;
+
         &:hover {
           background: #e67e22;
           transform: translateY(-3px);
@@ -91,10 +91,10 @@
       text-decoration: none;
       font-size: 0.95rem;
       transition: color 0.3s ease;
-      cursor: pointer; 
-      
+      cursor: pointer;
+
       &.clickable {
-        cursor: pointer; 
+        cursor: pointer;
         user-select: none;
       }
 
@@ -113,12 +113,12 @@
     .copyright {
       font-size: 0.9rem;
       margin: 0;
-      
+
       a {
         color: #e67e22;
         text-decoration: none;
-        cursor: pointer; 
-        
+        cursor: pointer;
+
         &:hover {
           color: #ecf0f1;
         }
@@ -133,8 +133,8 @@
   .text-accent {
     color: #e67e22;
     text-decoration: none;
-    cursor: pointer; 
-    
+    cursor: pointer;
+
     &.hover\:text-white:hover {
       color: #ecf0f1;
     }

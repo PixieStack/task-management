@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+} from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http'; 
+import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -12,7 +18,7 @@ import { throwError } from 'rxjs';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.scss']
+  styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
@@ -24,23 +30,37 @@ export class RegisterComponent implements OnInit {
   passwordStrength = {
     value: 0,
     class: '',
-    label: ''
+    label: '',
   };
 
   private apiUrl = 'http://127.0.0.1:8000/auth/register';
 
-  constructor(private fb: FormBuilder, private http: HttpClient, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
   ngOnInit(): void {
-    this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), this.strongPasswordValidator]],
-      confirmPassword: ['', Validators.required],
-      termsAccepted: [false, Validators.requiredTrue]
-    }, { validators: this.passwordMatchValidator });
+    this.registerForm = this.fb.group(
+      {
+        username: ['', [Validators.required, Validators.minLength(3)]],
+        email: ['', [Validators.required, Validators.email]],
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(8),
+            this.strongPasswordValidator,
+          ],
+        ],
+        confirmPassword: ['', Validators.required],
+        termsAccepted: [false, Validators.requiredTrue],
+      },
+      { validators: this.passwordMatchValidator },
+    );
 
-    this.registerForm.get('password')?.valueChanges.subscribe(value => {
+    this.registerForm.get('password')?.valueChanges.subscribe((value) => {
       this.passwordStrength = this.calculatePasswordStrength(value);
     });
   }
@@ -107,19 +127,21 @@ export class RegisterComponent implements OnInit {
     const registrationData = {
       username: this.registerForm.value.username,
       email: this.registerForm.value.email,
-      password: this.registerForm.value.password
+      password: this.registerForm.value.password,
     };
 
     console.log('Sending registration data:', registrationData);
 
-    this.http.post(this.apiUrl, registrationData)
+    this.http
+      .post(this.apiUrl, registrationData)
       .pipe(
-        catchError(err => {
+        catchError((err) => {
           this.isLoading = false;
           console.error('Registration error:', err);
-          this.registrationError = err.error?.detail || 'Registration failed. Please try again.';
+          this.registrationError =
+            err.error?.detail || 'Registration failed. Please try again.';
           return throwError(() => err);
-        })
+        }),
       )
       .subscribe((response: any) => {
         this.isLoading = false;

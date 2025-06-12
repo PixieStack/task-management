@@ -8,32 +8,31 @@ import { AuthService } from '../services/auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss']
+  styleUrls: ['./footer.component.scss'],
 })
 export class FooterComponent {
   currentYear = new Date().getFullYear();
-  
+
   footerLinks = {
     product: [
       { label: 'Features', route: '/key-features' },
-      { label: 'Dashboard', route: '/dashboard', protected: true }, 
-      { label: 'About', route: '/about' }
+      { label: 'Dashboard', route: '/dashboard', protected: true },
+      { label: 'About', route: '/about' },
     ],
     support: [
       { label: 'Contact', route: '/contact' },
       { label: 'FAQ', route: '/faq' },
-      { label: 'Help Center', route: '/help' }
     ],
     legal: [
       { label: 'Privacy Policy', route: '/privacy' },
       { label: 'Terms of Service', route: '/terms' },
-      { label: 'Cookie Policy', route: '/cookies' }
-    ]
+      { label: 'Cookie Policy', route: '/cookies' },
+    ],
   };
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   navigateToRoute(link: any): void {

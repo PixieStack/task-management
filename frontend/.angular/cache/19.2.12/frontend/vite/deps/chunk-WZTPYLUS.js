@@ -4,13 +4,16 @@ import {
   argsOrArgArray,
   filter,
   not,
-  raceWith
+  raceWith,
 } from "./chunk-GQGAQNC4.js";
 
 // ../node_modules/rxjs/dist/esm5/internal/operators/partition.js
 function partition(predicate, thisArg) {
-  return function(source) {
-    return [filter(predicate, thisArg)(source), filter(not(predicate, thisArg))(source)];
+  return function (source) {
+    return [
+      filter(predicate, thisArg)(source),
+      filter(not(predicate, thisArg))(source),
+    ];
   };
 }
 
@@ -20,11 +23,11 @@ function race() {
   for (var _i = 0; _i < arguments.length; _i++) {
     args[_i] = arguments[_i];
   }
-  return raceWith.apply(void 0, __spreadArray([], __read(argsOrArgArray(args))));
+  return raceWith.apply(
+    void 0,
+    __spreadArray([], __read(argsOrArgArray(args))),
+  );
 }
 
-export {
-  partition,
-  race
-};
+export { partition, race };
 //# sourceMappingURL=chunk-WZTPYLUS.js.map

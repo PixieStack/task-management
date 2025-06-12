@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
 })
 export class NavbarComponent {
   user: { name: string } | null = null;
@@ -21,6 +21,6 @@ export class NavbarComponent {
   logout() {
     localStorage.removeItem('user');
     this.user = null;
-    window.location.href = '/';  
+    window.location.href = '/';
   }
 }

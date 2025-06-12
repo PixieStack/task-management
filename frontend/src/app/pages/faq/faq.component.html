@@ -1,0 +1,80 @@
+<div class="faq-container">
+  <!-- Hero Section -->
+  <section class="faq-hero">
+    <h1>Frequently Asked Questions</h1>
+    <p>Find answers to common questions about Task Manager</p>
+  </section>
+
+  <!-- Search and Filter Section -->
+  <section class="faq-controls">
+    <div class="search-box">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input 
+        type="text" 
+        placeholder="Search FAQs..." 
+        [value]="searchTerm"
+        (input)="onSearch($any($event.target).value)"
+        class="search-input"
+      />
+    </div>
+    
+    <select 
+      class="category-select" 
+      [value]="selectedCategory"
+      (change)="onCategoryChange($any($event.target).value)"
+    >
+      <option *ngFor="let cat of categories" [value]="cat.value">
+        {{ cat.label }}
+      </option>
+    </select>
+  </section>
+
+  <!-- FAQ Items -->
+  <section class="faq-content">
+    <div class="faq-list" *ngIf="filteredFAQs.length > 0">
+      <div 
+        *ngFor="let faq of filteredFAQs" 
+        class="faq-item"
+        [class.active]="faq.isOpen"
+      >
+        <div class="faq-question" (click)="toggleFAQ(faq)">
+          <h3 [innerHTML]="highlightText(faq.question)"></h3>
+          <svg 
+            class="chevron-icon" 
+            [class.rotated]="faq.isOpen"
+            xmlns="http://www.w3.org/2000/svg" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+        <div class="faq-answer" *ngIf="faq.isOpen">
+          <p [innerHTML]="highlightText(faq.answer)"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div *ngIf="filteredFAQs.length === 0" class="no-results">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3>No FAQs found</h3>
+      <p>Try adjusting your search or filter criteria</p>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section class="contact-cta">
+    <h2>Still have questions?</h2>
+    <p>Our support team is here to help</p>
+    <button class="btn-primary" (click)="navigateToContact()">
+      <span class="btn-icon">📧</span>
+      Contact Support
+    </button>
+  </section>
+</div>

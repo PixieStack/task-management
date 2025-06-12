@@ -3,8 +3,17 @@
     <a routerLink="/" class="logo">TaskManager</a>
 
     <ul class="nav-links">
-      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a></li>
-      <li><a routerLink="/key-features" routerLinkActive="active">Key Features</a></li>
+      <li>
+        <a
+          routerLink="/"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          >Home</a
+        >
+      </li>
+      <li>
+        <a routerLink="/key-features" routerLinkActive="active">Key Features</a>
+      </li>
       <li><a routerLink="/about" routerLinkActive="active">About Us</a></li>
       <li><a routerLink="/contact" routerLinkActive="active">Contact Us</a></li>
     </ul>

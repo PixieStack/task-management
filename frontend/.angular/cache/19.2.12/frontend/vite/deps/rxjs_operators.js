@@ -1,7 +1,4 @@
-import {
-  partition,
-  race
-} from "./chunk-WZTPYLUS.js";
+import { partition, race } from "./chunk-WZTPYLUS.js";
 import {
   audit,
   auditTime,
@@ -113,7 +110,7 @@ import {
   withLatestFrom,
   zip2 as zip,
   zipAll,
-  zipWith
+  zipWith,
 } from "./chunk-GQGAQNC4.js";
 import "./chunk-WDMUDEB6.js";
 export {
@@ -229,5 +226,5 @@ export {
   withLatestFrom,
   zip,
   zipAll,
-  zipWith
+  zipWith,
 };

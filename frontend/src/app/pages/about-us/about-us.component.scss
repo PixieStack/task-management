@@ -4,7 +4,7 @@
   max-width: 1000px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   color: #333;
 
   .page-title {
@@ -14,9 +14,9 @@
     color: #000;
     margin-bottom: 3rem;
     position: relative;
-    
+
     &:after {
-      content: '';
+      content: "";
       display: block;
       width: 80px;
       height: 4px;
@@ -29,7 +29,7 @@
   // Slideshow Styles
   .slideshow {
     margin-bottom: 4rem;
-    
+
     .slideshow-container {
       position: relative;
       width: 100%;
@@ -37,23 +37,23 @@
       overflow: hidden;
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      
+
       .slide-wrapper {
         display: flex;
         transition: transform 0.5s ease-in-out;
         height: 100%;
-        
+
         .slide {
           min-width: 100%;
           height: 100%;
           position: relative;
-          
+
           img {
             width: 100%;
             height: 100%;
             object-fit: cover;
           }
-          
+
           .slide-caption {
             position: absolute;
             bottom: 0;
@@ -67,7 +67,7 @@
           }
         }
       }
-      
+
       .slide-nav {
         position: absolute;
         top: 50%;
@@ -83,20 +83,20 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         &:hover {
           background: rgba(255, 255, 255, 0.8);
         }
-        
+
         &.prev {
           left: 15px;
         }
-        
+
         &.next {
           right: 15px;
         }
       }
-      
+
       .slide-dots {
         position: absolute;
         bottom: 10px;
@@ -106,7 +106,7 @@
         justify-content: center;
         gap: 8px;
         z-index: 5;
-        
+
         .dot {
           width: 12px;
           height: 12px;
@@ -114,8 +114,9 @@
           background: rgba(255, 255, 255, 0.5);
           cursor: pointer;
           transition: background 0.3s;
-          
-          &.active, &:hover {
+
+          &.active,
+          &:hover {
             background: white;
           }
         }
@@ -127,9 +128,11 @@
     margin-bottom: 4rem;
     opacity: 0;
     animation: fadeInSection 0.8s forwards;
-    
+
     @keyframes fadeInSection {
-      to { opacity: 1; }
+      to {
+        opacity: 1;
+      }
     }
 
     h2 {
@@ -139,9 +142,9 @@
       margin-bottom: 1.5rem;
       text-align: center;
       position: relative;
-      
+
       &:after {
-        content: '';
+        content: "";
         display: block;
         width: 60px;
         height: 3px;
@@ -169,13 +172,14 @@
         box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
         object-fit: contain;
         transition: transform 0.3s ease;
-        
+
         &:hover {
           transform: translateY(-5px);
         }
       }
 
-      p, ul {
+      p,
+      ul {
         flex: 1 1 400px;
         font-size: 1.1rem;
         line-height: 1.6;
@@ -190,9 +194,9 @@
           font-weight: 500;
           position: relative;
           padding-left: 1.5rem;
-          
+
           &:before {
-            content: '✓';
+            content: "✓";
             color: #4caf50;
             position: absolute;
             left: 0;
@@ -206,28 +210,30 @@
       }
     }
   }
-  
+
   // Feature Cards
   .cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 1.5rem;
     margin-top: 2rem;
-    
+
     .feature-card {
       background: white;
       border-radius: 12px;
       padding: 1.5rem;
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
       text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
       cursor: pointer;
-      
+
       &:hover {
         transform: translateY(-8px);
         box-shadow: 0 12px 20px rgba(0, 0, 0, 0.12);
       }
-      
+
       .card-icon {
         font-size: 2rem;
         margin-bottom: 1rem;
@@ -239,18 +245,18 @@
         background: linear-gradient(135deg, #f5f7fa 0%, #e5e9f2 100%);
         border-radius: 50%;
         margin: 0 auto 1rem;
-        
+
         i {
           color: #4caf50;
         }
       }
-      
+
       h3 {
         font-size: 1.3rem;
         margin-bottom: 0.7rem;
         color: #000;
       }
-      
+
       p {
         color: #555;
         font-size: 0.95rem;
@@ -262,53 +268,53 @@
   // Developer Section
   .developer {
     text-align: center;
-    
+
     .developer-profile {
       background-color: #f7f8fa;
       border-radius: 14px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       padding: 2rem;
       text-align: left;
-      
+
       .developer-header {
         display: flex;
         gap: 2rem;
         margin-bottom: 2rem;
-        
+
         .developer-photo {
           width: 170px;
           height: 170px;
           border-radius: 50%;
           object-fit: cover;
           border: 5px solid white;
-          box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .developer-intro {
           flex: 1;
-          
+
           h3 {
             margin: 0 0 0.4rem 0;
             font-size: 1.8rem;
             color: #000;
           }
-          
+
           .developer-title {
             color: #4caf50;
             font-weight: 600;
             font-size: 1.1rem;
             margin: 0 0 1rem 0;
           }
-          
+
           .developer-bio {
             line-height: 1.6;
             margin-bottom: 1.5rem;
           }
-          
+
           .social-links {
             display: flex;
             gap: 1rem;
-            
+
             .social-icon {
               width: 40px;
               height: 40px;
@@ -320,7 +326,7 @@
               color: #444;
               font-size: 1.2rem;
               transition: all 0.3s ease;
-              
+
               &:hover {
                 background: #4caf50;
                 color: white;
@@ -330,41 +336,41 @@
           }
         }
       }
-      
+
       .skills-section {
         margin-bottom: 2rem;
-        
+
         h4 {
           font-size: 1.4rem;
           margin-bottom: 1rem;
           color: #000;
         }
-        
+
         .skill-bars {
           display: flex;
           flex-direction: column;
           gap: 1.2rem;
-          
+
           .skill {
             .skill-info {
               display: flex;
               justify-content: space-between;
               margin-bottom: 0.3rem;
-              
+
               .skill-name {
                 font-weight: 600;
               }
-              
+
               .skill-percent {
                 color: #666;
               }
             }
-            
+
             .skill-bar {
               height: 10px;
               background: #e9ecef;
               border-radius: 5px;
-              
+
               .skill-progress {
                 height: 100%;
                 background: linear-gradient(90deg, #4caf50, #2196f3);
@@ -372,13 +378,13 @@
                 transition: width 1s ease-in-out;
               }
             }
-            
+
             .skill-technologies {
               display: flex;
               flex-wrap: wrap;
               gap: 0.5rem;
               margin-top: 0.5rem;
-              
+
               .tech-tag {
                 background: #e0f2f1;
                 padding: 0.3rem 0.8rem;
@@ -390,39 +396,40 @@
           }
         }
       }
-      
+
       .developer-statement {
         background: #fff;
         border-left: 4px solid #4caf50;
         padding: 1.5rem;
         border-radius: 0 8px 8px 0;
-        
+
         h4 {
           font-size: 1.4rem;
           margin-bottom: 1rem;
           color: #000;
         }
-        
+
         blockquote {
           font-style: italic;
           line-height: 1.6;
           color: #555;
           margin: 0;
           position: relative;
-          
-          &:before, &:after {
+
+          &:before,
+          &:after {
             color: #4caf50;
             font-size: 1.5rem;
             font-family: serif;
           }
-          
+
           &:before {
             content: '"';
             position: absolute;
             left: -0.5rem;
             top: -0.5rem;
           }
-          
+
           &:after {
             content: '"';
           }
@@ -437,7 +444,8 @@
         flex-direction: column !important;
         text-align: center;
 
-        p, ul {
+        p,
+        ul {
           flex: 1 1 100%;
         }
 
@@ -446,7 +454,7 @@
           max-width: 100%;
           height: auto;
         }
-        
+
         ul {
           text-align: left;
         }
@@ -456,15 +464,15 @@
     .developer {
       .developer-profile {
         padding: 1.5rem;
-        
+
         .developer-header {
           flex-direction: column;
           align-items: center;
           text-align: center;
-          
+
           .developer-intro {
             width: 100%;
-            
+
             .social-links {
               justify-content: center;
             }
@@ -472,10 +480,10 @@
         }
       }
     }
-    
+
     .slideshow-container {
       height: 300px !important;
-      
+
       .slide-nav {
         width: 30px !important;
         height: 30px !important;
