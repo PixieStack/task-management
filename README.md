@@ -7,14 +7,12 @@ A modern, full-stack task management application built with Angular frontend and
 ## ✨ Features
 
 ### 🔐 Authentication & User Management
-
 - Secure user registration and login
 - JWT token-based authentication
 - Password change and account management
 - User-specific profile pictures and data
 
 ### 📊 Task Management
-
 - Create, edit, and delete tasks
 - Task prioritization (High, Medium, Low)
 - Status tracking (Not Started, In Progress, Completed)
@@ -24,7 +22,6 @@ A modern, full-stack task management application built with Angular frontend and
 - Bulk operations and drag-and-drop interface
 
 ### 📈 Analytics & Insights
-
 - Personal productivity dashboard
 - Task completion statistics
 - Time efficiency tracking
@@ -32,7 +29,6 @@ A modern, full-stack task management application built with Angular frontend and
 - Overdue task monitoring
 
 ### 🎨 User Experience
-
 - Responsive design for all devices
 - Dark/Light mode support
 - Real-time greeting based on time of day
@@ -40,7 +36,6 @@ A modern, full-stack task management application built with Angular frontend and
 - Intuitive user interface
 
 ### 📧 Communication
-
 - Contact form with email notifications
 - Admin message management
 - SMTP integration for notifications
@@ -48,7 +43,6 @@ A modern, full-stack task management application built with Angular frontend and
 ## 🛠️ Tech Stack
 
 ### Frontend
-
 - **Angular 17+** - Modern web framework
 - **TypeScript** - Type-safe JavaScript
 - **SCSS** - Enhanced CSS with variables and mixins
@@ -57,7 +51,6 @@ A modern, full-stack task management application built with Angular frontend and
 - **HttpClient** - API communication
 
 ### Backend
-
 - **FastAPI** - High-performance Python web framework
 - **SQLAlchemy** - SQL toolkit and ORM
 - **SQLite** - Lightweight database
@@ -66,7 +59,6 @@ A modern, full-stack task management application built with Angular frontend and
 - **SMTP** - Email sending capabilities
 
 ### Development Tools
-
 - **Git** - Version control
 - **VS Code** - Development environment
 - **Postman** - API testing
@@ -74,7 +66,6 @@ A modern, full-stack task management application built with Angular frontend and
 ## 🚀 Getting Started
 
 ### Prerequisites
-
 - **Node.js** (v18 or higher)
 - **Python** (v3.8 or higher)
 - **Git**
@@ -85,33 +76,4 @@ A modern, full-stack task management application built with Angular frontend and
    ```bash
    git clone git@github.com:PixieStack/task-management.git
    cd task-management
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 2b87639 (Temporary commit to sync with remote master)
-
-```markdown
-## Run the Backend (FastAPI)
-
-```bash
-uvicorn app:app --reload
-```
-
-> ⚠️ **Important:** The backend must be running to enable login, registration, and all authenticated features.
-
-## Run the Frontend (Angular)
-
-```bash
-cd frontend
-npm install
-ng serve
-```
-
-This will start the Angular application at **http://localhost:4200**.
-```
-<<<<<<< HEAD
-=======
    ```
->>>>>>> 25d736a (Add FAQ page feature and Prettier changes)
-=======
->>>>>>> 2b87639 (Temporary commit to sync with remote master)
