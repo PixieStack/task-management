@@ -9,17 +9,8 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./terms-of-service.component.scss']
 })
 export class TermsOfServiceComponent {
-  lastUpdated: string; 
-  
-  constructor() {
-    const currentDate = new Date();
-    this.lastUpdated = currentDate.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
- 
+  lastUpdated = 'April 20, 2025';
+
   sections = [
     {
       title: 'Introduction',

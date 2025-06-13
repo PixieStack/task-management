@@ -5,6 +5,7 @@ import { AboutUsComponent } from './pages/about-us/about-us.component';
 import { ContactCtaComponent } from './shared/contact-cta/contact-cta.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { AuthGuard } from './auth.guard';
+
 export const routes: Routes = [
   // Public routes
   { path: '', component: HomeComponent },
@@ -25,7 +26,6 @@ export const routes: Routes = [
         (m) => m.RegisterComponent,
       ),
   },
-
   {
     path: 'dashboard',
     component: DashboardComponent,
@@ -67,6 +67,5 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/cookie-policy/cookie-policy.component').then(
       m => m.CookiePolicyComponent) 
   },
-
   { path: '**', redirectTo: '' },
 ];

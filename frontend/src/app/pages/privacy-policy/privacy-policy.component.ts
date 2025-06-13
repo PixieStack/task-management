@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./privacy-policy.component.scss']
 })
 export class PrivacyPolicyComponent {
-  lastUpdated = 'January 15, 2025';
+  lastUpdated = 'April 20, 2025';
   
   sections = [
     {
