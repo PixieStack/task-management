@@ -40,10 +40,17 @@ export class AuthService {
     if (token && username && this.isLoggedIn()) {
       this.userSubject.next({ username });
     } else {
-      // Token is expired or invalid, clear everything
-      this.logout();
+      // Token is expired or invalid, clear local storage and subject, but DO NOT redirect
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('expires_at');
+      localStorage.removeItem('userId');
+      this.userSubject.next(null);
+      // Do not call this.logout() or this.router.navigate here!
     }
   }
+
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http
       .post<AuthResponse>(`${this.apiUrl}/login`, { email, password })
@@ -62,6 +69,7 @@ export class AuthService {
     localStorage.removeItem('username');
     localStorage.removeItem('userEmail');
     localStorage.removeItem('expires_at');
+    localStorage.removeItem('userId');
     this.userSubject.next(null);
     this.router.navigate(['/login']);
   }
@@ -108,7 +116,8 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     const expiresAt = localStorage.getItem('expires_at');
-    if (!expiresAt) return false;
+    const token = localStorage.getItem('token');
+    if (!expiresAt || !token) return false;
 
     return new Date() < new Date(expiresAt);
   }
@@ -125,7 +134,6 @@ export class AuthService {
     return localStorage.getItem('userEmail');
   }
 
-  // Add this method to your AuthService
   getCurrentUser(): User | null {
     const username = this.getUsername();
     const email = this.getUserEmail();
@@ -142,7 +150,6 @@ export class AuthService {
     return null;
   }
 
-  // Add this method to your AuthService
   getUserId(): string | null {
     const user = this.getCurrentUser();
     if (user && user.id) {
