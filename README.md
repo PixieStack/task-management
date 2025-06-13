@@ -59,6 +59,84 @@ Key highlights include:
 
 -----
 
+## 🖼️ Application Screenshots
+
+Below are screenshots demonstrating the core user experience and features.  
+*Images are located in `frontend/src/assets/site images/`.*
+
+<table>
+  <tr>
+    <td align="center"><b>Landing Page</b></td>
+    <td align="center"><b>Login</b></td>
+    <td align="center"><b>Register</b></td>
+  </tr>
+  <tr>
+    <td><img src="frontend/src/assets/site%20images/LANDING%20PAGE.png" alt="Landing Page" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/login.png" alt="Login" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/register.png" alt="Register" width="220"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Dashboard</b></td>
+    <td align="center"><b>Add Task</b></td>
+    <td align="center"><b>Analytics</b></td>
+  </tr>
+  <tr>
+    <td><img src="frontend/src/assets/site%20images/dashboard.png" alt="Dashboard" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/add%20task.png" alt="Add Task" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/analytics.png" alt="Analytics" width="220"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Calendar View</b></td>
+    <td align="center"><b>Profile</b></td>
+    <td align="center"><b>Account Settings</b></td>
+  </tr>
+  <tr>
+    <td><img src="frontend/src/assets/site%20images/calender%20view.png" alt="Calendar View" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/profile.png" alt="Profile" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/account%20settings.png" alt="Account Settings" width="220"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Cookies Policy</b></td>
+    <td align="center"><b>Privacy Policy</b></td>
+    <td align="center"><b>Terms of Service</b></td>
+  </tr>
+  <tr>
+    <td><img src="frontend/src/assets/site%20images/cookies.png" alt="Cookies Policy" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/privacy.png" alt="Privacy Policy" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/terms.png" alt="Terms of Service" width="220"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Secondary Terms Page</b></td>
+    <td align="center"><b>Footer</b></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><img src="frontend/src/assets/site%20images/terms2.png" alt="Secondary Terms" width="220"/></td>
+    <td><img src="frontend/src/assets/site%20images/FOOTER.png" alt="Footer" width="220"/></td>
+    <td></td>
+  </tr>
+</table>
+
+### Image Descriptions
+- **Landing Page:** Modern introductory splash page for the app.
+- **Login:** Secure login form for existing users.
+- **Register:** New user registration screen.
+- **Dashboard:** Central hub for viewing and organizing all tasks.
+- **Add Task:** Modal/dialog for creating a new task with all necessary details.
+- **Analytics:** Visual productivity analytics and completion stats.
+- **Calendar View:** View and manage tasks by due date in a calendar format.
+- **Profile:** User profile details and personal info.
+- **Account Settings:** Manage password, email, and authentication settings.
+- **Cookies Policy:** Info on cookies and user privacy.
+- **Privacy Policy:** Full privacy practices and data handling.
+- **Terms of Service:** App usage terms and conditions.
+- **Secondary Terms Page:** Additional legal or informational terms.
+- **Footer:** App footer with navigation and additional information.
+
+*For the full and most up-to-date set of images, [browse the assets directory](https://github.com/PixieStack/task-management/tree/master/frontend/src/assets/site%20images) on GitHub.*
+
+-----
+
 ## 🛠️ Tech Stack
 
 ### Frontend
