@@ -1,106 +1,154 @@
 <div class="auth-container">
-  <div class="auth-card">
-    <div class="auth-header">
-      <h2>Welcome Back</h2>
-      <p>Sign in to access your TaskManager account</p>
+  <div class="auth-wrapper">
+    <!-- Background decorative elements -->
+    <div class="auth-background">
+      <div class="bg-shape bg-shape-1"></div>
+      <div class="bg-shape bg-shape-2"></div>
+      <div class="bg-shape bg-shape-3"></div>
     </div>
 
-    <div *ngIf="loginError" class="error-message">
-      <i class="fas fa-exclamation-circle"></i>
-      {{ loginError }}
-    </div>
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-icon">
+          <i class="fas fa-tasks"></i>
+        </div>
+        <h1>TaskManager</h1>
+      </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <div class="input-container">
-          <i class="fas fa-envelope input-icon"></i>
+      <div class="auth-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to continue to your dashboard</p>
+      </div>
+
+      <div *ngIf="loginError" class="alert-message error-alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <span>{{ loginError }}</span>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+        <div class="form-field">
+          <div class="field-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
           <input
             id="email"
             type="email"
             formControlName="email"
-            placeholder="Enter your email"
-            [class.invalid]="
+            placeholder=" "
+            [class.error]="
               loginForm.get('email')?.invalid && loginForm.get('email')?.touched
             "
           />
-        </div>
-        <div
-          class="error-text"
-          *ngIf="
-            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
-          "
-        >
-          <span *ngIf="loginForm.get('email')?.errors?.['required']"
-            >Email is required</span
+          <label for="email">Email Address</label>
+          <div class="field-underline"></div>
+          <span
+            class="error-text"
+            *ngIf="
+              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+            "
           >
-          <span *ngIf="loginForm.get('email')?.errors?.['email']"
-            >Please enter a valid email</span
-          >
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">
+              Email is required
+            </span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">
+              Please enter a valid email
+            </span>
+          </span>
         </div>
-      </div>
 
-      <div class="form-group">
-        <div class="label-row">
-          <label for="password">Password</label>
-          <a routerLink="/forgot-password" class="forgot-link"
-            >Forgot Password?</a
-          >
-        </div>
-        <div class="input-container">
-          <i class="fas fa-lock input-icon"></i>
+        <div class="form-field">
+          <div class="field-icon">
+            <i class="fas fa-lock"></i>
+          </div>
           <input
             id="password"
             [type]="showPassword ? 'text' : 'password'"
             formControlName="password"
-            placeholder="Enter your password"
-            [class.invalid]="
+            placeholder=" "
+            [class.error]="
               loginForm.get('password')?.invalid &&
               loginForm.get('password')?.touched
             "
           />
-          <i
-            class="fas"
-            [class.fa-eye]="!showPassword"
-            [class.fa-eye-slash]="showPassword"
-            (click)="togglePasswordVisibility()"
+          <label for="password">Password</label>
+          <div class="field-underline"></div>
+          <button
+            type="button"
             class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            tabindex="-1"
           >
-          </i>
+            <i
+              class="fas"
+              [class.fa-eye]="!showPassword"
+              [class.fa-eye-slash]="showPassword"
+            ></i>
+          </button>
+          <span
+            class="error-text"
+            *ngIf="
+              loginForm.get('password')?.invalid &&
+              loginForm.get('password')?.touched
+            "
+          >
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">
+              Password is required
+            </span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">
+              Password must be at least 8 characters
+            </span>
+          </span>
         </div>
-        <div
-          class="error-text"
-          *ngIf="
-            loginForm.get('password')?.invalid &&
-            loginForm.get('password')?.touched
-          "
+
+        <div class="form-options">
+          <label class="remember-me">
+            <input type="checkbox" formControlName="rememberMe" />
+            <span class="checkbox-custom"></span>
+            <span class="checkbox-label">Remember me</span>
+          </label>
+          <a routerLink="/forgot-password" class="forgot-link">
+            Forgot Password?
+          </a>
+        </div>
+
+        <button 
+          type="submit" 
+          class="submit-button" 
+          [disabled]="isLoading || loginForm.invalid"
+          [class.loading]="isLoading"
         >
-          <span *ngIf="loginForm.get('password')?.errors?.['required']"
-            >Password is required</span
-          >
-          <span *ngIf="loginForm.get('password')?.errors?.['minlength']"
-            >Password must be at least 8 characters</span
-          >
+          <span class="button-content" *ngIf="!isLoading">
+            <i class="fas fa-sign-in-alt"></i>
+            Sign In
+          </span>
+          <span class="button-loader" *ngIf="isLoading">
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+          </span>
+        </button>
+
+        <!-- Social Login Options -->
+        <div class="divider">
+          <span>or continue with</span>
         </div>
-      </div>
 
-      <div class="remember-me">
-        <label class="checkbox-container">
-          <input type="checkbox" formControlName="rememberMe" />
-          <span class="checkmark"></span>
-          Remember me
-        </label>
-      </div>
+        <div class="social-logins">
+          <button type="button" class="social-btn google-btn">
+            <i class="fab fa-google"></i>
+            <span>Google</span>
+          </button>
+          <button type="button" class="social-btn apple-btn">
+            <i class="fab fa-apple"></i>
+            <span>Apple</span>
+          </button>
+        </div>
 
-      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
-        <span *ngIf="!isLoading">Sign In</span>
-        <span class="spinner" *ngIf="isLoading"></span>
-      </button>
-
-      <div class="auth-footer">
-        <span>Don't have an account?</span>
-        <a routerLink="/register" class="register-link">Create one</a>
-      </div>
-    </form>
+        <div class="auth-footer">
+          <span>Don't have an account?</span>
+          <a routerLink="/register" class="register-link">Create one</a>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

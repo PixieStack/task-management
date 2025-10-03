@@ -1,106 +1,113 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChildren, QueryList } from '@angular/core';
+import { CommonModule, DecimalPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import {
   trigger,
   transition,
   style,
   animate,
-  state,
 } from '@angular/animations';
+
+// Define the structure for a question/suggestion
+interface Suggestion {
+  title: string;
+  questions: { q: string, a: string }[];
+  isVisible?: boolean;
+}
 
 @Component({
   selector: 'app-about-us',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
+  providers: [DecimalPipe],
   templateUrl: './about-us.component.html',
   styleUrls: ['./about-us.component.scss'],
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateY(20px)' }),
-        animate(
-          '0.5s ease-out',
-          style({ opacity: 1, transform: 'translateY(0)' }),
-        ),
+        animate('0.5s ease-out', style({ opacity: 1, transform: 'translateY(0)' })),
       ]),
     ]),
-    trigger('slideAnimation', [
-      state('active', style({ opacity: 1 })),
-      state('inactive', style({ opacity: 0 })),
-      transition('inactive => active', animate('500ms ease-in')),
-      transition('active => inactive', animate('500ms ease-out')),
+    trigger('fadeHide', [
+      transition(':leave', [
+        style({ opacity: 1, height: '*', margin: '*' }),
+        animate('0.3s ease-out', style({ opacity: 0, height: '0', margin: '0' })),
+      ]),
+      transition(':enter', [
+        style({ opacity: 0, height: '0', margin: '0' }),
+        animate('0.3s ease-out', style({ opacity: 1, height: '*', margin: '*' })),
+      ]),
     ]),
   ],
 })
 export class AboutUsComponent implements OnInit, OnDestroy {
-  slideImages = [
-    { url: 'assets/slide/slide1.png', alt: 'Slide 1' },
-    { url: 'assets/slide/slide2.png', alt: 'Slide 2' },
-    { url: 'assets/slide/slide3.png', alt: 'Slide 3' },
-    { url: 'assets/slide/slide4.png', alt: 'Slide 4' },
-    { url: 'assets/slide/slide5.png', alt: 'Slide 5' },
-    { url: 'assets/slide/slide6.png', alt: 'Slide 6' },
-    { url: 'assets/slide/slide7.avif', alt: 'Slide 7' },
-    { url: 'assets/slide/slide8.png', alt: 'Slide 8' },
-    { url: 'assets/slide/slide9.png', alt: 'Slide 9' },
-    { url: 'assets/slide/slide10.png', alt: 'Slide 10' },
-  ];
-  currentSlide = 0;
-  private slideInterval: any;
+  @ViewChildren('skillBar') skillBars!: QueryList<ElementRef>;
+  private skillsAnimated = false;
 
-  // Feature cards
+  // Track which category is expanded
+  activeCategory: number | null = null;
+  showCategories: boolean = true;
+
+  // --- FEATURE CARDS (Original, with new futuristic icons) ---
   featureCards = [
     {
-      icon: 'fa-inbox',
-      title: 'Smart Inbox',
+      icon: 'fa-cogs',
+      title: 'AI Smart Core',
       description:
-        'AI organizes your to-dos automatically, prioritizing what matters most.',
+        'Our core AI engine processes and prioritizes your tasks instantly, adapting to your workflow.',
     },
     {
-      icon: 'fa-tasks',
-      title: 'Task Boards',
+      icon: 'fa-columns',
+      title: 'Visual Workflow',
       description:
-        'Intuitive drag-and-drop workflow management with custom categories.',
+        'Intuitive drag-and-drop task boards for Kanban, Scrum, or any custom project management style.',
     },
     {
-      icon: 'fa-calendar',
-      title: 'Calendar View',
+      icon: 'fa-clock',
+      title: 'Time Synchronization',
       description:
-        'Visualize your schedule with ease and manage your time effectively.',
+        'Integrated calendar and time-blocking tools ensure you meet deadlines and optimize your schedule.',
     },
     {
       icon: 'fa-robot',
-      title: 'AI Assistant',
+      title: 'Hyper-Focus Assist',
       description:
-        'Personalized reminders and productivity suggestions based on your habits.',
+        'Receive personalized, non-intrusive reminders and productivity suggestions to maintain deep focus.',
     },
   ];
 
-  // Developer skills with animated property
+  // --- DEVELOPER SKILLS (Your Original Stack, with `animatedLevel` property) ---
   developerSkills = [
     {
       name: 'Frontend',
-      level: 80,
+      level: 90,
       animatedLevel: 0,
-      technologies: ['Angular', 'React', 'TypeScript', 'HTML/CSS'],
+      technologies: ['Angular', 'React', 'TypeScript', 'JavaScript', 'HTML/CSS', 'Bootstrap', 'Tailwind CSS'],
     },
     {
       name: 'Backend',
       level: 90,
       animatedLevel: 0,
-      technologies: ['Node.js', 'Express', 'Java Spring Boot'],
+      technologies: ['C#', 'Java', 'Ruby', 'Node.js', 'Express', 'Java Spring Boot', 'Python', 'Bash', 'PowerShell', 'RSpec'],
     },
     {
       name: 'Database',
-      level: 85,
+      level: 80,
       animatedLevel: 0,
-      technologies: ['MongoDB', 'MySQL', 'PostgreSQL'],
+      technologies: ['MongoDB', 'MySQL', 'PostgreSQL', 'MSSQL', 'Supabase'],
     },
     {
       name: 'DevOps',
-      level: 80,
+      level: 70,
       animatedLevel: 0,
-      technologies: ['Docker', 'AWS', 'CI/CD'],
+      technologies: ['Docker', 'AWS (EC2, S3, RDS, SES)', 'Azure (Fundamentals)', 'Kubernetes', 'Git/GitHub', 'CI/CD Pipelines'],
+    },
+    {
+      name: 'ETL & Data Pipelines',
+      level: 70,
+      animatedLevel: 0,
+      technologies: ['ETL Process Design', 'Data Transformation', 'Data Integration', 'Batch & Stream Processing'],
     },
   ];
 
@@ -108,80 +115,335 @@ export class AboutUsComponent implements OnInit, OnDestroy {
   socialLinks = [
     {
       icon: 'fa-github',
-      url: 'https://github.com/yourusername',
+      url: 'https://github.com/PixieStack',
       name: 'GitHub',
     },
     {
       icon: 'fa-linkedin',
-      url: 'https://linkedin.com/in/yourusername',
+      url: 'https://www.linkedin.com/in/thembinkosi-eden-thwala-69083a1a4',
       name: 'LinkedIn',
+    }
+  ];
+
+  // --- MINI CHATBOT DATA (populated from repository README / project info) ---
+  miniKnowledge: Suggestion[] = [
+    {
+      title: 'Authentication & Users',
+      questions: [
+        {
+          q: 'How does authentication work?',
+          a:
+            'TaskManager uses secure JWT-based authentication (frontend + backend) to protect API access and manage user sessions. Users register and log in with standard credentials and receive JWT tokens for API calls.',
+        },
+        {
+          q: 'Can users change passwords and manage accounts?',
+          a:
+            'Yes — the app supports password changes and full account management. Profile customization (including profile images) is supported for a personalized experience.',
+        },
+        {
+          q: 'Are profile pictures supported?',
+          a:
+          'Yes — user-specific profile pictures are supported so users can personalize their profiles.',
+        },
+      ],
     },
     {
-      icon: 'fa-twitter',
-      url: 'https://twitter.com/yourusername',
-      name: 'Twitter',
+      title: 'Task Management',
+      questions: [
+        {
+          q: 'How do I create or edit tasks?',
+          a:
+            'The app provides full CRUD for tasks. You can create tasks with title, description, due date, priority and update them as needed using the UI or API.',
+        },
+        {
+          q: 'What statuses and priorities exist?',
+          a:
+            'Tasks support statuses like "Not Started", "In Progress" and "Completed", plus priority levels (High, Medium, Low) for triage and sorting.',
+        },
+        {
+          q: 'Does it support drag-and-drop and bulk operations?',
+          a:
+            'Yes — the UI includes drag-and-drop reordering and bulk operations to speed up task management for teams and power users.',
+        },
+      ],
+    },
+    {
+      title: 'Analytics & Insights',
+      questions: [
+        {
+          q: 'What analytics are available?',
+          a:
+            'A personal productivity dashboard provides completion stats, time-efficiency metrics, overdue task monitoring and trend analysis to help you understand work patterns.',
+        },
+        {
+          q: 'How does time tracking & estimates work?',
+          a:
+            'Time spent can be logged on tasks and estimations stored, enabling comparison between expected vs actual effort in the analytics.',
+        },
+        {
+          q: 'Can I see long-term productivity trends?',
+          a:
+            'Yes — the analytics include trend visualizations to identify peak performance periods and long-term patterns.',
+        },
+      ],
+    },
+    {
+      title: 'User Experience',
+      questions: [
+        {
+          q: 'Is the app responsive and mobile-ready?',
+          a:
+            'Yes — TaskManager uses a responsive Angular frontend designed to adapt across desktops, tablets and mobile devices.',
+        },
+        {
+          q: 'Does the app support Dark/Light mode?',
+          a:
+            'Yes — the UI supports theme preferences including dark and light modes to reduce eye strain and match user preference.',
+        },
+        {
+          q: 'Are there smooth animations and transitions?',
+          a:
+          'Yes — Angular Animations are used to provide fluid UI transitions across the app for a polished experience.',
+        },
+      ],
+    },
+    {
+      title: 'Communication & Notifications',
+      questions: [
+        {
+          q: 'How do contact forms and admin messages work?',
+          a:
+            'There is a contact form that integrates with SMTP on the backend; admin message management tools allow administrators to manage inbound messages.',
+        },
+        {
+          q: 'Are email notifications supported?',
+          a:
+            'Yes — SMTP integration is available for sending notifications like overdue alerts and contact form emails.',
+        },
+        {
+          q: 'Is there an admin notification center?',
+          a:
+            'The backend provides admin-focused message management for timely responses and tracking user communications.',
+        },
+      ],
+    },
+    {
+      title: 'Tech Stack & Setup',
+      questions: [
+        {
+          q: 'What does the frontend use?',
+          a:
+            'Frontend: Angular (recent version), TypeScript, SCSS, Angular Animations and Reactive Forms.',
+        },
+                {
+          q: 'What does the backend use?',
+          a:
+            'Backend: FastAPI + SQLAlchemy, SQLite for development, Pydantic for validation and JWT for auth.',
+        },
+        {
+          q: 'How can I run the project locally?',
+          a:
+            'The repo includes setup scripts and a docker-compose (see repository root). You can run frontend and backend locally via the provided setup steps or Docker compose for a full stack environment.',
+        },
+      ],
     },
   ];
 
-  // Project statistics
-  projectStats = [
-    { value: '15+', label: 'Projects Completed' },
-    { value: '99.9%', label: 'Uptime' },
-    { value: '24/7', label: 'Support Available' },
-    { value: '4.9/5', label: 'Customer Rating' },
+  // Chat UI state
+  chatMessages: { sender: 'user' | 'bot'; text: string }[] = [
+    { sender: 'bot', text: `Hi — I'm Mini, the M.O.B TaskManager assistant. Type <strong>hello</strong> to see guided questions.` }
   ];
+  userInput = '';
+  showSuggestions = false;
+  // State for the interactive flow (cascading behavior)
+  awaitingFollowUp = false;
 
-  constructor() {}
+  constructor(private elementRef: ElementRef) { }
 
   ngOnInit(): void {
-    this.startSlideshow();
-
+    // Start skill bar animations after a short delay (preserve original behavior)
     setTimeout(() => {
       this.animateSkillBars();
     }, 1500);
   }
 
   ngOnDestroy(): void {
-    if (this.slideInterval) {
-      clearInterval(this.slideInterval);
+    // nothing slideshow-related to clear anymore (slides were removed)
+  }
+
+  // Toggle category expansion
+  toggleCategory(index: number): void {
+    if (this.activeCategory === index) {
+      // If clicking the same category, go back to showing all categories
+      this.activeCategory = null;
+      this.showCategories = true;
+    } else {
+      // Show only the selected category and its questions
+      this.activeCategory = index;
+      this.showCategories = false;
     }
   }
 
-  startSlideshow(): void {
-    this.slideInterval = setInterval(() => {
-      this.nextSlide();
-    }, 5000);
+  // Go back to categories view
+  backToCategories(): void {
+    this.activeCategory = null;
+    this.showCategories = true;
   }
 
-  pauseSlideshow(): void {
-    if (this.slideInterval) {
-      clearInterval(this.slideInterval);
+  // Refresh/Reset the chatbot
+  refreshChat(): void {
+    // Reset all chat states
+    this.chatMessages = [
+      { sender: 'bot', text: `Hi — I'm Mini, the M.O.B TaskManager assistant. Type <strong>hello</strong> to see guided questions.` }
+    ];
+    this.userInput = '';
+    this.showSuggestions = false;
+    this.awaitingFollowUp = false;
+    this.activeCategory = null;
+    this.showCategories = true;
+    
+    // Scroll to top of chat
+    setTimeout(() => {
+      const chatWindow = this.elementRef.nativeElement.querySelector('.chat-window');
+      if (chatWindow) {
+        chatWindow.scrollTop = 0;
+      }
+    }, 0);
+  }
+
+  // --- Chatbot handlers ---
+  handleUserInput(): void {
+    const raw = (this.userInput || '').trim();
+    if (!raw) return;
+
+    // Add user msg
+    this.chatMessages.push({ sender: 'user', text: raw });
+
+    const low = raw.toLowerCase();
+
+    // 1. Handle Awaiting Follow-Up (Y/N)
+    if (this.awaitingFollowUp) {
+      if (low === 'yes' || low === 'y') {
+        this.awaitingFollowUp = false;
+        this.showSuggestions = true;
+        this.activeCategory = null; // Reset category selection
+        this.showCategories = true; // Show all categories again
+        this.chatMessages.push({
+          sender: 'bot',
+          text: `Great! Here are the topics again. Pick a new question.`,
+        });
+      } else if (low === 'no' || low === 'n') {
+        this.awaitingFollowUp = false;
+        this.showSuggestions = false;
+        // Quote message + Bye message
+        this.chatMessages.push({
+          sender: 'bot',
+          text: `&quot;The secret of getting ahead is getting started.&quot; - Mark Twain`,
+        });
+        this.chatMessages.push({
+          sender: 'bot',
+          text: `Understood. Thanks for chatting! Goodbye.`,
+        });
+      } else {
+        this.chatMessages.push({
+          sender: 'bot',
+          text: `Please answer with **Yes** or **No** (Y/N).`,
+        });
+      }
+
+      this.userInput = '';
+      this.scrollChatToBottom();
+      return;
     }
+
+    // 2. Handle Initial 'hello'
+    if (low === 'hello') {
+      this.showSuggestions = true;
+      this.activeCategory = null; // Reset category selection
+      this.showCategories = true; // Show all categories
+      this.chatMessages.push({
+        sender: 'bot',
+        text: `Hello! I can answer common questions about M.O.B TaskManager. Pick a topic below or click a suggested question.`,
+      });
+      this.userInput = '';
+      this.scrollChatToBottom();
+      return;
+    }
+
+    // 3. Handle Question Match (only if suggestions are shown)
+    if (this.showSuggestions) {
+      const match = this.findQuestion(raw);
+      if (match) {
+        // Answer question
+        this.chatMessages.push({ sender: 'bot', text: match.answer });
+        this.askForFollowUp(); // Start the interactive flow
+      } else {
+        this.chatMessages.push({
+          sender: 'bot',
+          text: `Sorry — I don't have a direct answer for that phrasing. Try one of the suggested questions.`,
+        });
+      }
+    } else {
+      // 4. Nudge user to start with 'hello' if no interaction yet
+      this.chatMessages.push({
+        sender: 'bot',
+        text: `Please type <strong>hello</strong> first — I'll then show guided questions about the app.`,
+      });
+    }
+
+    this.userInput = '';
+    this.scrollChatToBottom();
   }
 
-  resumeSlideshow(): void {
-    this.startSlideshow();
+  selectQuestion(catIndex: number, qIndex: number): void {
+    const qObj = this.miniKnowledge[catIndex].questions[qIndex];
+    // simulate user clicking the suggestion (add user message)
+    this.chatMessages.push({ sender: 'user', text: qObj.q });
+    // add bot answer
+    this.chatMessages.push({ sender: 'bot', text: qObj.a });
+    this.askForFollowUp(); // Start the interactive flow
   }
 
-  nextSlide(): void {
-    this.currentSlide = (this.currentSlide + 1) % this.slideImages.length;
+  /**
+   * Clears suggestions and prompts user for continuation, setting up the 'Y/N' flow.
+   */
+  private askForFollowUp(): void {
+    this.showSuggestions = false; // Hide suggestions after selection
+    this.awaitingFollowUp = true; // Engage Y/N mode
+    this.chatMessages.push({
+      sender: 'bot',
+      text: `Question answered. Do you want to ask another question? **(Yes/No)**`,
+    });
+    this.scrollChatToBottom();
   }
 
-  prevSlide(): void {
-    this.currentSlide =
-      (this.currentSlide - 1 + this.slideImages.length) %
-      this.slideImages.length;
+  private findQuestion(text: string): { answer: string } | null {
+    const low = text.toLowerCase();
+    for (const cat of this.miniKnowledge) {
+      for (const q of cat.questions) {
+        if (q.q.toLowerCase() === low) {
+          return { answer: q.a };
+        }
+      }
+    }
+    return null;
   }
 
-  setCurrentSlide(index: number): void {
-    this.currentSlide = index;
+  private scrollChatToBottom(): void {
+    // Use setTimeout to wait for the DOM to update after message addition/removal
+    setTimeout(() => {
+      const chatWindow = this.elementRef.nativeElement.querySelector('.chat-window');
+      if (chatWindow) {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+      }
+    }, 0);
   }
 
-  getSlideState(index: number): string {
-    return index === this.currentSlide ? 'active' : 'inactive';
-  }
-
+  // --- Animation logic preserved for skill bars ---
   animateSkillBars(): void {
+    if (this.skillsAnimated) return;
+    this.skillsAnimated = true;
+
     this.developerSkills.forEach((skill, index) => {
       setTimeout(() => {
         this.animateSkillBar(skill);
@@ -192,14 +454,14 @@ export class AboutUsComponent implements OnInit, OnDestroy {
   private animateSkillBar(skill: any): void {
     const duration = 1500;
     const steps = 60;
-    const increment = skill.level / steps;
     const stepDuration = duration / steps;
 
     let currentStep = 0;
 
     const timer = setInterval(() => {
       currentStep++;
-      skill.animatedLevel = Math.min(currentStep * increment, skill.level);
+      const easeLevel = skill.level * (1 - Math.cos((currentStep / steps) * (Math.PI / 2)));
+      skill.animatedLevel = Math.min(easeLevel, skill.level);
 
       if (currentStep >= steps) {
         clearInterval(timer);

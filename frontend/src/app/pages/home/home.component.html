@@ -1,25 +1,23 @@
 <div class="home-container">
   <div class="hero-card">
     <div class="hero-text">
-      <h1>Welcome to <span class="highlight">Task Manager</span></h1>
-      <p>Your AI-powered productivity companion.</p>
+      <h1>Welcome to <span class="highlight">M.O.B Task Manager</span></h1>
+      <p>Your AI-powered productivity companion. Organized. Smart. Efficient.</p>
       <p *ngIf="user">Welcome back, {{ user.name }}!</p>
       <button class="btn-primary" (click)="onGetStarted()">
         🚀 Get Started
       </button>
     </div>
-    <img
-      src="assets/tasks.avif"
-      alt="Task Illustration"
-      class="hero-illustration"
-    />
+    <div class="hero-visual-container">
+      <img src="assets/ai-task-visual.png" alt="AI Task Manager Visual" class="hero-illustration" />
+    </div>
   </div>
 
   <div class="features-section">
-    <h2>✨ Key Features</h2>
+    <h2 class="section-title">✨ Key Features</h2>
     <div class="features-grid">
       <div class="card" *ngFor="let feature of features">
-        <img [src]="feature.icon" class="icon" alt="{{ feature.title }}" />
+        <i [class]="feature.icon" class="icon-placeholder"></i>
         <h3>{{ feature.title }}</h3>
         <p>{{ feature.description }}</p>
       </div>

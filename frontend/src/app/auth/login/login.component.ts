@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
+        this.isLoading = true;
     this.loginError = '';
 
     const { email, password } = this.loginForm.value;

@@ -7,7 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { trigger, transition, style, animate } from '@angular/animations';
+import { trigger, transition, style, animate, keyframes } from '@angular/animations';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -19,10 +19,31 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   animations: [
     trigger('fadeIn', [
       transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(20px)' }),
+        style({ opacity: 0, transform: 'translateY(30px)' }),
         animate(
-          '0.5s ease-out',
+          '0.6s cubic-bezier(0.35, 0, 0.25, 1)',
           style({ opacity: 1, transform: 'translateY(0)' }),
+        ),
+      ]),
+    ]),
+    trigger('slideInLeft', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(-50px)' }),
+        animate(
+          '0.8s cubic-bezier(0.35, 0, 0.25, 1)',
+          style({ opacity: 1, transform: 'translateX(0)' }),
+        ),
+      ]),
+    ]),
+    trigger('pulse', [
+      transition(':enter', [
+        animate(
+          '2s ease-in-out',
+          keyframes([
+            style({ transform: 'scale(1)', offset: 0 }),
+            style({ transform: 'scale(1.05)', offset: 0.5 }),
+            style({ transform: 'scale(1)', offset: 1 }),
+          ])
         ),
       ]),
     ]),
@@ -31,13 +52,15 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 export class ContactCtaComponent {
   @Input() title: string = 'Get In Touch';
   @Input() description: string =
-    'Interested in learning more about TaskManager or have questions? Feel free to reach out!';
+    'Have a question about TaskManager? We\'re here to help you succeed!';
   @Input() buttonText: string = 'Send Message';
 
   contactForm: FormGroup;
   isSubmitting = false;
   submitSuccess = false;
   submitError = false;
+  focusedField: string = '';
+  mousePosition = { x: 0, y: 0 };
 
   // Direct API URL - change this to match your backend
   private apiUrl = 'http://localhost:8000';
@@ -52,10 +75,26 @@ export class ContactCtaComponent {
       email: ['', [Validators.required, Validators.email]],
       phone: [
         '',
-        [Validators.required, Validators.pattern(/^\+?[0-9\s-()]{7,15}$/)],
+        [Validators.required, Validators.pattern(/^\+?[\d\s\-\(\)]+$/)],
       ],
       message: ['', [Validators.required, Validators.minLength(10)]],
     });
+  }
+
+  onMouseMove(event: MouseEvent): void {
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    this.mousePosition = {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top
+    };
+  }
+
+  setFocusedField(fieldName: string): void {
+    this.focusedField = fieldName;
+  }
+
+  clearFocusedField(): void {
+    this.focusedField = '';
   }
 
   onSubmit(): void {
@@ -78,11 +117,11 @@ export class ContactCtaComponent {
         this.isSubmitting = false;
         this.submitSuccess = true;
 
-        // Reset form after showing success message for a moment
+        // Reset form after showing success message
         setTimeout(() => {
           this.contactForm.reset();
           this.submitSuccess = false;
-        }, 3000);
+        }, 4000);
       },
       error: (error) => {
         console.error('Error sending contact message:', error);
@@ -106,7 +145,7 @@ export class ContactCtaComponent {
     const control = this.contactForm.get(controlName);
 
     if (control?.hasError('required')) {
-      return 'This field is required';
+      return `${this.getFieldLabel(controlName)} is required`;
     }
 
     if (control?.hasError('email')) {
@@ -125,5 +164,22 @@ export class ContactCtaComponent {
     }
 
     return 'Invalid input';
+  }
+
+  private getFieldLabel(controlName: string): string {
+    const labels: { [key: string]: string } = {
+      firstName: 'First name',
+      lastName: 'Last name',
+      email: 'Email',
+      phone: 'Phone',
+      message: 'Message',
+    };
+    return labels[controlName] || controlName;
+  }
+
+  get formCompletion(): number {
+    const fields = Object.keys(this.contactForm.controls);
+    const validFields = fields.filter(key => this.contactForm.get(key)?.valid).length;
+    return Math.round((validFields / fields.length) * 100);
   }
 }

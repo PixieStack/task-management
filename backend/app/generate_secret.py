@@ -1,0 +1,4 @@
+SECRET_KEY = "CRjaNl6psT2rMsekEtcNmBEL6NRbdfDLWWcksFOr1Bw"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+DATABASE_URL="sqlite:///./taskmanager.db"

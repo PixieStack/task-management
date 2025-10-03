@@ -14,24 +14,28 @@ export class HomeComponent {
 
   features = [
     {
-      title: 'Smart Inbox',
-      icon: 'https://cdn-icons-png.flaticon.com/512/725/725643.png',
-      description: 'AI captures and organizes your to-dos effortlessly.',
+      title: 'AI Smart Capture',
+      // Font Awesome equivalent for Inbox/Data
+      icon: 'fas fa-inbox', 
+      description: 'Your central hub. AI processes inputs from all sources to queue tasks instantly.',
     },
     {
-      title: 'Task Boards',
-      icon: 'https://cdn-icons-png.flaticon.com/512/2866/2866450.png',
-      description: 'Drag-and-drop boards for your daily workflow.',
+      title: 'Dynamic Task Boards',
+      // Font Awesome equivalent for Grid/Boards
+      icon: 'fas fa-th-large', 
+      description: 'Flexible Kanban-style layouts for visual workflow management and team syncing.',
     },
     {
-      title: 'Calendar View',
-      icon: 'https://cdn-icons-png.flaticon.com/512/1055/1055646.png',
-      description: 'Visualize tasks on a built-in schedule view.',
+      title: 'Time Matrix View',
+      // Font Awesome equivalent for Calendar/Time
+      icon: 'fas fa-clock', 
+      description: 'A holistic calendar view that optimizes deadlines and flags scheduling conflicts.',
     },
     {
-      title: 'AI Assistant',
-      icon: 'https://cdn-icons-png.flaticon.com/512/4712/4712107.png',
-      description: 'Summarizes, reminds, and boosts your focus.',
+      title: 'Hyper-Focus Mode',
+      // Font Awesome equivalent for Brain/AI
+      icon: 'fas fa-brain', 
+      description: 'The assistant auto-prioritizes your list, boosting concentration and productivity.',
     },
   ];
 

@@ -1,163 +1,198 @@
-<section class="contact-cta-section">
-  <div class="contact-card">
-    <div class="card-header">
-      <h2>{{ title }}</h2>
-      <p class="description">{{ description }}</p>
+<section class="contact-cta-section" (mousemove)="onMouseMove($event)">
+  <div class="background-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <div class="contact-wrapper" @fadeIn>
+    <!-- Header -->
+    <div class="contact-header">
+      <div class="header-icon">
+        <i class="fas fa-comments"></i>
+      </div>
+      <h2 class="header-title">{{ title }}</h2>
+      <p class="header-description">{{ description }}</p>
+      
+      <!-- Progress Indicator -->
+      <div class="form-progress" *ngIf="!submitSuccess">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="formCompletion">
+            <span class="progress-glow"></span>
+          </div>
+        </div>
+        <span class="progress-text">{{ formCompletion }}% Complete</span>
+      </div>
     </div>
-    <div class="card-body">
-      <!-- Success message -->
-      <div class="alert success-alert" *ngIf="submitSuccess">
-        <div class="alert-icon">✓</div>
-        <div class="alert-message">
-          <h4>Message Sent Successfully!</h4>
-          <p>
-            Thank you for reaching out. We've received your message and will get
-            back to you within 24 hours.
-          </p>
+
+    <!-- Success State -->
+    <div class="success-state" *ngIf="submitSuccess" @pulse>
+      <div class="success-icon">
+        <i class="fas fa-check-circle"></i>
+        <div class="success-ring"></div>
+      </div>
+      <h3>Message Sent Successfully!</h3>
+      <p>Thank you for contacting us. We'll respond within 24 hours.</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" *ngIf="submitError" @slideInLeft>
+      <div class="error-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <h3>Oops! Something went wrong</h3>
+      <p>Please try again or email us at support&#64;taskmanager.com</p>
+    </div>
+
+    <!-- Contact Form -->
+    <form 
+      [formGroup]="contactForm" 
+      (ngSubmit)="onSubmit()" 
+      *ngIf="!submitSuccess"
+      class="contact-form"
+      @fadeIn
+    >
+      <!-- Name Fields Row -->
+      <div class="form-row">
+        <div class="form-field" [class.focused]="focusedField === 'firstName'">
+          <div class="field-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            placeholder=" "
+            (focus)="setFocusedField('firstName')"
+            (blur)="clearFocusedField()"
+            [class.error]="hasError('firstName', 'required') || hasError('firstName', 'minlength')"
+          />
+          <label for="firstName">First Name</label>
+          <div class="field-highlight"></div>
+          <span class="error-message" *ngIf="hasError('firstName', 'required') || hasError('firstName', 'minlength')">
+            {{ getErrorMessage('firstName') }}
+          </span>
+        </div>
+
+        <div class="form-field" [class.focused]="focusedField === 'lastName'">
+          <div class="field-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            placeholder=" "
+            (focus)="setFocusedField('lastName')"
+            (blur)="clearFocusedField()"
+            [class.error]="hasError('lastName', 'required') || hasError('lastName', 'minlength')"
+          />
+          <label for="lastName">Last Name</label>
+          <div class="field-highlight"></div>
+          <span class="error-message" *ngIf="hasError('lastName', 'required') || hasError('lastName', 'minlength')">
+            {{ getErrorMessage('lastName') }}
+          </span>
         </div>
       </div>
 
-      <!-- Error message -->
-      <div class="alert error-alert" *ngIf="submitError">
-        <div class="alert-icon">!</div>
-        <div class="alert-message">
-          <h4>Something Went Wrong</h4>
-          <p>
-            We couldn't send your message. Please try again or contact us
-            directly at
-          </p>
+      <!-- Email Field -->
+      <div class="form-field" [class.focused]="focusedField === 'email'">
+        <div class="field-icon">
+          <i class="fas fa-envelope"></i>
         </div>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder=" "
+          (focus)="setFocusedField('email')"
+          (blur)="clearFocusedField()"
+          [class.error]="hasError('email', 'required') || hasError('email', 'email')"
+        />
+        <label for="email">Email Address</label>
+        <div class="field-highlight"></div>
+        <span class="error-message" *ngIf="hasError('email', 'required') || hasError('email', 'email')">
+          {{ getErrorMessage('email') }}
+        </span>
       </div>
 
-      <!-- Contact Form -->
-      <form
-        [formGroup]="contactForm"
-        (ngSubmit)="onSubmit()"
-        *ngIf="!submitSuccess"
-        class="contact-form"
-      >
-        <div class="form-row">
-          <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input
-              type="text"
-              id="firstName"
-              formControlName="firstName"
-              placeholder="Your first name"
-              [class.input-error]="
-                hasError('firstName', 'required') ||
-                hasError('firstName', 'minlength')
-              "
-            />
-            <div
-              class="error-message"
-              *ngIf="
-                hasError('firstName', 'required') ||
-                hasError('firstName', 'minlength')
-              "
-            >
-              {{ getErrorMessage("firstName") }}
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="lastName">Surname</label>
-            <input
-              type="text"
-              id="lastName"
-              formControlName="lastName"
-              placeholder="Your surname"
-              [class.input-error]="
-                hasError('lastName', 'required') ||
-                hasError('lastName', 'minlength')
-              "
-            />
-            <div
-              class="error-message"
-              *ngIf="
-                hasError('lastName', 'required') ||
-                hasError('lastName', 'minlength')
-              "
-            >
-              {{ getErrorMessage("lastName") }}
-            </div>
-          </div>
+      <!-- Phone Field -->
+      <div class="form-field" [class.focused]="focusedField === 'phone'">
+        <div class="field-icon">
+          <i class="fas fa-phone"></i>
         </div>
+        <input
+          type="tel"
+          id="phone"
+          formControlName="phone"
+          placeholder=" "
+          (focus)="setFocusedField('phone')"
+          (blur)="clearFocusedField()"
+          [class.error]="hasError('phone', 'required') || hasError('phone', 'pattern')"
+        />
+        <label for="phone">Phone Number</label>
+        <div class="field-highlight"></div>
+        <span class="error-message" *ngIf="hasError('phone', 'required') || hasError('phone', 'pattern')">
+          {{ getErrorMessage('phone') }}
+        </span>
+      </div>
 
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="your.email@example.com"
-            [class.input-error]="
-              hasError('email', 'required') || hasError('email', 'email')
-            "
-          />
-          <div
-            class="error-message"
-            *ngIf="hasError('email', 'required') || hasError('email', 'email')"
-          >
-            {{ getErrorMessage("email") }}
-          </div>
+      <!-- Message Field -->
+      <div class="form-field textarea-field" [class.focused]="focusedField === 'message'">
+        <div class="field-icon">
+          <i class="fas fa-comment-dots"></i>
         </div>
+        <textarea
+          id="message"
+          formControlName="message"
+          placeholder=" "
+          rows="4"
+          (focus)="setFocusedField('message')"
+          (blur)="clearFocusedField()"
+          [class.error]="hasError('message', 'required') || hasError('message', 'minlength')"
+        ></textarea>
+        <label for="message">Your Message</label>
+        <div class="field-highlight"></div>
+        <span class="error-message" *ngIf="hasError('message', 'required') || hasError('message', 'minlength')">
+          {{ getErrorMessage('message') }}
+        </span>
+      </div>
 
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <input
-            type="tel"
-            id="phone"
-            formControlName="phone"
-            placeholder="+27 (61) 123-4567"
-            [class.input-error]="
-              hasError('phone', 'required') || hasError('phone', 'pattern')
-            "
-          />
-          <div
-            class="error-message"
-            *ngIf="
-              hasError('phone', 'required') || hasError('phone', 'pattern')
-            "
-          >
-            {{ getErrorMessage("phone") }}
-          </div>
-        </div>
+      <!-- Submit Button -->
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="submit-button"
+          [disabled]="isSubmitting || contactForm.invalid"
+          [class.loading]="isSubmitting"
+        >
+          <span class="button-content" *ngIf="!isSubmitting">
+            <i class="fas fa-paper-plane"></i>
+            {{ buttonText }}
+          </span>
+          <span class="button-loader" *ngIf="isSubmitting">
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+            <span class="loader-dot"></span>
+          </span>
+        </button>
+      </div>
 
-        <div class="form-group">
-          <label for="message">Your Message</label>
-          <textarea
-            id="message"
-            formControlName="message"
-            rows="5"
-            placeholder="Please describe how we can help you..."
-            [class.input-error]="
-              hasError('message', 'required') ||
-              hasError('message', 'minlength')
-            "
-          ></textarea>
-          <div
-            class="error-message"
-            *ngIf="
-              hasError('message', 'required') ||
-              hasError('message', 'minlength')
-            "
-          >
-            {{ getErrorMessage("message") }}
-          </div>
+      <!-- Quick Contact Info -->
+      <div class="quick-contact">
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>support&#64;mobtaskmanager.com</span>
         </div>
-
-        <div class="button-container">
-          <button
-            type="submit"
-            class="primary-button"
-            [disabled]="isSubmitting || contactForm.invalid"
-          >
-            <span *ngIf="!isSubmitting">{{ buttonText }}</span>
-            <span *ngIf="isSubmitting" class="loading-spinner"></span>
-          </button>
+        <div class="contact-item">
+          <i class="fas fa-phone-alt"></i>
+          <span>+27 (64) 802-3069</span>
         </div>
-      </form>
-    </div>
+        <div class="contact-item">
+          <i class="fas fa-clock"></i>
+          <span>Response within 24h</span>
+        </div>
+      </div>
+    </form>
   </div>
 </section>

@@ -1,33 +1,110 @@
 <div class="key-features-container">
-  <section class="intro">
-    <h2>✨ Key Features</h2>
-    <p>
-      We help you organize your tasks, track productivity, and manage your
-      schedule using cutting-edge AI tools.
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <h1 class="page-title">M.O.B TaskManager Ultimate</h1>
+    <p class="page-subtitle">
+      Transform your life with AI-powered challenges, project tracking, and intelligent habit management
     </p>
   </section>
 
-  <section class="feature-grid">
-    <div class="card" *ngFor="let feature of features">
-      <img
-        [src]="feature.icon"
-        alt="{{ feature.title }} Icon"
-        class="card-icon"
-      />
-      <h3>{{ feature.title }}</h3>
-      <p>{{ feature.description }}</p>
+  <!-- Main 8 Features Grid -->
+  <section class="main-features-section">
+    <h2 class="section-title">✨ Complete Feature Suite</h2>
+    <div class="main-features-grid">
+      <div class="feature-card" [ngClass]="feature.gradient" *ngFor="let feature of mainFeatures">
+        <div class="feature-header">
+          <i [class]="feature.icon" class="feature-icon"></i>
+        </div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </div>
     </div>
   </section>
 
-  <section class="tasks-section">
-    <h2>📋 Tasks You Can Manage</h2>
-    <p>From daily reminders to AI-assisted planning — we cover it all.</p>
+  <!-- Challenges Detail Section -->
+  <section class="detail-section challenges-section">
+    <h2 class="section-title">21-30 Day Life-Changing Challenges</h2>
+    <p class="section-subtitle">Short-term commitments for long-lasting transformation</p>
+    <div class="challenge-grid">
+      <div class="challenge-item" *ngFor="let challenge of challengeTypes">
+        <i [class]="challenge.icon" class="challenge-icon"></i>
+        <h4>{{ challenge.name }}</h4>
+        <span class="duration">{{ challenge.duration }}</span>
+      </div>
+    </div>
+  </section>
 
-    <div class="task-grid">
-      <div class="task-card" *ngFor="let task of taskCategories">
-        <img [src]="task.icon" alt="{{ task.title }} Icon" class="task-icon" />
-        <h4>{{ task.title }}</h4>
-        <p>{{ task.description }}</p>
+  <!-- Projects Detail Section -->
+  <section class="detail-section projects-section">
+    <h2 class="section-title">📊 Long-Term Project Planning</h2>
+    <p class="section-subtitle">Structured milestone tracking for major achievements</p>
+    <div class="project-timeline">
+      <div class="timeline-item" *ngFor="let project of projectTypes">
+        <div class="timeline-marker">
+          <i [class]="project.icon"></i>
+        </div>
+        <div class="timeline-content">
+          <h4>{{ project.name }}</h4>
+          <span>{{ project.duration }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Diet Management Section -->
+  <section class="detail-section diet-section">
+    <h2 class="section-title">🥗 Smart Diet & Hydration Management</h2>
+    <p class="section-subtitle">Time-based suggestions for optimal health</p>
+    <div class="diet-timeline">
+      <div class="diet-time-block" *ngFor="let diet of dietFeatures">
+        <div class="time-label">{{ diet.time }}</div>
+        <div class="suggestion">{{ diet.suggestion }}</div>
+      </div>
+    </div>
+    <div class="diet-features">
+      <div class="diet-feature">
+        <i class="fas fa-leaf"></i>
+        <span>Custom diet types: Keto, Vegan, Low Sugar</span>
+      </div>
+      <div class="diet-feature">
+        <i class="fas fa-tint"></i>
+        <span>Hydration tracking & reminders</span>
+      </div>
+      <div class="diet-feature">
+        <i class="fas fa-heart"></i>
+        <span>Motivational messages after 6 PM</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gamification Section -->
+  <section class="detail-section gamification-section">
+    <h2 class="section-title">🎮 Gamification & Rewards</h2>
+    <p class="section-subtitle">Stay motivated with achievements and progression</p>
+    <div class="gamification-grid">
+      <div class="gamification-item" *ngFor="let element of gamificationElements">
+        <i [class]="element.icon" class="gamification-icon"></i>
+        <span>{{ element.name }}</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Transform Your Life?</h2>
+      <p>Join thousands achieving their goals with AI-powered guidance</p>
+      <div class="platform-options">
+        <button class="download-btn">
+          <i class="fas fa-download"></i>
+          Download for Your Platform
+        </button>
+        <div class="platform-icons">
+          <i class="fab fa-windows"></i>
+          <i class="fab fa-apple"></i>
+          <i class="fab fa-android"></i>
+          <i class="fab fa-app-store-ios"></i>
+        </div>
       </div>
     </div>
   </section>
