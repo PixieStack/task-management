@@ -1,3 +1,56 @@
+# Import schemas from app to fix NameError
+from app import schemas
+# Import Session from sqlalchemy.orm to fix NameError
+from sqlalchemy.orm import Session
+# --- Challenge-related CRUD operations ---
+def create_challenge(db: Session, challenge: schemas.ChallengeCreate, user_id: int):
+    db_challenge = models.Challenge(
+        title=challenge.title,
+        description=challenge.description,
+        duration=challenge.duration,
+        type=challenge.type,
+        start_date=challenge.start_date,
+        current_streak=challenge.current_streak,
+        best_streak=challenge.best_streak,
+        completed=challenge.completed,
+        xp_reward=challenge.xp_reward,
+        icon=challenge.icon,
+        progress=challenge.progress,
+        owner_id=user_id
+    )
+    db.add(db_challenge)
+    db.commit()
+    db.refresh(db_challenge)
+    return db_challenge
+
+def get_challenges(db: Session, user_id: int):
+    return db.query(models.Challenge).filter(models.Challenge.owner_id == user_id).all()
+
+def get_challenge_by_id(db: Session, challenge_id: int, user_id: int):
+    return db.query(models.Challenge).filter(
+        models.Challenge.id == challenge_id,
+        models.Challenge.owner_id == user_id
+    ).first()
+
+def update_challenge(db: Session, challenge_id: int, challenge_update: schemas.ChallengeUpdate, user_id: int):
+    challenge = get_challenge_by_id(db, challenge_id, user_id)
+    if not challenge:
+        return None
+    update_data = challenge_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(challenge, key, value)
+    challenge.updated_at = datetime.utcnow()
+    db.commit()
+    db.refresh(challenge)
+    return challenge
+
+def delete_challenge(db: Session, challenge_id: int, user_id: int):
+    challenge = get_challenge_by_id(db, challenge_id, user_id)
+    if not challenge:
+        return None
+    db.delete(challenge)
+    db.commit()
+    return True
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 from datetime import datetime, timedelta
@@ -10,9 +63,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # --- Password Utilities ---
 def get_password_hash(password: str) -> str:
+    password = password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    plain_password = plain_password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
     return pwd_context.verify(plain_password, hashed_password)
 
 # --- User-related CRUD operations ---

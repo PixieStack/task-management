@@ -1,1380 +1,1210 @@
 import {
   Component,
   OnInit,
-  ViewChild,
-  ElementRef,
   OnDestroy,
   ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../shared/services/auth.service';
 import { TaskService, Task } from '../../shared/services/task.service';
-import {
-  DragDropModule,
-  CdkDragDrop,
-  moveItemInArray,
-  transferArrayItem,
-} from '@angular/cdk/drag-drop';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
-import { HttpClient } from '@angular/common/http';
-import { Subscription, interval } from 'rxjs';
+import { Subject, interval, takeUntil } from 'rxjs';
 
 Chart.register(...registerables);
 
-interface TimerState {
-  taskId: number;
-  startTime: number;
-  timeEstimate: number;
-  isCountdown: boolean;
+// Interfaces (keep the same as before)
+interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  type: ChallengeType;
+  startDate: Date;
+  currentStreak: number;
+  bestStreak: number;
+  completed: boolean;
+  xpReward: number;
+  icon: string;
+  progress: number;
 }
 
-// Frontend Task interface (extended from backend)
-interface FrontendTask extends Task {
-  status: string;
-  priority: 'Low' | 'Medium' | 'High';
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  milestones: Milestone[];
+  startDate: Date;
+  endDate: Date;
+  progress: number;
+  status: ProjectStatus;
+  category: string;
+}
+
+interface Milestone {
+  id: string;
+  title: string;
+  completed: boolean;
+  dueDate: Date;
+  tasks: TaskItem[];
+}
+
+interface TaskItem {
+  id?: number;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: Priority;
   dueDate: string;
   tags: string[];
-  timeSpent?: number;
-  timeEstimate?: number;
-  isTimerRunning?: boolean;
+  timeEstimate: number;
+  timeSpent: number;
+  isTimerRunning: boolean;
   timerStart?: Date;
-  timerInterval?: any;
-  isCountdownTimer?: boolean;
+  isCountdownTimer: boolean;
   remainingTime?: number;
+  xpReward?: number;
 }
 
-interface Analytics {
-  total_tasks: number;
-  completed_tasks: number;
-  completion_rate: number;
-  total_time_spent: number;
-  overdue_tasks: number;
-  tasks_by_status: { [key: string]: number };
-  tasks_by_priority: { [key: string]: number };
-  productivity_trend: Array<{ date: string; completed_tasks: number }>;
+interface HabitEntry {
+  id: string;
+  habitId: string;
+  date: Date;
+  completed: boolean;
+  mood?: number;
+  energy?: number;
+  notes?: string;
+}
+
+interface DietEntry {
+  id: string;
+  date: Date;
+  mealTime: Date;
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  description: string;
+  calories?: number;
+  waterIntake: number;
+}
+
+interface UserStats {
+  level: number;
+  xp: number;
+  xpToNextLevel: number;
+  totalChallengesCompleted: number;
+  currentStreaks: { [key: string]: number };
+  badges: Badge[];
+  rank?: string;
+}
+
+interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedDate?: Date;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+}
+
+enum ChallengeType {
+  Eating = 'eating',
+  NoSocial = 'no-social',
+  Productivity = 'productivity',
+  Meditation = 'meditation',
+  Coding = 'coding',
+  Reading = 'reading',
+  Exercise = 'exercise',
+  Sleep = 'sleep',
+  Finance = 'finance',
+  Language = 'language'
+}
+
+enum TaskStatus {
+  NotStarted = 'Not Started',
+  InProgress = 'In Progress',
+  Pending = 'Pending',
+  Completed = 'Completed'
+}
+
+enum Priority {
+  Low = 'Low',
+  Medium = 'Medium',
+  High = 'High'
+}
+
+enum ProjectStatus {
+  Planning = 'Planning',
+  Active = 'Active',
+  OnHold = 'On Hold',
+  Completed = 'Completed'
 }
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, DatePipe, DragDropModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  readonly Math = Math;
-  private subscriptions: Subscription[] = [];
-  private globalTimerSubscription?: Subscription;
+  // ViewChild references
+  @ViewChild('progressChart') progressChartRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('habitChart') habitChartRef?: ElementRef<HTMLCanvasElement>;
+  @ViewChild('xpChart') xpChartRef?: ElementRef<HTMLCanvasElement>;
 
-  username: string | null = null;
-  email: string | null = null;
-  profilePicture: string | null = null;
-  tasks: FrontendTask[] = [];
-  analytics: Analytics | null = null;
+  // Observables
+  private destroy$ = new Subject<void>();
 
-  // Task lists by status
-  notStartedTasks: FrontendTask[] = [];
-  inProgressTasks: FrontendTask[] = [];
-  pendingTasks: FrontendTask[] = [];
-  completedTasks: FrontendTask[] = [];
-
-  filteredTasks: FrontendTask[] = [];
-
-  newTask: FrontendTask = this.getEmptyTask();
-
-  // UI state
-  activeView: 'list' | 'kanban' | 'calendar' | 'analytics' = 'list';
-  isAddTaskModalOpen = false;
-  isTaskDetailsModalOpen = false;
-  selectedTask: FrontendTask | null = null;
-  isDarkMode = false;
-  searchQuery = '';
-  selectedTag = 'all';
-  selectedPriority = 'all';
+  // Main sections
+  activeSection: 'overview' | 'challenges' | 'projects' | 'habits' | 'diet' | 'gamification' = 'overview';
+  
+  // State
+  tasks: TaskItem[] = [];
+  challenges: Challenge[] = [];
+  activeProjects: Project[] = [];
+  todaysHabits: HabitEntry[] = [];
+  dietEntries: DietEntry[] = [];
+  userStats: UserStats = {
+    level: 1,
+    xp: 0,
+    xpToNextLevel: 100,
+    totalChallengesCompleted: 0,
+    currentStreaks: {},
+    badges: []
+  };
+  
+  // UI State
+  showAddChallengeModal = false;
+  showAddProjectModal = false;
+  showAddTaskModal = false;
+  showDietModal = false;
+  showAiAssistant = false;
   isLoading = false;
-
-  // Timer notification states
-  showTimerAlert = false;
-  alertTask: FrontendTask | null = null;
-
-  // Charts
-  productivityChart: Chart | null = null;
-  distributionChart: Chart | null = null;
-
-  // Pomodoro
-  pomodoroMinutes = 25;
-  pomodoroSeconds = 0;
-  isPomodoroPaused = true;
-  pomodoroInterval: any;
-  pomodoroSessionCount = 0;
-
-  // Calendar properties
-  currentDate = new Date();
-  calendarDays: Date[] = [];
-
-  // Audio context for timer alerts
-  private audioContext?: AudioContext;
-  private alertAudio?: HTMLAudioElement;
-
-  // Available tags and colors
-  availableTags = [
-    { name: 'Work', color: '#3498db' },
-    { name: 'Personal', color: '#e74c3c' },
-    { name: 'Urgent', color: '#f39c12' },
-    { name: 'Learning', color: '#9b59b6' },
-    { name: 'Health', color: '#2ecc71' },
-  ];
-
-  @ViewChild('productivityCanvas') productivityCanvas?: ElementRef;
-  @ViewChild('distributionCanvas') distributionCanvas?: ElementRef;
-
-  constructor(
-    private authService: AuthService,
-    private taskService: TaskService,
-    private http: HttpClient,
-    private cdr: ChangeDetectorRef,
-  ) {
-    this.initializeAudio();
+  currentTime = new Date();
+  showFabMenu = false;
+  
+  // AI Assistant
+  aiSuggestions: string[] = [];
+  aiMotivationalQuote = '';
+  aiApiKey: string = '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';
+  aiInput: string = '';
+  aiResponse: string = '';
+  aiError: string = '';
+  // Allow user to set their own API key for the AI assistant
+  setApiKey(key: string): void {
+    this.aiApiKey = key;
+    localStorage.setItem('mob_ai_api_key', key);
   }
 
-  ngOnInit() {
-    this.initializeUser();
-    this.loadTasks();
-    this.loadAnalytics();
-    this.generateCalendarDays();
-    this.startGlobalTimer();
-    this.restoreTimerStates();
+  // Load API key from localStorage if present
+  loadApiKey(): void {
+    const key = localStorage.getItem('mob_ai_api_key');
+    if (key) {
+      this.aiApiKey = key;
+    }
+  }
 
-    // Subscribe to task updates
-    const tasksSub = this.taskService.tasks$.subscribe((tasks) => {
-      this.tasks = this.convertBackendTasksToFrontend(tasks);
-      this.applyFilters();
-      this.filterTasksByStatus();
-    });
-    this.subscriptions.push(tasksSub);
-
-    // Listen for page visibility changes to handle tab switching
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) {
-        this.restoreTimerStates();
+  // Call OpenAI API (or similar) for suggestions or motivational quote
+  async callAiAssistant(prompt: string): Promise<string> {
+    if (!this.aiApiKey) {
+      this.aiError = 'No API key set.';
+      return '';
+    }
+    try {
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.aiApiKey}`
+        },
+        body: JSON.stringify({
+          model: 'gpt-3.5-turbo',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 60
+        })
+      });
+      const data = await response.json();
+      if (data.choices && data.choices.length > 0) {
+        return data.choices[0].message.content.trim();
+      } else {
+        this.aiError = 'No response from AI.';
+        return '';
       }
-    });
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
-    this.clearTimers();
-    this.destroyCharts();
-    if (this.globalTimerSubscription) {
-      this.globalTimerSubscription.unsubscribe();
-    }
-  }
-
-  private initializeAudio() {
-    try {
-      this.audioContext = new (window.AudioContext ||
-        (window as any).webkitAudioContext)();
-    } catch (e) {
-      console.warn('Audio context not supported');
-    }
-
-    this.alertAudio = new Audio();
-    this.alertAudio.preload = 'auto';
-
-    this.alertAudio.src = this.generateBeepSound();
-  }
-
-  private generateBeepSound(): string {
-    if (!this.audioContext) return '';
-
-    try {
-      const oscillator = this.audioContext.createOscillator();
-      const gainNode = this.audioContext.createGain();
-
-      oscillator.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
-
-      oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-
-      return 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ4AAAAAAAAAAAAAAA==';
-    } catch (e) {
-      console.warn('Could not generate beep sound');
+    } catch (err) {
+      this.aiError = 'Error contacting AI service.';
       return '';
     }
   }
 
-  private startGlobalTimer() {
-    this.globalTimerSubscription = interval(1000).subscribe(() => {
-      let hasActiveTimers = false;
-
-      this.tasks.forEach((task) => {
-        if (task.isTimerRunning && task.timerStart) {
-          hasActiveTimers = true;
-          this.updateTaskTimer(task);
-        }
-      });
-
-      if (hasActiveTimers) {
-        this.saveTimerStates();
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  private updateTaskTimer(task: FrontendTask) {
-    if (!task.timerStart) return;
-
-    const now = new Date();
-    const elapsedMs = now.getTime() - task.timerStart.getTime();
-    const elapsedMinutes = Math.floor(elapsedMs / 60000);
-
-    if (task.isCountdownTimer && task.timeEstimate) {
-      const remainingMinutes = task.timeEstimate - elapsedMinutes;
-      task.remainingTime = Math.max(0, remainingMinutes);
-
-      if (remainingMinutes <= 0 && task.isTimerRunning) {
-        this.onTimerComplete(task);
-      }
+  // Example: Use AI for motivational quote if API key is set
+  async updateMotivationalQuote(): Promise<void> {
+    if (this.aiApiKey) {
+      const prompt = 'Give me a short, motivational quote for productivity.';
+      const quote = await this.callAiAssistant(prompt);
+      this.aiMotivationalQuote = quote || 'Success is the sum of small efforts repeated day in and day out.';
     } else {
-      task.remainingTime = elapsedMinutes;
+      const quotes = [
+        'Success is the sum of small efforts repeated day in and day out.',
+        'The only way to do great work is to love what you do.',
+        "Don’t watch the clock; do what it does. Keep going.",
+        'The future depends on what you do today.',
+        "Excellence is not a skill, it’s an attitude."
+      ];
+      this.aiMotivationalQuote = quotes[Math.floor(Math.random() * quotes.length)];
     }
   }
 
-  private onTimerComplete(task: FrontendTask) {
-    this.stopTimer(task);
-
-    this.showTimerCompleteAlert(task);
-
-    this.playAlertSound();
-
-    this.sendBrowserNotification(task);
-
-    if (task.isCountdownTimer) {
-      task.status = 'Completed';
-      this.updateTaskInBackend(task);
-    }
-  }
-
-  private showTimerCompleteAlert(task: FrontendTask) {
-    this.alertTask = task;
-    this.showTimerAlert = true;
-
-    // Auto-hide after 10 seconds if user doesn't interact
-    setTimeout(() => {
-      if (this.alertTask?.id === task.id) {
-        this.dismissAlert();
-      }
-    }, 10000);
-  }
-
-  private playAlertSound() {
-    if (this.alertAudio) {
-      try {
-        this.alertAudio.currentTime = 0;
-        this.alertAudio.play().catch((e) => {
-          console.warn('Could not play alert sound:', e);
-        });
-      } catch (e) {
-        console.warn('Audio playback failed:', e);
-      }
-    }
-  }
-
-  private sendBrowserNotification(task: FrontendTask) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification('Task Timer Complete!', {
-        body: `Timer for "${task.title}" has finished!`,
-        icon: '/assets/timer-icon.png',
-        tag: `task-${task.id}`,
-        requireInteraction: true,
-      });
-    } else if (
-      'Notification' in window &&
-      Notification.permission === 'default'
-    ) {
-      Notification.requestPermission();
-    }
-  }
-
-  private saveTimerStates() {
-    const activeTimers: TimerState[] = [];
-
-    this.tasks.forEach((task) => {
-      if (task.isTimerRunning && task.timerStart) {
-        activeTimers.push({
-          taskId: task.id!,
-          startTime: task.timerStart.getTime(),
-          timeEstimate: task.timeEstimate || 0,
-          isCountdown: task.isCountdownTimer || false,
-        });
-      }
-    });
-
-    localStorage.setItem('activeTimers', JSON.stringify(activeTimers));
-  }
-
-  private restoreTimerStates() {
-    const savedTimers = localStorage.getItem('activeTimers');
-    if (!savedTimers) return;
-
-    try {
-      const timerStates: TimerState[] = JSON.parse(savedTimers);
-
-      timerStates.forEach((timerState) => {
-        const task = this.tasks.find((t) => t.id === timerState.taskId);
-        if (task) {
-          task.isTimerRunning = true;
-          task.timerStart = new Date(timerState.startTime);
-          task.isCountdownTimer = timerState.isCountdown;
-          task.timeEstimate = timerState.timeEstimate;
-
-          // Check if timer should have completed while page was closed
-          const now = new Date();
-          const elapsedMs = now.getTime() - timerState.startTime;
-          const elapsedMinutes = Math.floor(elapsedMs / 60000);
-
-          if (
-            timerState.isCountdown &&
-            elapsedMinutes >= timerState.timeEstimate
-          ) {
-            // Timer completed while away
-            this.onTimerComplete(task);
-          }
-        }
-      });
-    } catch (e) {
-      console.warn('Could not restore timer states:', e);
-      localStorage.removeItem('activeTimers');
-    }
-  }
-
-  private clearTimers() {
-    if (this.pomodoroInterval) {
-      clearInterval(this.pomodoroInterval);
-    }
-
-    localStorage.removeItem('activeTimers');
-  }
-
-  private destroyCharts() {
-    if (this.productivityChart) {
-      this.productivityChart.destroy();
-    }
-    if (this.distributionChart) {
-      this.distributionChart.destroy();
-    }
-  }
-
-  private initializeUser() {
-    this.username = this.authService.getUsername();
-    this.email = localStorage.getItem('userEmail');
-    this.profilePicture = localStorage.getItem('profilePicture');
-
-    const darkModePreference = localStorage.getItem('darkMode');
-    this.isDarkMode = darkModePreference === 'true';
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-mode');
-    }
-
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }
-
-  private loadTasks() {
-    this.isLoading = true;
-    const tasksSub = this.taskService.getTasks().subscribe({
-      next: (tasks) => {
-        this.tasks = this.convertBackendTasksToFrontend(tasks);
-        this.taskService.updateTasksState(tasks);
-        this.applyFilters();
-        this.filterTasksByStatus();
-        this.restoreTimerStates();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading tasks:', error);
-        this.isLoading = false;
-      },
-    });
-    this.subscriptions.push(tasksSub);
-  }
-
-  private loadAnalytics() {
-    const token = this.authService.getToken();
-    const analyticsSub = this.http
-      .get<Analytics>('http://localhost:8000/analytics', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .subscribe({
-        next: (analytics) => {
-          this.analytics = analytics;
-          if (this.activeView === 'analytics') {
-            setTimeout(() => this.initializeCharts(), 100);
-          }
-        },
-        error: (error) => {
-          console.error('Error loading analytics:', error);
-        },
-      });
-    this.subscriptions.push(analyticsSub);
-  }
-
-  private convertBackendTasksToFrontend(backendTasks: Task[]): FrontendTask[] {
-    return backendTasks.map((task) => ({
-      ...task,
-      status: task.completed ? 'Completed' : task.status || 'Not Started',
-      priority: (task.priority as 'Low' | 'Medium' | 'High') || 'Medium',
-      dueDate: task.due_date
-        ? new Date(task.due_date).toISOString().split('T')[0]
-        : this.formatDate(new Date()),
-      tags: Array.isArray(task.tags)
-        ? task.tags
-        : task.tags
-          ? JSON.parse(task.tags as string)
-          : [],
-      timeSpent: task.time_spent || 0,
-      timeEstimate: task.time_estimate || 0,
-      isTimerRunning: false,
-      isCountdownTimer: false,
-      remainingTime: 0,
-    }));
-  }
-
-  private convertFrontendTaskToBackend(frontendTask: FrontendTask): any {
-    return {
-      title: frontendTask.title,
-      description: frontendTask.description || '',
-      completed: frontendTask.status === 'Completed',
-      status: frontendTask.status,
-      priority: frontendTask.priority,
-      due_date: frontendTask.dueDate
-        ? new Date(frontendTask.dueDate).toISOString()
-        : null,
-      tags: frontendTask.tags || [],
-      time_estimate: frontendTask.timeEstimate || 0,
-      time_spent: frontendTask.timeSpent || 0,
-    };
-  }
-
-  // Filtering logic
-  applyFilters() {
-    this.filteredTasks = this.tasks.filter((task) => {
-      if (this.searchQuery && this.searchQuery.trim() !== '') {
-        const searchLower = this.searchQuery.toLowerCase();
-        const matchesTitle = task.title.toLowerCase().includes(searchLower);
-        const matchesDescription = task.description
-          ?.toLowerCase()
-          .includes(searchLower);
-        if (!matchesTitle && !matchesDescription) {
-          return false;
-        }
-      }
-
-      // Tag filter
-      if (this.selectedTag !== 'all') {
-        if (!task.tags || !task.tags.includes(this.selectedTag)) {
-          return false;
-        }
-      }
-
-      // Priority filter
-      if (this.selectedPriority !== 'all') {
-        if (task.priority !== this.selectedPriority) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }
-
-  filterTasksByStatus() {
-    this.notStartedTasks = this.filteredTasks.filter(
-      (task) => task.status === 'Not Started',
-    );
-    this.inProgressTasks = this.filteredTasks.filter(
-      (task) => task.status === 'In Progress',
-    );
-    this.pendingTasks = this.filteredTasks.filter(
-      (task) => task.status === 'Pending',
-    );
-    this.completedTasks = this.filteredTasks.filter(
-      (task) => task.status === 'Completed',
-    );
-  }
-
-  initializeCharts() {
-    if (!this.analytics) return;
-
-    setTimeout(() => {
-      this.initializeProductivityChart();
-      this.initializeDistributionChart();
-    }, 100);
-  }
-
-  private initializeProductivityChart() {
-    if (!this.productivityCanvas || !this.analytics) return;
-
-    if (this.productivityChart) {
-      this.productivityChart.destroy();
-    }
-
-    const ctx = this.productivityCanvas.nativeElement.getContext('2d');
-
-    const config: ChartConfiguration = {
-      type: 'line',
-      data: {
-        labels: this.analytics.productivity_trend.map((item) =>
-          new Date(item.date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-          }),
-        ),
-        datasets: [
-          {
-            label: 'Completed Tasks',
-            data: this.analytics.productivity_trend.map(
-              (item) => item.completed_tasks,
-            ),
-            borderColor: '#3498db',
-            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-            tension: 0.4,
-            fill: true,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              stepSize: 1,
-            },
-          },
-        },
-        plugins: {
-          legend: {
-            display: false,
-          },
-        },
-      },
-    };
-
-    this.productivityChart = new Chart(ctx, config);
-  }
-
-  private initializeDistributionChart() {
-    if (!this.distributionCanvas || !this.analytics) return;
-
-    if (this.distributionChart) {
-      this.distributionChart.destroy();
-    }
-
-    const ctx = this.distributionCanvas.nativeElement.getContext('2d');
-
-    const statusData = this.analytics.tasks_by_status;
-    const labels = Object.keys(statusData);
-    const data = Object.values(statusData);
-
-    const colors = ['#95a5a6', '#3498db', '#f39c12', '#2ecc71'];
-
-    const config: ChartConfiguration = {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            data: data,
-            backgroundColor: colors.slice(0, labels.length),
-            borderWidth: 2,
-            borderColor: '#fff',
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              padding: 20,
-              usePointStyle: true,
-            },
-          },
-        },
-      },
-    };
-
-    this.distributionChart = new Chart(ctx, config);
-  }
-
-  // UI Interaction methods
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    localStorage.setItem('darkMode', this.isDarkMode.toString());
-
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-mode');
-    } else {
-      document.body.classList.remove('dark-mode');
-    }
-  }
-
-  changeView(view: 'list' | 'kanban' | 'calendar' | 'analytics') {
-    this.activeView = view;
-
-    if (view === 'analytics') {
-      this.loadAnalytics();
-    } else if (view === 'calendar') {
-      this.generateCalendarDays();
-    }
-  }
-
-  openAddTaskModal() {
-    this.isAddTaskModalOpen = true;
-    this.newTask = this.getEmptyTask();
-  }
-
-  closeAddTaskModal() {
-    this.isAddTaskModalOpen = false;
-  }
-
-  openTaskDetailsModal(task: FrontendTask) {
-    this.selectedTask = { ...task };
-    this.isTaskDetailsModalOpen = true;
-  }
-
-  closeTaskDetailsModal() {
-    this.isTaskDetailsModalOpen = false;
-    this.selectedTask = null;
-  }
-
-  getEmptyTask(): FrontendTask {
-    return {
-      id: 0,
-      title: '',
-      description: '',
-      completed: false,
-      status: 'Not Started',
-      priority: 'Medium',
-      dueDate: this.formatDate(new Date()),
-      tags: [],
-      timeEstimate: 0,
-      timeSpent: 0,
-      isTimerRunning: false,
-      isCountdownTimer: false,
-      remainingTime: 0,
-    };
-  }
-
-  formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  addTask() {
-    if (this.newTask.title.trim() === '') return;
-
-    this.isLoading = true;
-    const backendTask = this.convertFrontendTaskToBackend(this.newTask);
-
-    const addSub = this.taskService.createTask(backendTask).subscribe({
-      next: (task) => {
-        const frontendTask = this.convertBackendTasksToFrontend([task])[0];
-        this.tasks.push(frontendTask);
-        this.taskService.addTaskToState(task);
-        this.applyFilters();
-        this.filterTasksByStatus();
-        this.closeAddTaskModal();
-        this.loadAnalytics();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error creating task:', error);
-        this.isLoading = false;
-      },
-    });
-    this.subscriptions.push(addSub);
-  }
-
-  // UpdateTask method
-  updateTask() {
-    if (!this.selectedTask || this.selectedTask.title.trim() === '') return;
-
-    this.isLoading = true;
-    const backendTask = this.convertFrontendTaskToBackend(this.selectedTask);
-
-    const updateSub = this.taskService
-      .updateTask(this.selectedTask.id!, backendTask)
-      .subscribe({
-        next: (updatedTask) => {
-          const index = this.tasks.findIndex(
-            (t) => t.id === this.selectedTask!.id,
-          );
-          if (index !== -1) {
-            // Preserve timer state
-            const wasTimerRunning = this.tasks[index].isTimerRunning;
-            const timerStart = this.tasks[index].timerStart;
-            const isCountdownTimer = this.tasks[index].isCountdownTimer;
-
-            this.tasks[index] = this.convertBackendTasksToFrontend([
-              updatedTask,
-            ])[0];
-
-            // Restore timer state
-            if (wasTimerRunning) {
-              this.tasks[index].isTimerRunning = wasTimerRunning;
-              this.tasks[index].timerStart = timerStart;
-              this.tasks[index].isCountdownTimer = isCountdownTimer;
-            }
-
-            this.applyFilters();
-            this.filterTasksByStatus();
-            this.loadAnalytics();
-          }
-          this.closeTaskDetailsModal();
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        },
-        error: (error) => {
-          console.error('Error updating task:', error);
-          this.isLoading = false;
-        },
-      });
-    this.subscriptions.push(updateSub);
-  }
-
-  private updateTaskInBackend(task: FrontendTask) {
-    const backendTask = this.convertFrontendTaskToBackend(task);
-    const updateSub = this.taskService
-      .updateTask(task.id!, backendTask)
-      .subscribe({
-        next: () => {
-          this.loadAnalytics();
-        },
-        error: (error) => {
-          console.error('Error updating task in backend:', error);
-        },
-      });
-    this.subscriptions.push(updateSub);
-  }
-
-  deleteTask(taskId: number | undefined) {
-    if (taskId === undefined) return;
-
-    this.isLoading = true;
-    const deleteSub = this.taskService.deleteTask(taskId).subscribe({
-      next: () => {
-        const taskToDelete = this.tasks.find((t) => t.id === taskId);
-        if (taskToDelete && taskToDelete.isTimerRunning) {
-          this.stopTimer(taskToDelete);
-        }
-
-        this.tasks = this.tasks.filter((t) => t.id !== taskId);
-        this.taskService.removeTaskFromState(taskId);
-        this.applyFilters();
-        this.filterTasksByStatus();
-        this.closeTaskDetailsModal();
-        this.loadAnalytics();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error deleting task:', error);
-        this.isLoading = false;
-      },
-    });
-    this.subscriptions.push(deleteSub);
-  }
-
-  toggleTaskTag(task: FrontendTask, tag: string) {
-    if (task.tags.includes(tag)) {
-      task.tags = task.tags.filter((t) => t !== tag);
-    } else {
-      task.tags.push(tag);
-    }
-  }
-
-  //Timer functionality with countdown support
-  startTimer(task: FrontendTask, isCountdown: boolean = false) {
-    if (task.isTimerRunning) return;
-
-    if (isCountdown && (!task.timeEstimate || task.timeEstimate <= 0)) {
-      const estimateMinutes = prompt(
-        'Enter time estimate in minutes for countdown timer:',
-        '25',
-      );
-      if (!estimateMinutes || isNaN(Number(estimateMinutes))) {
-        return;
-      }
-      task.timeEstimate = Number(estimateMinutes);
-    }
-
-    task.isTimerRunning = true;
-    task.timerStart = new Date();
-    task.isCountdownTimer = isCountdown;
-    task.remainingTime = isCountdown ? task.timeEstimate || 0 : 0;
-
-    this.saveTimerStates();
-    this.cdr.detectChanges();
-  }
-
-  startCountdownTimer(task: FrontendTask) {
-    this.startTimer(task, true);
-  }
-
-  startRegularTimer(task: FrontendTask) {
-    this.startTimer(task, false);
-  }
-
-  stopTimer(task: FrontendTask) {
-    if (!task.isTimerRunning || !task.timerStart) return;
-
-    const now = new Date();
-    const diffMs = now.getTime() - task.timerStart.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    const actualTimeSpent = task.isCountdownTimer
-      ? Math.min(diffMins, task.timeEstimate || 0)
-      : diffMins;
-
-    task.timeSpent = (task.timeSpent || 0) + actualTimeSpent;
-    task.isTimerRunning = false;
-    task.timerStart = undefined;
-    task.isCountdownTimer = false;
-    task.remainingTime = 0;
-
-    this.saveTimerStates();
-    this.updateTaskInBackend(task);
-    this.cdr.detectChanges();
-  }
-
-  // Timer alert methods
-  dismissAlert() {
-    this.showTimerAlert = false;
-    this.alertTask = null;
-  }
-
-  snoozeTimer(minutes: number = 5) {
-    if (this.alertTask) {
-      this.alertTask.timeEstimate = minutes;
-      this.startCountdownTimer(this.alertTask);
-      this.dismissAlert();
-    }
-  }
-
-  markTaskComplete() {
-    if (this.alertTask) {
-      this.alertTask.status = 'Completed';
-      this.updateTaskInBackend(this.alertTask);
-      this.applyFilters();
-      this.filterTasksByStatus();
-      this.dismissAlert();
-    }
-  }
-
-  // Pomodoro functionality
-  startPomodoro() {
-    if (!this.isPomodoroPaused) return;
-
-    this.isPomodoroPaused = false;
-    this.pomodoroInterval = setInterval(() => {
-      if (this.pomodoroSeconds === 0) {
-        if (this.pomodoroMinutes === 0) {
-          this.pomodoroSessionCount++;
-          this.pausePomodoro();
-
-          // Play sound when pomodoro completes
-          this.playAlertSound();
-
-          if (this.pomodoroSessionCount % 2 === 1) {
-            this.pomodoroMinutes = 5;
-          } else {
-            this.pomodoroMinutes = 25;
-            if (this.pomodoroSessionCount % 8 === 0) {
-              this.pomodoroMinutes = 15;
-            }
-          }
-          this.cdr.detectChanges();
-          return;
-        }
-        this.pomodoroMinutes--;
-        this.pomodoroSeconds = 59;
+  // Example: Use AI for suggestions if API key is set
+  async generateAISuggestions(): Promise<void> {
+    if (this.aiApiKey) {
+      const prompt = 'Give me 3 personalized productivity suggestions for the next hour.';
+      const aiText = await this.callAiAssistant(prompt);
+      if (aiText) {
+        this.aiSuggestions = aiText.split(/\n|\d+\.|•/).map(s => s.trim()).filter(Boolean).slice(0, 3);
       } else {
-        this.pomodoroSeconds--;
+        this.aiSuggestions = [];
       }
-      this.cdr.detectChanges();
-    }, 1000);
+    } else {
+      // fallback to local logic
+      const hour = this.currentHour;
+      const suggestions: string[] = [];
+      if (hour >= 6 && hour < 9) {
+        suggestions.push('Start your day with the most challenging task');
+        suggestions.push('Review your daily goals and priorities');
+      } else if (hour >= 12 && hour < 14) {
+        suggestions.push('Take a break and have a healthy lunch');
+        suggestions.push('Perfect time for a short meditation session');
+      } else if (hour >= 15 && hour < 18) {
+        suggestions.push('Last meal window approaching - plan your dinner');
+        suggestions.push('Review your progress and adjust evening plans');
+      } else if (hour >= 18) {
+        suggestions.push('Focus on water and herbal tea only');
+        suggestions.push('Great time for reading or light exercise');
+      }
+      this.challenges.forEach(challenge => {
+        if (challenge.currentStreak > 0 && challenge.currentStreak % 7 === 0) {
+          suggestions.push(`Amazing! ${challenge.currentStreak} days on ${challenge.title}`);
+        }
+      });
+      this.aiSuggestions = suggestions.slice(0, 3);
+    }
   }
+  
+  // Diet Management
+  lastMealTime?: Date;
+  waterIntakeToday = 0;
+  waterIntakeGoal = 2000;
+  currentHour = new Date().getHours();
+  
+  // User
+  username = '';
+  userAvatar = '';
+  
+  // Charts
+  private progressChart?: Chart;
+  private habitChart?: Chart;
+  private xpChart?: Chart;
 
-  pausePomodoro() {
-    this.isPomodoroPaused = true;
-    if (this.pomodoroInterval) {
-      clearInterval(this.pomodoroInterval);
+  // Predefined challenges
+  // using any[] here because some templates include UI-only flags (e.g. isCustom)
+  challengeTemplates: any[] = [
+    {
+      title: 'Custom Challenge',
+      description: 'Create a custom challenge for 1-12 months (choose months when starting)',
+      duration: 30,
+      type: ChallengeType.Productivity,
+      xpReward: 0,
+      icon: 'fas fa-sliders-h',
+      // UI-only flag to indicate custom behaviour
+      isCustom: true
+    },
+    {
+      title: 'Eating/Fasting Challenge',
+      description: 'Intermittent fasting with last meal by 6 PM',
+      duration: 21,
+      type: ChallengeType.Eating,
+      xpReward: 500,
+      icon: 'fas fa-apple-alt'
+    },
+    {
+      title: 'No Social Media',
+      description: 'Digital detox from all social platforms',
+      duration: 21,
+      type: ChallengeType.NoSocial,
+      xpReward: 600,
+      icon: 'fas fa-ban'
+    },
+    {
+      title: 'Daily Productivity',
+      description: 'Complete 3 key tasks every day',
+      duration: 30,
+      type: ChallengeType.Productivity,
+      xpReward: 800,
+      icon: 'fas fa-bolt'
+    },
+    {
+      title: 'Meditation Journey',
+      description: '15 minutes of daily meditation',
+      duration: 21,
+      type: ChallengeType.Meditation,
+      xpReward: 400,
+      icon: 'fas fa-spa'
+    },
+    {
+      title: 'Code Every Day',
+      description: 'Write code for at least 1 hour daily',
+      duration: 30,
+      type: ChallengeType.Coding,
+      xpReward: 1000,
+      icon: 'fas fa-code'
+    },
+    {
+      title: 'Reading Challenge',
+      description: 'Read 30 pages every day',
+      duration: 30,
+      type: ChallengeType.Reading,
+      xpReward: 700,
+      icon: 'fas fa-book-open'
+    }
+  ];
+
+  
+
+  // Project templates
+  projectTemplates = [
+    {
+      title: 'AI/ML Project',
+      category: 'Technology',
+      duration: '3-6 months',
+      icon: '🤖'
+    },
+    {
+      title: 'Data Dashboard',
+      category: 'Analytics',
+      duration: '3 months',
+      icon: '📊'
+    },
+    {
+      title: 'Mobile App',
+      category: 'Development',
+      duration: '6 months',
+      icon: '📱'
+    },
+    {
+      title: 'Side Business',
+      category: 'Entrepreneurship',
+      duration: '6-12 months',
+      icon: '🚀'
+    }
+  ];
+
+  constructor(
+    private authService: AuthService,
+    private taskService: TaskService,
+    private cdr: ChangeDetectorRef
+  ) {
+    // Ensure a finance savings challenge exists in the templates
+    const hasFinance = this.challengeTemplates.some((t: any) => t.title && t.title.toLowerCase().includes('finance'));
+    if (!hasFinance) {
+      this.challengeTemplates.push({
+        title: 'Finance Savings',
+        description: 'Build disciplined savings habits. Save a target amount weekly or monthly.',
+        duration: 30,
+        type: ChallengeType.Finance,
+        xpReward: 600,
+        icon: 'fas fa-coins'
+      });
     }
   }
 
-  resetPomodoro() {
-    this.pausePomodoro();
-    this.pomodoroMinutes = 25;
-    this.pomodoroSeconds = 0;
-    this.pomodoroSessionCount = 0;
+  ngOnInit(): void {
+    this.loadApiKey();
+    this.initializeUser();
+    this.loadData();
+    this.startTimers();
+    this.initializeAI();
   }
 
-  // Calendar functionality
-  generateCalendarDays() {
-    const year = this.currentDate.getFullYear();
-    const month = this.currentDate.getMonth();
-
-    // First day of the month
-    const firstDay = new Date(year, month, 1);
-    // Last day of the month
-    const lastDay = new Date(year, month + 1, 0);
-
-    // Start from Sunday of the week containing the first day
-    const startDate = new Date(firstDay);
-    startDate.setDate(firstDay.getDate() - firstDay.getDay());
-
-    this.calendarDays = [];
-
-    // Generate 42 days (6 weeks) to fill the calendar grid
-    for (let i = 0; i < 42; i++) {
-      const day = new Date(startDate);
-      day.setDate(startDate.getDate() + i);
-      this.calendarDays.push(day);
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.destroyCharts();
   }
 
-  getCalendarDays(): Date[] {
-    return this.calendarDays;
+  // Computed properties for template
+  get completedTasks(): TaskItem[] {
+    return this.tasks.filter(t => t.status === TaskStatus.Completed);
   }
 
-  getCurrentMonth(): Date {
-    return this.currentDate;
+  get incompleteTasks(): TaskItem[] {
+    return this.tasks.filter(t => t.status !== TaskStatus.Completed);
   }
 
-  getTasksForCalendarDate(date: Date): FrontendTask[] {
-    const dateStr = this.formatDate(date);
-    return this.filteredTasks.filter((task) => task.dueDate === dateStr);
-  }
-
-  isToday(date: Date): boolean {
-    const today = new Date();
-    return date.toDateString() === today.toDateString();
-  }
-
-  isCurrentMonth(date: Date): boolean {
-    return (
-      date.getMonth() === this.currentDate.getMonth() &&
-      date.getFullYear() === this.currentDate.getFullYear()
-    );
-  }
-
-  // Calendar navigation
-  previousMonth() {
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth() - 1,
-      1,
-    );
-    this.generateCalendarDays();
-  }
-
-  nextMonth() {
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth() + 1,
-      1,
-    );
-    this.generateCalendarDays();
-  }
-
-  // Fixed search functionality
-  onSearchChange() {
-    this.applyFilters();
-    this.filterTasksByStatus();
-  }
-
-  onTagFilterChange() {
-    this.applyFilters();
-    this.filterTasksByStatus();
-  }
-
-  onPriorityFilterChange() {
-    this.applyFilters();
-    this.filterTasksByStatus();
-  }
-
-  clearSearch() {
-    this.searchQuery = '';
-    this.selectedTag = 'all';
-    this.selectedPriority = 'all';
-    this.applyFilters();
-    this.filterTasksByStatus();
-  }
-
-  // Data export functionality
-  exportTasks() {
-    const dataStr = JSON.stringify(this.tasks, null, 2);
-    const dataUri =
-      'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-
-    const exportFileDefaultName = 'tasks.json';
-
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-  }
-
-  getCompletionRate(): number {
-    return this.analytics ? this.analytics.completion_rate : 0;
-  }
-
-  getTotalTimeSpent(): number {
-    return this.analytics ? this.analytics.total_time_spent : 0;
-  }
-
-  getOverdueTasksCount(): number {
-    return this.analytics ? this.analytics.overdue_tasks : 0;
-  }
-
-  getUpcomingTasksCount(): number {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const dayAfterTomorrow = new Date(today);
-    dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-
-    return this.tasks.filter((task) => {
-      if (task.status === 'Completed') return false;
-      const dueDate = new Date(task.dueDate);
-      return dueDate >= today && dueDate < dayAfterTomorrow;
+  get completedTasksToday(): number {
+    const today = new Date().toDateString();
+    return this.completedTasks.filter(t => {
+      // For demo, assume completed today
+      return true;
     }).length;
   }
 
-  getTagColor(tagName: string): string {
-    const tag = this.availableTags.find((t) => t.name === tagName);
-    return tag ? tag.color : '#95a5a6';
+  get activeTasksCount(): number {
+    return this.incompleteTasks.length;
   }
 
-  getPriorityColor(priority: string): string {
+  get activeChallenges(): Challenge[] {
+    return this.challenges.filter(c => !c.completed);
+  }
+
+  get completedProjects(): Project[] {
+    return this.activeProjects.filter(p => p.status === ProjectStatus.Completed);
+  }
+
+  get dailyStreak(): number {
+    return this.userStats.currentStreaks['daily'] || 0;
+  }
+
+  // Add missing method
+  closeAddModal(): void {
+    this.showAddTaskModal = false;
+  }
+
+  // Continue with all the methods from before...
+  private initializeUser(): void {
+    this.username = this.authService.getUsername() || 'User';
+    this.userAvatar = this.generateAvatar(this.username);
+    this.loadUserStats();
+  }
+
+  private generateAvatar(name: string): string {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=e67e22&color=fff&size=128&font-size=0.4`;
+  }
+
+  private loadData(): void {
+    this.isLoading = true;
+    
+    Promise.all([
+      this.loadTasks(),
+      this.loadChallenges(),
+      this.loadProjects(),
+      this.loadHabits(),
+      this.loadDietData()
+    ]).then(() => {
+      this.isLoading = false;
+      this.cdr.markForCheck();
+      this.initializeCharts();
+    });
+  }
+
+  private async loadTasks(): Promise<void> {
+    try {
+      const tasks = await this.taskService.getTasks().toPromise();
+      this.tasks = this.convertTasks(tasks || []);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+    }
+  }
+
+  private loadChallenges(): void {
+    const savedChallenges = localStorage.getItem('mob_challenges');
+    if (savedChallenges) {
+      this.challenges = JSON.parse(savedChallenges);
+    }
+  }
+
+  private loadProjects(): void {
+    const savedProjects = localStorage.getItem('mob_projects');
+    if (savedProjects) {
+      this.activeProjects = JSON.parse(savedProjects);
+    }
+  }
+
+  private loadHabits(): void {
+    const savedHabits = localStorage.getItem('mob_habits');
+    if (savedHabits) {
+      this.todaysHabits = JSON.parse(savedHabits);
+    }
+  }
+
+  private loadDietData(): void {
+    const savedDiet = localStorage.getItem('mob_diet');
+    if (savedDiet) {
+      this.dietEntries = JSON.parse(savedDiet);
+      this.calculateWaterIntake();
+      this.findLastMealTime();
+    }
+  }
+
+  private loadUserStats(): void {
+    const savedStats = localStorage.getItem('mob_user_stats');
+    if (savedStats) {
+      this.userStats = JSON.parse(savedStats);
+    }
+  }
+
+    private convertTasks(backendTasks: any[]): TaskItem[] {
+    return backendTasks.map(task => ({
+      id: task.id,
+      title: task.title,
+      description: task.description || '',
+      status: task.completed ? TaskStatus.Completed : TaskStatus.NotStarted,
+      priority: task.priority || Priority.Medium,
+      dueDate: task.due_date ? new Date(task.due_date).toISOString().split('T')[0] : '',
+      tags: Array.isArray(task.tags) ? task.tags : [],
+      timeEstimate: task.time_estimate || 30,
+      timeSpent: task.time_spent || 0,
+      isTimerRunning: false,
+      isCountdownTimer: false,
+      xpReward: this.calculateXP(task.priority)
+    }));
+  }
+
+  private calculateXP(priority: string): number {
     switch (priority) {
-      case 'High':
-        return '#e74c3c';
-      case 'Medium':
-        return '#f39c12';
-      case 'Low':
-        return '#3498db';
-      default:
-        return '#95a5a6';
+      case 'High': return 50;
+      case 'Medium': return 30;
+      case 'Low': return 20;
+      default: return 20;
     }
   }
 
-  getStatusColor(status: string): string {
-    switch (status) {
-      case 'Not Started':
-        return '#95a5a6';
-      case 'In Progress':
-        return '#3498db';
-      case 'Pending':
-        return '#f39c12';
-      case 'Completed':
-        return '#2ecc71';
-      default:
-        return '#95a5a6';
-    }
+  private startTimers(): void {
+    interval(1000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.currentTime = new Date();
+        this.currentHour = this.currentTime.getHours();
+        this.updateRunningTimers();
+        this.checkDietReminders();
+        this.cdr.markForCheck();
+      });
   }
 
-  formatTimeDisplay(minutes: number): string {
-    if (!minutes) return '0h 0m';
-
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-
-    return `${hours}h ${mins}m`;
-  }
-
-  // Timer display methods
-  getTimerDisplay(task: FrontendTask): string {
-    if (!task.isTimerRunning) {
-      return this.formatTimeDisplay(task.timeSpent || 0);
-    }
-
-    if (task.isCountdownTimer) {
-      return this.formatTimeDisplay(task.remainingTime || 0);
-    } else {
-      if (!task.timerStart) return this.formatTimeDisplay(task.timeSpent || 0);
-
-      const now = new Date();
-      const diffMs = now.getTime() - task.timerStart.getTime();
-      const currentSessionMins = Math.floor(diffMs / 60000);
-      const totalMins = (task.timeSpent || 0) + currentSessionMins;
-
-      return this.formatTimeDisplay(totalMins);
-    }
-  }
-
-  getTimerDisplayWithLabel(task: FrontendTask): string {
-    const timeStr = this.getTimerDisplay(task);
-
-    if (task.isTimerRunning) {
-      if (task.isCountdownTimer) {
-        return `⏰ ${timeStr} remaining`;
-      } else {
-        return `⏱️ ${timeStr} elapsed`;
-      }
-    }
-
-    return `🕐 ${timeStr} total`;
-  }
-
-  getTimerProgress(task: FrontendTask): number {
-    if (!task.isCountdownTimer || !task.timeEstimate) return 0;
-
-    if (!task.isTimerRunning || !task.timerStart) return 0;
-
-    const now = new Date();
-    const elapsedMs = now.getTime() - task.timerStart.getTime();
-    const elapsedMinutes = Math.floor(elapsedMs / 60000);
-    const progress = (elapsedMinutes / task.timeEstimate) * 100;
-
-    return Math.min(100, Math.max(0, progress));
-  }
-
-  isTimerNearCompletion(task: FrontendTask): boolean {
-    if (!task.isCountdownTimer || !task.isTimerRunning) return false;
-    return (task.remainingTime || 0) <= 2;
-  }
-
-  isTimerOvertime(task: FrontendTask): boolean {
-    if (!task.isCountdownTimer || !task.isTimerRunning) return false;
-    return (task.remainingTime || 0) <= 0;
-  }
-
-  isTaskOverdue(task: FrontendTask): boolean {
-    if (task.status === 'Completed') return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDate = new Date(task.dueDate);
-    return dueDate < today;
-  }
-
-  // Track by methods
-  trackByTaskId(index: number, task: FrontendTask): number {
-    return task.id || index;
-  }
-
-  trackByDate(index: number, date: Date): string {
-    return date.toISOString();
-  }
-
-  // Timer control methods for UI
-  hasActiveTimer(task: FrontendTask): boolean {
-    return task.isTimerRunning || false;
-  }
-
-  canStartTimer(task: FrontendTask): boolean {
-    return !task.isTimerRunning && task.status !== 'Completed';
-  }
-
-  canStartCountdown(task: FrontendTask): boolean {
-    return !task.isTimerRunning && task.status !== 'Completed';
-  }
-
-  // Utility method to format countdown display
-  formatCountdownDisplay(minutes: number): string {
-    if (minutes <= 0) return '00:00';
-
-    const hrs = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    const secs = 0;
-
-    if (hrs > 0) {
-      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:00`;
-    } else {
-      return `${mins.toString().padStart(2, '0')}:00`;
-    }
-  }
-
-  getRealTimeCountdown(task: FrontendTask): string {
-    if (!task.isTimerRunning || !task.isCountdownTimer || !task.timerStart) {
-      return this.formatCountdownDisplay(task.timeEstimate || 0);
-    }
-
-    const now = new Date();
-    const elapsedMs = now.getTime() - task.timerStart.getTime();
-    const elapsedMinutes = Math.floor(elapsedMs / 60000);
-    const elapsedSeconds = Math.floor((elapsedMs % 60000) / 1000);
-
-    const totalElapsedMinutes = elapsedMinutes;
-    const remainingMinutes = Math.max(
-      0,
-      (task.timeEstimate || 0) - totalElapsedMinutes,
-    );
-    const remainingSeconds = remainingMinutes > 0 ? 60 - elapsedSeconds : 0;
-
-    const actualRemainingMinutes =
-      remainingSeconds === 60 ? remainingMinutes : remainingMinutes;
-    const actualRemainingSeconds =
-      remainingSeconds === 60 ? 0 : remainingSeconds;
-
-    if (actualRemainingMinutes >= 60) {
-      const hours = Math.floor(actualRemainingMinutes / 60);
-      const minutes = actualRemainingMinutes % 60;
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${actualRemainingSeconds.toString().padStart(2, '0')}`;
-    } else {
-      return `${actualRemainingMinutes.toString().padStart(2, '0')}:${actualRemainingSeconds.toString().padStart(2, '0')}`;
-    }
-  }
-
-  // Method to get timer button text
-  getTimerButtonText(task: FrontendTask): string {
-    if (task.isTimerRunning) {
-      return task.isCountdownTimer ? 'Stop Countdown' : 'Stop Timer';
-    }
-    return 'Start Timer';
-  }
-
-  getCountdownButtonText(task: FrontendTask): string {
-    if (task.isTimerRunning && task.isCountdownTimer) {
-      return 'Stop Countdown';
-    }
-    return 'Start Countdown';
-  }
-
-  // Method to get timer status class for styling
-  getTimerStatusClass(task: FrontendTask): string {
-    if (!task.isTimerRunning) return '';
-
-    if (task.isCountdownTimer) {
-      if (this.isTimerOvertime(task)) return 'timer-overtime';
-      if (this.isTimerNearCompletion(task)) return 'timer-warning';
-      return 'timer-countdown';
-    }
-
-    return 'timer-active';
-  }
-
-  // Method to check if any task has an active timer
-  hasAnyActiveTimer(): boolean {
-    return this.tasks.some((task) => task.isTimerRunning);
-  }
-
-  // Method to get count of active timers
-  getActiveTimersCount(): number {
-    return this.tasks.filter((task) => task.isTimerRunning).length;
-  }
-
-  // Method to stop all active timers
-  stopAllTimers() {
-    this.tasks.forEach((task) => {
-      if (task.isTimerRunning) {
-        this.stopTimer(task);
+  private updateRunningTimers(): void {
+    this.tasks.forEach(task => {
+      if (task.isTimerRunning && task.timerStart) {
+        const elapsed = Date.now() - task.timerStart.getTime();
+        const elapsedMinutes = Math.floor(elapsed / 60000);
+        
+        if (task.isCountdownTimer && task.timeEstimate) {
+          task.remainingTime = Math.max(0, task.timeEstimate - elapsedMinutes);
+          if (task.remainingTime <= 0) {
+            this.completeTask(task);
+          }
+        }
       }
     });
   }
 
-  // Method to get tasks with active timers
-  getTasksWithActiveTimers(): FrontendTask[] {
-    return this.tasks.filter((task) => task.isTimerRunning);
+  private initializeAI(): void {
+    this.generateAISuggestions();
+    this.updateMotivationalQuote();
+    
+    interval(3600000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.generateAISuggestions();
+        this.updateMotivationalQuote();
+      });
   }
 
-  // Time estimation helpers
-  estimateTimeFromDescription(description: string): number {
-    const words = description.toLowerCase().split(' ');
-    let baseTime = Math.max(15, Math.min(120, words.length * 2));
-    const complexKeywords = [
-      'research',
-      'analyze',
-      'develop',
-      'create',
-      'design',
-      'implement',
-    ];
-    const simpleKeywords = [
-      'update',
-      'fix',
-      'review',
-      'call',
-      'email',
-      'check',
-    ];
 
-    const hasComplexKeywords = complexKeywords.some((keyword) =>
-      description.toLowerCase().includes(keyword),
-    );
-    const hasSimpleKeywords = simpleKeywords.some((keyword) =>
-      description.toLowerCase().includes(keyword),
-    );
 
-    if (hasComplexKeywords) baseTime *= 1.5;
-    if (hasSimpleKeywords) baseTime *= 0.7;
-
-    return Math.round(baseTime);
-  }
-
-  // Auto-suggest time estimate for new tasks
-  suggestTimeEstimate(task: FrontendTask): number {
-    if (task.description) {
-      return this.estimateTimeFromDescription(task.description);
-    }
-
-    // Default estimates based on priority
-    switch (task.priority) {
-      case 'High':
-        return 60;
-      case 'Medium':
-        return 30;
-      case 'Low':
-        return 15;
-      default:
-        return 30;
+  private checkDietReminders(): void {
+    if (this.currentHour === 15 && this.currentTime.getMinutes() === 30) {
+      this.showDietReminder('Last meal window starts in 30 minutes!');
+    } else if (this.currentHour === 17 && this.currentTime.getMinutes() === 45) {
+      this.showDietReminder('Last meal window closing in 15 minutes!');
     }
   }
 
-  // Apply suggested time estimate
-  applySuggestedEstimate(task: FrontendTask) {
-    const suggestion = this.suggestTimeEstimate(task);
-    task.timeEstimate = suggestion;
+  private showDietReminder(message: string): void {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('M.O.B Diet Reminder', {
+        body: message,
+        icon: '/assets/logo.png'
+      });
+    }
   }
 
-  // Batch timer operations
-  startTimerForMultipleTasks(
-    tasks: FrontendTask[],
-    isCountdown: boolean = false,
-  ) {
-    tasks.forEach((task) => {
-      if (this.canStartTimer(task)) {
-        this.startTimer(task, isCountdown);
+  private calculateWaterIntake(): void {
+    const today = new Date().toDateString();
+    this.waterIntakeToday = this.dietEntries
+      .filter(entry => new Date(entry.date).toDateString() === today)
+      .reduce((total, entry) => total + (entry.waterIntake || 0), 0);
+  }
+
+  private findLastMealTime(): void {
+    const today = new Date().toDateString();
+    const todaysMeals = this.dietEntries
+      .filter(entry => new Date(entry.date).toDateString() === today)
+      .filter(entry => entry.mealType !== 'snack')
+      .sort((a, b) => new Date(b.mealTime).getTime() - new Date(a.mealTime).getTime());
+    
+    if (todaysMeals.length > 0) {
+      this.lastMealTime = new Date(todaysMeals[0].mealTime);
+    }
+  }
+
+  private initializeCharts(): void {
+    if (this.activeSection === 'overview' || this.activeSection === 'habits') {
+      this.createProgressChart();
+      this.createHabitChart();
+      this.createXPChart();
+    }
+  }
+
+  private createProgressChart(): void {
+    if (!this.progressChartRef) return;
+    
+    const ctx = this.progressChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+    
+    this.progressChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: this.getLast7Days(),
+        datasets: [
+          {
+            label: 'Tasks Completed',
+            data: this.getTaskCompletionData(),
+            borderColor: '#e67e22',
+            backgroundColor: 'rgba(230, 126, 34, 0.1)',
+            tension: 0.4
+          },
+          {
+            label: 'XP Earned',
+            data: this.getXPData(),
+            borderColor: '#2ecc71',
+            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+            tension: 0.4,
+            yAxisID: 'y1'
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#ecf0f1' }
+          }
+        },
+        scales: {
+          y: {
+            ticks: { color: '#ecf0f1' },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          },
+          y1: {
+            position: 'right',
+            ticks: { color: '#ecf0f1' },
+            grid: { drawOnChartArea: false }
+          },
+          x: {
+            ticks: { color: '#ecf0f1' },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+          }
+        }
       }
     });
   }
 
-  // Get summary of time tracking
-  getTimeTrackingSummary() {
-    const totalEstimated = this.tasks.reduce(
-      (sum, task) => sum + (task.timeEstimate || 0),
-      0,
-    );
-    const totalSpent = this.tasks.reduce(
-      (sum, task) => sum + (task.timeSpent || 0),
-      0,
-    );
-    const activeTimers = this.getActiveTimersCount();
+  private createHabitChart(): void {
+    if (!this.habitChartRef) return;
+    
+    const ctx = this.habitChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+    
+    this.habitChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['Productivity', 'Health', 'Learning', 'Mindfulness', 'Fitness'],
+        datasets: [{
+          label: 'This Week',
+          data: [80, 65, 90, 75, 85],
+          borderColor: '#e67e22',
+          backgroundColor: 'rgba(230, 126, 34, 0.2)'
+        }, {
+          label: 'Last Week',
+          data: [70, 60, 85, 70, 75],
+          borderColor: '#95a5a6',
+          backgroundColor: 'rgba(149, 165, 166, 0.2)'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#ecf0f1' }
+          }
+        },
+        scales: {
+          r: {
+            ticks: { color: '#ecf0f1' },
+            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            pointLabels: { color: '#ecf0f1' }
+          }
+        }
+      }
+    });
+  }
 
-    return {
-      totalEstimated,
-      totalSpent,
-      activeTimers,
-      efficiency: totalEstimated > 0 ? (totalSpent / totalEstimated) * 100 : 0,
+  private createXPChart(): void {
+    if (!this.xpChartRef) return;
+    
+    const ctx = this.xpChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+    
+    this.xpChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Tasks', 'Challenges', 'Streaks', 'Habits'],
+        datasets: [{
+          data: [300, 500, 200, 150],
+          backgroundColor: [
+            '#e67e22',
+            '#3498db',
+            '#2ecc71',
+            '#9b59b6'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#ecf0f1' }
+          }
+        }
+      }
+    });
+  }
+
+  private destroyCharts(): void {
+    this.progressChart?.destroy();
+    this.habitChart?.destroy();
+    this.xpChart?.destroy();
+  }
+
+  getLast7Days(): string[] {
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      days.push(date.toLocaleDateString('en', { weekday: 'short' }));
+    }
+    return days;
+  }
+
+  private getTaskCompletionData(): number[] {
+    return [5, 8, 6, 9, 7, 10, 8];
+  }
+
+  private getXPData(): number[] {
+    return [150, 240, 180, 270, 210, 300, 240];
+  }
+
+  // Public methods
+  setActiveSection(section: typeof this.activeSection): void {
+    this.activeSection = section;
+    if (section === 'overview' || section === 'habits') {
+      setTimeout(() => this.initializeCharts(), 100);
+    }
+    this.cdr.markForCheck();
+  }
+
+  startChallenge(template: Partial<Challenge>): void {
+    const challenge: Challenge = {
+      id: this.generateId(),
+      title: template.title!,
+      description: template.description!,
+      duration: template.duration!,
+      type: template.type!,
+      startDate: new Date(),
+      currentStreak: 0,
+      bestStreak: 0,
+      completed: false,
+      xpReward: template.xpReward!,
+      icon: template.icon!,
+      progress: 0
     };
+    
+    this.challenges.push(challenge);
+    this.saveChallenges();
+    this.showNotification(`Started ${challenge.title}!`);
   }
+
+  updateChallengeProgress(challengeId: string): void {
+    const challenge = this.challenges.find(c => c.id === challengeId);
+    if (!challenge || challenge.completed) return;
+    
+    challenge.currentStreak++;
+    challenge.progress = (challenge.currentStreak / challenge.duration) * 100;
+    
+    if (challenge.currentStreak > challenge.bestStreak) {
+      challenge.bestStreak = challenge.currentStreak;
+    }
+    
+    if (challenge.currentStreak >= challenge.duration) {
+      this.completeChallenge(challenge);
+    }
+    
+    this.saveChallenges();
+    this.cdr.markForCheck();
+  }
+
+  private completeChallenge(challenge: Challenge): void {
+    challenge.completed = true;
+    this.addXP(challenge.xpReward);
+    this.userStats.totalChallengesCompleted++;
+    this.saveUserStats();
+    this.showNotification(`Congratulations! Completed ${challenge.title}`);
+    this.checkForBadges();
+  }
+
+  addXP(amount: number): void {
+    this.userStats.xp += amount;
+    
+      while (this.userStats.xp >= this.userStats.xpToNextLevel) {
+    this.userStats.xp -= this.userStats.xpToNextLevel;
+    this.userStats.level++;
+    this.userStats.xpToNextLevel = this.calculateXPForLevel(this.userStats.level);
+    this.showNotification(`Level Up! You're now level ${this.userStats.level}`);
+  }
+  
+  this.saveUserStats();
+}
+
+private calculateXPForLevel(level: number): number {
+  return Math.floor(100 * level * 1.5);
+}
+
+private checkForBadges(): void {
+  const badges: Badge[] = [];
+  
+  if (this.userStats.totalChallengesCompleted >= 5) {
+    badges.push({
+      id: 'challenger',
+      name: 'Challenge Master',
+      description: 'Complete 5 challenges',
+      icon: '🏆',
+      rarity: 'rare'
+    });
+  }
+  
+  if (this.userStats.level >= 10) {
+    badges.push({
+      id: 'level10',
+      name: 'Dedicated User',
+      description: 'Reach level 10',
+      icon: '⭐',
+      rarity: 'epic'
+    });
+  }
+  
+  badges.forEach(badge => {
+    if (!this.userStats.badges.find(b => b.id === badge.id)) {
+      badge.unlockedDate = new Date();
+      this.userStats.badges.push(badge);
+      this.showNotification(`New Badge Unlocked: ${badge.name}!`);
+    }
+  });
+  
+  this.saveUserStats();
+}
+
+createProject(template: any): void {
+  const project: Project = {
+    id: this.generateId(),
+    title: template.title,
+    description: '',
+    duration: template.duration,
+    milestones: this.generateMilestones(template.duration),
+    startDate: new Date(),
+    endDate: this.calculateEndDate(template.duration),
+    progress: 0,
+    status: ProjectStatus.Planning,
+    category: template.category
+  };
+  
+  this.activeProjects.push(project);
+  this.saveProjects();
+}
+
+private generateMilestones(duration: string): Milestone[] {
+  const months = parseInt(duration.split('-')[0]);
+  const milestones: Milestone[] = [];
+  
+  for (let i = 1; i <= months; i++) {
+    const milestone: Milestone = {
+      id: this.generateId(),
+      title: `Month ${i} Milestone`,
+      completed: false,
+      dueDate: new Date(Date.now() + (i * 30 * 24 * 60 * 60 * 1000)),
+      tasks: []
+    };
+    milestones.push(milestone);
+  }
+  
+  return milestones;
+}
+
+private calculateEndDate(duration: string): Date {
+  const months = parseInt(duration.split('-')[1] || duration.split('-')[0]);
+  const endDate = new Date();
+  endDate.setMonth(endDate.getMonth() + months);
+  return endDate;
+}
+
+toggleTimer(task: TaskItem): void {
+  if (task.isTimerRunning) {
+    this.stopTimer(task);
+  } else {
+    this.startTimer(task);
+  }
+}
+
+private startTimer(task: TaskItem): void {
+  task.isTimerRunning = true;
+  task.timerStart = new Date();
+  this.saveTasks();
+}
+
+private stopTimer(task: TaskItem): void {
+  if (!task.timerStart) return;
+  
+  const elapsed = Date.now() - task.timerStart.getTime();
+  const elapsedMinutes = Math.floor(elapsed / 60000);
+  task.timeSpent += elapsedMinutes;
+  task.isTimerRunning = false;
+  task.timerStart = undefined;
+  
+  this.saveTasks();
+}
+
+completeTask(task: TaskItem): void {
+  task.status = TaskStatus.Completed;
+  if (task.xpReward) {
+    this.addXP(task.xpReward);
+  }
+  this.saveTasks();
+  this.updateProjectProgress();
+  this.showNotification(`Task completed! +${task.xpReward} XP`);
+}
+
+private updateProjectProgress(): void {
+  this.activeProjects.forEach(project => {
+    let completedMilestones = 0;
+    let totalTasks = 0;
+    let completedTasks = 0;
+    
+    project.milestones.forEach(milestone => {
+      totalTasks += milestone.tasks.length;
+      completedTasks += milestone.tasks.filter(t => t.status === TaskStatus.Completed).length;
+      
+      if (milestone.tasks.length > 0 && 
+          milestone.tasks.every(t => t.status === TaskStatus.Completed)) {
+        milestone.completed = true;
+        completedMilestones++;
+      }
+    });
+    
+    project.progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+    
+    if (completedMilestones === project.milestones.length && project.milestones.length > 0) {
+      project.status = ProjectStatus.Completed;
+      this.addXP(1000);
+      this.showNotification(`Project "${project.title}" completed! +1000 XP`);
+    }
+  });
+  
+  this.saveProjects();
+}
+
+addWaterIntake(amount: number): void {
+  const entry: DietEntry = {
+    id: this.generateId(),
+    date: new Date(),
+    mealTime: new Date(),
+    mealType: 'snack',
+    description: `Water ${amount}ml`,
+    waterIntake: amount
+  };
+  
+  this.dietEntries.push(entry);
+  this.waterIntakeToday += amount;
+  this.saveDietData();
+  
+  if (this.waterIntakeToday >= this.waterIntakeGoal) {
+    this.addXP(20);
+    this.showNotification('Daily water goal achieved! +20 XP');
+  }
+}
+
+logMeal(mealType: string): void {
+  if (this.currentHour >= 18 && mealType !== 'snack') {
+    this.showNotification('Remember: No meals after 6 PM!', 'warning');
+    return;
+  }
+  
+  this.showDietModal = true;
+}
+
+getDietSuggestion(): string {
+  const hour = this.currentHour;
+  
+  if (hour < 12) {
+    return 'Start your day with a protein-rich breakfast and plenty of water';
+  } else if (hour < 16) {
+    return 'Perfect time for a balanced lunch with vegetables and whole grains';
+  } else if (hour < 18) {
+    return 'Last meal window! Make it count with a nutritious dinner';
+  } else {
+    return 'Fasting time! Stick to water and herbal teas only';
+  }
+}
+
+getMotivationalMessage(): string {
+  if (this.currentHour >= 18 && this.lastMealTime) {
+    const hoursSinceLastMeal = (Date.now() - this.lastMealTime.getTime()) / (1000 * 60 * 60);
+    if (hoursSinceLastMeal > 2) {
+      return `Great job! ${Math.floor(hoursSinceLastMeal)} hours into your fasting window!`;
+    }
+  }
+  return this.aiMotivationalQuote;
+}
+
+private showNotification(message: string, type: 'success' | 'warning' | 'info' = 'success'): void {
+  console.log(`[${type}] ${message}`);
+  // Implement toast notification here
+  this.cdr.markForCheck();
+}
+
+private generateId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+private saveTasks(): void {
+  localStorage.setItem('mob_tasks', JSON.stringify(this.tasks));
+}
+
+private saveChallenges(): void {
+  localStorage.setItem('mob_challenges', JSON.stringify(this.challenges));
+}
+
+private saveProjects(): void {
+  localStorage.setItem('mob_projects', JSON.stringify(this.activeProjects));
+}
+
+private saveDietData(): void {
+  localStorage.setItem('mob_diet', JSON.stringify(this.dietEntries));
+}
+
+private saveUserStats(): void {
+  localStorage.setItem('mob_user_stats', JSON.stringify(this.userStats));
+}
+
+// Computed properties for template
+get waterIntakePercentage(): number {
+  return Math.min((this.waterIntakeToday / this.waterIntakeGoal) * 100, 100);
+}
+
+get canEatMeal(): boolean {
+  return this.currentHour < 18;
+}
+
+get levelProgress(): number {
+  return (this.userStats.xp / this.userStats.xpToNextLevel) * 100;
+}
+
+get activeChallengesCount(): number {
+  return this.activeChallenges.length;
+}
+
+get activeProjectsCount(): number {
+  return this.activeProjects.filter(p => p.status === ProjectStatus.Active).length;
+}
+
+getRarityColor(rarity: string): string {
+  switch (rarity) {
+    case 'common': return '#95a5a6';
+    case 'rare': return '#3498db';
+    case 'epic': return '#9b59b6';
+    case 'legendary': return '#f39c12';
+    default: return '#95a5a6';
+  }
+}
+
+getChallengeTypeIcon(type: ChallengeType): string {
+  const icons = {
+    [ChallengeType.Eating]: '🍎',
+    [ChallengeType.NoSocial]: '📵',
+    [ChallengeType.Productivity]: '⚡',
+    [ChallengeType.Meditation]: '🧘',
+    [ChallengeType.Coding]: '💻',
+    [ChallengeType.Reading]: '📚',
+    [ChallengeType.Exercise]: '💪',
+    [ChallengeType.Sleep]: '😴',
+    [ChallengeType.Finance]: '💰',
+    [ChallengeType.Language]: '🗣️'
+  };
+  return icons[type] || '🎯';
+}
+
+formatTime(date: Date): string {
+  return new Date(date).toLocaleTimeString('en-US', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: true 
+  });
+}
+
+formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric',
+    year: 'numeric'
+  });
+}
+
+getBadgeCount(): number {
+  return this.userStats.badges.length;
+}
+
+// Fixed template methods
+getCompletedTasksCount(): number {
+  return this.completedTasks.length;
+}
+
+getActiveTasksDisplay(): string {
+  return `${this.activeTasksCount}`;
+}
+
+getCompletedTodayDisplay(): string {
+  return `${this.completedTasksToday} completed today`;
+}
+
+getActiveChallengesDisplay(): string {
+  return `${this.activeChallengesCount}`;
+}
+
+getCompletedProjectsDisplay(): string {
+  return `${this.completedProjects.length} completed`;
+}
+
+toggleMobileMenu(): void {
+  // NOTE: Implement logic to show/hide the sidebar on mobile
+  console.log('Mobile menu toggled');
+}
+
+toggleFabMenu(): void {
+  this.showFabMenu = !this.showFabMenu;
+  this.cdr.markForCheck();
+}
 }

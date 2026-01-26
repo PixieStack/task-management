@@ -1,4 +1,29 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime, Text
+
+from datetime import datetime
+from .database import Base
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+
+class Challenge(Base):
+    __tablename__ = "challenges"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    description = Column(Text)
+    duration = Column(Integer, nullable=False)  # in days
+    type = Column(String, nullable=False)
+    start_date = Column(DateTime, nullable=True)
+    current_streak = Column(Integer, default=0)
+    best_streak = Column(Integer, default=0)
+    completed = Column(Boolean, default=False)
+    xp_reward = Column(Integer, default=0)
+    icon = Column(String, default="fas fa-bolt")
+    progress = Column(Integer, default=0)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    owner = relationship("User", backref="challenges")
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .database import Base

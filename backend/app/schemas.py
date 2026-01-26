@@ -1,3 +1,48 @@
+# Import datetime from datetime to fix NameError
+from datetime import datetime
+# Import Optional from typing to fix NameError
+from typing import Optional
+# Import BaseModel from pydantic to fix NameError
+from pydantic import BaseModel
+# --- Challenge ---
+from typing import Any
+class ChallengeBase(BaseModel):
+    title: str
+    description: Optional[str] = ""
+    duration: int
+    type: str
+    start_date: Optional[datetime] = None
+    current_streak: Optional[int] = 0
+    best_streak: Optional[int] = 0
+    completed: Optional[bool] = False
+    xp_reward: Optional[int] = 0
+    icon: Optional[str] = "fas fa-bolt"
+    progress: Optional[int] = 0
+
+class ChallengeCreate(ChallengeBase):
+    pass
+
+class ChallengeUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    duration: Optional[int] = None
+    type: Optional[str] = None
+    start_date: Optional[datetime] = None
+    current_streak: Optional[int] = None
+    best_streak: Optional[int] = None
+    completed: Optional[bool] = None
+    xp_reward: Optional[int] = None
+    icon: Optional[str] = None
+    progress: Optional[int] = None
+
+class ChallengeOut(ChallengeBase):
+    id: int
+    owner_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
 from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List, Union
 from datetime import datetime

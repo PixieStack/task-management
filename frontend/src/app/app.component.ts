@@ -30,8 +30,8 @@ import { Subscription } from 'rxjs';
         <router-outlet></router-outlet>
       </main>
 
-      <!-- Footer -->
-      <app-footer></app-footer>
+  <!-- Footer -->
+  <app-footer *ngIf="!isLoggedIn"></app-footer>
     </div>
   `,
   styles: [
