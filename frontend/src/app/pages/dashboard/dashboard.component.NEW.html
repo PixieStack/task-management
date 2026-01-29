@@ -50,6 +50,18 @@
       📁 Projects
     </button>
     <button 
+      [class.active]="activeSection === 'roadmaps'" 
+      (click)="changeSection('roadmaps')"
+      data-testid="roadmaps-tab">
+      🗺️ Roadmaps
+    </button>
+    <button 
+      [class.active]="activeSection === 'habits'" 
+      (click)="changeSection('habits')"
+      data-testid="habits-tab">
+      📈 Habits
+    </button>
+    <button 
       [class.active]="activeSection === 'diet'" 
       (click)="changeSection('diet')"
       data-testid="diet-tab">
