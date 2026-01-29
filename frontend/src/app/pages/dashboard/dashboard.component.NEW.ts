@@ -206,6 +206,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadTasks();
     this.loadChallenges();
     this.loadProjects();
+    this.loadRoadmaps();
+    this.loadHabits();
     this.loadDietData();
     this.loadUserStats();
   }
