@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -7,9 +8,9 @@ from sqlalchemy.orm import Session
 from app import models, database
 from datetime import timedelta, datetime
 
-# Load .env relative to this file
-dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
-load_dotenv(dotenv_path)
+# Load .env from backend directory
+env_path = Path(__file__).parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -17,9 +18,6 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
-
-# Debugging output
-print(f"Loaded SECRET_KEY: {SECRET_KEY}")
 
 if not SECRET_KEY or not isinstance(SECRET_KEY, str):
     raise ValueError("SECRET_KEY is not set, is empty, or not a string.")

@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from typing import Optional
-from app import schemas, crud
+from app import schemas, crud, models
+from app.schemas_extended import UserProfileCreate, UserProfileUpdate, UserProfileOut, UserUpdateExtended
 from app.auth import SECRET_KEY, ALGORITHM, get_db, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -87,6 +88,8 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
                 "created_at": user.created_at
             }
         }
@@ -240,4 +243,68 @@ def logout():
 @router.post("/verify-token")
 def verify_token(current_user: schemas.UserOut = Depends(get_current_user)):
     """Verify if token is valid"""
+
+
+# Profile Management Endpoints
+
+@router.get("/profile", response_model=UserProfileOut)
+def get_profile(current_user: schemas.UserOut = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get user profile"""
+    profile = db.query(models.UserProfile).filter(models.UserProfile.user_id == current_user.id).first()
+    if not profile:
+        # Create empty profile
+        profile = models.UserProfile(user_id=current_user.id)
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+    return profile
+
+@router.put("/profile", response_model=UserProfileOut)
+def update_profile(profile_update: UserProfileUpdate, current_user: schemas.UserOut = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Update user profile"""
+    profile = db.query(models.UserProfile).filter(models.UserProfile.user_id == current_user.id).first()
+    
+    if not profile:
+        # Create new profile
+        profile_data = profile_update.dict(exclude_unset=True)
+        profile = models.UserProfile(user_id=current_user.id, **profile_data)
+        db.add(profile)
+    else:
+        # Update existing profile
+        update_data = profile_update.dict(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(profile, key, value)
+        profile.updated_at = datetime.utcnow()
+    
+    db.commit()
+    db.refresh(profile)
+    return profile
+
+@router.put("/update-user", response_model=schemas.UserOut)
+def update_user_info(user_update: UserUpdateExtended, current_user: schemas.UserOut = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Update user basic info (username, email, first_name, last_name)"""
+    user = db.query(models.User).filter(models.User.id == current_user.id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    update_data = user_update.dict(exclude_unset=True)
+    
+    # Check uniqueness for username and email
+    if "username" in update_data and update_data["username"] != user.username:
+        existing = db.query(models.User).filter(models.User.username == update_data["username"]).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Username already taken")
+    
+    if "email" in update_data and update_data["email"] != user.email:
+        existing = db.query(models.User).filter(models.User.email == update_data["email"]).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+    
+    for key, value in update_data.items():
+        setattr(user, key, value)
+    
+    db.commit()
+    db.refresh(user)
+    return user
+
     return {"valid": True, "user": current_user}
