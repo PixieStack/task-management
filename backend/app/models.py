@@ -34,6 +34,8 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    first_name = Column(String(100))
+    last_name = Column(String(100))
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     tasks = relationship("Task", back_populates="owner", cascade="all, delete-orphan")
