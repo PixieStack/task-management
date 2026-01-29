@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from typing import Optional
-from app import schemas, crud
+from app import schemas, crud, models
+from app.schemas_extended import UserProfileCreate, UserProfileUpdate, UserProfileOut, UserUpdateExtended
 from app.auth import SECRET_KEY, ALGORITHM, get_db, get_current_user
 
 router = APIRouter(prefix="/auth", tags=["auth"])
