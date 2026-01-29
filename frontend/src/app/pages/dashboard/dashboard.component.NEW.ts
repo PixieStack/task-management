@@ -103,6 +103,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
     year: new Date().getFullYear()
   };
 
+  selectedRoadmap: Roadmap | null = null;
+  quarterlyCheckIn: any = {
+    quarter: 1,
+    accomplishments: [''],
+    conclusion: ''
+  };
+
+  newHabit: Partial<Habit> = {
+    name: '',
+    description: '',
+    category: '',
+    frequency: 'daily',
+    target_count: 1,
+    icon: '✓',
+    color: '#3498db'
+  };
+
+  newHabitEntry: Partial<HabitEntry> = {
+    habit_id: 0,
+    date: new Date().toISOString(),
+    completed: false,
+    count: 1,
+    mood: 3,
+    energy: 3,
+    notes: ''
+  };
+
   newTask: Task = {
     title: '',
     description: '',
