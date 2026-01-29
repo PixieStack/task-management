@@ -1,0 +1,122 @@
+╔══════════════════════════════════════════════════════════════╗
+║     🚀 COMMANDS TO RUN YOUR APPS IN VS CODE TERMINAL 🚀     ║
+╚══════════════════════════════════════════════════════════════╝
+
+📝 You need TWO separate terminal windows in VS Code.
+
+════════════════════════════════════════════════════════════════
+TERMINAL 1: BACKEND (FastAPI)
+════════════════════════════════════════════════════════════════
+
+Copy and paste these commands one by one:
+
+cd /app/backend
+source /root/.venv/bin/activate
+python -m uvicorn server:app --reload --host 0.0.0.0 --port 8001
+
+✅ When you see "Application startup complete", backend is ready!
+✅ Access: http://localhost:8001/docs
+
+
+════════════════════════════════════════════════════════════════
+TERMINAL 2: FRONTEND (Angular)
+════════════════════════════════════════════════════════════════
+
+Copy and paste these commands one by one:
+
+cd /app/frontend
+yarn start
+
+✅ Wait ~30 seconds for compilation
+✅ When you see "Compiled successfully", frontend is ready!
+✅ Access: http://localhost:3000
+
+
+════════════════════════════════════════════════════════════════
+🎯 TESTING THE APPS
+════════════════════════════════════════════════════════════════
+
+1. Open Backend API Docs:
+   http://localhost:8001/docs
+
+2. Open Frontend App:
+   http://localhost:3000
+
+3. Test Backend Health:
+   curl http://localhost:8001/api/health
+
+
+════════════════════════════════════════════════════════════════
+🛑 TO STOP THE APPS
+════════════════════════════════════════════════════════════════
+
+In each terminal window:
+Press: Ctrl + C
+
+Or close the terminal windows.
+
+
+════════════════════════════════════════════════════════════════
+🔍 TROUBLESHOOTING
+════════════════════════════════════════════════════════════════
+
+❌ If Backend shows "Address already in use":
+sudo supervisorctl stop backend
+lsof -ti:8001 | xargs kill -9
+# Then try running backend command again
+
+❌ If Frontend shows "Address already in use":
+sudo supervisorctl stop frontend
+lsof -ti:3000 | xargs kill -9
+# Then try running frontend command again
+
+❌ If Backend shows "ModuleNotFoundError":
+cd /app/backend
+source /root/.venv/bin/activate
+pip install -r requirements.txt
+# Then try running backend command again
+
+❌ If Frontend shows errors:
+cd /app/frontend
+yarn install
+# Then try running frontend command again
+
+
+════════════════════════════════════════════════════════════════
+📦 WHAT'S INCLUDED
+════════════════════════════════════════════════════════════════
+
+✅ Backend: 50+ API endpoints for:
+   - User authentication & profiles
+   - Challenges (21-30 days with 24hr check-in cooldown)
+   - Projects (3-6 months)
+   - Roadmaps (12 months, quarterly tracking)
+   - Diet & Hydration (AI meal planning)
+   - Habits tracking
+   - AI Assistant (learns from you)
+   - Gamification (2000 XP per level)
+
+✅ Database: SQLite with 15 tables
+   Location: /app/backend/taskmanager.db
+
+✅ Frontend: Angular app
+   (Needs integration with backend - Phase 2)
+
+
+════════════════════════════════════════════════════════════════
+🎓 QUICK TIPS
+════════════════════════════════════════════════════════════════
+
+💡 Keep both terminals open while using the app
+💡 Backend auto-reloads when you change Python files
+💡 Frontend auto-compiles when you change Angular files
+💡 Use API docs (http://localhost:8001/docs) to test endpoints
+💡 Register a test user to explore features
+
+
+════════════════════════════════════════════════════════════════
+📧 READY TO GO!
+════════════════════════════════════════════════════════════════
+
+Open VS Code Terminal and run the commands above! 🚀
+
