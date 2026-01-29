@@ -20,7 +20,7 @@ interface AuthResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = 'http://127.0.0.1:8000/auth';
+  private apiUrl = 'http://127.0.0.1:8001/auth';
   private userSubject = new BehaviorSubject<User | null>(null);
 
   public user$ = this.userSubject.asObservable();
