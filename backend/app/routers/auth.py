@@ -88,6 +88,8 @@ def login(login_data: schemas.UserLogin, db: Session = Depends(get_db)):
                 "id": user.id,
                 "username": user.username,
                 "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
                 "created_at": user.created_at
             }
         }
