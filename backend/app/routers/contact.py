@@ -9,7 +9,7 @@ import os
 from app import models, schemas
 from app.auth import get_db, get_current_user
 
-router = APIRouter(prefix="/contact", tags=["contact"])
+router = APIRouter(prefix="/api/contact", tags=["contact"])
 
 # Email configuration (you can move these to environment variables)
 SMTP_SERVER = "smtp.gmail.com"
