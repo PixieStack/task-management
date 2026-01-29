@@ -628,3 +628,149 @@
     </div>
   </div>
 </div>
+
+<!-- Add Project Modal -->
+<div *ngIf="showAddProjectModal" class="modal-overlay" (click)="showAddProjectModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" data-testid="add-project-modal">
+    <div class="modal-header">
+      <h2>Start a New Project</h2>
+      <button class="modal-close" (click)="showAddProjectModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Project Title *</label>
+        <input type="text" [(ngModel)]="newProject.title" placeholder="e.g., Learn Spanish" data-testid="project-title-input">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="newProject.description" placeholder="Describe your project..." data-testid="project-description-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Category *</label>
+        <select [(ngModel)]="newProject.category" data-testid="project-category-select">
+          <option value="">Select category...</option>
+          <option *ngFor="let cat of projectCategories" [value]="cat">{{cat}}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Duration *</label>
+        <select [(ngModel)]="newProject.duration" data-testid="project-duration-select">
+          <option value="3 months">3 Months</option>
+          <option value="6 months">6 Months</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showAddProjectModal = false">Cancel</button>
+      <button class="btn-primary" (click)="createProject()" data-testid="create-project-btn">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Roadmap Modal -->
+<div *ngIf="showAddRoadmapModal" class="modal-overlay" (click)="showAddRoadmapModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" data-testid="add-roadmap-modal">
+    <div class="modal-header">
+      <h2>Create 12-Month Roadmap</h2>
+      <button class="modal-close" (click)="showAddRoadmapModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Roadmap Title *</label>
+        <input type="text" [(ngModel)]="newRoadmap.title" placeholder="e.g., 2024 Goals" data-testid="roadmap-title-input">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="newRoadmap.description" placeholder="Describe your year..." data-testid="roadmap-description-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Year *</label>
+        <input type="number" [(ngModel)]="newRoadmap.year" [min]="2024" data-testid="roadmap-year-input">
+      </div>
+      <p class="info-text">You'll be able to check in quarterly (every 3 months) with accomplishments and conclusions (100-500 words).</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showAddRoadmapModal = false">Cancel</button>
+      <button class="btn-primary" (click)="createRoadmap()" data-testid="create-roadmap-btn">Create Roadmap</button>
+    </div>
+  </div>
+</div>
+
+<!-- Quarterly Check-In Modal -->
+<div *ngIf="showQuarterlyCheckInModal" class="modal-overlay" (click)="showQuarterlyCheckInModal = false">
+  <div class="modal-content large" (click)="$event.stopPropagation()" data-testid="quarterly-checkin-modal">
+    <div class="modal-header">
+      <h2>Q{{quarterlyCheckIn.quarter}} Check-In</h2>
+      <button class="modal-close" (click)="showQuarterlyCheckInModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Accomplishments</label>
+        <div *ngFor="let acc of quarterlyCheckIn.accomplishments; let i = index" class="accomplishment-row">
+          <input 
+            type="text" 
+            [(ngModel)]="quarterlyCheckIn.accomplishments[i]" 
+            placeholder="What did you accomplish?" 
+            [attr.data-testid]="'accomplishment-' + i">
+          <button class="btn-remove" (click)="removeAccomplishment(i)">×</button>
+        </div>
+        <button class="btn-add-more" (click)="addAccomplishment()">+ Add More</button>
+      </div>
+      <div class="form-group">
+        <label>Quarterly Conclusion (100-500 words) *</label>
+        <textarea 
+          [(ngModel)]="quarterlyCheckIn.conclusion" 
+          placeholder="Reflect on this quarter..." 
+          rows="8"
+          data-testid="quarterly-conclusion-input"></textarea>
+        <p class="word-count">
+          Word count: {{quarterlyCheckIn.conclusion.trim().split(/\s+/).length}}
+          <span [class.text-danger]="quarterlyCheckIn.conclusion.trim().split(/\s+/).length < 100 || quarterlyCheckIn.conclusion.trim().split(/\s+/).length > 500">
+            (Required: 100-500 words)
+          </span>
+        </p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showQuarterlyCheckInModal = false">Cancel</button>
+      <button class="btn-primary" (click)="submitQuarterlyCheckIn()" data-testid="submit-quarterly-checkin-btn">Submit Check-In</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Habit Modal -->
+<div *ngIf="showAddHabitModal" class="modal-overlay" (click)="showAddHabitModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" data-testid="add-habit-modal">
+    <div class="modal-header">
+      <h2>Add New Habit</h2>
+      <button class="modal-close" (click)="showAddHabitModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Habit Name *</label>
+        <input type="text" [(ngModel)]="newHabit.name" placeholder="e.g., Morning Exercise" data-testid="habit-name-input">
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea [(ngModel)]="newHabit.description" placeholder="Describe this habit..." data-testid="habit-description-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" [(ngModel)]="newHabit.category" placeholder="e.g., Health, Learning" data-testid="habit-category-input">
+      </div>
+      <div class="form-group">
+        <label>Icon (Emoji)</label>
+        <input type="text" [(ngModel)]="newHabit.icon" placeholder="e.g., ✓, 💪, 📚" data-testid="habit-icon-input">
+      </div>
+      <div class="form-group">
+        <label>Color</label>
+        <input type="color" [(ngModel)]="newHabit.color" data-testid="habit-color-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showAddHabitModal = false">Cancel</button>
+      <button class="btn-primary" (click)="createHabit()" data-testid="create-habit-btn">Add Habit</button>
+    </div>
+  </div>
+</div>
