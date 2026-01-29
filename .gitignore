@@ -73,3 +73,7 @@ logs/
 .cache/
 */.cache/
 EOF
+-e 
+# Environment files
+*.env
+*.env.*
