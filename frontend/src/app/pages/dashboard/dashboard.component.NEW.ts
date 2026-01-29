@@ -68,12 +68,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showAddChallengeModal = false;
   showAddProjectModal = false;
   showAddRoadmapModal = false;
+  showAddHabitModal = false;
   showAddTaskModal = false;
   showDietModal = false;
   showDietPreferencesModal = false;
   showAiAssistant = false;
   showCustomChallengeModal = false;
   showMealLogModal = false;
+  showQuarterlyCheckInModal = false;
+  showHabitEntryModal = false;
   isLoading = false;
   currentTime = new Date();
 
