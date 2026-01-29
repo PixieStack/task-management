@@ -9,6 +9,15 @@ models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI(title="Life Management & Task Tracking API")
 
+# CORS middleware - MUST be added before routers
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Include routers
 app.include_router(auth.router)
 app.include_router(tasks.router, prefix="/api/tasks", tags=["tasks"])
@@ -21,15 +30,6 @@ app.include_router(habits.router)
 app.include_router(diet.router)
 app.include_router(ai_assistant.router)
 app.include_router(gamification.router)
-
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 @app.get("/", tags=["root"])
 def root():
