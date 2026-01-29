@@ -185,6 +185,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private aiService: AIService,
     private gamificationService: GamificationService,
     private notificationService: NotificationService,
+    private projectService: ProjectService,
+    private roadmapService: RoadmapService,
+    private habitService: HabitService,
     private cdr: ChangeDetectorRef
   ) {}
 
