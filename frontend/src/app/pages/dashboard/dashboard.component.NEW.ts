@@ -390,12 +390,372 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // ==================== PROJECTS ====================
   loadProjects(): void {
-    // TODO: Implement project service and API calls
-    console.log('Projects loading not yet implemented');
+    this.projectService.getProjects(false).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (projects) => {
+        this.projects = projects;
+        this.activeProjects = projects.filter(p => !p.is_archived);
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error loading projects:', error)
+    });
+
+    this.projectService.getProjects(true).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (projects) => {
+        this.archivedProjects = projects.filter(p => p.is_archived);
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error loading archived projects:', error)
+    });
   }
 
   createProject(): void {
-    console.log('Project creation not yet implemented');
+    if (!this.newProject.title || !this.newProject.duration) {
+      alert('Please fill in required fields');
+      return;
+    }
+
+    this.projectService.createProject(this.newProject).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (project) => {
+        this.projects.push(project);
+        this.activeProjects.push(project);
+        this.showAddProjectModal = false;
+        this.newProject = {
+          title: '',
+          description: '',
+          category: '',
+          duration: '3 months',
+          milestones: []
+        };
+        alert('Project created successfully!');
+        this.gamificationService.addXP(100, 'Project created').subscribe();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error creating project:', error);
+        alert('Failed to create project');
+      }
+    });
+  }
+
+  updateProjectProgress(project: Project, newProgress: number): void {
+    if (!project.id) return;
+
+    this.projectService.updateProject(project.id, { progress: newProgress }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (updated) => {
+        const index = this.projects.findIndex(p => p.id === project.id);
+        if (index !== -1) {
+          this.projects[index] = updated;
+        }
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error updating project:', error)
+    });
+  }
+
+  archiveProject(project: Project): void {
+    if (!project.id || !confirm('Archive this project?')) return;
+
+    this.projectService.archiveProject(project.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.activeProjects = this.activeProjects.filter(p => p.id !== project.id);
+        if (project.progress === 100) {
+          this.gamificationService.addXP(500, 'Project completed').subscribe();
+        }
+        alert('Project archived!');
+        this.loadProjects();
+      },
+      error: (error) => {
+        console.error('Error archiving project:', error);
+        alert('Failed to archive project');
+      }
+    });
+  }
+
+  deleteProject(project: Project): void {
+    if (!project.id || !confirm('Delete this project permanently?')) return;
+
+    this.projectService.deleteProject(project.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.projects = this.projects.filter(p => p.id !== project.id);
+        this.activeProjects = this.activeProjects.filter(p => p.id !== project.id);
+        alert('Project deleted!');
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error deleting project:', error);
+        alert('Failed to delete project');
+      }
+    });
+  }
+
+  // ==================== ROADMAPS ====================
+  loadRoadmaps(): void {
+    this.roadmapService.getRoadmaps(false).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (roadmaps) => {
+        this.roadmaps = roadmaps;
+        this.activeRoadmaps = roadmaps.filter(r => !r.is_archived);
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error loading roadmaps:', error)
+    });
+
+    this.roadmapService.getRoadmaps(true).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (roadmaps) => {
+        this.archivedRoadmaps = roadmaps.filter(r => r.is_archived);
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error loading archived roadmaps:', error)
+    });
+  }
+
+  createRoadmap(): void {
+    if (!this.newRoadmap.title) {
+      alert('Please enter a title');
+      return;
+    }
+
+    this.roadmapService.createRoadmap(this.newRoadmap).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (roadmap) => {
+        this.roadmaps.push(roadmap);
+        this.activeRoadmaps.push(roadmap);
+        this.showAddRoadmapModal = false;
+        this.newRoadmap = {
+          title: '',
+          description: '',
+          year: new Date().getFullYear()
+        };
+        alert('Roadmap created successfully!');
+        this.gamificationService.addXP(150, 'Roadmap created').subscribe();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        if (error.status === 400 && error.error?.detail?.includes('3 active roadmaps')) {
+          alert('You can only have 3 active roadmaps per year. Please archive one first.');
+        } else {
+          console.error('Error creating roadmap:', error);
+          alert('Failed to create roadmap');
+        }
+      }
+    });
+  }
+
+  openQuarterlyCheckIn(roadmap: Roadmap, quarter: number): void {
+    this.selectedRoadmap = roadmap;
+    this.quarterlyCheckIn = {
+      quarter: quarter,
+      accomplishments: [''],
+      conclusion: ''
+    };
+    this.showQuarterlyCheckInModal = true;
+  }
+
+  addAccomplishment(): void {
+    this.quarterlyCheckIn.accomplishments.push('');
+  }
+
+  removeAccomplishment(index: number): void {
+    this.quarterlyCheckIn.accomplishments.splice(index, 1);
+  }
+
+  submitQuarterlyCheckIn(): void {
+    if (!this.selectedRoadmap || !this.selectedRoadmap.id) return;
+
+    // Validate conclusion word count (100-500 words)
+    const wordCount = this.quarterlyCheckIn.conclusion.trim().split(/\s+/).length;
+    if (wordCount < 100 || wordCount > 500) {
+      alert(`Conclusion must be between 100-500 words. Current: ${wordCount} words.`);
+      return;
+    }
+
+    // Remove empty accomplishments
+    const accomplishments = this.quarterlyCheckIn.accomplishments.filter((a: string) => a.trim() !== '');
+    if (accomplishments.length === 0) {
+      alert('Please add at least one accomplishment');
+      return;
+    }
+
+    const quarter = this.quarterlyCheckIn.quarter;
+    const updateData: any = {};
+    updateData[`q${quarter}_date`] = new Date().toISOString();
+    updateData[`q${quarter}_accomplishments`] = accomplishments;
+    updateData[`q${quarter}_conclusion`] = this.quarterlyCheckIn.conclusion;
+
+    this.roadmapService.updateQuarterlyCheckIn(this.selectedRoadmap.id, updateData).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (updated) => {
+        const index = this.roadmaps.findIndex(r => r.id === this.selectedRoadmap?.id);
+        if (index !== -1) {
+          this.roadmaps[index] = updated;
+        }
+        this.showQuarterlyCheckInModal = false;
+        this.selectedRoadmap = null;
+        alert('Quarterly check-in submitted successfully!');
+        this.gamificationService.addXP(200, 'Quarterly check-in').subscribe();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        if (error.status === 400) {
+          alert(error.error?.detail || 'Cannot check in yet. Must wait 3 months between check-ins.');
+        } else {
+          console.error('Error submitting check-in:', error);
+          alert('Failed to submit check-in');
+        }
+      }
+    });
+  }
+
+  canCheckInQuarter(roadmap: Roadmap, quarter: number): boolean {
+    const quarterDateField = `q${quarter}_date` as keyof Roadmap;
+    const lastCheckIn = roadmap[quarterDateField];
+    
+    if (!lastCheckIn) return true;
+    
+    const lastDate = new Date(lastCheckIn as string);
+    const now = new Date();
+    const daysSince = (now.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24);
+    
+    return daysSince >= 90; // 3 months ≈ 90 days
+  }
+
+  archiveRoadmap(roadmap: Roadmap): void {
+    if (!roadmap.id || !confirm('Archive this roadmap?')) return;
+
+    this.roadmapService.archiveRoadmap(roadmap.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.activeRoadmaps = this.activeRoadmaps.filter(r => r.id !== roadmap.id);
+        alert('Roadmap archived!');
+        this.loadRoadmaps();
+      },
+      error: (error) => {
+        console.error('Error archiving roadmap:', error);
+        alert('Failed to archive roadmap');
+      }
+    });
+  }
+
+  deleteRoadmap(roadmap: Roadmap): void {
+    if (!roadmap.id || !confirm('Delete this roadmap permanently?')) return;
+
+    this.roadmapService.deleteRoadmap(roadmap.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.roadmaps = this.roadmaps.filter(r => r.id !== roadmap.id);
+        this.activeRoadmaps = this.activeRoadmaps.filter(r => r.id !== roadmap.id);
+        alert('Roadmap deleted!');
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error deleting roadmap:', error);
+        alert('Failed to delete roadmap');
+      }
+    });
+  }
+
+  // ==================== HABITS ====================
+  loadHabits(): void {
+    this.habitService.getHabits().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (habits) => {
+        this.habits = habits;
+        this.loadHabitEntries();
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error loading habits:', error)
+    });
+  }
+
+  loadHabitEntries(): void {
+    this.habitService.getHabitEntries(undefined, 7).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (entries) => {
+        this.habitEntries = entries;
+        this.prepareTodaysHabits();
+        this.cdr.markForCheck();
+      },
+      error: (error) => console.error('Error loading habit entries:', error)
+    });
+  }
+
+  prepareTodaysHabits(): void {
+    const today = new Date().toDateString();
+    this.todaysHabits = this.habits.map(habit => {
+      const todayEntry = this.habitEntries.find(e => 
+        e.habit_id === habit.id && new Date(e.date).toDateString() === today
+      );
+      return {
+        ...habit,
+        todayEntry: todayEntry,
+        completed: todayEntry?.completed || false
+      };
+    });
+  }
+
+  createHabit(): void {
+    if (!this.newHabit.name) {
+      alert('Please enter a habit name');
+      return;
+    }
+
+    this.habitService.createHabit(this.newHabit).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (habit) => {
+        this.habits.push(habit);
+        this.showAddHabitModal = false;
+        this.newHabit = {
+          name: '',
+          description: '',
+          category: '',
+          frequency: 'daily',
+          target_count: 1,
+          icon: '✓',
+          color: '#3498db'
+        };
+        alert('Habit created successfully!');
+        this.prepareTodaysHabits();
+        this.gamificationService.addXP(50, 'Habit created').subscribe();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error creating habit:', error);
+        alert('Failed to create habit');
+      }
+    });
+  }
+
+  logHabitEntry(habit: any): void {
+    const entry: Partial<HabitEntry> = {
+      habit_id: habit.id,
+      date: new Date().toISOString(),
+      completed: true,
+      count: 1
+    };
+
+    this.habitService.createHabitEntry(entry).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (newEntry) => {
+        this.habitEntries.push(newEntry);
+        habit.completed = true;
+        habit.todayEntry = newEntry;
+        alert('Habit logged!');
+        this.gamificationService.addXP(20, 'Habit completed').subscribe();
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error logging habit:', error);
+        alert('Failed to log habit');
+      }
+    });
+  }
+
+  deleteHabit(habit: Habit): void {
+    if (!habit.id || !confirm('Delete this habit?')) return;
+
+    this.habitService.deleteHabit(habit.id).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => {
+        this.habits = this.habits.filter(h => h.id !== habit.id);
+        this.prepareTodaysHabits();
+        alert('Habit deleted!');
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error deleting habit:', error);
+        alert('Failed to delete habit');
+      }
+    });
   }
 
   // ==================== DIET & HYDRATION ====================
