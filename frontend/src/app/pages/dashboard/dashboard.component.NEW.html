@@ -1,0 +1,414 @@
+<!-- Dashboard Container -->
+<div class="dashboard-container">
+  
+  <!-- Top Navigation -->
+  <div class="dashboard-header">
+    <h1>{{getGreeting()}}! 👋</h1>
+    <div class="quick-stats">
+      <div class="stat-card">
+        <span class="stat-icon">⭐</span>
+        <div>
+          <div class="stat-value">Level {{userStats.level}}</div>
+          <div class="stat-label">{{userStats.rank}}</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🔥</span>
+        <div>
+          <div class="stat-value">{{userStats.total_xp}}</div>
+          <div class="stat-label">Total XP</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">🏆</span>
+        <div>
+          <div class="stat-value">{{activeChallenges.length}}</div>
+          <div class="stat-label">Active Challenges</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Tabs -->
+  <div class="section-tabs">
+    <button 
+      [class.active]="activeSection === 'overview'" 
+      (click)="changeSection('overview')"
+      data-testid="overview-tab">
+      📊 Overview
+    </button>
+    <button 
+      [class.active]="activeSection === 'challenges'" 
+      (click)="changeSection('challenges')"
+      data-testid="challenges-tab">
+      🎯 Challenges
+    </button>
+    <button 
+      [class.active]="activeSection === 'projects'" 
+      (click)="changeSection('projects')"
+      data-testid="projects-tab">
+      📁 Projects
+    </button>
+    <button 
+      [class.active]="activeSection === 'diet'" 
+      (click)="changeSection('diet')"
+      data-testid="diet-tab">
+      🥗 Diet & Hydration
+    </button>
+    <button 
+      [class.active]="activeSection === 'gamification'" 
+      (click)="changeSection('gamification')"
+      data-testid="gamification-tab">
+      🎮 Rewards
+    </button>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="dashboard-content">
+
+    <!-- ==================== CHALLENGES SECTION ==================== -->
+    <div *ngIf="activeSection === 'challenges'" class="section-content">
+      <div class="section-header">
+        <h2>21-30 Day Life-Changing Challenges</h2>
+        <button class="btn-primary" (click)="showCustomChallengeModal = true" data-testid="create-custom-challenge-btn">
+          <i class="fas fa-plus"></i> Create Custom Challenge
+        </button>
+      </div>
+
+      <!-- Challenge Templates Grid (2 rows x 5 columns) -->
+      <div class="challenge-templates-grid">
+        <div 
+          *ngFor="let template of challengeTemplates" 
+          class="challenge-template-card"
+          [attr.data-testid]="'challenge-template-' + template.type">
+          <div class="template-icon">{{template.icon}}</div>
+          <h3>{{template.title}}</h3>
+          <p>{{template.description}}</p>
+          <div class="template-duration">{{template.duration}} Days</div>
+          <button 
+            class="btn-start-challenge" 
+            (click)="startChallenge(template)"
+            [attr.data-testid]="'start-' + template.type + '-challenge'">
+            Start Challenge
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Challenges -->
+      <div *ngIf="activeChallenges.length > 0" class="active-challenges-section">
+        <h3>Your Active Challenges</h3>
+        <div class="active-challenges-list">
+          <div *ngFor="let challenge of activeChallenges" class="active-challenge-card" [attr.data-testid]="'active-challenge-' + challenge.id">
+            <div class="challenge-header">
+              <span class="challenge-icon">{{challenge.icon}}</span>
+              <div class="challenge-info">
+                <h4>{{challenge.title}}</h4>
+                <p>{{challenge.description}}</p>
+              </div>
+            </div>
+            <div class="challenge-progress">
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" [style.width.%]="challenge.progress"></div>
+              </div>
+              <div class="progress-text">{{challenge.current_streak}} / {{challenge.duration}} days</div>
+            </div>
+            <div class="challenge-actions">
+              <button 
+                class="btn-check-in" 
+                [disabled]="!canCheckIn(challenge)"
+                (click)="checkInChallenge(challenge)"
+                [attr.data-testid]="'check-in-challenge-' + challenge.id">
+                <span *ngIf="canCheckIn(challenge)">✓ Check In</span>
+                <span *ngIf="!canCheckIn(challenge)">⏰ Next check-in in {{getHoursUntilNextCheckIn(challenge) | number:'1.0-0'}}h</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed Challenges -->
+      <div *ngIf="completedChallenges.length > 0" class="completed-challenges-section">
+        <h3>Completed Challenges 🎉</h3>
+        <div class="completed-challenges-list">
+          <div *ngFor="let challenge of completedChallenges" class="completed-challenge-card">
+            <span class="challenge-icon">{{challenge.icon}}</span>
+            <div>
+              <h4>{{challenge.title}}</h4>
+              <p>Completed {{challenge.duration}} days!</p>
+            </div>
+            <span class="xp-badge">+{{challenge.xp_reward}} XP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== DIET & HYDRATION SECTION ==================== -->
+    <div *ngIf="activeSection === 'diet'" class="section-content">
+      <div class="section-header">
+        <h2>Smart Diet & Hydration Management</h2>
+        <button class="btn-primary" (click)="showDietPreferencesModal = true" data-testid="set-diet-preferences-btn">
+          <i class="fas fa-cog"></i> Set Preferences
+        </button>
+      </div>
+
+      <!-- Meal Plan (AI Generated) -->
+      <div *ngIf="mealPlan" class="meal-plan-section">
+        <h3>Today's AI Meal Plan</h3>
+        <div class="meal-plan-grid">
+          <div class="meal-plan-card">
+            <h4>🌅 Breakfast</h4>
+            <ul>
+              <li *ngFor="let item of mealPlan.breakfast">{{item}}</li>
+            </ul>
+            <button 
+              class="btn-log-meal" 
+              [disabled]="hasMealLoggedToday('breakfast')"
+              (click)="mealLog.meal_type = 'breakfast'; showMealLogModal = true"
+              data-testid="log-breakfast-btn">
+              <span *ngIf="!hasMealLoggedToday('breakfast')">Log Breakfast</span>
+              <span *ngIf="hasMealLoggedToday('breakfast')">✓ Logged</span>
+            </button>
+          </div>
+          <div class="meal-plan-card">
+            <h4>🌞 Lunch</h4>
+            <ul>
+              <li *ngFor="let item of mealPlan.lunch">{{item}}</li>
+            </ul>
+            <button 
+              class="btn-log-meal" 
+              [disabled]="hasMealLoggedToday('lunch')"
+              (click)="mealLog.meal_type = 'lunch'; showMealLogModal = true"
+              data-testid="log-lunch-btn">
+              <span *ngIf="!hasMealLoggedToday('lunch')">Log Lunch</span>
+              <span *ngIf="hasMealLoggedToday('lunch')">✓ Logged</span>
+            </button>
+          </div>
+          <div class="meal-plan-card">
+            <h4>🌙 Dinner</h4>
+            <ul>
+              <li *ngFor="let item of mealPlan.dinner">{{item}}</li>
+            </ul>
+            <button 
+              class="btn-log-meal" 
+              [disabled]="hasMealLoggedToday('dinner')"
+              (click)="mealLog.meal_type = 'dinner'; showMealLogModal = true"
+              data-testid="log-dinner-btn">
+              <span *ngIf="!hasMealLoggedToday('dinner')">Log Dinner</span>
+              <span *ngIf="hasMealLoggedToday('dinner')">✓ Logged</span>
+            </button>
+          </div>
+          <div class="meal-plan-card">
+            <h4>🍎 Snacks</h4>
+            <ul>
+              <li *ngFor="let item of mealPlan.snacks">{{item}}</li>
+            </ul>
+            <button 
+              class="btn-log-meal" 
+              [disabled]="hasMealLoggedToday('snack')"
+              (click)="mealLog.meal_type = 'snack'; showMealLogModal = true"
+              data-testid="log-snack-btn">
+              <span *ngIf="!hasMealLoggedToday('snack')">Log Snack</span>
+              <span *ngIf="hasMealLoggedToday('snack')">✓ Logged</span>
+            </button>
+          </div>
+        </div>
+        <div class="meal-tips">
+          <h4>💡 Tips for Today:</h4>
+          <ul>
+            <li *ngFor="let tip of mealPlan.tips">{{tip}}</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Water Tracking -->
+      <div class="water-tracking-section">
+        <h3>💧 Water Intake</h3>
+        <div class="water-progress">
+          <div class="water-visual">
+            <div class="water-glass">
+              <div class="water-fill" [style.height.%]="(getTotalWaterToday() / 2000) * 100"></div>
+            </div>
+            <p>{{getTotalWaterToday()}} / 2000 ml</p>
+          </div>
+          <div class="water-log-section">
+            <div class="water-amount-selector">
+              <button (click)="waterAmount = 250" [class.active]="waterAmount === 250">250ml</button>
+              <button (click)="waterAmount = 500" [class.active]="waterAmount === 500">500ml</button>
+              <button (click)="waterAmount = 750" [class.active]="waterAmount === 750">750ml</button>
+            </div>
+            <button class="btn-log-water" (click)="logWater()" data-testid="log-water-btn">
+              Log {{waterAmount}}ml Water
+            </button>
+            <p class="water-reminder-info">💡 Hourly reminders are active (8 AM - 10 PM)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Logged Meals -->
+      <div *ngIf="meals.length > 0" class="logged-meals-section">
+        <h3>Today's Meals</h3>
+        <div class="logged-meals-list">
+          <div *ngFor="let meal of meals" class="logged-meal-card">
+            <span class="meal-type-badge">{{meal.meal_type}}</span>
+            <p>{{meal.description}}</p>
+            <span *ngIf="meal.calories" class="calories-badge">{{meal.calories}} cal</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== GAMIFICATION SECTION ==================== -->
+    <div *ngIf="activeSection === 'gamification'" class="section-content">
+      <div class="section-header">
+        <h2>Gamification & Rewards</h2>
+      </div>
+
+      <!-- XP Progress -->
+      <div class="xp-progress-section">
+        <div class="level-badge">Level {{userStats.level}}</div>
+        <div class="xp-progress-bar">
+          <div class="xp-fill" [style.width.%]="getXPProgress()"></div>
+        </div>
+        <p>{{userStats.total_xp}} / {{userStats.xp_to_next_level}} XP</p>
+        <p class="rank-badge">{{userStats.rank}}</p>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card-large">
+          <h3>🏆 Achievements</h3>
+          <p class="stat-number">{{userStats.challenges_completed}}</p>
+          <p>Challenges Completed</p>
+        </div>
+        <div class="stat-card-large">
+          <h3>🔥 Best Streak</h3>
+          <p class="stat-number">{{userStats.best_streak}}</p>
+          <p>Days</p>
+        </div>
+        <div class="stat-card-large">
+          <h3>⭐ Total XP</h3>
+          <p class="stat-number">{{userStats.total_xp}}</p>
+          <p>Points Earned</p>
+        </div>
+      </div>
+
+      <!-- Badges -->
+      <div *ngIf="userStats.badges && userStats.badges.length > 0" class="badges-section">
+        <h3>🏅 Your Badges</h3>
+        <div class="badges-grid">
+          <div *ngFor="let badge of userStats.badges" class="badge-card" [attr.data-testid]="'badge-' + badge.id">
+            <div class="badge-icon">{{badge.icon}}</div>
+            <h4>{{badge.name}}</h4>
+            <p>{{badge.description}}</p>
+            <span class="badge-rarity" [class]="badge.rarity">{{badge.rarity}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Assistant -->
+      <div class="ai-assistant-section">
+        <h3>🤖 AI Life Coach</h3>
+        <div class="ai-chat-container">
+          <div class="ai-messages" *ngIf="aiMessages.length > 0">
+            <div *ngFor="let msg of aiMessages" class="ai-message">
+              <div class="user-message">
+                <strong>You:</strong> {{msg.question}}
+              </div>
+              <div class="ai-response">
+                <strong>AI Coach:</strong> {{msg.answer}}
+              </div>
+            </div>
+          </div>
+          <div class="ai-input-section">
+            <input 
+              type="text" 
+              [(ngModel)]="aiInput" 
+              placeholder="Ask for advice, motivation, or help..."
+              (keyup.enter)="askAI()"
+              data-testid="ai-input">
+            <button class="btn-primary" (click)="askAI()" data-testid="ai-send-btn">
+              <i class="fas fa-paper-plane"></i> Ask
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Custom Challenge Modal -->
+<div *ngIf="showCustomChallengeModal" class="modal-overlay" (click)="showCustomChallengeModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" data-testid="custom-challenge-modal">
+    <div class="modal-header">
+      <h2>Create Custom Challenge (21-30 Days)</h2>
+      <button class="modal-close" (click)="showCustomChallengeModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Challenge Title *</label>
+        <input type="text" [(ngModel)]="newChallenge.title" placeholder="e.g., Morning Yoga" data-testid="challenge-title-input">
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea [(ngModel)]="newChallenge.description" placeholder="Describe your challenge..." data-testid="challenge-description-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Duration (21-30 days) *</label>
+        <input type="number" [(ngModel)]="newChallenge.duration" min="21" max="30" data-testid="challenge-duration-input">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <input type="text" [(ngModel)]="newChallenge.challenge_type" placeholder="e.g., fitness, learning" data-testid="challenge-type-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showCustomChallengeModal = false">Cancel</button>
+      <button class="btn-primary" (click)="createCustomChallenge()" data-testid="create-challenge-btn">Create Challenge</button>
+    </div>
+  </div>
+</div>
+
+<!-- Meal Log Modal -->
+<div *ngIf="showMealLogModal" class="modal-overlay" (click)="showMealLogModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" data-testid="meal-log-modal">
+    <div class="modal-header">
+      <h2>Log {{mealLog.meal_type}}</h2>
+      <button class="modal-close" (click)="showMealLogModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>What did you eat?</label>
+        <textarea [(ngModel)]="mealLog.description" placeholder="Describe your meal..." data-testid="meal-description-input"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Calories (optional)</label>
+        <input type="number" [(ngModel)]="mealLog.calories" placeholder="e.g., 450" data-testid="meal-calories-input">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showMealLogModal = false">Cancel</button>
+      <button class="btn-primary" (click)="logMeal()" data-testid="log-meal-btn">Log Meal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Diet Preferences Modal -->
+<div *ngIf="showDietPreferencesModal" class="modal-overlay" (click)="showDietPreferencesModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()" data-testid="diet-preferences-modal">
+    <div class="modal-header">
+      <h2>Set Diet Preferences</h2>
+      <button class="modal-close" (click)="showDietPreferencesModal = false">×</button>
+    </div>
+    <div class="modal-body">
+      <p>Set your preferences to get AI-powered meal plans!</p>
+      <!-- TODO: Add diet preference form -->
+      <p class="coming-soon">Full diet preferences form coming soon...</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="showDietPreferencesModal = false">Close</button>
+    </div>
+  </div>
+</div>
