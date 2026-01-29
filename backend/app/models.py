@@ -1,9 +1,14 @@
-
 from datetime import datetime
 from .database import Base
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Float, JSON
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+
+# Import extended models
+from .models_extended import (
+    UserProfile, Challenge as ExtendedChallenge, Project, Roadmap,
+    Habit, HabitEntry, DietPreference, MealEntry, WaterEntry,
+    AIConversation, UserStatistics, MLTrainingData
+)
 
 class Challenge(Base):
     __tablename__ = "challenges"
