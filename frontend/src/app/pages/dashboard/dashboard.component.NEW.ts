@@ -15,6 +15,9 @@ import { DietService } from '../../shared/services/diet.service';
 import { AIService } from '../../shared/services/ai.service';
 import { GamificationService } from '../../shared/services/gamification.service';
 import { NotificationService } from '../../shared/services/notification.service';
+import { ProjectService, Project } from '../../shared/services/project.service';
+import { RoadmapService, Roadmap } from '../../shared/services/roadmap.service';
+import { HabitService, Habit, HabitEntry } from '../../shared/services/habit.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { Subject, takeUntil } from 'rxjs';
 
