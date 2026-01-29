@@ -18,18 +18,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(auth.router)
+# Include routers - auth stays without /api prefix for proxy compatibility
+app.include_router(auth.router)  # /auth/*
 app.include_router(tasks.router, prefix="/api/tasks", tags=["tasks"])
-app.include_router(analytics.router)
-app.include_router(contact.router)
-app.include_router(challenges.router)
-app.include_router(projects.router)
-app.include_router(roadmaps.router)
-app.include_router(habits.router)
-app.include_router(diet.router)
-app.include_router(ai_assistant.router)
-app.include_router(gamification.router)
+app.include_router(analytics.router)  # Already has /api prefix in router
+app.include_router(contact.router)  # /contact/* - can be accessed via proxy
+app.include_router(challenges.router)  # Already has /api prefix in router
+app.include_router(projects.router)  # Already has /api prefix in router
+app.include_router(roadmaps.router)  # Already has /api prefix in router
+app.include_router(habits.router)  # Already has /api prefix in router
+app.include_router(diet.router)  # Already has /api prefix in router
+app.include_router(ai_assistant.router)  # Already has /api prefix in router
+app.include_router(gamification.router)  # Already has /api prefix in router
 
 @app.get("/", tags=["root"])
 def root():

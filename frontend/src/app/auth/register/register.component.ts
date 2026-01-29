@@ -33,7 +33,7 @@ export class RegisterComponent implements OnInit {
     label: '',
   };
 
-  private apiUrl = 'http://127.0.0.1:8000/auth/register';
+  private apiUrl = '/auth/register';
 
   constructor(
     private fb: FormBuilder,

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app import models, crud
 from app.auth import get_current_user, get_db
 
-router = APIRouter(prefix="/analytics", tags=["analytics"])
+router = APIRouter(prefix="/api/analytics", tags=["analytics"])
 
 @router.get("/")
 def get_analytics(

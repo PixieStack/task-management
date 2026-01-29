@@ -62,8 +62,8 @@ export class ContactCtaComponent {
   focusedField: string = '';
   mousePosition = { x: 0, y: 0 };
 
-  // Direct API URL - change this to match your backend
-  private apiUrl = 'http://localhost:8000';
+  // Use proxy for API calls
+  private apiUrl = '/api';
 
   constructor(
     private fb: FormBuilder,
