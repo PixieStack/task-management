@@ -47,7 +47,7 @@ export interface TaskUpdate {
   providedIn: 'root',
 })
 export class TaskService {
-  private apiUrl = 'http://localhost:8000/tasks';
+  private apiUrl = 'http://localhost:8001/api/tasks';
   private tasksSubject = new BehaviorSubject<Task[]>([]);
   public tasks$ = this.tasksSubject.asObservable();
 
