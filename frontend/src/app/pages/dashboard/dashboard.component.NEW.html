@@ -154,6 +154,210 @@
       </div>
     </div>
 
+    <!-- ==================== PROJECTS SECTION ==================== -->
+    <div *ngIf="activeSection === 'projects'" class="section-content">
+      <div class="section-header">
+        <h2>Long-Term Project Planning (3-6 Months)</h2>
+        <button class="btn-primary" (click)="showAddProjectModal = true" data-testid="start-new-project-btn">
+          <i class="fas fa-plus"></i> Start a New Project
+        </button>
+      </div>
+
+      <!-- Active Projects -->
+      <div *ngIf="activeProjects.length > 0" class="projects-grid">
+        <div *ngFor="let project of activeProjects" class="project-card" [attr.data-testid]="'project-' + project.id">
+          <div class="project-header">
+            <h3>{{project.title}}</h3>
+            <span class="project-duration-badge">{{project.duration}}</span>
+          </div>
+          <p class="project-description">{{project.description}}</p>
+          <div class="project-meta">
+            <span class="project-category">{{project.category}}</span>
+            <span class="project-status" [class]="project.status">{{project.status}}</span>
+          </div>
+          <div class="project-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" [style.width.%]="project.progress"></div>
+            </div>
+            <div class="progress-controls">
+              <input 
+                type="range" 
+                min="0" 
+                max="100" 
+                [value]="project.progress" 
+                (change)="updateProjectProgress(project, $any($event.target).value)"
+                data-testid="project-progress-slider">
+              <span>{{project.progress}}%</span>
+            </div>
+          </div>
+          <div class="project-actions">
+            <button class="btn-secondary" (click)="archiveProject(project)" data-testid="archive-project-btn">
+              📦 Archive
+            </button>
+            <button class="btn-danger" (click)="deleteProject(project)" data-testid="delete-project-btn">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="activeProjects.length === 0" class="empty-state">
+        <div class="empty-state-icon">📁</div>
+        <h3>No active projects yet</h3>
+        <p>Start your first long-term project and track your progress!</p>
+        <button class="btn-primary" (click)="showAddProjectModal = true">Start a New Project</button>
+      </div>
+
+      <!-- Archived Projects -->
+      <div *ngIf="archivedProjects.length > 0" class="archived-projects-section">
+        <h3>📦 Archived Projects</h3>
+        <div class="archived-projects-list">
+          <div *ngFor="let project of archivedProjects" class="archived-project-card">
+            <h4>{{project.title}}</h4>
+            <p>{{project.description}}</p>
+            <span class="completion-badge">{{project.progress}}% Complete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== ROADMAPS SECTION ==================== -->
+    <div *ngIf="activeSection === 'roadmaps'" class="section-content">
+      <div class="section-header">
+        <h2>12-Month Roadmaps (Quarterly Tracking)</h2>
+        <button 
+          class="btn-primary" 
+          (click)="showAddRoadmapModal = true" 
+          [disabled]="activeRoadmaps.length >= 3"
+          data-testid="create-roadmap-btn">
+          <i class="fas fa-plus"></i> Create Roadmap
+          <span *ngIf="activeRoadmaps.length >= 3">(Max 3 per year)</span>
+        </button>
+      </div>
+
+      <p class="info-text">
+        ℹ️ You can have up to 3 active roadmaps per year. Quarterly check-ins available every 3 months.
+      </p>
+
+      <!-- Active Roadmaps -->
+      <div *ngIf="activeRoadmaps.length > 0" class="roadmaps-grid">
+        <div *ngFor="let roadmap of activeRoadmaps" class="roadmap-card" [attr.data-testid]="'roadmap-' + roadmap.id">
+          <div class="roadmap-header">
+            <h3>{{roadmap.title}}</h3>
+            <span class="year-badge">{{roadmap.year}}</span>
+          </div>
+          <p class="roadmap-description">{{roadmap.description}}</p>
+
+          <!-- Quarterly Check-ins -->
+          <div class="quarterly-checkins">
+            <h4>Quarterly Progress</h4>
+            <div class="quarters-grid">
+              <div *ngFor="let quarter of [1, 2, 3, 4]" class="quarter-card">
+                <div class="quarter-header">
+                  <h5>Q{{quarter}}</h5>
+                  <span *ngIf="roadmap['q' + quarter + '_date']" class="check-in-badge">✓ Completed</span>
+                </div>
+                <button 
+                  *ngIf="!roadmap['q' + quarter + '_date']"
+                  class="btn-check-in-quarter" 
+                  [disabled]="!canCheckInQuarter(roadmap, quarter)"
+                  (click)="openQuarterlyCheckIn(roadmap, quarter)"
+                  [attr.data-testid]="'roadmap-q' + quarter + '-checkin'">
+                  <span *ngIf="canCheckInQuarter(roadmap, quarter)">Check In</span>
+                  <span *ngIf="!canCheckInQuarter(roadmap, quarter)">Locked</span>
+                </button>
+                <div *ngIf="roadmap['q' + quarter + '_date']" class="quarter-summary">
+                  <p class="check-in-date">{{roadmap['q' + quarter + '_date'] | date:'short'}}</p>
+                  <ul *ngIf="roadmap['q' + quarter + '_accomplishments']">
+                    <li *ngFor="let acc of roadmap['q' + quarter + '_accomplishments'].slice(0, 2)">{{acc}}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="roadmap-actions">
+            <button class="btn-secondary" (click)="archiveRoadmap(roadmap)" data-testid="archive-roadmap-btn">
+              📦 Archive
+            </button>
+            <button class="btn-danger" (click)="deleteRoadmap(roadmap)" data-testid="delete-roadmap-btn">
+              🗑️ Delete
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="activeRoadmaps.length === 0" class="empty-state">
+        <div class="empty-state-icon">🗺️</div>
+        <h3>No roadmaps yet</h3>
+        <p>Create a 12-month roadmap and track your quarterly progress!</p>
+        <button class="btn-primary" (click)="showAddRoadmapModal = true">Create Your First Roadmap</button>
+      </div>
+
+      <!-- Archived Roadmaps -->
+      <div *ngIf="archivedRoadmaps.length > 0" class="archived-section">
+        <h3>📦 Archived Roadmaps</h3>
+        <div class="archived-list">
+          <div *ngFor="let roadmap of archivedRoadmaps" class="archived-roadmap-card">
+            <h4>{{roadmap.title}} ({{roadmap.year}})</h4>
+            <p>{{roadmap.description}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== HABITS SECTION ==================== -->
+    <div *ngIf="activeSection === 'habits'" class="section-content">
+      <div class="section-header">
+        <h2>Daily Habits Tracker</h2>
+        <button class="btn-primary" (click)="showAddHabitModal = true" data-testid="add-habit-btn">
+          <i class="fas fa-plus"></i> Add Habit
+        </button>
+      </div>
+
+      <!-- Today's Habits -->
+      <div *ngIf="todaysHabits.length > 0" class="habits-today-section">
+        <h3>Today's Habits</h3>
+        <div class="habits-list">
+          <div 
+            *ngFor="let habit of todaysHabits" 
+            class="habit-card" 
+            [class.completed]="habit.completed"
+            [attr.data-testid]="'habit-' + habit.id">
+            <div class="habit-icon" [style.color]="habit.color">{{habit.icon}}</div>
+            <div class="habit-info">
+              <h4>{{habit.name}}</h4>
+              <p>{{habit.description}}</p>
+              <span class="habit-category">{{habit.category}}</span>
+            </div>
+            <div class="habit-actions">
+              <button 
+                *ngIf="!habit.completed"
+                class="btn-complete-habit" 
+                (click)="logHabitEntry(habit)"
+                [attr.data-testid]="'complete-habit-' + habit.id">
+                ✓ Complete
+              </button>
+              <span *ngIf="habit.completed" class="completed-badge">✓ Done!</span>
+              <button class="btn-delete-habit" (click)="deleteHabit(habit)" data-testid="delete-habit-btn">
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="habits.length === 0" class="empty-state">
+        <div class="empty-state-icon">📈</div>
+        <h3>No habits yet</h3>
+        <p>Start tracking your daily habits to build consistency!</p>
+        <button class="btn-primary" (click)="showAddHabitModal = true">Add Your First Habit</button>
+      </div>
+    </div>
+
     <!-- ==================== DIET & HYDRATION SECTION ==================== -->
     <div *ngIf="activeSection === 'diet'" class="section-content">
       <div class="section-header">
