@@ -1004,14 +1004,14 @@ function _arrayUnique(items) {
   }
   return Array.from(set2);
 }
-var requestAnimFrame = (function() {
+var requestAnimFrame = function() {
   if (typeof window === "undefined") {
     return function(callback2) {
       return callback2();
     };
   }
   return window.requestAnimationFrame;
-})();
+}();
 function throttled(fn, thisArg) {
   let argsToUse = [];
   let ticking = false;
@@ -2580,7 +2580,7 @@ function retinaScale(chart, forceRatio, forceStyle) {
   }
   return false;
 }
-var supportsEventListenerOptions = (function() {
+var supportsEventListenerOptions = function() {
   let passiveSupported = false;
   try {
     const options = {
@@ -2596,7 +2596,7 @@ var supportsEventListenerOptions = (function() {
   } catch (e) {
   }
   return passiveSupported;
-})();
+}();
 function readUsedSize(element, property) {
   const value = getStyle(element, property);
   const matches = value && value.match(/^(\d+)(\.\d+)?px$/);

@@ -200,7 +200,7 @@ Follow these steps to set up and launch the Task Management Application:
     # For macOS/Linux: source venv/bin/activate
 
     # Install Python dependencies (ensure you have a requirements.txt if needed)
-    # pip install -r requirements.txt 
+    # python -m pip install -r requirements.txt 
 
     python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     ```
