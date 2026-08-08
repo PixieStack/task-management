@@ -1,17 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { KeyFeaturesComponent } from './key-features.component';
 
-import { ServicesComponent } from './key-features.component';
-
-describe('ServicesComponent', () => {
-  let component: ServicesComponent;
-  let fixture: ComponentFixture<ServicesComponent>;
+describe('KeyFeaturesComponent', () => {
+  let component: KeyFeaturesComponent;
+  let fixture: ComponentFixture<KeyFeaturesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ServicesComponent],
+      imports: [KeyFeaturesComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ServicesComponent);
+    fixture = TestBed.createComponent(KeyFeaturesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
