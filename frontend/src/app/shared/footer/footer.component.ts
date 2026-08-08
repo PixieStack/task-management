@@ -16,6 +16,7 @@ export class FooterComponent {
   footerLinks = {
     product: [
       { label: 'Features', route: '/key-features' },
+      { label: 'Downloads', route: '/downloads' },
       { label: 'Dashboard', route: '/dashboard', protected: true },
       { label: 'About', route: '/about' },
     ],
