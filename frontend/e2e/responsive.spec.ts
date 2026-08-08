@@ -3,9 +3,9 @@ import { expect, test, type Page } from '@playwright/test';
 const publicRoutes = [
   '/',
   '/key-features',
-  '/downloads',
   '/about',
   '/contact',
+  '/downloads',
   '/login',
   '/register',
   '/faq',
@@ -52,11 +52,7 @@ async function expectNoHorizontalOverflow(page: Page, label: string): Promise<vo
         const style = getComputedStyle(element);
         if (style.display === 'none' || style.visibility === 'hidden') return false;
 
-        // Decorative login/register background blobs are intentionally clipped by the page.
         if (element.classList.contains('bg-shape')) return false;
-
-        // Children of an explicit horizontal scroller (for example dashboard tabs)
-        // may sit outside the viewport without creating page-level overflow.
         if (isInsideIntentionalHorizontalScroller(element)) return false;
 
         const rect = element.getBoundingClientRect();
@@ -144,15 +140,42 @@ test.describe('responsive layout smoke suite', () => {
     await expectNoHorizontalOverflow(page, '320px open mobile navigation');
   });
 
-  test('Downloads page generates a web QR code and never activates unpublished native installers', async ({ page }) => {
+  test('Downloads page keeps unpublished release links and QR codes disabled', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('.download-card')).toHaveCount(6);
-    await expect(page.getByRole('img', { name: 'QR code for Web / PWA' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Install web app' })).toHaveCount(2);
     await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
+    await expect(page.locator('.qr-panel img')).toHaveCount(0);
     await expect(page.locator('.download-card:not([data-platform="web"]) a.download-button')).toHaveCount(0);
-    await expectNoHorizontalOverflow(page, '390px downloads page');
+    await expectNoHorizontalOverflow(page, '390px unpublished downloads page');
+  });
+
+  test('Downloads page generates a QR code when a real public release URL is configured', async ({ page }) => {
+    await page.route('**/downloads.json', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          web: { available: true, url: 'https://downloads.example.test/mob-taskmanager' },
+          macos: { available: false, url: '' },
+          windowsX64: { available: false, url: '' },
+          windowsArm64: { available: false, url: '' },
+          android: { available: false, url: '' },
+          ios: { available: false, url: '' },
+        }),
+      });
+    });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
+
+    const qrImage = page.getByRole('img', { name: 'QR code for Web / PWA' });
+    await expect(qrImage).toBeVisible();
+    await expect(qrImage).toHaveAttribute('src', /^data:image\/svg\+xml/);
+    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
+    await expectNoHorizontalOverflow(page, '390px published web QR downloads page');
   });
 
   for (const viewport of [viewports[0], viewports[2], viewports[4], viewports[5]]) {
