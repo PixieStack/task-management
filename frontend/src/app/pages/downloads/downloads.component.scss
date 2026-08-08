@@ -1,0 +1,381 @@
+:host {
+  display: block;
+}
+
+.downloads-page {
+  width: min(100%, 1500px);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 3rem);
+}
+
+.downloads-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: center;
+  padding: clamp(1.5rem, 5vw, 4.5rem);
+  border-radius: 28px;
+  background: linear-gradient(135deg, #111827, #312e81 58%, #7c2d12);
+  color: #fff;
+  overflow: hidden;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fdba74;
+}
+
+h1 {
+  margin: 0;
+  max-width: 15ch;
+  font-size: clamp(2rem, 6vw, 4.8rem);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.hero-copy > p {
+  max-width: 68ch;
+  margin: 1.25rem 0 0;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1.6rem;
+}
+
+.primary-action,
+.secondary-action,
+.download-button {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  border-radius: 12px;
+  padding: 0.8rem 1.1rem;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary-action,
+.download-button {
+  border: 0;
+  background: #f97316;
+  color: #111827;
+}
+
+.primary-action:hover,
+.download-button:not(.disabled):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+}
+
+.secondary-action {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.install-status {
+  margin-top: 0.9rem !important;
+  font-size: 0.95rem !important;
+  color: #fed7aa !important;
+}
+
+.hero-panel {
+  display: grid;
+  gap: 1rem;
+  align-content: center;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.hero-logo-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.hero-logo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero-panel strong,
+.hero-panel span {
+  display: block;
+}
+
+.hero-panel strong {
+  font-size: 1.15rem;
+}
+
+.hero-panel span {
+  margin-top: 0.4rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.release-note {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  margin: 1.5rem 0;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid #fdba74;
+  background: #fff7ed;
+  color: #7c2d12;
+}
+
+.release-note i {
+  margin-top: 0.2rem;
+}
+
+.release-note p {
+  margin: 0.2rem 0 0;
+  line-height: 1.55;
+}
+
+.download-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.download-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-width: 0;
+  padding: clamp(1.1rem, 2.5vw, 1.6rem);
+  border: 1px solid #e5e7eb;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 34px rgba(15, 23, 42, 0.06);
+}
+
+.card-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.platform-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #111827;
+  color: #fff;
+  font-size: 1.45rem;
+}
+
+.card-heading h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.5vw, 1.65rem);
+}
+
+.card-heading p {
+  margin: 0.25rem 0 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.platform-notes {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.platform-notes li + li {
+  margin-top: 0.3rem;
+}
+
+.download-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+  margin-top: auto;
+}
+
+.download-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.download-button.disabled {
+  background: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.status-pill.available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pill.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.qr-panel {
+  width: 142px;
+  min-height: 142px;
+  padding: 0.6rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.qr-panel img {
+  width: 112px;
+  height: 112px;
+}
+
+.qr-panel span {
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: #475569;
+}
+
+.qr-disabled i {
+  font-size: 2.2rem;
+  color: #94a3b8;
+}
+
+.device-guidance {
+  margin-top: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border-radius: 20px;
+  background: #f8fafc;
+}
+
+.device-guidance h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.guidance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.guidance-grid > div {
+  padding: 1rem;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.guidance-grid strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #0f172a;
+}
+
+.guidance-grid p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .downloads-hero,
+  .download-grid,
+  .guidance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    max-width: 18ch;
+  }
+
+  .hero-panel {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+@media (max-width: 560px) {
+  .downloads-page {
+    padding: 1rem;
+  }
+
+  .downloads-hero {
+    padding: 1.2rem;
+    border-radius: 20px;
+  }
+
+  .hero-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions,
+  .primary-action,
+  .secondary-action,
+  .download-button {
+    width: 100%;
+  }
+
+  .download-area {
+    grid-template-columns: 1fr;
+  }
+
+  .download-controls {
+    width: 100%;
+  }
+
+  .qr-panel {
+    width: 100%;
+    min-height: 0;
+  }
+
+  .release-note {
+    grid-template-columns: 1fr;
+  }
+}
