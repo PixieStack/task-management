@@ -12,15 +12,25 @@ import { RouterModule } from '@angular/router';
 })
 export class NavbarComponent {
   user: { name: string } | null = null;
+  menuOpen = false;
 
   constructor() {
     const userData = localStorage.getItem('user');
     this.user = userData ? JSON.parse(userData) : null;
   }
 
-  logout() {
+  toggleMobileMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.menuOpen = false;
+  }
+
+  logout(): void {
     localStorage.removeItem('user');
     this.user = null;
+    this.closeMobileMenu();
     window.location.href = '/';
   }
 }
