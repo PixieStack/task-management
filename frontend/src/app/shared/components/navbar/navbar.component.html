@@ -1,33 +1,63 @@
-<nav class="navbar">
+<nav class="navbar" aria-label="Primary navigation">
   <div class="container">
-    <!-- Logo with image -->
-    <a routerLink="/" class="logo">
+    <a routerLink="/" class="logo" (click)="closeMobileMenu()">
       <img src="assets/Logo.png" alt="TaskManager Logo" class="logo-img" />
-      M.O.B TaskManager
+      <span>M.O.B TaskManager</span>
     </a>
 
-    <ul class="nav-links">
-      <li>
-        <a
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          >Home</a
-        >
-      </li>
-      <li>
-        <a routerLink="/key-features" routerLinkActive="active">Key Features</a>
-      </li>
-      <li><a routerLink="/about" routerLinkActive="active">About Us</a></li>
-      <li><a routerLink="/contact" routerLinkActive="active">Contact Us</a></li>
-    </ul>
+    <div class="desktop-nav">
+      <ul class="nav-links">
+        <li>
+          <a
+            routerLink="/"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+          >Home</a>
+        </li>
+        <li><a routerLink="/key-features" routerLinkActive="active">Key Features</a></li>
+        <li><a routerLink="/about" routerLinkActive="active">About Us</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">Contact Us</a></li>
+      </ul>
 
-    <div class="auth-buttons" *ngIf="!user">
-      <button routerLink="/login" class="btn btn-primary">Login</button>
-      <button routerLink="/register" class="btn btn-secondary">Register</button>
+      <div class="auth-buttons" *ngIf="!user">
+        <button routerLink="/login" class="btn btn-primary">Login</button>
+        <button routerLink="/register" class="btn btn-secondary">Register</button>
+      </div>
+
+      <div class="auth-buttons" *ngIf="user">
+        <span class="welcome-text">Welcome, {{ user.name }}!</span>
+        <button (click)="logout()" class="btn btn-logout">Logout</button>
+      </div>
     </div>
 
-    <div class="auth-buttons" *ngIf="user">
+    <button
+      type="button"
+      class="menu-toggle"
+      (click)="toggleMobileMenu()"
+      [attr.aria-expanded]="menuOpen"
+      aria-controls="mobile-navigation"
+      aria-label="Toggle navigation menu"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+
+  <div id="mobile-navigation" class="mobile-panel" *ngIf="menuOpen">
+    <ul class="mobile-links">
+      <li><a routerLink="/" (click)="closeMobileMenu()">Home</a></li>
+      <li><a routerLink="/key-features" (click)="closeMobileMenu()">Key Features</a></li>
+      <li><a routerLink="/about" (click)="closeMobileMenu()">About Us</a></li>
+      <li><a routerLink="/contact" (click)="closeMobileMenu()">Contact Us</a></li>
+    </ul>
+
+    <div class="mobile-auth" *ngIf="!user">
+      <button routerLink="/login" class="btn btn-primary" (click)="closeMobileMenu()">Login</button>
+      <button routerLink="/register" class="btn btn-secondary" (click)="closeMobileMenu()">Register</button>
+    </div>
+
+    <div class="mobile-auth" *ngIf="user">
       <span class="welcome-text">Welcome, {{ user.name }}!</span>
       <button (click)="logout()" class="btn btn-logout">Logout</button>
     </div>
