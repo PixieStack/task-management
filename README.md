@@ -30,7 +30,7 @@ A focused full-stack productivity app built with Angular and FastAPI.
 
 ### Backend
 
-Python 3.14.7 is the validated backend runtime.
+Python 3.14.7 is the validated backend runtime and is pinned in `backend/.python-version`.
 
 ```bash
 cd backend
