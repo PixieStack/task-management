@@ -1,0 +1,6 @@
+{
+  "identifier": "default",
+  "description": "Default capability set for the M.O.B TaskManager application shell.",
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

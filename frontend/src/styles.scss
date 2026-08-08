@@ -1,9 +1,17 @@
 /* Global responsive foundation */
 
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
 html {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
+  min-height: 100%;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
@@ -24,8 +32,17 @@ body {
 
 body {
   min-width: 0;
+  min-height: 100dvh;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #fff;
+}
+
+app-root {
+  display: block;
+  min-height: 100dvh;
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  padding-bottom: var(--safe-bottom);
 }
 
 img,
@@ -79,6 +96,15 @@ footer,
 div,
 form {
   min-width: 0;
+}
+
+/* Avoid iOS Safari/WebView zooming form controls smaller than 16px. */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1rem);
+  }
 }
 
 /* The About-page Mini assistant must remain usable on 320px phones. */
