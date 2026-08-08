@@ -1,0 +1,164 @@
+import { expect, test, type Page } from '@playwright/test';
+
+const publicRoutes = [
+  '/',
+  '/key-features',
+  '/about',
+  '/contact',
+  '/login',
+  '/register',
+  '/faq',
+  '/privacy',
+  '/terms',
+  '/cookies',
+];
+
+const viewports = [
+  { name: 'small-phone', width: 320, height: 568 },
+  { name: 'phone', width: 390, height: 844 },
+  { name: 'tablet', width: 768, height: 1024 },
+  { name: 'laptop', width: 1366, height: 768 },
+  { name: 'desktop', width: 1920, height: 1080 },
+  { name: 'ultrawide', width: 3440, height: 1440 },
+];
+
+async function expectNoHorizontalOverflow(page: Page, label: string): Promise<void> {
+  await page.locator('app-root').waitFor({ state: 'visible' });
+  await page.waitForTimeout(200);
+
+  const result = await page.evaluate(() => {
+    const viewportWidth = document.documentElement.clientWidth;
+    const scrollWidth = Math.max(
+      document.documentElement.scrollWidth,
+      document.body?.scrollWidth ?? 0,
+    );
+
+    const isInsideIntentionalHorizontalScroller = (element: HTMLElement): boolean => {
+      let current = element.parentElement;
+
+      while (current && current !== document.body) {
+        const style = getComputedStyle(current);
+        const scrollable = style.overflowX === 'auto' || style.overflowX === 'scroll';
+        if (scrollable && current.scrollWidth > current.clientWidth + 1) return true;
+        current = current.parentElement;
+      }
+
+      return false;
+    };
+
+    const offenders = Array.from(document.querySelectorAll<HTMLElement>('body *'))
+      .filter((element) => {
+        const style = getComputedStyle(element);
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+
+        // Decorative login/register background blobs are intentionally clipped by the page.
+        if (element.classList.contains('bg-shape')) return false;
+
+        // Children of an explicit horizontal scroller (for example dashboard tabs)
+        // may sit outside the viewport without creating page-level overflow.
+        if (isInsideIntentionalHorizontalScroller(element)) return false;
+
+        const rect = element.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return false;
+        return rect.left < -2 || rect.right > viewportWidth + 2;
+      })
+      .slice(0, 8)
+      .map((element) => ({
+        tag: element.tagName.toLowerCase(),
+        className: element.className,
+        text: (element.textContent ?? '').trim().slice(0, 80),
+        rect: element.getBoundingClientRect().toJSON(),
+      }));
+
+    return { viewportWidth, scrollWidth, offenders };
+  });
+
+  expect(
+    result.scrollWidth,
+    `${label} created page-level horizontal overflow: ${JSON.stringify(result)}`,
+  ).toBeLessThanOrEqual(result.viewportWidth + 1);
+
+  expect(
+    result.offenders,
+    `${label} has visible elements outside the viewport: ${JSON.stringify(result.offenders)}`,
+  ).toEqual([]);
+}
+
+async function stubProtectedLayoutApi(page: Page): Promise<void> {
+  await page.route('**/auth/me', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        id: 1,
+        username: 'Responsive Tester',
+        email: 'responsive@example.com',
+      }),
+    });
+  });
+
+  await page.route('**/auth/profile', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        first_name: 'Responsive',
+        last_name: 'Tester',
+        bio: '',
+      }),
+    });
+  });
+
+  for (const pattern of ['**/api/tasks**', '**/api/habits**', '**/api/challenges**', '**/api/ai/conversations**']) {
+    await page.route(pattern, async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
+    });
+  }
+}
+
+test.describe('responsive layout smoke suite', () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  for (const viewport of viewports) {
+    test(`${viewport.name} public routes fit ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+      for (const route of publicRoutes) {
+        await page.goto(route, { waitUntil: 'domcontentloaded' });
+        await expectNoHorizontalOverflow(page, `${viewport.name} ${route}`);
+      }
+    });
+  }
+
+  test('320px mobile navigation opens and remains on-screen', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+    const toggle = page.getByRole('button', { name: 'Toggle navigation menu' });
+    await expect(toggle).toBeVisible();
+    await toggle.click();
+    await expect(page.locator('#mobile-navigation')).toBeVisible();
+    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Key Features' })).toBeVisible();
+    await expectNoHorizontalOverflow(page, '320px open mobile navigation');
+  });
+
+  for (const viewport of [viewports[0], viewports[2], viewports[4], viewports[5]]) {
+    test(`${viewport.name} protected layouts fit ${viewport.width}px`, async ({ page }) => {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+      await stubProtectedLayoutApi(page);
+      await page.addInitScript(() => {
+        localStorage.setItem('token', 'responsive-layout-test-token');
+        localStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
+        localStorage.setItem('userId', '1');
+        localStorage.setItem('username', 'Responsive Tester');
+        localStorage.setItem('userEmail', 'responsive@example.com');
+      });
+
+      for (const route of ['/dashboard', '/profile']) {
+        await page.goto(route, { waitUntil: 'domcontentloaded' });
+        await expect(page).toHaveURL(new RegExp(`${route.replace('/', '\\/')}$`));
+        await expectNoHorizontalOverflow(page, `${viewport.name} ${route}`);
+      }
+    });
+  }
+});
