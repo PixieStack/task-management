@@ -3,6 +3,7 @@ import { expect, test, type Page } from '@playwright/test';
 const publicRoutes = [
   '/',
   '/key-features',
+  '/downloads',
   '/about',
   '/contact',
   '/login',
@@ -130,7 +131,7 @@ test.describe('responsive layout smoke suite', () => {
     });
   }
 
-  test('320px mobile navigation opens and remains on-screen', async ({ page }) => {
+  test('320px mobile navigation exposes Downloads and remains on-screen', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
@@ -139,7 +140,19 @@ test.describe('responsive layout smoke suite', () => {
     await toggle.click();
     await expect(page.locator('#mobile-navigation')).toBeVisible();
     await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Key Features' })).toBeVisible();
+    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Downloads' })).toBeVisible();
     await expectNoHorizontalOverflow(page, '320px open mobile navigation');
+  });
+
+  test('Downloads page generates a web QR code and never activates unpublished native installers', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('.download-card')).toHaveCount(6);
+    await expect(page.getByRole('img', { name: 'QR code for Web / PWA' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
+    await expect(page.locator('.download-card:not([data-platform="web"]) a.download-button')).toHaveCount(0);
+    await expectNoHorizontalOverflow(page, '390px downloads page');
   });
 
   for (const viewport of [viewports[0], viewports[2], viewports[4], viewports[5]]) {
