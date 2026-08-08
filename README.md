@@ -19,7 +19,7 @@ A focused full-stack productivity app built with Angular and FastAPI.
 - Angular 22
 - Node.js 22.22.3
 - TypeScript 6
-- Python 3.14.6
+- Python 3.14.7
 - FastAPI
 - SQLAlchemy
 - SQLite by default
@@ -30,7 +30,7 @@ A focused full-stack productivity app built with Angular and FastAPI.
 
 ### Backend
 
-Python 3.14.6 is the validated backend runtime.
+Python 3.14.7 is the validated backend runtime.
 
 ```bash
 cd backend
@@ -49,7 +49,7 @@ Verify the active runtime with:
 python --version
 ```
 
-Expected: `Python 3.14.6`.
+Expected: `Python 3.14.7`.
 
 Set the real credentials only in `backend/.env` (or your deployment provider's secret/environment settings). Never commit API keys or SMTP keys.
 
