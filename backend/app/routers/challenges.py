@@ -1,139 +1,50 @@
+from datetime import datetime
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
-from typing import List
 from app import models
-from app.schemas_extended import ChallengeCreate, ChallengeUpdate, ChallengeOut, ChallengeCheckIn
 from app.auth import get_current_user, get_db
+from app.schemas_extended import ChallengeCreate, ChallengeOut, ChallengeUpdate
 
 router = APIRouter(prefix="/api/challenges", tags=["challenges"])
+META = {"meditation": {"icon": "fas fa-spa", "title": "Meditation Challenge"}, "reading": {"icon": "fas fa-book-open", "title": "Reading Challenge"}}
 
+def _get(cid: int, uid: int, db: Session):
+    obj = db.query(models.Challenge).filter(models.Challenge.id == cid, models.Challenge.user_id == uid).first()
+    if not obj: raise HTTPException(status_code=404, detail="Challenge not found")
+    return obj
 
-@router.post("/", response_model=ChallengeOut, status_code=status.HTTP_201_CREATED)
-def create_challenge(challenge: ChallengeCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Create a new challenge"""
-    db_challenge = models.Challenge(
-        user_id=current_user.id,
-        title=challenge.title,
-        description=challenge.description,
-        duration=challenge.duration,
-        challenge_type=challenge.challenge_type,
-        start_date=datetime.utcnow(),
-        xp_reward=challenge.xp_reward or 100,
-        icon=challenge.icon or "fas fa-trophy"
-    )
-    db.add(db_challenge)
-    db.commit()
-    db.refresh(db_challenge)
-    return db_challenge
+@router.post("", response_model=ChallengeOut, status_code=status.HTTP_201_CREATED)
+def create_challenge(data: ChallengeCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    meta = META[data.challenge_type]
+    obj = models.Challenge(user_id=current_user.id, title=data.title.strip() or meta["title"], description=data.description, duration=data.duration, challenge_type=data.challenge_type, start_date=datetime.utcnow(), xp_reward=0, icon=data.icon or meta["icon"])
+    db.add(obj); db.commit(); db.refresh(obj); return obj
 
-
-@router.get("/", response_model=List[ChallengeOut])
+@router.get("", response_model=List[ChallengeOut])
 def get_challenges(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Get all challenges for current user"""
-    challenges = db.query(models.Challenge).filter(
-        models.Challenge.user_id == current_user.id,
-        models.Challenge.is_active == True
-    ).all()
-    return challenges
-
+    return db.query(models.Challenge).filter(models.Challenge.user_id == current_user.id).order_by(models.Challenge.created_at.desc()).all()
 
 @router.get("/{challenge_id}", response_model=ChallengeOut)
-def get_challenge(challenge_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Get specific challenge"""
-    challenge = db.query(models.Challenge).filter(
-        models.Challenge.id == challenge_id,
-        models.Challenge.user_id == current_user.id
-    ).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-    return challenge
-
+def get_challenge(challenge_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)): return _get(challenge_id, current_user.id, db)
 
 @router.put("/{challenge_id}", response_model=ChallengeOut)
-def update_challenge(challenge_id: int, challenge_update: ChallengeUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Update challenge"""
-    challenge = db.query(models.Challenge).filter(
-        models.Challenge.id == challenge_id,
-        models.Challenge.user_id == current_user.id
-    ).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-    
-    update_data = challenge_update.dict(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(challenge, key, value)
-    
-    challenge.updated_at = datetime.utcnow()
-    db.commit()
-    db.refresh(challenge)
-    return challenge
-
+def update_challenge(challenge_id: int, data: ChallengeUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    obj = _get(challenge_id, current_user.id, db)
+    for key, value in data.model_dump(exclude_unset=True).items(): setattr(obj, key, value)
+    obj.progress = min(100.0, (obj.current_streak / obj.duration) * 100); obj.completed = obj.current_streak >= obj.duration
+    if obj.completed: obj.is_active = False
+    obj.updated_at = datetime.utcnow(); db.commit(); db.refresh(obj); return obj
 
 @router.post("/check-in/{challenge_id}", response_model=ChallengeOut)
 def check_in_challenge(challenge_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Check in to a challenge (24-hour cooldown)"""
-    challenge = db.query(models.Challenge).filter(
-        models.Challenge.id == challenge_id,
-        models.Challenge.user_id == current_user.id
-    ).first()
-    
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-    
-    # Check 24-hour restriction
-    if challenge.last_check_in:
-        time_since_last_checkin = datetime.utcnow() - challenge.last_check_in
-        if time_since_last_checkin < timedelta(hours=24):
-            hours_remaining = 24 - (time_since_last_checkin.total_seconds() / 3600)
-            raise HTTPException(
-                status_code=400,
-                detail=f"Cannot check in yet. Please wait {hours_remaining:.1f} more hours."
-            )
-    
-    # Update challenge
-    challenge.current_streak += 1
-    challenge.last_check_in = datetime.utcnow()
-    
-    if challenge.current_streak > challenge.best_streak:
-        challenge.best_streak = challenge.current_streak
-    
-    # Update progress
-    challenge.progress = (challenge.current_streak / challenge.duration) * 100
-    
-    # Check if completed
-    if challenge.current_streak >= challenge.duration:
-        challenge.completed = True
-        challenge.is_active = False
-        
-        # Award XP
-        stats = db.query(models.UserStatistics).filter(
-            models.UserStatistics.user_id == current_user.id
-        ).first()
-        if stats:
-            stats.total_xp += challenge.xp_reward
-            stats.challenges_completed += 1
-            # Level up logic (2000 XP per level)
-            while stats.total_xp >= stats.xp_to_next_level:
-                stats.level += 1
-                stats.xp_to_next_level = stats.level * 2000
-    
-    challenge.updated_at = datetime.utcnow()
-    db.commit()
-    db.refresh(challenge)
-    return challenge
-
+    obj = _get(challenge_id, current_user.id, db)
+    if obj.completed or not obj.is_active: raise HTTPException(status_code=400, detail="This challenge is already completed")
+    now = datetime.utcnow()
+    if obj.last_check_in and obj.last_check_in.date() == now.date(): raise HTTPException(status_code=400, detail="You have already checked in today")
+    obj.current_streak += 1; obj.best_streak = max(obj.best_streak, obj.current_streak); obj.last_check_in = now; obj.progress = min(100.0, (obj.current_streak / obj.duration) * 100)
+    if obj.current_streak >= obj.duration: obj.completed = True; obj.is_active = False
+    obj.updated_at = now; db.commit(); db.refresh(obj); return obj
 
 @router.delete("/{challenge_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_challenge(challenge_id: int, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Delete challenge"""
-    challenge = db.query(models.Challenge).filter(
-        models.Challenge.id == challenge_id,
-        models.Challenge.user_id == current_user.id
-    ).first()
-    if not challenge:
-        raise HTTPException(status_code=404, detail="Challenge not found")
-    
-    db.delete(challenge)
-    db.commit()
-    return
+    db.delete(_get(challenge_id, current_user.id, db)); db.commit(); return None
