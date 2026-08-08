@@ -1,111 +1,45 @@
-cat > .gitignore <<'EOF'
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-
-# Compiled output
-/dist
-/tmp
-/out-tsc
-/bazel-out
-
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
-
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
-
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-
-# System files
+# OS / editor
 .DS_Store
 Thumbs.db
+.idea/
+.vscode/
+.history/
 
-# Python/FastAPI Backend
+# Node / Angular
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+.angular/
+frontend/.angular/
+coverage/
+*.log
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
 *.pyd
 .Python
 venv/
+.venv/
 env/
-backend/venv/
-backend/env/
+backend/venv*/
+backend/.venv/
 
-# Environment variables
+# Environment / credentials
 .env
-*/.env
+.env.*
+!.env.example
 backend/.env
 frontend/.env
 
-# Database files
+# Local databases
 *.db
 *.sqlite
 *.sqlite3
 
-# Logs
-*.log
-logs/
-*/logs/
-
-# Cache directories
+# Caches
 .cache/
-*/.cache/
-EOF
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
