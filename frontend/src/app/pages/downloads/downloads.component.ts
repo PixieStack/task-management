@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
-import * as QRCode from 'qrcode';
+import QRCode from 'qrcode';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -230,11 +230,13 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       if (!target.available || !target.url) continue;
 
       try {
-        this.qrCodes[card.id] = await QRCode.toDataURL(target.url, {
+        const svg = await QRCode.toString(target.url, {
+          type: 'svg',
           width: 220,
           margin: 1,
           errorCorrectionLevel: 'M',
         });
+        this.qrCodes[card.id] = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
         this.qrErrors[card.id] = false;
       } catch (error) {
         this.qrErrors[card.id] = true;
