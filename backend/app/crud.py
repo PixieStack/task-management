@@ -1,22 +1,26 @@
 from datetime import datetime, timedelta
 from typing import Any, Dict
 
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy.orm import Session
 
 from . import models, schemas
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _password_bytes(password: str) -> bytes:
+    """Encode a password for bcrypt while preserving bcrypt's 72-byte limit."""
+    return password.encode("utf-8")[:72]
 
 
 def get_password_hash(password: str) -> str:
-    safe = password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
-    return pwd_context.hash(safe)
+    return bcrypt.hashpw(_password_bytes(password), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    safe = plain_password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
-    return pwd_context.verify(safe, hashed_password)
+    try:
+        return bcrypt.checkpw(_password_bytes(plain_password), hashed_password.encode("utf-8"))
+    except (TypeError, ValueError):
+        return False
 
 
 def get_user_by_username(db: Session, username: str):
