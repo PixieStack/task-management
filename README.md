@@ -16,7 +16,10 @@ A focused full-stack productivity app built with Angular and FastAPI.
 
 ## Stack
 
-- Angular 19
+- Angular 22
+- Node.js 22.22.3
+- TypeScript 6
+- Python 3.14.6
 - FastAPI
 - SQLAlchemy
 - SQLite by default
@@ -27,15 +30,26 @@ A focused full-stack productivity app built with Angular and FastAPI.
 
 ### Backend
 
+Python 3.14.6 is the validated backend runtime.
+
 ```bash
 cd backend
 python -m venv .venv
-# Windows: .venv\Scripts\activate
+# Windows PowerShell: .\.venv\Scripts\Activate.ps1
 # macOS/Linux: source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
-cp .env.example .env
+# Copy backend/.env.example to backend/.env if you have not already created it.
 python -m uvicorn app.main:app --reload --port 8000
 ```
+
+Verify the active runtime with:
+
+```bash
+python --version
+```
+
+Expected: `Python 3.14.6`.
 
 Set the real credentials only in `backend/.env` (or your deployment provider's secret/environment settings). Never commit API keys or SMTP keys.
 
@@ -53,7 +67,7 @@ The sender email must be verified in Brevo.
 
 ```bash
 cd frontend
-npm ci
+npm install
 npm start
 ```
 
