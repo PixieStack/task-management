@@ -1,0 +1,139 @@
+<section class="downloads-page">
+  <div class="downloads-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">M.O.B TaskManager everywhere</span>
+      <h1>Choose how you want to install the app</h1>
+      <p>
+        Keep using the normal web version, install the PWA from your browser, or download a native
+        package for macOS, Windows, Android, iPhone and iPad when that release is published.
+      </p>
+
+      <div class="hero-actions">
+        <button type="button" class="primary-action" (click)="installWebApp()">
+          <i class="fas fa-download" aria-hidden="true"></i>
+          {{ isStandalone ? 'Web app already installed' : 'Install web app' }}
+        </button>
+        <a class="secondary-action" href="#platform-downloads">View platform downloads</a>
+      </div>
+
+      <p class="install-status" *ngIf="installStatus" aria-live="polite">{{ installStatus }}</p>
+    </div>
+
+    <div class="hero-panel" aria-label="Supported application targets">
+      <div class="hero-logo-wrap">
+        <img src="assets/Logo.png" alt="M.O.B TaskManager logo" />
+      </div>
+      <div>
+        <strong>One account. One backend. Multiple devices.</strong>
+        <span>Web · macOS Intel · macOS Apple Silicon · Windows · Android · iPhone · iPad</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="release-note">
+    <i class="fas fa-circle-info" aria-hidden="true"></i>
+    <div>
+      <strong>Download safety</strong>
+      <p>
+        A button only becomes active after a real package URL is published. QR codes are generated
+        from the same verified URL, so this page never points users at placeholder installers.
+      </p>
+    </div>
+  </div>
+
+  <div id="platform-downloads" class="download-grid">
+    <article class="download-card" *ngFor="let card of cards" [attr.data-platform]="card.id">
+      <div class="card-heading">
+        <div class="platform-icon" aria-hidden="true">
+          <i [class]="card.icon"></i>
+        </div>
+        <div>
+          <h2>{{ card.title }}</h2>
+          <p>{{ card.subtitle }}</p>
+        </div>
+      </div>
+
+      <ul class="platform-notes">
+        <li *ngFor="let note of card.notes">{{ note }}</li>
+      </ul>
+
+      <div class="download-area">
+        <div class="download-controls">
+          <ng-container *ngIf="card.id === 'web'; else nativeDownload">
+            <button type="button" class="download-button" (click)="installWebApp()">
+              <i class="fas fa-arrow-down" aria-hidden="true"></i>
+              {{ isStandalone ? 'Installed' : card.packageLabel }}
+            </button>
+            <span class="status-pill available">Browser install</span>
+          </ng-container>
+
+          <ng-template #nativeDownload>
+            <a
+              *ngIf="target(card).available && target(card).url; else notPublished"
+              class="download-button"
+              [href]="target(card).url"
+              rel="noopener"
+            >
+              <i class="fas fa-arrow-down" aria-hidden="true"></i>
+              {{ card.packageLabel }}
+            </a>
+
+            <ng-template #notPublished>
+              <button type="button" class="download-button disabled" disabled>
+                <i class="fas fa-lock" aria-hidden="true"></i>
+                Not published yet
+              </button>
+              <span class="status-pill pending">Release pending</span>
+            </ng-template>
+          </ng-template>
+        </div>
+
+        <div class="qr-panel" *ngIf="qrCodes[card.id]; else qrPending">
+          <img [src]="qrCodes[card.id]" [alt]="'QR code for ' + card.title" />
+          <span>Scan to open this install option</span>
+        </div>
+
+        <ng-template #qrPending>
+          <div class="qr-panel qr-disabled">
+            <i class="fas fa-qrcode" aria-hidden="true"></i>
+            <span>QR activates when the download is published</span>
+          </div>
+        </ng-template>
+      </div>
+    </article>
+  </div>
+
+  <section class="device-guidance">
+    <h2>What “supported” means</h2>
+    <div class="guidance-grid">
+      <div>
+        <strong>macOS</strong>
+        <p>
+          The Universal package contains both Intel x86_64 and Apple Silicon arm64 code. Your 2019
+          Intel MacBook is in the Intel target; current M-series Macs use the Apple Silicon target.
+        </p>
+      </div>
+      <div>
+        <strong>iPhone / iPad</strong>
+        <p>
+          The PWA can be added from Safari after the web deployment. A native iOS app still needs
+          Apple signing/provisioning before it can be installed on a physical device or distributed.
+        </p>
+      </div>
+      <div>
+        <strong>Windows</strong>
+        <p>
+          Separate x64 and ARM64 packages are planned so normal Intel/AMD PCs and newer ARM Windows
+          devices do not have to share one installer target.
+        </p>
+      </div>
+      <div>
+        <strong>Android</strong>
+        <p>
+          The build pipeline can create an APK for direct device testing and an AAB for future Play
+          distribution. Production distribution requires a persistent release signing key.
+        </p>
+      </div>
+    </div>
+  </section>
+</section>
