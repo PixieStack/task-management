@@ -1,34 +1,21 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import {
-  ReactiveFormsModule,
+  AbstractControl,
   FormBuilder,
   FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
   Validators,
-  AbstractControl,
-  ValidatorFn,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../shared/services/auth.service';
+import { forkJoin } from 'rxjs';
 
-// Define profile interface
-interface UserProfile {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
-  country: string;
-  gender: string;
-  dateOfBirth: string;
-  occupation: string;
-  company: string;
-  bio: string;
-  profilePicture?: string;
-}
+import { AuthService, User } from '../../shared/services/auth.service';
+import {
+  ProfileService,
+  UserProfile,
+} from '../../shared/services/profile.service';
 
 @Component({
   selector: 'app-profile',
@@ -38,110 +25,59 @@ interface UserProfile {
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
-  activeSection: 'personal' | 'security' | 'notifications' = 'personal';
+  activeSection: 'personal' | 'security' = 'personal';
 
-  // Profile form
-  profileForm!: FormGroup;
-  submitted = false;
-  success = false;
-  loading = false;
+  profileForm: FormGroup;
+  emailForm: FormGroup;
+  passwordForm: FormGroup;
+  deleteAccountForm: FormGroup;
+
+  user: User | null = null;
   profilePicture: string | null = null;
-  username: string | null = null;
-  currentUserId: string | null = null;
 
-  // Security forms
-  emailForm!: FormGroup;
-  passwordForm!: FormGroup;
-  deleteAccountForm!: FormGroup;
-
-  emailSubmitted = false;
-  passwordSubmitted = false;
-  deleteSubmitted = false;
-
-  showEmailSuccess = false;
-  showPasswordSuccess = false;
-
-  securityLoading = {
+  loading = {
+    page: true,
+    profile: false,
     email: false,
     password: false,
     delete: false,
+    picture: false,
   };
 
-  showDeleteConfirmation = false;
+  successMessage = '';
+  errorMessage = '';
 
-  // Country list for the dropdown
   countries = [
     'South Africa',
-    'Canada',
+    'Botswana',
+    'Eswatini',
+    'Lesotho',
+    'Mozambique',
+    'Namibia',
+    'Zimbabwe',
     'United Kingdom',
+    'United States',
+    'Canada',
     'Australia',
     'Germany',
     'France',
-    'Japan',
-    'China',
     'India',
-    'Brazil',
-    'United States',
     'Nigeria',
     'Kenya',
-    'Egypt',
-    'Morocco',
-    'Mexico',
-    'Spain',
-    'Italy',
-    'Russia',
-    'South Korea',
   ];
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
+    private profileService: ProfileService,
     private router: Router,
-  ) {}
-
-  ngOnInit(): void {
-    this.username = this.authService.getUsername();
-    this.currentUserId = this.authService.getUserId();
-
-    // If no user is logged in, redirect to login
-    if (!this.currentUserId) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    this.loadUserSpecificData();
-    this.initForm();
-    this.initSecurityForms();
-    this.loadProfile();
-  }
-
-  // Load user-specific data using user ID
-  private loadUserSpecificData(): void {
-    if (this.currentUserId) {
-      this.profilePicture = localStorage.getItem(
-        `profilePicture_${this.currentUserId}`,
-      );
-    }
-  }
-
-  // Get user-specific localStorage key
-  private getUserStorageKey(key: string): string {
-    return `${key}_${this.currentUserId}`;
-  }
-
-  // Toggle active section
-  setActiveSection(section: 'personal' | 'security'): void {
-    this.activeSection = section;
-  }
-
-  // === PERSONAL INFORMATION SECTION ===
-
-  initForm(): void {
+  ) {
     this.profileForm = this.fb.group({
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.pattern(/^\+?[0-9\s-()]{7,20}$/)]],
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      firstName: [''],
+      lastName: [''],
+      email: [{ value: '', disabled: true }],
+      phone: ['', [Validators.pattern(/^\+?[0-9\s()\-]{7,20}$/)]],
       address: [''],
       city: [''],
       state: [''],
@@ -153,262 +89,289 @@ export class ProfileComponent implements OnInit {
       company: [''],
       bio: ['', [Validators.maxLength(500)]],
     });
-  }
-
-  loadProfile(): void {
-    if (!this.currentUserId) return;
-
-    const savedProfile = localStorage.getItem(
-      this.getUserStorageKey('userProfile'),
-    );
-    if (savedProfile) {
-      const profile: UserProfile = JSON.parse(savedProfile);
-      this.profileForm.patchValue(profile);
-    }
-  }
-
-  onSubmit(): void {
-    this.submitted = true;
-
-    if (this.profileForm.invalid) {
-      return;
-    }
-
-    this.loading = true;
-
-    setTimeout(() => {
-      if (this.currentUserId) {
-        localStorage.setItem(
-          this.getUserStorageKey('userProfile'),
-          JSON.stringify(this.profileForm.value),
-        );
-        localStorage.setItem(
-          this.getUserStorageKey('userEmail'),
-          this.profileForm.value.email,
-        );
-      }
-
-      this.loading = false;
-      this.success = true;
-
-      setTimeout(() => {
-        this.success = false;
-      }, 3000);
-    }, 800);
-  }
-
-  updateProfilePicture(): void {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files && target.files.length && this.currentUserId) {
-        const file = target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-          this.profilePicture = event.target?.result as string;
-          localStorage.setItem(
-            this.getUserStorageKey('profilePicture'),
-            this.profilePicture,
-          );
-        };
-
-        reader.readAsDataURL(file);
-      }
-    };
-    fileInput.click();
-  }
-
-  hasError(field: string, errorType: string): boolean {
-    return (
-      (this.profileForm.get(field)?.hasError(errorType) &&
-        (this.profileForm.get(field)?.touched || this.submitted)) ||
-      false
-    );
-  }
-
-  resetForm(): void {
-    this.submitted = false;
-    this.profileForm.reset();
-    this.loadProfile();
-  }
-
-  // === ACCOUNT SECURITY SECTION ===
-
-  // Password match validator
-  passwordMatchValidator(): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
-      const password = control.get('newPassword');
-      const confirmPassword = control.get('confirmPassword');
-
-      return password &&
-        confirmPassword &&
-        password.value !== confirmPassword.value
-        ? { passwordMismatch: true }
-        : null;
-    };
-  }
-
-  initSecurityForms(): void {
-    // Email form
-    let currentEmail = '';
-    if (this.currentUserId) {
-      currentEmail =
-        localStorage.getItem(this.getUserStorageKey('userEmail')) || '';
-    }
 
     this.emailForm = this.fb.group({
-      currentEmail: [{ value: currentEmail, disabled: true }],
+      currentEmail: [{ value: '', disabled: true }],
       newEmail: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
+      password: ['', Validators.required],
     });
 
-    // Password form
     this.passwordForm = this.fb.group(
       {
-        currentPassword: ['', [Validators.required]],
+        currentPassword: ['', Validators.required],
         newPassword: [
           '',
           [
             Validators.required,
             Validators.minLength(8),
             Validators.pattern(
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/,
             ),
           ],
         ],
-        confirmPassword: ['', [Validators.required]],
+        confirmPassword: ['', Validators.required],
       },
-      { validators: this.passwordMatchValidator() },
+      { validators: this.passwordMatchValidator },
     );
 
-    // Delete account form
     this.deleteAccountForm = this.fb.group({
-      password: ['', [Validators.required]],
-      confirmPhrase: [
-        '',
-        [Validators.required, Validators.pattern(/^DELETE$/)],
-      ],
+      password: ['', Validators.required],
+      confirmPhrase: ['', [Validators.required, Validators.pattern(/^DELETE$/)]],
     });
   }
 
-  // Security form error checker
-  hasSecurityError(form: FormGroup, field: string, errorType: string): boolean {
-    const control = form.get(field);
-    const isSubmitted =
-      field === 'newEmail'
-        ? this.emailSubmitted
-        : field === 'newPassword' || field === 'confirmPassword'
-          ? this.passwordSubmitted
-          : this.deleteSubmitted;
-
-    return (
-      (control?.hasError(errorType) && (control?.touched || isSubmitted)) ||
-      false
-    );
+  ngOnInit(): void {
+    this.loadProfile();
   }
 
-  // Check for password mismatch
-  hasPasswordMismatch(): boolean {
-    return (
-      (this.passwordForm.hasError('passwordMismatch') &&
-        this.passwordForm.get('confirmPassword')?.touched) ||
-      false
-    );
+  setActiveSection(section: 'personal' | 'security'): void {
+    this.activeSection = section;
+    this.clearMessages();
   }
 
-  // Email update submission
-  onEmailSubmit(): void {
-    this.emailSubmitted = true;
+  loadProfile(): void {
+    this.loading.page = true;
+    forkJoin({
+      user: this.authService.getMe(),
+      profile: this.profileService.getProfile(),
+    }).subscribe({
+      next: ({ user, profile }) => {
+        this.user = user;
+        this.profilePicture = profile.profile_picture || null;
+        this.patchForms(user, profile);
+        this.cacheProfilePicture(profile.profile_picture || null);
+        this.loading.page = false;
+      },
+      error: (error) => {
+        this.loading.page = false;
+        this.showError(error.message);
+      },
+    });
+  }
 
-    if (this.emailForm.invalid) {
-      return;
-    }
+  saveProfile(): void {
+    this.profileForm.markAllAsTouched();
+    if (this.profileForm.invalid || this.loading.profile) return;
 
-    this.securityLoading.email = true;
+    this.loading.profile = true;
+    const value = this.profileForm.getRawValue();
 
-    // Simulate API call
-    setTimeout(() => {
-      const newEmail = this.emailForm.get('newEmail')?.value;
-      if (this.currentUserId) {
-        localStorage.setItem(this.getUserStorageKey('userEmail'), newEmail);
+    const userUpdate = {
+      username: value.username.trim(),
+      first_name: value.firstName?.trim() || undefined,
+      last_name: value.lastName?.trim() || undefined,
+    };
+
+    const profileUpdate: Partial<UserProfile> = {
+      phone: value.phone?.trim() || undefined,
+      address: value.address?.trim() || undefined,
+      city: value.city?.trim() || undefined,
+      state: value.state?.trim() || undefined,
+      zip_code: value.zipCode?.trim() || undefined,
+      country: value.country || undefined,
+      gender: value.gender || undefined,
+      date_of_birth: value.dateOfBirth
+        ? new Date(`${value.dateOfBirth}T00:00:00`).toISOString()
+        : undefined,
+      occupation: value.occupation?.trim() || undefined,
+      company: value.company?.trim() || undefined,
+      bio: value.bio?.trim() || undefined,
+    };
+
+    forkJoin({
+      user: this.authService.updateUser(userUpdate),
+      profile: this.profileService.updateProfile(profileUpdate),
+    }).subscribe({
+      next: ({ user }) => {
+        this.user = user;
+        this.loading.profile = false;
+        this.showSuccess('Profile updated.');
+      },
+      error: (error) => {
+        this.loading.profile = false;
+        this.showError(error.message);
+      },
+    });
+  }
+
+  resetForm(): void {
+    this.loadProfile();
+  }
+
+  updateProfilePicture(): void {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/png,image/jpeg,image/webp';
+
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) {
+        this.showError('Profile picture must be smaller than 2 MB.');
+        return;
       }
 
-      this.securityLoading.email = false;
-      this.showEmailSuccess = true;
-
-      setTimeout(() => {
-        this.showEmailSuccess = false;
-        this.emailSubmitted = false;
-        this.emailForm.reset();
-
-        // Reinitialize with updated email
-        let currentEmail = '';
-        if (this.currentUserId) {
-          currentEmail =
-            localStorage.getItem(this.getUserStorageKey('userEmail')) || '';
-        }
-        this.emailForm.patchValue({
-          currentEmail: currentEmail,
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = String(reader.result || '');
+        this.loading.picture = true;
+        this.profileService.uploadProfilePicture(base64).subscribe({
+          next: (profile) => {
+            this.profilePicture = profile.profile_picture || null;
+            this.cacheProfilePicture(this.profilePicture);
+            this.loading.picture = false;
+            this.showSuccess('Profile picture updated.');
+          },
+          error: (error) => {
+            this.loading.picture = false;
+            this.showError(error.message);
+          },
         });
-      }, 3000);
-    }, 1000);
+      };
+      reader.readAsDataURL(file);
+    };
+
+    input.click();
   }
 
-  // Password update submission
-  onPasswordSubmit(): void {
-    this.passwordSubmitted = true;
+  changeEmail(): void {
+    this.emailForm.markAllAsTouched();
+    if (this.emailForm.invalid || this.loading.email) return;
 
-    if (this.passwordForm.invalid) {
-      return;
-    }
+    this.loading.email = true;
+    const { newEmail, password } = this.emailForm.getRawValue();
 
-    this.securityLoading.password = true;
+    this.authService.changeEmail(newEmail, password).subscribe({
+      next: (response) => {
+        this.user = response.user;
+        this.profileForm.get('email')?.setValue(response.user.email);
+        this.emailForm.reset({
+          currentEmail: response.user.email,
+          newEmail: '',
+          password: '',
+        });
+        this.loading.email = false;
+        this.showSuccess('Email updated. Confirmation messages were sent through Brevo.');
+      },
+      error: (error) => {
+        this.loading.email = false;
+        this.showError(error.message);
+      },
+    });
+  }
 
-    // Simulate API call
-    setTimeout(() => {
-      this.securityLoading.password = false;
-      this.showPasswordSuccess = true;
+  changePassword(): void {
+    this.passwordForm.markAllAsTouched();
+    if (this.passwordForm.invalid || this.loading.password) return;
 
-      setTimeout(() => {
-        this.showPasswordSuccess = false;
-        this.passwordSubmitted = false;
+    this.loading.password = true;
+    const { currentPassword, newPassword } = this.passwordForm.value;
+
+    this.authService.changePassword(currentPassword, newPassword).subscribe({
+      next: () => {
         this.passwordForm.reset();
-      }, 3000);
-    }, 1000);
+        this.loading.password = false;
+        this.showSuccess('Password updated.');
+      },
+      error: (error) => {
+        this.loading.password = false;
+        this.showError(error.message);
+      },
+    });
   }
 
-  // Delete account confirmation
-  toggleDeleteConfirmation(): void {
-    this.showDeleteConfirmation = !this.showDeleteConfirmation;
-    if (!this.showDeleteConfirmation) {
-      this.deleteAccountForm.reset();
-      this.deleteSubmitted = false;
-    }
-  }
-
-  // Delete account submission
-  onDeleteSubmit(): void {
-    this.deleteSubmitted = true;
-
-    if (this.deleteAccountForm.invalid) {
+  deleteAccount(): void {
+    this.deleteAccountForm.markAllAsTouched();
+    if (this.deleteAccountForm.invalid || this.loading.delete) return;
+    if (!window.confirm('Permanently delete your Task Manager account and data?')) {
       return;
     }
 
-    this.securityLoading.delete = true;
+    this.loading.delete = true;
+    const { password, confirmPhrase } = this.deleteAccountForm.value;
 
-    setTimeout(() => {
-      if (this.currentUserId) {
-        localStorage.removeItem(this.getUserStorageKey('userProfile'));
-        localStorage.removeItem(this.getUserStorageKey('userEmail'));
-        localStorage.removeItem(this.getUserStorageKey('profilePicture'));
-      }
-      this.authService.logout();
-      this.securityLoading.delete = false;
+    this.authService.deleteAccount(password, confirmPhrase).subscribe({
+      next: () => {
+        this.loading.delete = false;
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        this.loading.delete = false;
+        this.showError(error.message);
+      },
+    });
+  }
 
-      this.router.navigate(['/login']);
-    }, 1500);
+  hasError(form: FormGroup, field: string, error: string): boolean {
+    const control = form.get(field);
+    return !!(control && control.touched && control.hasError(error));
+  }
+
+  passwordMismatch(): boolean {
+    return !!(
+      this.passwordForm.touched &&
+      this.passwordForm.hasError('passwordMismatch')
+    );
+  }
+
+  private passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('newPassword')?.value;
+    const confirm = group.get('confirmPassword')?.value;
+    return password && confirm && password !== confirm
+      ? { passwordMismatch: true }
+      : null;
+  }
+
+  private patchForms(user: User, profile: UserProfile): void {
+    this.profileForm.patchValue({
+      username: user.username,
+      firstName: user.first_name || '',
+      lastName: user.last_name || '',
+      email: user.email,
+      phone: profile.phone || '',
+      address: profile.address || '',
+      city: profile.city || '',
+      state: profile.state || '',
+      zipCode: profile.zip_code || '',
+      country: profile.country || '',
+      gender: profile.gender || '',
+      dateOfBirth: profile.date_of_birth
+        ? profile.date_of_birth.slice(0, 10)
+        : '',
+      occupation: profile.occupation || '',
+      company: profile.company || '',
+      bio: profile.bio || '',
+    });
+
+    this.emailForm.patchValue({
+      currentEmail: user.email,
+      newEmail: '',
+      password: '',
+    });
+  }
+
+  private cacheProfilePicture(value: string | null): void {
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+    const key = `profilePicture_${userId}`;
+    if (value) localStorage.setItem(key, value);
+    else localStorage.removeItem(key);
+  }
+
+  private showSuccess(message: string): void {
+    this.errorMessage = '';
+    this.successMessage = message;
+    window.setTimeout(() => (this.successMessage = ''), 3500);
+  }
+
+  private showError(message: string): void {
+    this.successMessage = '';
+    this.errorMessage = message || 'Something went wrong.';
+    window.setTimeout(() => (this.errorMessage = ''), 5000);
+  }
+
+  private clearMessages(): void {
+    this.successMessage = '';
+    this.errorMessage = '';
   }
 }

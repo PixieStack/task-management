@@ -1,971 +1,355 @@
-<div class="futuristic-dashboard">
-  <!-- Animated Background -->
-  <div class="animated-bg">
-    <div class="gradient-overlay"></div>
-    <div class="particles"></div>
+<div class="dashboard-shell">
+  <div class="page-heading">
+    <div>
+      <p class="eyebrow">Focus workspace</p>
+      <h1>Your day, without the clutter.</h1>
+      <p>Tasks, habits, reading, meditation and AI support in one focused workspace.</p>
+    </div>
   </div>
 
-  <!-- Main Container -->
-  <div class="dashboard-container">
-    
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar">
-      <div class="logo">
-        <div class="logo-icon">M.O.B</div>
-        <span class="logo-text">TaskManager</span>
-      </div>
+  <div class="toast error" *ngIf="errorMessage">{{ errorMessage }}</div>
+  <div class="toast success" *ngIf="successMessage">{{ successMessage }}</div>
 
-      <nav class="nav-menu">
-        <button 
-          class="nav-item"
-          [class.active]="activeSection === 'overview'"
-          (click)="setActiveSection('overview')"
-        >
-          <i class="fas fa-th-large"></i>
-          <span>Overview</span>
-          <div class="nav-indicator"></div>
-        </button>
+  <nav class="section-tabs" aria-label="Dashboard sections">
+    <button [class.active]="activeSection === 'overview'" (click)="setSection('overview')">Overview</button>
+    <button [class.active]="activeSection === 'tasks'" (click)="setSection('tasks')">Tasks</button>
+    <button [class.active]="activeSection === 'habits'" (click)="setSection('habits')">Habits</button>
+    <button [class.active]="activeSection === 'challenges'" (click)="setSection('challenges')">Reading & Meditation</button>
+    <button [class.active]="activeSection === 'ai'" (click)="setSection('ai')">AI Assistant</button>
+  </nav>
 
-        <button
-          class="nav-item"
-          [class.active]="showAddTaskModal"
-          (click)="showAddTaskModal = true"
-          title="Add Task"
-        >
-          <i class="fas fa-plus-circle"></i>
-          <span>Tasks</span>
-          <div class="nav-indicator"></div>
-        </button>
+  <section *ngIf="activeSection === 'overview'" class="section">
+    <div class="stats-grid">
+      <button class="stat-card" (click)="setSection('tasks')">
+        <span>Active tasks</span>
+        <strong>{{ activeTasks }}</strong>
+        <small>{{ completedTasks }} completed</small>
+      </button>
+      <button class="stat-card" (click)="setSection('tasks')">
+        <span>Overdue</span>
+        <strong>{{ overdueTasks }}</strong>
+        <small>Needs attention</small>
+      </button>
+      <button class="stat-card" (click)="setSection('habits')">
+        <span>Habits today</span>
+        <strong>{{ completedHabitsToday }}/{{ habits.length }}</strong>
+        <small>Daily check-ins</small>
+      </button>
+      <button class="stat-card" (click)="setSection('challenges')">
+        <span>Active challenges</span>
+        <strong>{{ activeChallenges }}</strong>
+        <small>Reading + meditation</small>
+      </button>
+    </div>
 
-        <button 
-          class="nav-item"
-          [class.active]="activeSection === 'challenges'"
-          (click)="setActiveSection('challenges')"
-        >
-          <i class="fas fa-trophy"></i>
-          <span>Challenges</span>
-          <div class="nav-indicator"></div>
-        </button>
-
-        <button 
-          class="nav-item"
-          [class.active]="activeSection === 'projects'"
-          (click)="setActiveSection('projects')"
-        >
-          <i class="fas fa-project-diagram"></i>
-          <span>Projects</span>
-          <div class="nav-indicator"></div>
-        </button>
-
-        <button 
-          class="nav-item"
-          [class.active]="activeSection === 'habits'"
-          (click)="setActiveSection('habits')"
-        >
-          <i class="fas fa-calendar-check"></i>
-          <span>Habits</span>
-          <div class="nav-indicator"></div>
-        </button>
-
-        <button 
-          class="nav-item"
-          [class.active]="activeSection === 'diet'"
-          (click)="setActiveSection('diet')"
-        >
-          <i class="fas fa-apple-alt"></i>
-          <span>Diet & Hydration</span>
-          <div class="nav-indicator"></div>
-        </button>
-
-        <button 
-          class="nav-item"
-          [class.active]="activeSection === 'gamification'"
-          (click)="setActiveSection('gamification')"
-        >
-          <i class="fas fa-gamepad"></i>
-          <span>Achievements</span>
-          <div class="nav-indicator"></div>
-        </button>
-      </nav>
-
-      <!-- User Profile -->
-      <div class="sidebar-footer">
-        <div class="user-profile" style="display: flex; align-items: center; gap: 0.75rem;">
-          <img [src]="userAvatar" [alt]="username" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
-          <div class="user-info">
-            <div class="username">{{ username }}</div>
-            <div class="user-level">Level {{ userStats.level }}</div>
+    <div class="overview-grid">
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Next actions</p>
+            <h2>Priority tasks</h2>
           </div>
+          <button class="link-button" (click)="setSection('tasks')">View all</button>
         </div>
-      </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="main-content">
-      
-      <!-- Header -->
-      <header class="dashboard-header">
-        <div class="header-left">
-          <h1 class="greeting">
-            Good {{ currentHour < 12 ? 'Morning' : currentHour < 17 ? 'Afternoon' : 'Evening' }}, 
-            {{ username }}!
-          </h1>
-          <p class="date-time">{{ currentTime | date: 'EEEE, MMMM d, y' }} • {{ currentTime | date: 'h:mm a' }}</p>
-        </div>
-
-        <div class="header-right">
-          <!-- AI Assistant Toggle -->
-          <button class="ai-assistant-btn" (click)="showAiAssistant = !showAiAssistant">
-            <i class="fas fa-robot"></i>
-            AI Assistant
-          </button>
-
-          <!-- Quick Stats -->
-          <div class="quick-stats">
-            <div class="stat-item">
-              <i class="fas fa-fire"></i>
-              <span>{{ dailyStreak }} day streak</span>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-star"></i>
-              <span>{{ userStats.xp }} XP</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- AI Assistant Panel -->
-      <div class="ai-assistant-panel" *ngIf="showAiAssistant">
-        <div class="ai-header">
-          <h3><i class="fas fa-robot"></i> AI Assistant</h3>
-          <button class="close-btn" (click)="showAiAssistant = false">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="ai-content">
-          <div class="motivational-quote">
-            <i class="fas fa-quote-left"></i>
-            <p>{{ aiMotivationalQuote }}</p>
-          </div>
-          <div class="ai-suggestions">
-            <h4>Personalized Suggestions</h4>
-            <div class="suggestion-item" *ngFor="let suggestion of aiSuggestions">
-              <i class="fas fa-lightbulb"></i>
-              <span>{{ suggestion }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Overview Section -->
-      <section class="content-section" *ngIf="activeSection === 'overview'">
-        <div class="section-header">
-          <h2>Dashboard Overview</h2>
-          <p class="section-subtitle">Your progress at a glance</p>
-        </div>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-          <div class="stat-card gradient-orange">
-            <div class="stat-icon">
-              <i class="fas fa-tasks"></i>
-            </div>
-            <div class="stat-content">
-              <h3>Active Tasks</h3>
-              <div class="stat-value">{{ activeTasksCount }}</div>
-              <div class="stat-change positive">
-                <i class="fas fa-arrow-up"></i>
-                {{ completedTasksToday }} completed today
-              </div>
-            </div>
-          </div>
-
-          <div class="stat-card gradient-blue">
-            <div class="stat-icon">
-              <i class="fas fa-trophy"></i>
-            </div>
-            <div class="stat-content">
-              <h3>Active Challenges</h3>
-              <div class="stat-value">{{ activeChallengesCount }}</div>
-              <div class="stat-change">
-                {{ userStats.totalChallengesCompleted }} total completed
-              </div>
-            </div>
-          </div>
-
-          <div class="stat-card gradient-green">
-            <div class="stat-icon">
-              <i class="fas fa-project-diagram"></i>
-            </div>
-            <div class="stat-content">
-              <h3>Active Projects</h3>
-              <div class="stat-value">{{ activeProjectsCount }}</div>
-              <div class="stat-change">
-                {{ completedProjects.length }} completed
-              </div>
-            </div>
-          </div>
-
-          <div class="stat-card gradient-purple">
-            <div class="stat-icon">
-              <i class="fas fa-star"></i>
-            </div>
-            <div class="stat-content">
-              <h3>Total XP</h3>
-              <div class="stat-value">{{ userStats.xp }}</div>
-              <div class="stat-change">
-                Level {{ userStats.level }} • {{ levelProgress | number:'1.0-0' }}%
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Progress Charts -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <h3>Weekly Progress</h3>
-            <canvas #progressChart></canvas>
-          </div>
-
-          <div class="chart-card">
-            <h3>Habit Tracker</h3>
-            <canvas #habitChart></canvas>
-          </div>
-
-          <div class="chart-card">
-            <h3>XP Sources</h3>
-            <canvas #xpChart></canvas>
-          </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-          <h3>Quick Actions</h3>
-          <div class="action-buttons">
-            <button class="action-btn" (click)="showAddTaskModal = true">
-              <i class="fas fa-plus"></i>
-              New Task
-            </button>
-            <button class="action-btn" (click)="setActiveSection('challenges')">
-              <i class="fas fa-trophy"></i>
-              Start Challenge
-            </button>
-            <button class="action-btn" (click)="setActiveSection('diet')">
-              <i class="fas fa-glass-water"></i>
-              Log Water
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Challenges Section -->
-      <section class="content-section" *ngIf="activeSection === 'challenges'">
-        <div class="section-header">
-          <h2>21-30 Day Challenges</h2>
-          <p class="section-subtitle">Transform your life with focused commitments</p>
-        </div>
-
-        <!-- Active Challenges -->
-        <div class="active-challenges" *ngIf="activeChallengesCount > 0">
-          <h3>Active Challenges</h3>
-          <div class="challenge-grid">
-            <div class="challenge-card active" *ngFor="let challenge of activeChallenges">
-              <div class="challenge-header">
-                <div class="challenge-icon"><i [class]="challenge.icon"></i></div>
-                <div class="challenge-info">
-                  <h4>{{ challenge.title }}</h4>
-                  <p>Day {{ challenge.currentStreak }} of {{ challenge.duration }}</p>
-                </div>
-              </div>
-              
-              <div class="challenge-progress">
-                <div class="progress-bar">
-                  <div class="progress-fill" [style.width.%]="challenge.progress"></div>
-                </div>
-                <span class="progress-text">{{ challenge.progress | number:'1.0-0' }}%</span>
-              </div>
-
-              <div class="challenge-stats">
-                <div class="stat">
-                  <i class="fas fa-fire"></i>
-                  <span>{{ challenge.currentStreak }} day streak</span>
-                </div>
-                <div class="stat">
-                  <i class="fas fa-trophy"></i>
-                  <span>{{ challenge.xpReward }} XP</span>
-                </div>
-              </div>
-
-              <button class="check-in-btn" (click)="updateChallengeProgress(challenge.id)">
-                <i class="fas fa-check"></i>
-                Check In Today
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Available Challenges -->
-        <div class="available-challenges">
-          <h3>Start a New Challenge</h3>
-          <div class="challenge-templates">
-            <div class="template-card" *ngFor="let template of challengeTemplates">
-              <div class="template-icon"><i [class]="template.icon"></i></div>
-              <h4>{{ template.title }}</h4>
-              <p>{{ template.description }}</p>
-              <div class="template-meta">
-                <span *ngIf="template.isCustom"><i class="fas fa-calendar-alt"></i> Custom (1-12 months)</span>
-                <span *ngIf="!template.isCustom"><i class="fas fa-calendar"></i> {{ template.duration }} days</span>
-                <span><i class="fas fa-star"></i> {{ template.xpReward }} XP</span>
-              </div>
-              <button class="start-btn" (click)="startChallenge(template)">
-                Start Challenge
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Projects Section -->
-      <section class="content-section" *ngIf="activeSection === 'projects'">
-        <div class="section-header">
-          <h2>Long-term Projects</h2>
-          <p class="section-subtitle">Build something amazing with structured milestones</p>
-        </div>
-
-        <!-- Active Projects -->
-        <div class="projects-grid">
-          <div class="project-card" *ngFor="let project of activeProjects">
-            <div class="project-header">
-              <h3>{{ project.title }}</h3>
-              <div class="project-badge" [class]="project.status.toLowerCase().replace(' ', '-')">
-                {{ project.status }}
-              </div>
-            </div>
-
-            <div class="project-timeline">
-              <div class="timeline-info">
-                <span>{{ project.duration }}</span>
-                <span>{{ formatDate(project.endDate) }}</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="project.progress"></div>
-              </div>
-            </div>
-
-            <div class="milestones">
-              <h4>Milestones</h4>
-              <div class="milestone-list">
-                <div class="milestone" *ngFor="let milestone of project.milestones" 
-                     [class.completed]="milestone.completed">
-                  <i class="fas" [class.fa-check-circle]="milestone.completed" 
-                     [class.fa-circle]="!milestone.completed"></i>
-                  <span>{{ milestone.title }}</span>
-                  <span class="milestone-date">{{ formatDate(milestone.dueDate) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <button class="project-action-btn">
-              <i class="fas fa-tasks"></i>
-              Manage Tasks
-            </button>
-          </div>
-
-          <!-- Add New Project -->
-          <div class="add-project-card">
-            <div class="add-content">
-              <i class="fas fa-plus-circle"></i>
-              <h3>Start New Project</h3>
-              <p>Choose from templates or create custom</p>
-            </div>
-            <div class="project-templates">
-              <button class="template-btn" *ngFor="let template of projectTemplates" 
-                      (click)="createProject(template)">
-                <span>{{ template.icon }}</span>
-                {{ template.title }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Habits Section -->
-      <section class="content-section" *ngIf="activeSection === 'habits'">
-        <div class="section-header">
-          <h2>Habit Tracker</h2>
-          <p class="section-subtitle">Build consistency, track progress</p>
-        </div>
-
-                <!-- Habit Calendar -->
-        <div class="habit-calendar">
-          <div class="calendar-header">
-            <h3>This Week's Progress</h3>
-          </div>
-          <div class="habit-grid">
-            <div class="habit-day" *ngFor="let day of getLast7Days()">
-              <div class="day-label">{{ day }}</div>
-              <div class="habit-slots">
-                <div class="habit-slot completed">
-                  <i class="fas fa-check"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Habit Analytics -->
-        <div class="habit-analytics">
-          <div class="analytics-card">
-            <h4>Consistency Score</h4>
-            <div class="score-display">
-              <div class="score-ring">
-                <svg viewBox="0 0 36 36">
-                  <path class="circle-bg"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                  <path class="circle"
-                    stroke-dasharray="85, 100"
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                  />
-                </svg>
-                <div class="percentage">85%</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="analytics-card">
-            <h4>Mood & Energy Correlation</h4>
-            <div class="correlation-chart">
-              <!-- Mood/Energy visualization -->
-              <canvas #habitChart></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Diet & Hydration Section -->
-      <section class="content-section" *ngIf="activeSection === 'diet'">
-        <div class="section-header">
-          <h2>Diet & Hydration Management</h2>
-          <p class="section-subtitle">{{ getDietSuggestion() }}</p>
-        </div>
-
-        <!-- Meal Timer -->
-        <div class="meal-timer-card" [class.warning]="currentHour >= 16 && currentHour < 18" 
-             [class.fasting]="currentHour >= 18">
-          <div class="timer-icon">
-            <i class="fas" [class.fa-utensils]="canEatMeal" [class.fa-clock]="!canEatMeal"></i>
-          </div>
-          <div class="timer-content">
-            <h3 *ngIf="canEatMeal">Meal Window Open</h3>
-            <h3 *ngIf="!canEatMeal">Fasting Period</h3>
-            <p *ngIf="currentHour < 16">You have {{ 18 - currentHour }} hours until fasting</p>
-            <p *ngIf="currentHour >= 16 && currentHour < 18">Last meal window closing soon!</p>
-            <p *ngIf="currentHour >= 18">{{ getMotivationalMessage() }}</p>
-          </div>
-        </div>
-
-        <!-- Water Intake Tracker -->
-        <div class="water-tracker">
-          <h3>Daily Hydration</h3>
-          <div class="water-visual">
-            <div class="water-bottle">
-              <div class="water-fill" [style.height.%]="waterIntakePercentage">
-                <div class="water-waves"></div>
-              </div>
-              <div class="water-measurements">
-                <div class="measurement" *ngFor="let mark of [2000, 1500, 1000, 500, 0]">
-                  <span>{{ mark }}ml</span>
-                </div>
-              </div>
-            </div>
-            <div class="water-info">
-              <h4>{{ waterIntakeToday }}ml / {{ waterIntakeGoal }}ml</h4>
-              <p>{{ waterIntakePercentage | number:'1.0-0' }}% of daily goal</p>
-              <div class="water-buttons">
-                <button class="water-btn" (click)="addWaterIntake(250)">
-                  <i class="fas fa-glass-water"></i> +250ml
-                </button>
-                <button class="water-btn" (click)="addWaterIntake(500)">
-                  <i class="fas fa-bottle-water"></i> +500ml
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Meal Log -->
-        <div class="meal-log">
-          <h3>Today's Meals</h3>
-          <div class="meal-cards">
-            <div class="meal-card" [class.disabled]="!canEatMeal">
-              <div class="meal-icon breakfast">
-                <i class="fas fa-sun"></i>
-              </div>
-              <h4>Breakfast</h4>
-              <p>6 AM - 9 AM</p>
-              <button class="log-meal-btn" [disabled]="!canEatMeal" (click)="logMeal('breakfast')">
-                Log Meal
-              </button>
-            </div>
-
-            <div class="meal-card" [class.disabled]="!canEatMeal">
-              <div class="meal-icon lunch">
-                <i class="fas fa-cloud-sun"></i>
-              </div>
-              <h4>Lunch</h4>
-              <p>12 PM - 2 PM</p>
-              <button class="log-meal-btn" [disabled]="!canEatMeal" (click)="logMeal('lunch')">
-                Log Meal
-              </button>
-            </div>
-
-            <div class="meal-card" [class.disabled]="!canEatMeal">
-              <div class="meal-icon dinner">
-                <i class="fas fa-moon"></i>
-              </div>
-              <h4>Dinner</h4>
-              <p>4 PM - 6 PM</p>
-              <button class="log-meal-btn" [disabled]="!canEatMeal" (click)="logMeal('dinner')">
-                Log Meal
-              </button>
-            </div>
-
-            <div class="meal-card snacks">
-              <div class="meal-icon snack">
-                <i class="fas fa-cookie-bite"></i>
-              </div>
-              <h4>Healthy Snacks</h4>
-              <p>Fruits & Nuts</p>
-              <button class="log-meal-btn" (click)="logMeal('snack')">
-                Log Snack
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Recent Entries -->
-        <div class="recent-meals" *ngIf="dietEntries.length > 0">
-          <h3>Recent Entries</h3>
-          <div class="meal-timeline">
-            <div class="timeline-entry" *ngFor="let entry of dietEntries.slice(-5).reverse()">
-              <div class="entry-time">{{ formatTime(entry.mealTime) }}</div>
-              <div class="entry-content">
-                <h5>{{ entry.mealType | titlecase }}</h5>
-                <p>{{ entry.description }}</p>
-                <span class="calories" *ngIf="entry.calories">{{ entry.calories }} cal</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Gamification Section -->
-      <section class="content-section" *ngIf="activeSection === 'gamification'">
-        <div class="section-header">
-          <h2>Achievements & Progress</h2>
-          <p class="section-subtitle">Level {{ userStats.level }} • {{ userStats.xp }} Total XP</p>
-        </div>
-
-        <!-- Level Progress -->
-        <div class="level-progress-card">
-          <div class="level-info">
-            <div class="current-level">
-              <div class="level-badge">
-                <span class="level-number">{{ userStats.level }}</span>
-                <span class="level-label">Level</span>
-              </div>
-            </div>
-            <div class="progress-details">
-              <h3>Progress to Level {{ userStats.level + 1 }}</h3>
-              <div class="xp-progress">
-                <div class="progress-bar large">
-                  <div class="progress-fill gradient" [style.width.%]="levelProgress"></div>
-                </div>
-                <div class="xp-text">
-                  {{ userStats.xp }} / {{ userStats.xpToNextLevel }} XP
-                </div>
-              </div>
-            </div>
-            <div class="next-level">
-              <div class="level-badge outline">
-                <span class="level-number">{{ userStats.level + 1 }}</span>
-                <span class="level-label">Next</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Badges -->
-        <div class="badges-section">
-          <h3>Earned Badges</h3>
-          <div class="badges-grid">
-            <div class="badge-card" *ngFor="let badge of userStats.badges"
-                 [class]="badge.rarity">
-              <div class="badge-glow"></div>
-              <div class="badge-icon">{{ badge.icon }}</div>
-              <h4>{{ badge.name }}</h4>
-              <p>{{ badge.description }}</p>
-              <div class="badge-date" *ngIf="badge.unlockedDate">{{ formatDate(badge.unlockedDate) }}</div>
-              <div class="rarity-indicator" [style.background]="getRarityColor(badge.rarity)">
-                {{ badge.rarity }}
-              </div>
-            </div>
-
-            <!-- Locked badges preview -->
-            <div class="badge-card locked">
-              <div class="badge-icon">🔒</div>
-              <h4>???</h4>
-              <p>Complete more challenges to unlock</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Leaderboard -->
-        <div class="leaderboard-section">
-          <h3>Weekly Leaderboard</h3>
-          <div class="leaderboard-card">
-            <div class="leaderboard-header">
-              <button class="filter-btn active">This Week</button>
-              <button class="filter-btn">All Time</button>
-              <button class="filter-btn">Friends</button>
-            </div>
-            <div class="leaderboard-list">
-              <div class="leaderboard-item current-user">
-                <div class="rank">1</div>
-                <img [src]="userAvatar" [alt]="username" class="user-avatar">
-                <div class="user-details">
-                  <span class="name">{{ username }} (You)</span>
-                  <span class="score">{{ userStats.xp }} XP</span>
-                </div>
-                <div class="rank-change positive">
-                  <i class="fas fa-arrow-up"></i> 2
-                </div>
-              </div>
-              <!-- Additional leaderboard entries could be added here -->
-            </div>
-          </div>
-        </div>
-
-        <!-- Stats Overview -->
-        <div class="stats-overview">
-          <h3>Lifetime Stats</h3>
-          <div class="stats-cards">
-            <div class="stat-item">
-              <i class="fas fa-trophy"></i>
-              <div class="stat-info">
-                <span class="stat-value">{{ userStats.totalChallengesCompleted }}</span>
-                <span class="stat-label">Challenges Completed</span>
-              </div>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-fire"></i>
-              <div class="stat-info">
-                <span class="stat-value">{{ dailyStreak }}</span>
-                <span class="stat-label">Day Streak</span>
-              </div>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-medal"></i>
-              <div class="stat-info">
-                <span class="stat-value">{{ getBadgeCount() }}</span>
-                <span class="stat-label">Badges Earned</span>
-              </div>
-            </div>
-            <div class="stat-item">
-              <i class="fas fa-star"></i>
-              <div class="stat-info">
-                <span class="stat-value">{{ userStats.xp }}</span>
-                <span class="stat-label">Total XP</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </main>
-  </div>
-
-  <!-- Modals -->
-  <!-- Add Task Modal -->
-  <div class="modal-overlay" *ngIf="showAddTaskModal" (click)="closeAddModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Add New Task</h2>
-        <button class="close-btn" (click)="closeAddModal()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-            <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="taskTitle">Task Title *</label>
-            <input 
-              type="text" 
-              id="taskTitle" 
-              class="form-control"
-              placeholder="Enter task title"
-              required
+        <div class="empty" *ngIf="!tasks.length">Add your first task to get started.</div>
+        <div class="compact-list">
+          <div class="compact-row" *ngFor="let task of tasks.slice(0, 5); trackBy: trackById">
+            <button
+              class="check"
+              [class.done]="task.completed"
+              (click)="toggleTask(task)"
+              [attr.aria-label]="task.completed ? 'Mark task active' : 'Complete task'"
             >
+              {{ task.completed ? '✓' : '' }}
+            </button>
+            <div>
+              <strong [class.strike]="task.completed">{{ task.title }}</strong>
+              <small>{{ task.priority }} priority<span *ngIf="task.due_date"> · due {{ task.due_date | date:'mediumDate' }}</span></small>
+            </div>
           </div>
+        </div>
+      </article>
 
-          <div class="form-group">
-            <label for="taskDescription">Description</label>
-            <textarea 
-              id="taskDescription" 
-              class="form-control"
-              rows="3"
-              placeholder="Enter task description"
-            ></textarea>
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <p class="eyebrow">Consistency</p>
+            <h2>Today's habits</h2>
           </div>
+          <button class="link-button" (click)="setSection('habits')">Manage</button>
+        </div>
+        <div class="empty" *ngIf="!habits.length">Create a daily habit and check it off here.</div>
+        <div class="compact-list">
+          <div class="compact-row" *ngFor="let habit of habits.slice(0, 5); trackBy: trackById">
+            <button
+              class="check"
+              [class.done]="isHabitDoneToday(habit)"
+              (click)="toggleHabit(habit)"
+              [attr.aria-label]="'Toggle ' + habit.name"
+            >
+              {{ isHabitDoneToday(habit) ? '✓' : '' }}
+            </button>
+            <div>
+              <strong>{{ habit.name }}</strong>
+              <small>{{ habitStreak(habit) }} day streak</small>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="taskStatus">Status</label>
-              <select id="taskStatus" class="form-control">
+    <article class="panel challenge-overview">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Longer focus</p>
+          <h2>Reading & meditation progress</h2>
+        </div>
+        <button class="link-button" (click)="setSection('challenges')">Open challenges</button>
+      </div>
+      <div class="challenge-mini-grid" *ngIf="challenges.length; else noChallenges">
+        <div class="mini-challenge" *ngFor="let challenge of challenges.slice(0, 4); trackBy: trackById">
+          <div class="mini-top">
+            <strong>{{ challenge.title }}</strong>
+            <span>{{ challenge.progress | number:'1.0-0' }}%</span>
+          </div>
+          <div class="progress-track"><span [style.width.%]="challenge.progress"></span></div>
+          <small>{{ challenge.current_streak }}/{{ challenge.duration }} check-ins</small>
+        </div>
+      </div>
+      <ng-template #noChallenges>
+        <div class="empty">Start a reading or meditation challenge when you're ready.</div>
+      </ng-template>
+    </article>
+  </section>
+
+  <section *ngIf="activeSection === 'tasks'" class="section two-column">
+    <article class="panel form-panel">
+      <p class="eyebrow">New task</p>
+      <h2>Capture what matters</h2>
+      <form (ngSubmit)="createTask()">
+        <label>
+          Task title
+          <input name="taskTitle" [(ngModel)]="newTask.title" placeholder="e.g. Finish project proposal" required />
+        </label>
+        <label>
+          Description
+          <textarea name="taskDescription" [(ngModel)]="newTask.description" rows="3" placeholder="Optional details"></textarea>
+        </label>
+        <div class="form-row">
+          <label>
+            Priority
+            <select name="taskPriority" [(ngModel)]="newTask.priority">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </label>
+          <label>
+            Due date
+            <input name="taskDueDate" type="date" [(ngModel)]="newTask.due_date" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            Estimate (minutes)
+            <input name="taskEstimate" type="number" min="0" [(ngModel)]="newTask.time_estimate" />
+          </label>
+          <label>
+            Tags
+            <input name="taskTags" [(ngModel)]="newTask.tags" placeholder="work, urgent" />
+          </label>
+        </div>
+        <button class="primary" type="submit">Add task</button>
+      </form>
+    </article>
+
+    <article class="panel list-panel">
+      <div class="panel-header task-header">
+        <div>
+          <p class="eyebrow">Task list</p>
+          <h2>{{ filteredTasks.length }} shown</h2>
+        </div>
+        <div class="filters">
+          <button [class.active]="taskFilter === 'all'" (click)="taskFilter = 'all'">All</button>
+          <button [class.active]="taskFilter === 'active'" (click)="taskFilter = 'active'">Active</button>
+          <button [class.active]="taskFilter === 'completed'" (click)="taskFilter = 'completed'">Done</button>
+          <button [class.active]="taskFilter === 'overdue'" (click)="taskFilter = 'overdue'">Overdue</button>
+        </div>
+      </div>
+
+      <div class="loading" *ngIf="loading.tasks">Loading tasks…</div>
+      <div class="empty" *ngIf="!loading.tasks && !filteredTasks.length">No tasks match this view.</div>
+      <div class="task-list">
+        <article class="task-item" *ngFor="let task of filteredTasks; trackBy: trackById" [class.is-overdue]="isOverdue(task)">
+          <button class="check large" [class.done]="task.completed" (click)="toggleTask(task)">{{ task.completed ? '✓' : '' }}</button>
+          <div class="task-body">
+            <div class="task-title-row">
+              <strong [class.strike]="task.completed">{{ task.title }}</strong>
+              <span class="priority" [class.high]="task.priority === 'High'">{{ task.priority }}</span>
+            </div>
+            <p *ngIf="task.description">{{ task.description }}</p>
+            <div class="meta">
+              <span>{{ task.status }}</span>
+              <span *ngIf="task.due_date" [class.overdue]="isOverdue(task)">Due {{ task.due_date | date:'MediumDate' }}</span>
+              <span *ngIf="task.time_estimate">Estimate: {{ task.time_estimate }}m</span>
+              <span *ngIf="task.time_spent">Tracked: {{ task.time_spent }}m</span>
+            </div>
+            <div class="tags" *ngIf="task.tags.length"><span *ngFor="let tag of task.tags">{{ tag }}</span></div>
+            <div class="task-actions">
+              <select [ngModel]="task.status" (ngModelChange)="updateTaskStatus(task, $event)" [disabled]="task.completed">
                 <option value="Not Started">Not Started</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Pending">Pending</option>
                 <option value="Completed">Completed</option>
               </select>
-            </div>
-
-            <div class="form-group">
-              <label for="taskPriority">Priority</label>
-              <select id="taskPriority" class="form-control">
-                <option value="Low">Low</option>
-                <option value="Medium">Medium</option>
-                <option value="High">High</option>
-              </select>
+              <button class="secondary small" (click)="toggleTimer(task)" [disabled]="task.completed">{{ isTimerRunning(task) ? 'Stop & save timer' : 'Start timer' }}</button>
+              <button class="danger-text" (click)="deleteTask(task)">Delete</button>
             </div>
           </div>
-
-          <div class="form-group">
-            <label for="taskDueDate">Due Date</label>
-            <input 
-              type="date" 
-              id="taskDueDate" 
-              class="form-control"
-            >
-          </div>
-
-          <div class="form-group">
-            <label>Tags</label>
-            <div class="tags-selector">
-              <button 
-                type="button"
-                class="tag-option"
-                *ngFor="let tag of ['Work', 'Personal', 'Urgent', 'Learning', 'Health']"
-              >
-                {{ tag }}
-              </button>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="timeEstimate">Time Estimate (minutes)</label>
-            <input 
-              type="number" 
-              id="timeEstimate" 
-              class="form-control"
-              placeholder="30"
-              min="0"
-            >
-          </div>
-        </form>
+        </article>
       </div>
+    </article>
+  </section>
 
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeAddModal()">
-          Cancel
-        </button>
-        <button class="btn btn-primary" (click)="closeAddModal()">
-          <i class="fas fa-plus"></i> Create Task
-        </button>
-      </div>
-    </div>
-  </div>
+  <section *ngIf="activeSection === 'habits'" class="section two-column">
+    <article class="panel form-panel">
+      <p class="eyebrow">New habit</p>
+      <h2>Build consistency</h2>
+      <form (ngSubmit)="createHabit()">
+        <label>
+          Habit
+          <input name="habitName" [(ngModel)]="newHabit.name" placeholder="e.g. Journal for 5 minutes" required />
+        </label>
+        <label>
+          Why it matters
+          <textarea name="habitDescription" [(ngModel)]="newHabit.description" rows="3" placeholder="Optional reminder"></textarea>
+        </label>
+        <label>
+          Daily target count
+          <input name="habitTarget" type="number" min="1" max="1000" [(ngModel)]="newHabit.target_count" />
+        </label>
+        <button class="primary" type="submit">Create habit</button>
+      </form>
+    </article>
 
-  <!-- Diet Modal -->
-  <div class="modal-overlay" *ngIf="showDietModal" (click)="showDietModal = false">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Log Meal</h2>
-        <button class="close-btn" (click)="showDietModal = false">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="mealDescription">What did you eat?</label>
-            <textarea 
-              id="mealDescription" 
-              class="form-control"
-              rows="3"
-              placeholder="Describe your meal"
-            ></textarea>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="calories">Calories (optional)</label>
-              <input 
-                type="number" 
-                id="calories" 
-                class="form-control"
-                placeholder="0"
-                min="0"
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="waterWithMeal">Water (ml)</label>
-              <input 
-                type="number" 
-                id="waterWithMeal" 
-                class="form-control"
-                placeholder="250"
-                min="0"
-              >
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="showDietModal = false">
-          Cancel
-        </button>
-        <button class="btn btn-primary" (click)="showDietModal = false">
-          <i class="fas fa-save"></i> Save Meal
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Challenge Modal -->
-  <div class="modal-overlay" *ngIf="showAddChallengeModal" (click)="showAddChallengeModal = false">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Start New Challenge</h2>
-        <button class="close-btn" (click)="showAddChallengeModal = false">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div class="challenge-selection">
-          <p>Select a challenge to begin your journey!</p>
-          <!-- Challenge templates would be displayed here -->
+    <article class="panel list-panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Daily tracker</p>
+          <h2>{{ completedHabitsToday }}/{{ habits.length }} complete today</h2>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Project Modal -->
-  <div class="modal-overlay" *ngIf="showAddProjectModal" (click)="showAddProjectModal = false">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>Create New Project</h2>
-        <button class="close-btn" (click)="showAddProjectModal = false">
-          <i class="fas fa-times"></i>
-        </button>
+      <div class="loading" *ngIf="loading.habits">Loading habits…</div>
+      <div class="empty" *ngIf="!loading.habits && !habits.length">No habits yet.</div>
+      <div class="habit-list">
+        <article class="habit-item" *ngFor="let habit of habits; trackBy: trackById">
+          <button class="habit-check" [class.done]="isHabitDoneToday(habit)" (click)="toggleHabit(habit)">
+            <span>{{ isHabitDoneToday(habit) ? '✓' : '○' }}</span>
+            <div>
+              <strong>{{ habit.name }}</strong>
+              <small>{{ habit.description || 'Daily habit' }}</small>
+            </div>
+          </button>
+          <div class="habit-side">
+            <span class="streak">{{ habitStreak(habit) }} day streak</span>
+            <button class="danger-text" (click)="deleteHabit(habit)">Delete</button>
+          </div>
+        </article>
       </div>
-      <div class="modal-body">
-        <form>
-          <div class="form-group">
-            <label for="projectTitle">Project Title *</label>
-            <input 
-              type="text" 
-              id="projectTitle" 
-              class="form-control"
-              placeholder="Enter project title"
-              required
-            >
-          </div>
+    </article>
+  </section>
 
-          <div class="form-group">
-            <label for="projectDescription">Description</label>
-            <textarea 
-              id="projectDescription" 
-              class="form-control"
-              rows="4"
-              placeholder="Describe your project goals"
-            ></textarea>
-          </div>
+  <section *ngIf="activeSection === 'challenges'" class="section two-column">
+    <article class="panel form-panel">
+      <p class="eyebrow">Focused challenge</p>
+      <h2>Choose one thing to practice</h2>
+      <form (ngSubmit)="createChallenge()">
+        <label>
+          Challenge type
+          <select name="challengeType" [(ngModel)]="newChallenge.challenge_type" (ngModelChange)="onChallengeTypeChange()">
+            <option value="meditation">Meditation</option>
+            <option value="reading">Reading</option>
+          </select>
+        </label>
+        <label>
+          Title
+          <input name="challengeTitle" [(ngModel)]="newChallenge.title" [placeholder]="newChallenge.challenge_type === 'meditation' ? 'Meditation Challenge' : 'Reading Challenge'" />
+        </label>
+        <div class="form-row">
+          <label>
+            Duration (days)
+            <input name="challengeDuration" type="number" min="1" max="365" [(ngModel)]="newChallenge.duration" />
+          </label>
+          <label>
+            Daily goal
+            <input name="challengeGoal" [(ngModel)]="newChallenge.dailyGoal" placeholder="10 minutes / 20 pages" />
+          </label>
+        </div>
+        <button class="primary" type="submit">Start challenge</button>
+      </form>
+    </article>
 
-          <div class="form-group">
-            <label for="projectDuration">Duration</label>
-            <select id="projectDuration" class="form-control">
-              <option value="3 months">3 months</option>
-              <option value="6 months">6 months</option>
-              <option value="12 months">12 months</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="projectCategory">Category</label>
-            <select id="projectCategory" class="form-control">
-              <option value="Technology">Technology</option>
-              <option value="Business">Business</option>
-              <option value="Personal">Personal</option>
-              <option value="Learning">Learning</option>
-            </select>
-          </div>
-        </form>
+    <article class="panel list-panel">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Your challenges</p>
+          <h2>Show up once a day</h2>
+        </div>
       </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="showAddProjectModal = false">
-          Cancel
-        </button>
-        <button class="btn btn-primary" (click)="showAddProjectModal = false">
-          <i class="fas fa-rocket"></i> Create Project
-        </button>
+      <div class="loading" *ngIf="loading.challenges">Loading challenges…</div>
+      <div class="empty" *ngIf="!loading.challenges && !challenges.length">No reading or meditation challenges yet.</div>
+      <div class="challenge-list">
+        <article class="challenge-card" *ngFor="let challenge of challenges; trackBy: trackById" [class.finished]="challenge.completed">
+          <div class="challenge-icon">{{ challenge.challenge_type === 'meditation' ? '🧘' : '📚' }}</div>
+          <div class="challenge-body">
+            <div class="task-title-row">
+              <strong>{{ challenge.title }}</strong>
+              <span>{{ challenge.progress | number:'1.0-0' }}%</span>
+            </div>
+            <p>{{ challenge.description }}</p>
+            <div class="progress-track"><span [style.width.%]="challenge.progress"></span></div>
+            <div class="meta">
+              <span>{{ challenge.current_streak }}/{{ challenge.duration }} check-ins</span>
+              <span>Best streak: {{ challenge.best_streak }}</span>
+            </div>
+            <div class="task-actions">
+              <button class="primary small" (click)="checkInChallenge(challenge)" [disabled]="challenge.completed || checkedInToday(challenge)">
+                {{ challenge.completed ? 'Completed' : checkedInToday(challenge) ? 'Checked in today' : 'Check in today' }}
+              </button>
+              <button class="danger-text" (click)="deleteChallenge(challenge)">Delete</button>
+            </div>
+          </div>
+        </article>
       </div>
-    </div>
-  </div>
+    </article>
+  </section>
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" *ngIf="isLoading">
-    <div class="loader">
-      <div class="loader-circle"></div>
-      <p>Loading your dashboard...</p>
-    </div>
-  </div>
-
-  <!-- Notification Container -->
-  <div class="notification-container">
-    <!-- Notifications would be dynamically added here -->
-  </div>
-
-  <!-- Mobile Menu Toggle (for responsive) -->
-  <button class="mobile-menu-toggle" (click)="toggleMobileMenu()">
-    <i class="fas fa-bars"></i>
-  </button>
-
-  <!-- Floating Action Button (Mobile) -->
-  <div class="fab-container">
-    <button class="fab main-fab" (click)="toggleFabMenu()">
-      <i class="fas fa-plus"></i>
-    </button>
-    <div class="fab-menu" *ngIf="showFabMenu">
-      <button class="fab fab-option" (click)="showAddTaskModal = true">
-        <i class="fas fa-tasks"></i>
-        <span>Task</span>
-      </button>
-      <button class="fab fab-option" (click)="setActiveSection('challenges')">
-        <i class="fas fa-trophy"></i>
-        <span>Challenge</span>
-      </button>
-      <button class="fab fab-option" (click)="setActiveSection('diet')">
-        <i class="fas fa-glass-water"></i>
-        <span>Water</span>
-      </button>
-    </div>
-  </div>
+  <section *ngIf="activeSection === 'ai'" class="section ai-layout">
+    <article class="panel ai-compose">
+      <p class="eyebrow">AI assistant</p>
+      <h2>Plan from your actual app data</h2>
+      <p class="muted">The assistant can see your current task, habit, reading and meditation progress. Your API key stays on the backend.</p>
+      <div class="prompt-chips">
+        <button *ngFor="let prompt of aiSuggestedPrompts" (click)="usePrompt(prompt)">{{ prompt }}</button>
+      </div>
+      <form (ngSubmit)="askAI()">
+        <label>What do you need help with?
+          <textarea name="aiQuestion" [(ngModel)]="aiQuestion" rows="5" placeholder="Ask for a plan, prioritization, habit advice, reading plan…"></textarea>
+        </label>
+        <button class="primary" type="submit" [disabled]="loading.ai || !aiQuestion.trim()">{{ loading.ai ? 'Thinking…' : 'Ask AI' }}</button>
+      </form>
+    </article>
+    <article class="panel conversation-panel">
+      <div class="panel-header"><div><p class="eyebrow">Conversation</p><h2>Recent answers</h2></div></div>
+      <div class="empty" *ngIf="!conversations.length">Your AI answers will appear here.</div>
+      <div class="conversation-list">
+        <article class="conversation" *ngFor="let item of conversations; trackBy: trackById">
+          <div class="message user-message"><strong>You</strong><p>{{ item.question }}</p></div>
+          <div class="message ai-message"><strong>Task Manager AI</strong><p>{{ item.answer }}</p>
+            <div class="rating"><span>Helpful?</span><button [class.selected]="item.feedback === 5" (click)="rateAI(item, 5)">Yes</button><button [class.selected]="item.feedback === 2" (click)="rateAI(item, 2)">Not really</button></div>
+          </div>
+        </article>
+      </div>
+    </article>
+  </section>
 </div>
