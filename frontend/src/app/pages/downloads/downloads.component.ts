@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
-import QRCode from 'qrcode';
+import * as QRCode from 'qrcode';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -123,6 +123,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   };
 
   qrCodes: Partial<Record<keyof DownloadManifest, string>> = {};
+  qrErrors: Partial<Record<keyof DownloadManifest, boolean>> = {};
   isBrowser = false;
   isIos = false;
   isStandalone = false;
@@ -212,8 +213,8 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   private configureWebTarget(): void {
     if (!this.isBrowser) return;
 
-    const isHostedWeb = window.location.protocol === 'https:' || window.location.protocol === 'http:';
-    if (!this.manifest.web.url && isHostedWeb) {
+    const isWebOrigin = window.location.protocol === 'https:' || window.location.protocol === 'http:';
+    if (!this.manifest.web.url && isWebOrigin) {
       this.manifest.web = {
         available: true,
         url: `${window.location.origin}/downloads`,
@@ -228,11 +229,17 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       const target = this.manifest[card.id];
       if (!target.available || !target.url) continue;
 
-      this.qrCodes[card.id] = await QRCode.toDataURL(target.url, {
-        width: 220,
-        margin: 1,
-        errorCorrectionLevel: 'M',
-      });
+      try {
+        this.qrCodes[card.id] = await QRCode.toDataURL(target.url, {
+          width: 220,
+          margin: 1,
+          errorCorrectionLevel: 'M',
+        });
+        this.qrErrors[card.id] = false;
+      } catch (error) {
+        this.qrErrors[card.id] = true;
+        console.error(`Unable to generate QR code for ${card.id}`, error);
+      }
     }
   }
 }
