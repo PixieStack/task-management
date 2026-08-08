@@ -212,7 +212,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   private configureWebTarget(): void {
     if (!this.isBrowser) return;
 
-    const isHostedWeb = window.location.protocol === 'https:' || window.location.hostname === 'localhost';
+    const isHostedWeb = window.location.protocol === 'https:' || window.location.protocol === 'http:';
     if (!this.manifest.web.url && isHostedWeb) {
       this.manifest.web = {
         available: true,
