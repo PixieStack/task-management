@@ -137,7 +137,7 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: dtolnay/rust-toolchain@stable
-      - run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+      - run: rustup target add x86_64-linux-android
       - name: Configure Android NDK
         run: |
           echo "NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
@@ -145,13 +145,19 @@ jobs:
       - run: npm install
       - run: npx tauri android init --ci
       - run: npm run icons
-      - run: npx tauri android build --debug --apk
+      - run: npx tauri android build --debug --apk --target x86_64
       - name: Locate APK
         shell: bash
         run: |
           APK="$(find "$GITHUB_WORKSPACE/frontend/src-tauri/gen/android/app/build/outputs" -name '*.apk' -print -quit)"
           test -n "$APK"
           echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+      - name: Reclaim disk before emulator
+        shell: bash
+        run: |
+          rm -rf "$HOME/.cargo/registry/src" "$HOME/.cargo/registry/cache"
+          rm -rf src-tauri/target
+          df -h
       - name: Install and launch in Android emulator
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
