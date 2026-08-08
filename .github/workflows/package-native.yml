@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  windows:
-    name: Windows installers
+  windows-x64:
+    name: Windows x64 installers
     runs-on: windows-latest
     defaults:
       run:
@@ -26,15 +26,44 @@ jobs:
         with:
           node-version: "22.22.3"
       - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add x86_64-pc-windows-msvc
       - run: npm install
-      - run: npm run desktop:build:windows
+      - run: npm run icons
+      - run: npx tauri build --target x86_64-pc-windows-msvc --bundles nsis,msi
       - uses: actions/upload-artifact@v4
         with:
-          name: mob-taskmanager-windows
+          name: mob-taskmanager-windows-x64
           if-no-files-found: error
           path: |
-            frontend/src-tauri/target/release/bundle/nsis/*.exe
-            frontend/src-tauri/target/release/bundle/msi/*.msi
+            frontend/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+            frontend/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+
+  windows-arm64:
+    name: Windows ARM64 installer
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      APP_API_BASE_URL: ${{ inputs.api_base_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
+      - run: rustup target add aarch64-pc-windows-msvc
+      - run: npm install
+      - run: npm run icons
+      - run: npx tauri build --target aarch64-pc-windows-msvc --bundles nsis
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-taskmanager-windows-arm64
+          if-no-files-found: error
+          path: frontend/src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/*.exe
 
   macos:
     name: macOS universal Intel + Apple Silicon
@@ -53,6 +82,14 @@ jobs:
       - run: rustup target add x86_64-apple-darwin aarch64-apple-darwin
       - run: npm install
       - run: npm run desktop:build:mac
+      - name: Verify Universal app includes Intel and Apple Silicon
+        shell: bash
+        run: |
+          BIN="$(find src-tauri/target/universal-apple-darwin/release/bundle/macos -path '*/Contents/MacOS/*' -type f -print -quit)"
+          test -n "$BIN"
+          ARCHS="$(lipo -archs "$BIN")"
+          echo "$ARCHS" | grep -q x86_64
+          echo "$ARCHS" | grep -q arm64
       - uses: actions/upload-artifact@v4
         with:
           name: mob-taskmanager-macos-universal
