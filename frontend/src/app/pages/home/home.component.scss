@@ -1,22 +1,20 @@
-/* --- Variables for Clarity --- */
-$color-primary: #e67e22; // Original Orange
-$color-primary-dark: #cf711f; // Darker Orange for hover
+$color-primary: #e67e22;
+$color-primary-dark: #cf711f;
 $color-background-start: #fdfcfb;
 $color-background-end: #e2d1c3;
 $color-text: #2c3e50;
 $color-text-light: #555;
 $color-heading: #34495e;
 
-/* --- Main Container & Typography (Original Sizes Enforced) --- */
 .home-container {
-  max-width: 1200px;
+  width: min(1200px, 100%);
   margin: auto;
-  padding: 2rem;
+  padding: clamp(1rem, 3vw, 2rem);
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 
   .section-title {
     text-align: center;
-    font-size: 2rem;
+    font-size: clamp(1.6rem, 4vw, 2rem);
     color: $color-heading;
     margin-bottom: 2rem;
     text-shadow: 0 0 5px rgba($color-primary, 0.1);
@@ -27,28 +25,38 @@ $color-heading: #34495e;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 2rem;
-    border-radius: 16px; 
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 0 0 20px rgba($color-primary, 0.3); 
+    gap: clamp(1.5rem, 4vw, 3rem);
+    padding: clamp(1.25rem, 4vw, 2rem);
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15), 0 0 20px rgba($color-primary, 0.3);
     animation: fadeIn 1s ease;
 
     .hero-text {
-      max-width: 60%; 
+      min-width: 0;
+      flex: 1 1 560px;
+      max-width: 60%;
+
       h1 {
-        font-size: 3rem; 
-        margin-bottom: 0.5rem;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.08;
+        margin: 0 0 0.75rem;
+
         .highlight {
           color: $color-primary;
-          border-bottom: 2px solid $color-primary; 
+          border-bottom: 2px solid $color-primary;
           padding-bottom: 2px;
         }
       }
+
       p {
-        font-size: 1.2rem;
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        line-height: 1.6;
         margin: 0.5rem 0;
         color: $color-text;
       }
+
       .btn-primary {
+        min-height: 44px;
         margin-top: 1.5rem;
         padding: 0.75rem 1.5rem;
         background-color: $color-primary;
@@ -57,20 +65,26 @@ $color-heading: #34495e;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        box-shadow: 0 0 8px $color-primary, 0 5px 20px rgba($color-primary, 0.6); 
+        box-shadow: 0 0 8px $color-primary, 0 5px 20px rgba($color-primary, 0.6);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+
         &:hover {
           background-color: $color-primary-dark;
-          transform: scale(1.05);
+          transform: scale(1.03);
           box-shadow: 0 0 15px $color-primary, 0 10px 30px rgba($color-primary, 0.8);
         }
       }
     }
+
     .hero-visual-container {
+      min-width: 0;
+      flex: 0 1 320px;
       max-width: 320px;
       width: 100%;
     }
+
     .hero-illustration {
+      width: 100%;
       max-width: 100%;
       height: auto;
       filter: drop-shadow(0 0 10px rgba($color-primary, 0.5));
@@ -78,51 +92,45 @@ $color-heading: #34495e;
     }
   }
 
-  /* --- Features Section (Icon Centering and Styling) --- */
   .features-section {
-    margin-top: 4rem; 
+    margin-top: clamp(2.5rem, 7vw, 4rem);
 
     .features-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
       gap: 1.5rem;
 
       .card {
+        min-width: 0;
         background: #ffffff;
         border-radius: 12px;
         padding: 1.5rem;
         text-align: center;
         border-top: 4px solid transparent;
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
-        
         transition:
-          transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
+          transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
           box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
           border-top 0.4s ease;
 
         &:hover {
           transform: translateY(-5px);
-          box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1), 0 0 10px rgba($color-primary, 0.4); 
+          box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1), 0 0 10px rgba($color-primary, 0.4);
           border-top: 4px solid $color-primary;
         }
 
-        // STYLING FOR FONT AWESOME ICONS
         .icon-placeholder {
-          font-size: 55px; // Large but controlled size
-          color: $color-primary; 
-          
-          // CENTERING THE ICON
-          display: block; 
-          margin: 0 auto 1rem auto; 
-
-          // Digital orange glow effect
-          text-shadow: 
+          font-size: clamp(2.6rem, 8vw, 55px);
+          color: $color-primary;
+          display: block;
+          margin: 0 auto 1rem;
+          text-shadow:
             0 0 5px rgba($color-primary, 0.7),
             0 0 10px rgba($color-primary, 0.4);
           transition: transform 0.3s ease;
-          
+
           .card:hover & {
-             transform: scale(1.1);
+            transform: scale(1.1);
           }
         }
 
@@ -134,6 +142,7 @@ $color-heading: #34495e;
 
         p {
           font-size: 0.95rem;
+          line-height: 1.55;
           color: $color-text-light;
         }
       }
@@ -141,7 +150,6 @@ $color-heading: #34495e;
   }
 }
 
-/* --- Keyframe Animations --- */
 @keyframes float {
   0% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -151,4 +159,53 @@ $color-heading: #34495e;
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 820px) {
+  .home-container {
+    .hero-card {
+      flex-direction: column;
+      text-align: center;
+
+      .hero-text {
+        max-width: 100%;
+        flex-basis: auto;
+      }
+
+      .hero-visual-container {
+        width: min(280px, 80vw);
+        max-width: 100%;
+        flex-basis: auto;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .home-container {
+    padding: 12px;
+
+    .hero-card {
+      padding: 1.15rem;
+      border-radius: 12px;
+
+      .hero-text {
+        h1 {
+          font-size: clamp(1.85rem, 10vw, 2.4rem);
+        }
+
+        .btn-primary {
+          width: 100%;
+        }
+      }
+    }
+
+    .features-section .features-grid {
+      gap: 1rem;
+
+      .card {
+        padding: 1.25rem;
+      }
+    }
+  }
 }
