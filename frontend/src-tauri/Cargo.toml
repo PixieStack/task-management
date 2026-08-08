@@ -1,0 +1,18 @@
+[package]
+name = "mob-taskmanager"
+version = "2.0.0"
+description = "M.O.B TaskManager desktop and mobile shell"
+authors = ["PixieStack"]
+edition = "2021"
+
+[lib]
+name = "mob_taskmanager_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.2", features = [] }
+
+[dependencies]
+tauri = { version = "2.11.2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
