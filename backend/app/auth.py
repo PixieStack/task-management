@@ -1,59 +1,58 @@
-import os
-from dotenv import load_dotenv
-from pathlib import Path
+from datetime import datetime, timedelta
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from app import models, database
-from datetime import timedelta, datetime
 
-# Load .env from backend directory
-env_path = Path(__file__).parent.parent / '.env'
-load_dotenv(dotenv_path=env_path)
+from app import models
+from app.config import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, SECRET_KEY
+from app.database import SessionLocal
+
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY is required. Set it in backend/.env or the deployment environment.")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-# Retrieve environment variables
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
-if not SECRET_KEY or not isinstance(SECRET_KEY, str):
-    raise ValueError("SECRET_KEY is not set, is empty, or not a string.")
-
-# Database dependency
 def get_db():
-    db = database.SessionLocal()
+    db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 
-# JWT token creation utility
-def create_access_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
 
-# Get current user dependency
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> models.User:
+def create_access_token(data: dict, expires_minutes: int | None = None) -> tuple[str, int]:
+    minutes = expires_minutes or ACCESS_TOKEN_EXPIRE_MINUTES
+    expires_delta = timedelta(minutes=minutes)
+    expire = datetime.utcnow() + expires_delta
+
+    payload = data.copy()
+    payload.update({"exp": expire, "iat": datetime.utcnow()})
+    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    return token, int(expires_delta.total_seconds())
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> models.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email: str = payload.get("sub")
-        if email is None:
+        email = payload.get("sub")
+        if not email:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
 
     user = db.query(models.User).filter(models.User.email == email).first()
-    if user is None:
+    if not user or not user.is_active:
         raise credentials_exception
     return user

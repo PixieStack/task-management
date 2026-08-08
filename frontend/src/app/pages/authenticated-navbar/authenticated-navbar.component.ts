@@ -1,133 +1,19 @@
-import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
+import { ProfileService } from '../../shared/services/profile.service';
 
-@Component({
-  selector: 'app-authenticated-navbar',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './authenticated-navbar.component.html',
-  styleUrls: ['./authenticated-navbar.component.scss'],
-})
+@Component({ selector: 'app-authenticated-navbar', standalone: true, imports: [CommonModule, RouterModule], templateUrl: './authenticated-navbar.component.html', styleUrls: ['./authenticated-navbar.component.scss'] })
 export class AuthenticatedNavbarComponent implements OnInit {
-  username: string | null = null;
-  email: string | null = null;
-  profilePicture: string | null = null;
-  greeting: string = 'Welcome back';
-  greetingEmoji: string = '👋';
-  isDarkMode: boolean = false;
-  isProfileDropdownOpen: boolean = false;
-  currentUserId: string | null = null;
-
-  constructor(private authService: AuthService) {}
-
-  ngOnInit(): void {
-    // Get current user ID
-    this.currentUserId = this.authService.getUserId();
-
-    // Subscribe to the user observable to update UI when auth state changes
-    this.authService.user$.subscribe((user) => {
-      this.username = user?.username || 'User';
-      this.email = user?.email || null;
-
-      // Update user ID and profile picture when user changes
-      this.currentUserId = this.authService.getUserId();
-      this.loadUserProfilePicture();
-    });
-
-    this.username = this.authService.getUsername() || 'User';
-
-    // Load user-specific profile picture
-    this.loadUserProfilePicture();
-
-    this.setGreetingByTimeOfDay();
-
-    const darkModePreference = localStorage.getItem('darkMode');
-    this.isDarkMode = darkModePreference === 'true';
-  }
-
-  // Load user-specific profile picture
-  private loadUserProfilePicture(): void {
-    if (this.currentUserId) {
-      this.profilePicture = localStorage.getItem(
-        `profilePicture_${this.currentUserId}`,
-      );
-    } else {
-      this.profilePicture = null;
-    }
-  }
-
-  // Close dropdown when clicking outside
-  @HostListener('document:click', ['$event'])
-  clickOutside(event: any): void {
-    const profileElement = document.querySelector(
-      '.profile-dropdown-container',
-    );
-    if (profileElement && !profileElement.contains(event.target)) {
-      this.isProfileDropdownOpen = false;
-    }
-  }
-
-  // Toggle profile dropdown
-  toggleProfileDropdown(event: Event): void {
-    event.stopPropagation();
-    this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
-  }
-
-  // Close dropdown programmatically
-  closeProfileDropdown(): void {
-    this.isProfileDropdownOpen = false;
-  }
-
-  // Profile picture upload functionality
-  addProfilePicture(event: Event): void {
-    event.stopPropagation();
-
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files && target.files.length && this.currentUserId) {
-        const file = target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = (event) => {
-          this.profilePicture = event.target?.result as string;
-          localStorage.setItem(
-            `profilePicture_${this.currentUserId}`,
-            this.profilePicture,
-          );
-        };
-
-        reader.readAsDataURL(file);
-      }
-    };
-    fileInput.click();
-  }
-
-  // Set greeting and emoji based on time of day
-  setGreetingByTimeOfDay(): void {
-    const hour = new Date().getHours();
-
-    if (hour >= 5 && hour < 12) {
-      this.greeting = 'Good morning';
-      this.greetingEmoji = '☀️';
-    } else if (hour >= 12 && hour < 18) {
-      this.greeting = 'Good afternoon';
-      this.greetingEmoji = '🌤️';
-    } else if (hour >= 18 && hour < 22) {
-      this.greeting = 'Good evening';
-      this.greetingEmoji = '🌙';
-    } else {
-      this.greeting = 'Good night';
-      this.greetingEmoji = '✨';
-    }
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.closeProfileDropdown();
-  }
+  username: string | null = null; email: string | null = null; profilePicture: string | null = null; greeting = 'Welcome back'; greetingEmoji = '👋'; isProfileDropdownOpen = false;
+  constructor(private authService: AuthService, private profileService: ProfileService) {}
+  ngOnInit(): void { this.setGreetingByTimeOfDay(); this.authService.user$.subscribe((user) => { this.username = user?.username || 'User'; this.email = user?.email || null; if (user) this.loadProfilePicture(); else this.profilePicture = null; }); const current = this.authService.getCurrentUser(); this.username = current?.username || this.authService.getUsername() || 'User'; this.email = current?.email || this.authService.getUserEmail(); if (this.authService.isLoggedIn()) this.loadProfilePicture(); }
+  @HostListener('document:click', ['$event']) clickOutside(event: Event): void { const target = event.target as Node | null; const el = document.querySelector('.profile-dropdown-container'); if (el && target && !el.contains(target)) this.isProfileDropdownOpen = false; }
+  toggleProfileDropdown(event: Event): void { event.stopPropagation(); this.isProfileDropdownOpen = !this.isProfileDropdownOpen; }
+  closeProfileDropdown(): void { this.isProfileDropdownOpen = false; }
+  addProfilePicture(event: Event): void { event.stopPropagation(); const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/png,image/jpeg,image/webp'; input.onchange = () => { const file = input.files?.[0]; if (!file || file.size > 2 * 1024 * 1024) return; const reader = new FileReader(); reader.onload = () => { const image = String(reader.result || ''); this.profileService.uploadProfilePicture(image).subscribe({ next: (profile) => { this.profilePicture = profile.profile_picture || null; const id = this.authService.getUserId(); if (id && this.profilePicture) localStorage.setItem(`profilePicture_${id}`, this.profilePicture); } }); }; reader.readAsDataURL(file); }; input.click(); }
+  setGreetingByTimeOfDay(): void { const hour = new Date().getHours(); if (hour >= 5 && hour < 12) { this.greeting = 'Good morning'; this.greetingEmoji = '☀️'; } else if (hour < 18) { this.greeting = 'Good afternoon'; this.greetingEmoji = '🌤️'; } else if (hour < 22) { this.greeting = 'Good evening'; this.greetingEmoji = '🌙'; } else { this.greeting = 'Good night'; this.greetingEmoji = '✨'; } }
+  logout(): void { this.closeProfileDropdown(); this.authService.logout(); }
+  private loadProfilePicture(): void { const id = this.authService.getUserId(); if (id) this.profilePicture = localStorage.getItem(`profilePicture_${id}`) || null; this.profileService.getProfile().subscribe({ next: (profile) => { this.profilePicture = profile.profile_picture || null; if (id && this.profilePicture) localStorage.setItem(`profilePicture_${id}`, this.profilePicture); }, error: () => undefined }); }
 }

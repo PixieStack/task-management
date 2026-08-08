@@ -1,170 +1,62 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from datetime import datetime
-from typing import List
-import random
 import json
+import logging
+from typing import List
+import httpx
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 from app import models
-from app.schemas_extended import AIQuestionCreate, AIConversationOut, AIFeedback
 from app.auth import get_current_user, get_db
+from app.config import GROQ_API_KEY, GROQ_MODEL
+from app.schemas_extended import AIConversationOut, AIFeedback, AIQuestionCreate
 
 router = APIRouter(prefix="/api/ai", tags=["ai-assistant"])
+logger = logging.getLogger(__name__)
+GROQ_CHAT_URL = "https://api.groq.com/openai/v1/chat/completions"
+SYSTEM_PROMPT = "You are a concise productivity assistant for a task manager. Use the supplied tasks, habits, reading challenges, and meditation challenge progress to suggest practical next actions. Never claim work was completed unless the context says it was."
 
+def _context(db: Session, uid: int) -> dict:
+    tasks = db.query(models.Task).filter(models.Task.owner_id == uid).order_by(models.Task.created_at.desc()).limit(25).all()
+    habits = db.query(models.Habit).filter(models.Habit.user_id == uid).order_by(models.Habit.created_at.desc()).limit(15).all()
+    challenges = db.query(models.Challenge).filter(models.Challenge.user_id == uid).order_by(models.Challenge.created_at.desc()).limit(10).all()
+    return {
+        "tasks": [{"title": t.title, "status": t.status, "priority": t.priority, "due_date": t.due_date.isoformat() if t.due_date else None, "completed": t.completed} for t in tasks],
+        "habits": [{"name": h.name, "frequency": h.frequency, "target_count": h.target_count} for h in habits],
+        "challenges": [{"title": c.title, "type": c.challenge_type, "duration": c.duration, "current_streak": c.current_streak, "progress": c.progress, "completed": c.completed} for c in challenges],
+    }
 
-# Simple pattern-based AI responses (learns from user interactions)
-AI_KNOWLEDGE_BASE = {
-    "challenge": [
-        "Starting a challenge is a great way to build discipline. I recommend beginning with a 21-day challenge.",
-        "The key to completing challenges is consistency. Check in every day at the same time.",
-        "If you miss a day, don't give up! Just start your streak again tomorrow."
-    ],
-    "task": [
-        "Break large tasks into smaller, manageable pieces.",
-        "Use the Pomodoro Technique: 25 minutes of focused work, then a 5-minute break.",
-        "Prioritize your tasks using the Eisenhower Matrix: urgent vs important."
-    ],
-    "diet": [
-        "Meal planning ahead of time helps you make healthier choices.",
-        "Remember to drink water throughout the day, not just when you're thirsty.",
-        "Balance is key - don't completely restrict foods you enjoy."
-    ],
-    "habit": [
-        "Habits typically take 21-66 days to form. Be patient with yourself.",
-        "Stack new habits onto existing ones for better success.",
-        "Track your habits daily to see your progress over time."
-    ],
-    "motivation": [
-        "Remember why you started. Your goals are worth the effort!",
-        "Progress, not perfection. Every small step counts.",
-        "You're stronger than you think. Keep pushing forward!"
-    ],
-    "default": [
-        "I'm here to help! Can you tell me more about what you're working on?",
-        "That's a great question. Based on your activity, I suggest focusing on consistency.",
-        "Let me help you break that down into actionable steps."
-    ]
-}
-
-
-def generate_ai_response(question: str, user_context: dict, db: Session, user_id: int) -> str:
-    """Generate AI response based on question and learned patterns"""
-    question_lower = question.lower()
-    
-    # Learn from past conversations
-    past_conversations = db.query(models.AIConversation).filter(
-        models.AIConversation.user_id == user_id
-    ).order_by(models.AIConversation.created_at.desc()).limit(20).all()
-    
-    # Determine category
-    category = "default"
-    for key in AI_KNOWLEDGE_BASE.keys():
-        if key in question_lower:
-            category = key
-            break
-    
-    # Get base response
-    base_responses = AI_KNOWLEDGE_BASE[category]
-    response = random.choice(base_responses)
-    
-    # Personalize based on user data
-    if user_context:
-        if "challenges_completed" in user_context:
-            response += f" You've already completed {user_context['challenges_completed']} challenges!"
-        if "current_streak" in user_context:
-            response += f" Your current streak is {user_context['current_streak']} days - keep it going!"
-        if "level" in user_context:
-            response += f" As a Level {user_context['level']} user, you're doing great!"
-    
-    # Learn from highly-rated past responses
-    good_responses = [c for c in past_conversations if c.feedback and c.feedback >= 4]
-    if good_responses and random.random() > 0.7:  # 30% chance to reference past good advice
-        past_response = random.choice(good_responses)
-        response += f" Remember: {past_response.answer[:100]}..."
-    
-    return response
-
+async def _ask(messages: list[dict]) -> str:
+    if not GROQ_API_KEY:
+        raise HTTPException(status_code=503, detail="AI is not configured. Set GROQ_API_KEY on the backend.")
+    try:
+        async with httpx.AsyncClient(timeout=35.0) as client:
+            response = await client.post(GROQ_CHAT_URL, json={"model": GROQ_MODEL, "messages": messages, "temperature": 0.5, "max_completion_tokens": 700}, headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"})
+            response.raise_for_status()
+        answer = response.json()["choices"][0]["message"]["content"].strip()
+        if not answer: raise ValueError("empty response")
+        return answer
+    except httpx.HTTPStatusError as exc:
+        logger.warning("AI provider returned %s", exc.response.status_code)
+        raise HTTPException(status_code=502, detail="AI provider returned an error") from exc
+    except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:
+        raise HTTPException(status_code=502, detail="AI service is temporarily unavailable") from exc
 
 @router.post("/ask", response_model=AIConversationOut)
-def ask_ai(question_data: AIQuestionCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Ask AI assistant a question"""
-    # Get user context for personalization
-    stats = db.query(models.UserStatistics).filter(
-        models.UserStatistics.user_id == current_user.id
-    ).first()
-    
-    user_context = question_data.context or {}
-    if stats:
-        user_context.update({
-            "level": stats.level,
-            "total_xp": stats.total_xp,
-            "challenges_completed": stats.challenges_completed,
-            "current_streak": stats.current_streak
-        })
-    
-    # Generate AI response
-    answer = generate_ai_response(question_data.question, user_context, db, current_user.id)
-    
-    # Save conversation
-    conversation = models.AIConversation(
-        user_id=current_user.id,
-        question=question_data.question,
-        answer=answer,
-        context=user_context
-    )
-    db.add(conversation)
-    db.commit()
-    db.refresh(conversation)
-    
-    # Store as ML training data
-    ml_data = models.MLTrainingData(
-        user_id=current_user.id,
-        data_type="ai_conversation",
-        features={
-            "question_length": len(question_data.question),
-            "context": user_context,
-            "question_keywords": [word for word in question_data.question.lower().split() if len(word) > 3]
-        },
-        labels={"answer": answer}
-    )
-    db.add(ml_data)
-    db.commit()
-    
-    return conversation
-
+async def ask_ai(data: AIQuestionCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    context = {**_context(db, current_user.id), **(data.context or {})}
+    history = db.query(models.AIConversation).filter(models.AIConversation.user_id == current_user.id).order_by(models.AIConversation.created_at.desc()).limit(6).all()
+    messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "system", "content": "App context:\n" + json.dumps(context, default=str)[:12000]}]
+    for item in reversed(history):
+        messages.append({"role": "user", "content": item.question}); messages.append({"role": "assistant", "content": item.answer})
+    messages.append({"role": "user", "content": data.question})
+    obj = models.AIConversation(user_id=current_user.id, question=data.question, answer=await _ask(messages), context=context)
+    db.add(obj); db.commit(); db.refresh(obj); return obj
 
 @router.get("/conversations", response_model=List[AIConversationOut])
-def get_conversations(limit: int = 20, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Get conversation history"""
-    conversations = db.query(models.AIConversation).filter(
-        models.AIConversation.user_id == current_user.id
-    ).order_by(models.AIConversation.created_at.desc()).limit(limit).all()
-    return conversations
-
+def conversations(limit: int = 20, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return db.query(models.AIConversation).filter(models.AIConversation.user_id == current_user.id).order_by(models.AIConversation.created_at.desc()).limit(max(1, min(limit, 100))).all()
 
 @router.post("/feedback")
-def provide_feedback(feedback_data: AIFeedback, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Provide feedback on AI response (helps it learn)"""
-    conversation = db.query(models.AIConversation).filter(
-        models.AIConversation.id == feedback_data.conversation_id,
-        models.AIConversation.user_id == current_user.id
-    ).first()
-    
-    if not conversation:
-        raise HTTPException(status_code=404, detail="Conversation not found")
-    
-    conversation.feedback = feedback_data.feedback
-    db.commit()
-    
-    # Update ML training data with feedback
-    ml_data = db.query(models.MLTrainingData).filter(
-        models.MLTrainingData.user_id == current_user.id,
-        models.MLTrainingData.data_type == "ai_conversation"
-    ).order_by(models.MLTrainingData.created_at.desc()).first()
-    
-    if ml_data:
-        labels = ml_data.labels or {}
-        labels["feedback"] = feedback_data.feedback
-        ml_data.labels = labels
-        db.commit()
-    
-    return {"message": "Feedback received. AI will learn from this!"}
+def feedback(data: AIFeedback, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    obj = db.query(models.AIConversation).filter(models.AIConversation.id == data.conversation_id, models.AIConversation.user_id == current_user.id).first()
+    if not obj: raise HTTPException(status_code=404, detail="Conversation not found")
+    obj.feedback = data.feedback; db.commit(); return {"message": "Feedback saved"}

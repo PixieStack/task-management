@@ -2,69 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-export interface Habit {
-  id?: number;
-  user_id?: number;
-  name: string;
-  description?: string;
-  category?: string;
-  frequency?: string;
-  target_count?: number;
-  icon?: string;
-  color?: string;
-  created_at?: string;
-}
-
-export interface HabitEntry {
-  id?: number;
-  habit_id: number;
-  user_id?: number;
-  date: string;
-  completed?: boolean;
-  count?: number;
-  mood?: number;
-  energy?: number;
-  notes?: string;
-  created_at?: string;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+export interface Habit { id?: number; user_id?: number; name: string; description?: string; category?: string; frequency: 'daily' | 'weekly'; target_count: number; icon?: string; color?: string; created_at?: string; }
+export interface HabitEntry { id?: number; habit_id: number; user_id?: number; date: string; completed: boolean; count: number; mood?: number; energy?: number; notes?: string; created_at?: string; }
+@Injectable({ providedIn: 'root' })
 export class HabitService {
-  private apiUrl = '/api/habits';
-
-  constructor(private http: HttpClient) {}
-
-  private getHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token');
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-  }
-
-  getHabits(): Observable<Habit[]> {
-    return this.http.get<Habit[]>(this.apiUrl, { headers: this.getHeaders() });
-  }
-
-  createHabit(habit: Partial<Habit>): Observable<Habit> {
-    return this.http.post<Habit>(this.apiUrl, habit, { headers: this.getHeaders() });
-  }
-
-  deleteHabit(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
-  }
-
-  createHabitEntry(entry: Partial<HabitEntry>): Observable<HabitEntry> {
-    return this.http.post<HabitEntry>(`${this.apiUrl}/entries`, entry, { headers: this.getHeaders() });
-  }
-
-  getHabitEntries(habitId?: number, days: number = 30): Observable<HabitEntry[]> {
-    let url = `${this.apiUrl}/entries?days=${days}`;
-    if (habitId) {
-      url += `&habit_id=${habitId}`;
-    }
-    return this.http.get<HabitEntry[]>(url, { headers: this.getHeaders() });
-  }
+  private apiUrl = '/api/habits'; constructor(private http: HttpClient) {}
+  getHabits(): Observable<Habit[]> { return this.http.get<Habit[]>(this.apiUrl, { headers: this.headers() }); }
+  createHabit(habit: Partial<Habit>): Observable<Habit> { return this.http.post<Habit>(this.apiUrl, habit, { headers: this.headers() }); }
+  updateHabit(id: number, habit: Partial<Habit>): Observable<Habit> { return this.http.put<Habit>(`${this.apiUrl}/${id}`, habit, { headers: this.headers() }); }
+  deleteHabit(id: number): Observable<void> { return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.headers() }); }
+  toggleCheckIn(id: number): Observable<HabitEntry> { return this.http.post<HabitEntry>(`${this.apiUrl}/${id}/check-in`, {}, { headers: this.headers() }); }
+  createHabitEntry(entry: Partial<HabitEntry>): Observable<HabitEntry> { return this.http.post<HabitEntry>(`${this.apiUrl}/entries`, entry, { headers: this.headers() }); }
+  getHabitEntries(habitId?: number, days = 30): Observable<HabitEntry[]> { let url = `${this.apiUrl}/entries?days=${days}`; if (habitId) url += `&habit_id=${habitId}`; return this.http.get<HabitEntry[]>(url, { headers: this.headers() }); }
+  private headers(): HttpHeaders { return new HttpHeaders({ Authorization: `Bearer ${localStorage.getItem('token') ?? ''}`, 'Content-Type': 'application/json' }); }
 }
