@@ -1,1 +1,100 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global responsive foundation */
+
+html {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html,
+body {
+  margin: 0;
+  max-width: 100%;
+  min-height: 100%;
+  overflow-x: clip;
+}
+
+body {
+  min-width: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #fff;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+p,
+li,
+a,
+button,
+label,
+small,
+strong,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: anywhere;
+}
+
+/* Prevent flex/grid descendants from forcing horizontal page overflow. */
+main,
+section,
+article,
+aside,
+nav,
+header,
+footer,
+div,
+form {
+  min-width: 0;
+}
+
+/* Keyboard accessibility remains visible across the app. */
+:focus-visible {
+  outline: 3px solid rgba(230, 126, 34, 0.55);
+  outline-offset: 2px;
+}
+
+/* Respect users who request reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
