@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const rawBaseUrl = (process.env.APP_API_BASE_URL ?? '').trim();
 
@@ -21,9 +22,9 @@ if (!['http:', 'https:'].includes(parsed.protocol)) {
 }
 
 const apiBaseUrl = rawBaseUrl.replace(/\/+$/, '');
-const ngExecutable = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+const angularCli = fileURLToPath(new URL('../node_modules/@angular/cli/bin/ng.js', import.meta.url));
 const args = [
-  'ng',
+  angularCli,
   'build',
   '--configuration',
   'production',
@@ -32,6 +33,11 @@ const args = [
 ];
 
 console.log(`Building native frontend for API host: ${parsed.host}`);
-const result = spawnSync(ngExecutable, args, { stdio: 'inherit', shell: false });
+const result = spawnSync(process.execPath, args, { stdio: 'inherit', shell: false });
+
+if (result.error) {
+  console.error('Failed to start Angular native build:', result.error);
+  process.exit(1);
+}
 
 process.exit(result.status ?? 1);
