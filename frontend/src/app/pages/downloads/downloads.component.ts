@@ -156,12 +156,10 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     this.http.get<Partial<DownloadManifest>>('/downloads.json').subscribe({
       next: (config) => {
         this.manifest = this.mergeManifest(config);
-        this.configureWebTarget();
-        void this.generateQrCodes();
+        this.generateQrCodes();
       },
       error: () => {
-        this.configureWebTarget();
-        void this.generateQrCodes();
+        this.generateQrCodes();
       },
     });
   }
@@ -210,32 +208,32 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     };
   }
 
-  private configureWebTarget(): void {
+  private generateQrCodes(): void {
     if (!this.isBrowser) return;
 
-    const isWebOrigin = window.location.protocol === 'https:' || window.location.protocol === 'http:';
-    if (!this.manifest.web.url && isWebOrigin) {
-      this.manifest.web = {
-        available: true,
-        url: `${window.location.origin}/downloads`,
-      };
-    }
-  }
-
-  private async generateQrCodes(): Promise<void> {
-    if (!this.isBrowser) return;
+    this.qrCodes = {};
+    this.qrErrors = {};
 
     for (const card of this.cards) {
       const target = this.manifest[card.id];
       if (!target.available || !target.url) continue;
 
       try {
-        const svg = await QRCode.toString(target.url, {
-          type: 'svg',
-          width: 220,
-          margin: 1,
-          errorCorrectionLevel: 'M',
-        });
+        const qr = QRCode.create(target.url, { errorCorrectionLevel: 'M' });
+        const matrixSize = qr.modules.size;
+        const quietZone = 4;
+        const size = matrixSize + quietZone * 2;
+        const path: string[] = [];
+
+        for (let y = 0; y < matrixSize; y += 1) {
+          for (let x = 0; x < matrixSize; x += 1) {
+            if (qr.modules.get(x, y)) {
+              path.push(`M${x + quietZone} ${y + quietZone}h1v1h-1z`);
+            }
+          }
+        }
+
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${path.join('')}" fill="#000"/></svg>`;
         this.qrCodes[card.id] = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
         this.qrErrors[card.id] = false;
       } catch (error) {
