@@ -81,6 +81,28 @@ form {
   min-width: 0;
 }
 
+/* The About-page Mini assistant must remain usable on 320px phones. */
+.about-container .chat-input input[type="text"] {
+  min-width: 0;
+}
+
+@media (max-width: 360px) {
+  .about-container .chat-input {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .about-container .chat-input input[type="text"],
+  .about-container .chat-input .btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .about-container .chat-input .btn {
+    min-height: 44px;
+  }
+}
+
 /* Keyboard accessibility remains visible across the app. */
 :focus-visible {
   outline: 3px solid rgba(230, 126, 34, 0.55);
