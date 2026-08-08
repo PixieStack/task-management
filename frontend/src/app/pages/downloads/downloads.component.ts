@@ -1,7 +1,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
-import QRCode from 'qrcode';
+import * as QRCodeNamespace from 'qrcode';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -31,7 +31,12 @@ interface DownloadCard {
   notes: string[];
 }
 
+type QRCodeModule = typeof import('qrcode');
+
 const EMPTY_TARGET: DownloadTargetConfig = { available: false, url: '' };
+const QR_CODE_API = (
+  (QRCodeNamespace as unknown as { default?: QRCodeModule }).default ?? QRCodeNamespace
+) as QRCodeModule;
 
 @Component({
   selector: 'app-downloads',
@@ -219,7 +224,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       if (!target.available || !target.url) continue;
 
       try {
-        const qr = QRCode.create(target.url, { errorCorrectionLevel: 'M' });
+        const qr = QR_CODE_API.create(target.url, { errorCorrectionLevel: 'M' });
         const matrixSize = qr.modules.size;
         const quietZone = 4;
         const size = matrixSize + quietZone * 2;
