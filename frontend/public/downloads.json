@@ -1,0 +1,26 @@
+{
+  "web": {
+    "available": false,
+    "url": ""
+  },
+  "macos": {
+    "available": false,
+    "url": ""
+  },
+  "windowsX64": {
+    "available": false,
+    "url": ""
+  },
+  "windowsArm64": {
+    "available": false,
+    "url": ""
+  },
+  "android": {
+    "available": false,
+    "url": ""
+  },
+  "ios": {
+    "available": false,
+    "url": ""
+  }
+}
