@@ -1,100 +1,115 @@
-/* --- Variables for Futuristic/Tech Theme --- */
-$color-bg-dark: #2c3e50; // Dark background
-$color-primary: #e67e22; // Orange accent
-$color-primary-dark: #cf711f; // Darker Orange for hover
+$color-bg-dark: #2c3e50;
+$color-primary: #e67e22;
+$color-primary-dark: #cf711f;
 $color-text-light: white;
 
+:host {
+  display: block;
+  position: relative;
+  z-index: 200;
+}
+
 .navbar {
-  // Increased height for a bolder presence
   background-color: $color-bg-dark;
   color: $color-text-light;
-  padding: 0 3rem; // Increased horizontal padding
-  height: 70px; // Increased navbar height
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); // Subtle shadow for depth
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 
   .container {
-    // Max width added for better centering on large screens
-    max-width: 1300px;
+    width: min(1300px, calc(100% - 48px));
+    min-height: 70px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 100%;
+    gap: 24px;
   }
 
   .logo {
+    min-width: 0;
     display: flex;
     align-items: center;
-    gap: 10px; // Slightly increased gap
+    gap: 10px;
     font-weight: 700;
-    font-size: 1.4rem; // Slightly increased font size
+    font-size: clamp(1rem, 2vw, 1.4rem);
     color: $color-text-light;
     text-decoration: none;
-    height: 100%;
-    cursor: pointer; // Explicitly indicates clickability
+    cursor: pointer;
 
     .logo-img {
-      max-height: 45px; // Larger logo image
       width: auto;
-      display: block;
+      max-height: 45px;
+      flex: 0 0 auto;
       border-radius: 6px;
       object-fit: contain;
-      // Added subtle glow to the logo image
       filter: drop-shadow(0 0 5px rgba($color-primary, 0.4));
     }
+
+    span {
+      white-space: nowrap;
+    }
+  }
+
+  .desktop-nav {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: clamp(18px, 2.5vw, 32px);
   }
 
   .nav-links {
     list-style: none;
     display: flex;
-    gap: 2rem; // Slightly increased link spacing
+    align-items: center;
+    gap: clamp(14px, 2vw, 32px);
     margin: 0;
     padding: 0;
 
     li a {
+      display: inline-block;
       color: $color-text-light;
       text-decoration: none;
       font-weight: 500;
-      padding: 0.5rem 0;
-      // Added transition for the border animation
-      transition: border-bottom 0.3s ease;
+      padding: 0.65rem 0;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: border-color 0.2s ease, color 0.2s ease;
 
       &.active,
       &:hover {
-        border-bottom: 3px solid $color-primary; // Thicker border on hover/active
+        border-bottom-color: $color-primary;
       }
     }
   }
 
-  .auth-buttons {
+  .auth-buttons,
+  .mobile-auth {
     display: flex;
     align-items: center;
+    gap: 10px;
 
     .welcome-text {
-        font-weight: 600;
-        margin-right: 1.25rem;
-        color: $color-primary; // Highlight the welcome text
+      font-weight: 600;
+      color: $color-primary;
     }
 
     button {
-      margin-left: 1rem;
-      padding: 0.6rem 1.2rem; // Slightly larger button padding
-      border-radius: 6px; // Slightly rounder buttons
+      min-height: 44px;
+      padding: 0.6rem 1.1rem;
+      border-radius: 6px;
       font-weight: 600;
       border: none;
       cursor: pointer;
-      transition: all 0.3s ease;
-      
-      // Added hover lift effect
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+
       &:hover {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
       }
     }
 
     .btn-primary {
       background-color: $color-primary;
       color: $color-text-light;
-      box-shadow: 0 4px 10px rgba($color-primary, 0.4);
 
       &:hover {
         background-color: $color-primary-dark;
@@ -105,23 +120,138 @@ $color-text-light: white;
       background-color: transparent;
       border: 2px solid $color-primary;
       color: $color-primary;
-      box-shadow: 0 4px 10px rgba($color-primary, 0.1);
 
       &:hover {
         background-color: $color-primary;
         color: $color-text-light;
-        box-shadow: 0 4px 10px rgba($color-primary, 0.6);
       }
     }
 
     .btn-logout {
-      background-color: #c0392b; /* Red for logout */
+      background-color: #c0392b;
       color: $color-text-light;
-      box-shadow: 0 4px 10px rgba(#c0392b, 0.4);
-
 
       &:hover {
         background-color: #a93226;
+      }
+    }
+  }
+
+  .menu-toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+
+    span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      margin: 4px 0;
+      border-radius: 999px;
+      background: white;
+    }
+  }
+
+  .mobile-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
+  .navbar {
+    .container {
+      width: min(100% - 32px, 1300px);
+    }
+
+    .desktop-nav {
+      display: none;
+    }
+
+    .menu-toggle {
+      display: block;
+    }
+
+    .mobile-panel {
+      display: block;
+      width: 100%;
+      padding: 8px 16px 18px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      background: $color-bg-dark;
+    }
+
+    .mobile-links {
+      width: min(100%, 520px);
+      list-style: none;
+      display: grid;
+      gap: 4px;
+      margin: 0 auto;
+      padding: 8px 0;
+
+      a {
+        display: block;
+        min-height: 44px;
+        padding: 11px 12px;
+        border-radius: 8px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+
+        &:hover,
+        &:focus-visible {
+          background: rgba(255, 255, 255, 0.08);
+        }
+      }
+    }
+
+    .mobile-auth {
+      width: min(100%, 520px);
+      margin: 8px auto 0;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+@media (max-width: 430px) {
+  .navbar {
+    .container {
+      width: min(100% - 24px, 1300px);
+    }
+
+    .logo {
+      gap: 8px;
+
+      .logo-img {
+        max-height: 38px;
+      }
+
+      span {
+        max-width: 190px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .mobile-panel {
+      padding-inline: 12px;
+    }
+
+    .mobile-auth {
+      align-items: stretch;
+      flex-direction: column;
+
+      .welcome-text {
+        text-align: center;
       }
     }
   }
