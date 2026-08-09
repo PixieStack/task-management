@@ -1,198 +1,70 @@
-<section class="contact-cta-section" (mousemove)="onMouseMove($event)">
-  <div class="background-shapes">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
-  </div>
+<main class="contact-cta-section app-shell-dark">
+  <div class="contact-wrapper">
+    <section class="contact-intro">
+      <span class="eyebrow">Contact</span>
+      <h1>{{ title }}</h1>
+      <p>{{ description }}</p>
 
-  <div class="contact-wrapper" @fadeIn>
-    <!-- Header -->
-    <div class="contact-header">
-      <div class="header-icon">
-        <i class="fas fa-comments"></i>
+      <div class="contact-principles">
+        <div><i class="fas fa-database"></i><span>Messages are saved through the FastAPI backend.</span></div>
+        <div><i class="fas fa-envelope"></i><span>Email delivery uses the configured backend mail service.</span></div>
+        <div><i class="fas fa-shield-halved"></i><span>No fake live-chat or response-time promise.</span></div>
       </div>
-      <h2 class="header-title">{{ title }}</h2>
-      <p class="header-description">{{ description }}</p>
-      
-      <!-- Progress Indicator -->
-      <div class="form-progress" *ngIf="!submitSuccess">
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width.%]="formCompletion">
-            <span class="progress-glow"></span>
-          </div>
-        </div>
-        <span class="progress-text">{{ formCompletion }}% Complete</span>
-      </div>
-    </div>
+    </section>
 
-    <!-- Success State -->
-    <div class="success-state" *ngIf="submitSuccess" @pulse>
-      <div class="success-icon">
-        <i class="fas fa-check-circle"></i>
-        <div class="success-ring"></div>
+    <section class="contact-card glass-panel" aria-label="Contact form">
+      <div class="success-state" *ngIf="submitSuccess" role="status">
+        <div class="state-icon success"><i class="fas fa-check"></i></div>
+        <span class="eyebrow">Message received</span>
+        <h2>Thanks for reaching out.</h2>
+        <p>Your message was submitted through the Task Manager backend.</p>
+        <button type="button" class="secondary-button" (click)="resetSuccess()">Send another message</button>
       </div>
-      <h3>Message Sent Successfully!</h3>
-      <p>Thank you for contacting us. We'll respond within 24 hours.</p>
-    </div>
 
-    <!-- Error State -->
-    <div class="error-state" *ngIf="submitError" @slideInLeft>
-      <div class="error-icon">
-        <i class="fas fa-exclamation-circle"></i>
+      <div class="error-state" *ngIf="submitError" role="alert">
+        <div class="state-icon error"><i class="fas fa-exclamation"></i></div>
+        <h2>Message not sent.</h2>
+        <p>Please check your connection and try submitting the form again.</p>
       </div>
-      <h3>Oops! Something went wrong</h3>
-      <p>Please try again or email us at support&#64;taskmanager.com</p>
-    </div>
 
-    <!-- Contact Form -->
-    <form 
-      [formGroup]="contactForm" 
-      (ngSubmit)="onSubmit()" 
-      *ngIf="!submitSuccess"
-      class="contact-form"
-      @fadeIn
-    >
-      <!-- Name Fields Row -->
-      <div class="form-row">
-        <div class="form-field" [class.focused]="focusedField === 'firstName'">
-          <div class="field-icon">
-            <i class="fas fa-user"></i>
-          </div>
-          <input
-            type="text"
-            id="firstName"
-            formControlName="firstName"
-            placeholder=" "
-            (focus)="setFocusedField('firstName')"
-            (blur)="clearFocusedField()"
-            [class.error]="hasError('firstName', 'required') || hasError('firstName', 'minlength')"
-          />
-          <label for="firstName">First Name</label>
-          <div class="field-highlight"></div>
-          <span class="error-message" *ngIf="hasError('firstName', 'required') || hasError('firstName', 'minlength')">
-            {{ getErrorMessage('firstName') }}
-          </span>
+      <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" *ngIf="!submitSuccess" class="contact-form" novalidate>
+        <div class="form-row">
+          <label class="form-field">
+            First name
+            <input type="text" id="firstName" formControlName="firstName" autocomplete="given-name" />
+            <span class="error-message" *ngIf="hasError('firstName', 'required') || hasError('firstName', 'minlength')">{{ getErrorMessage('firstName') }}</span>
+          </label>
+
+          <label class="form-field">
+            Last name
+            <input type="text" id="lastName" formControlName="lastName" autocomplete="family-name" />
+            <span class="error-message" *ngIf="hasError('lastName', 'required') || hasError('lastName', 'minlength')">{{ getErrorMessage('lastName') }}</span>
+          </label>
         </div>
 
-        <div class="form-field" [class.focused]="focusedField === 'lastName'">
-          <div class="field-icon">
-            <i class="fas fa-user"></i>
-          </div>
-          <input
-            type="text"
-            id="lastName"
-            formControlName="lastName"
-            placeholder=" "
-            (focus)="setFocusedField('lastName')"
-            (blur)="clearFocusedField()"
-            [class.error]="hasError('lastName', 'required') || hasError('lastName', 'minlength')"
-          />
-          <label for="lastName">Last Name</label>
-          <div class="field-highlight"></div>
-          <span class="error-message" *ngIf="hasError('lastName', 'required') || hasError('lastName', 'minlength')">
-            {{ getErrorMessage('lastName') }}
-          </span>
-        </div>
-      </div>
+        <label class="form-field">
+          Email address
+          <input type="email" id="email" formControlName="email" autocomplete="email" />
+          <span class="error-message" *ngIf="hasError('email', 'required') || hasError('email', 'email')">{{ getErrorMessage('email') }}</span>
+        </label>
 
-      <!-- Email Field -->
-      <div class="form-field" [class.focused]="focusedField === 'email'">
-        <div class="field-icon">
-          <i class="fas fa-envelope"></i>
-        </div>
-        <input
-          type="email"
-          id="email"
-          formControlName="email"
-          placeholder=" "
-          (focus)="setFocusedField('email')"
-          (blur)="clearFocusedField()"
-          [class.error]="hasError('email', 'required') || hasError('email', 'email')"
-        />
-        <label for="email">Email Address</label>
-        <div class="field-highlight"></div>
-        <span class="error-message" *ngIf="hasError('email', 'required') || hasError('email', 'email')">
-          {{ getErrorMessage('email') }}
-        </span>
-      </div>
+        <label class="form-field">
+          Phone number
+          <input type="tel" id="phone" formControlName="phone" autocomplete="tel" />
+          <span class="error-message" *ngIf="hasError('phone', 'required') || hasError('phone', 'pattern')">{{ getErrorMessage('phone') }}</span>
+        </label>
 
-      <!-- Phone Field -->
-      <div class="form-field" [class.focused]="focusedField === 'phone'">
-        <div class="field-icon">
-          <i class="fas fa-phone"></i>
-        </div>
-        <input
-          type="tel"
-          id="phone"
-          formControlName="phone"
-          placeholder=" "
-          (focus)="setFocusedField('phone')"
-          (blur)="clearFocusedField()"
-          [class.error]="hasError('phone', 'required') || hasError('phone', 'pattern')"
-        />
-        <label for="phone">Phone Number</label>
-        <div class="field-highlight"></div>
-        <span class="error-message" *ngIf="hasError('phone', 'required') || hasError('phone', 'pattern')">
-          {{ getErrorMessage('phone') }}
-        </span>
-      </div>
+        <label class="form-field">
+          Your message
+          <textarea id="message" formControlName="message" rows="5"></textarea>
+          <span class="error-message" *ngIf="hasError('message', 'required') || hasError('message', 'minlength')">{{ getErrorMessage('message') }}</span>
+        </label>
 
-      <!-- Message Field -->
-      <div class="form-field textarea-field" [class.focused]="focusedField === 'message'">
-        <div class="field-icon">
-          <i class="fas fa-comment-dots"></i>
-        </div>
-        <textarea
-          id="message"
-          formControlName="message"
-          placeholder=" "
-          rows="4"
-          (focus)="setFocusedField('message')"
-          (blur)="clearFocusedField()"
-          [class.error]="hasError('message', 'required') || hasError('message', 'minlength')"
-        ></textarea>
-        <label for="message">Your Message</label>
-        <div class="field-highlight"></div>
-        <span class="error-message" *ngIf="hasError('message', 'required') || hasError('message', 'minlength')">
-          {{ getErrorMessage('message') }}
-        </span>
-      </div>
-
-      <!-- Submit Button -->
-      <div class="form-actions">
-        <button 
-          type="submit" 
-          class="submit-button"
-          [disabled]="isSubmitting || contactForm.invalid"
-          [class.loading]="isSubmitting"
-        >
-          <span class="button-content" *ngIf="!isSubmitting">
-            <i class="fas fa-paper-plane"></i>
-            {{ buttonText }}
-          </span>
-          <span class="button-loader" *ngIf="isSubmitting">
-            <span class="loader-dot"></span>
-            <span class="loader-dot"></span>
-            <span class="loader-dot"></span>
-          </span>
+        <button type="submit" class="submit-button" [disabled]="isSubmitting || contactForm.invalid">
+          <span *ngIf="!isSubmitting">{{ buttonText }} <i class="fas fa-arrow-right"></i></span>
+          <span *ngIf="isSubmitting">Sending…</span>
         </button>
-      </div>
-
-      <!-- Quick Contact Info -->
-      <div class="quick-contact">
-        <div class="contact-item">
-          <i class="fas fa-envelope"></i>
-          <span>support&#64;mobtaskmanager.com</span>
-        </div>
-        <div class="contact-item">
-          <i class="fas fa-phone-alt"></i>
-          <span>+27 (64) 802-3069</span>
-        </div>
-        <div class="contact-item">
-          <i class="fas fa-clock"></i>
-          <span>Response within 24h</span>
-        </div>
-      </div>
-    </form>
+      </form>
+    </section>
   </div>
-</section>
+</main>
