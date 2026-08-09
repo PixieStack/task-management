@@ -21,7 +21,6 @@ export class FooterComponent {
       { label: 'About', route: '/about' },
     ],
     support: [
-      { label: 'Contact', route: '/contact' },
       { label: 'FAQ', route: '/faq' },
     ],
     legal: [

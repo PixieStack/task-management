@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { KeyFeaturesComponent } from './pages/key-features/key-features.component';
 import { AboutUsComponent } from './pages/about-us/about-us.component';
-import { ContactCtaComponent } from './shared/contact-cta/contact-cta.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { AuthGuard } from './auth.guard';
 
@@ -15,7 +14,6 @@ export const routes: Routes = [
       import('./pages/downloads/downloads.component').then((m) => m.DownloadsComponent),
   },
   { path: 'about', component: AboutUsComponent },
-  { path: 'contact', component: ContactCtaComponent },
   { path: 'login', loadComponent: () => import('./auth/login/login.component').then((m) => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./auth/register/register.component').then((m) => m.RegisterComponent) },
   { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent) },

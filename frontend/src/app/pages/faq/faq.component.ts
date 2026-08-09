@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { Router, RouterModule } from '@angular/router';
 
 interface FAQItem {
   question: string;
@@ -13,7 +12,7 @@ interface FAQItem {
 @Component({
   selector: 'app-faq',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule],
   templateUrl: './faq.component.html',
   styleUrls: ['./faq.component.scss'],
 })
@@ -40,7 +39,7 @@ export class FaqComponent {
     {
       question: 'What can the AI assistant actually do?',
       answer:
-        'The assistant can answer questions using your current productivity context and can perform an approved set of actions such as creating or updating tasks and Daily Todos, working with habits and reading or meditation challenges, and starting or stopping task/todo timers. FastAPI validates the action and your ownership before data changes.',
+        'The assistant can answer questions about your productivity and can perform approved actions such as creating or updating tasks and Daily Todos, working with habits and reading or meditation challenges, and starting or stopping task and todo timers. The app checks that each requested change is allowed and belongs to your account.',
       category: 'general',
       isOpen: false,
     },
@@ -54,14 +53,14 @@ export class FaqComponent {
     {
       question: 'Where is my app data stored?',
       answer:
-        'Persistent account and productivity data is stored in the Task Manager PostgreSQL database hosted on Supabase. The application accesses that data through the FastAPI backend rather than giving the browser or AI model direct database access.',
+        'Your account and productivity information is stored securely in the app database. The website and AI assistant do not receive unrestricted direct access to that database.',
       category: 'general',
       isOpen: false,
     },
     {
       question: 'How are registration and password-reset emails sent?',
       answer:
-        'Account emails are sent by the FastAPI backend through Brevo SMTP. Supabase is used as the PostgreSQL data store and is not used as the application email provider.',
+        'Registration verification and password-reset emails are sent through the app’s email service. The database provider is not used to send your account emails.',
       category: 'general',
       isOpen: false,
     },
@@ -76,7 +75,7 @@ export class FaqComponent {
     {
       question: 'How does task and todo time tracking work?',
       answer:
-        'Starting a timer creates a persisted time session on the backend. A running session can survive a page refresh, and stopping it adds the elapsed time to that task or Daily Todo. The app allows one active item timer per account at a time.',
+        'When you start a timer, the app saves the running session so it can survive a page refresh. When you stop it, the elapsed time is added to that task or Daily Todo. One item timer can run at a time for each account.',
       category: 'features',
       isOpen: false,
     },
@@ -97,7 +96,7 @@ export class FaqComponent {
     {
       question: 'Can the AI change my password, email address or delete my account?',
       answer:
-        'No. Sensitive account-security operations remain manual. The AI action layer is limited to approved productivity features and does not receive arbitrary SQL, backend-code or account-security access.',
+        'No. Sensitive account-security operations remain manual. The AI is limited to approved productivity features and cannot directly take over account-security settings.',
       category: 'features',
       isOpen: false,
     },
@@ -105,28 +104,28 @@ export class FaqComponent {
     {
       question: 'How do I reset my password?',
       answer:
-        'Choose “Forgot password” on the login page and enter your account email. The backend creates a single-use reset token and sends the reset link through Brevo SMTP. The configured reset-link lifetime is currently 30 minutes.',
+        'Choose “Forgot password” on the login page and enter your account email. The app sends a single-use reset link to your email address. The configured reset-link lifetime is currently 30 minutes.',
       category: 'account',
       isOpen: false,
     },
     {
       question: 'What happens to existing sessions after I reset or change my password?',
       answer:
-        'Password reset and password change increment the account authentication version. Existing JWT sessions tied to the older version become invalid and you sign in again using the new credentials.',
+        'After a password reset or password change, older signed-in sessions become invalid and you sign in again using the new password.',
       category: 'account',
       isOpen: false,
     },
     {
       question: 'Can I delete my account?',
       answer:
-        'Yes. Account deletion is available from account settings and requires your password plus the explicit DELETE confirmation phrase. Associated app data is removed as part of the account-deletion flow.',
+        'Yes. Account deletion is available from account settings and requires your password plus an explicit DELETE confirmation. Associated app data is removed as part of the account-deletion flow.',
       category: 'account',
       isOpen: false,
     },
     {
       question: 'Does the AI have direct access to my database?',
       answer:
-        'No. Groq receives the context needed to answer or plan an approved action, while FastAPI owns validation and persistence. The AI model cannot issue arbitrary database queries.',
+        'No. The AI only receives the information needed to answer your request or suggest an approved action. The app itself validates and saves changes, so the AI cannot run arbitrary database commands.',
       category: 'account',
       isOpen: false,
     },
@@ -141,14 +140,14 @@ export class FaqComponent {
     {
       question: 'Can I install the app instead of only using the website?',
       answer:
-        'Yes. The project supports an installable PWA plus native packaging targets for macOS, Windows, Android and iPhone/iPad. Native public download buttons and QR codes remain disabled until a real package URL has been published for that platform.',
+        'Yes. The project supports an installable web app plus native packaging targets for macOS, Windows, Android and iPhone/iPad. Native public download buttons and QR codes remain disabled until a real package URL has been published for that platform.',
       category: 'technical',
       isOpen: false,
     },
     {
       question: 'Will the Mac app work on Intel and Apple Silicon?',
       answer:
-        'The macOS packaging target is Universal, combining x86_64 for Intel Macs and arm64 for Apple Silicon Macs. The automated native smoke workflow verifies both architectures in the generated macOS app bundle.',
+        'The macOS packaging target is Universal, combining support for Intel and Apple Silicon Macs. Automated native checks verify both architectures in the generated macOS app bundle.',
       category: 'technical',
       isOpen: false,
     },
@@ -162,16 +161,13 @@ export class FaqComponent {
     {
       question: 'Does the app work fully offline?',
       answer:
-        'No full offline-data mode is promised. The application depends on the FastAPI backend for authenticated data, AI actions and persistent timers. Do not rely on task changes syncing while the backend or network is unavailable.',
+        'No full offline-data mode is promised. The application needs its online services for signed-in data, AI actions and persistent timers. Do not rely on task changes syncing while the service or network is unavailable.',
       category: 'technical',
       isOpen: false,
     },
   ];
 
-  constructor(
-    private router: Router,
-    private sanitizer: DomSanitizer,
-  ) {}
+  constructor(private sanitizer: DomSanitizer) {}
 
   get filteredFAQs(): FAQItem[] {
     const term = this.searchTerm.trim().toLowerCase();
@@ -209,9 +205,5 @@ export class FaqComponent {
 
   onCategoryChange(value: string): void {
     this.selectedCategory = value;
-  }
-
-  navigateToContact(): void {
-    this.router.navigate(['/contact']);
   }
 }

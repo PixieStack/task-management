@@ -1,3 +1,14 @@
+import os
+
+# The smoke suite must never use developer or deployment provider credentials
+# loaded from backend/.env. Email delivery is captured below and AI is expected
+# to report that no provider is configured.
+os.environ["BREVO_SMTP_LOGIN"] = ""
+os.environ["BREVO_SMTP_KEY"] = ""
+os.environ["SENDER_EMAIL"] = ""
+os.environ["ADMIN_EMAIL"] = ""
+os.environ["GROQ_API_KEY"] = ""
+
 from fastapi.testclient import TestClient
 
 from app import database, models
@@ -10,7 +21,6 @@ models.Base.metadata.create_all(bind=database.engine)
 
 client = TestClient(app)
 
-
 def expect(response, status_code):
     assert response.status_code == status_code, (
         f"{response.request.method} {response.request.url}: "
@@ -19,11 +29,22 @@ def expect(response, status_code):
     return response
 
 
-# Registration and authentication
+# Registration and authentication now require Brevo email verification.
 password = "StrongPass1!"
 reset_password = "ResetPass2!"
 new_password = "ChangedPass3!"
+captured_verification = {}
 
+
+def capture_verification_email(to_email, username, token, expires_minutes):
+    captured_verification["to_email"] = to_email
+    captured_verification["token"] = token
+    captured_verification["expires_minutes"] = expires_minutes
+    return True
+
+
+auth_router.send_verification_email = capture_verification_email
+auth_router.send_welcome_email = lambda *_args, **_kwargs: True
 register = expect(
     client.post(
         "/auth/register",
@@ -32,6 +53,18 @@ register = expect(
     201,
 )
 assert register.json()["email"] == "ci@example.com"
+assert captured_verification["to_email"] == "ci@example.com"
+assert captured_verification["token"]
+assert client.post(
+    "/auth/login", json={"email": "ci@example.com", "password": password}
+).status_code == 403
+
+verify = client.get(
+    f"/auth/verify-email?token={captured_verification['token']}",
+    follow_redirects=False,
+)
+assert verify.status_code == 303
+assert "verified=1" in verify.headers["location"]
 
 login = expect(
     client.post("/auth/login", json={"email": "ci@example.com", "password": password}),
@@ -44,7 +77,6 @@ expect(client.get("/auth/me", headers=headers), 200)
 expect(client.post("/auth/verify-token", headers=headers), 200)
 
 # Password reset is app-managed and sends through the configured email service.
-# Capture the reset token in CI instead of requiring SMTP credentials.
 captured_reset = {}
 
 
@@ -71,7 +103,6 @@ expect(
     ),
     200,
 )
-# Existing JWTs and old credentials are invalid after a reset.
 assert client.get("/auth/me", headers=headers).status_code == 401
 assert client.post(
     "/auth/login", json={"email": "ci@example.com", "password": password}
@@ -85,13 +116,11 @@ reset_login = expect(
 )
 headers = {"Authorization": f"Bearer {reset_login.json()['access_token']}"}
 
-# A reset link is single-use.
 assert client.post(
     "/auth/reset-password",
     json={"token": captured_reset["token"], "new_password": "AnotherPass4!"},
 ).status_code == 400
 
-# Profile
 profile = expect(
     client.put(
         "/auth/profile",
@@ -106,7 +135,6 @@ profile = expect(
 )
 assert profile.json()["city"] == "Johannesburg"
 
-# Tasks
 created_task = expect(
     client.post(
         "/api/tasks",
@@ -143,7 +171,6 @@ analytics = expect(client.get("/api/analytics/", headers=headers), 200).json()
 assert analytics["total_tasks"] == 1
 assert analytics["completed_tasks"] == 1
 
-# Habits
 habit = expect(
     client.post(
         "/api/habits",
@@ -166,7 +193,6 @@ habit_entries = expect(
 ).json()
 assert len(habit_entries) == 1
 
-# Reading and meditation challenges
 for challenge_type, title in (("reading", "Read Daily"), ("meditation", "Meditate Daily")):
     challenge = expect(
         client.post(
@@ -190,7 +216,6 @@ invalid_challenge = client.post(
 )
 assert invalid_challenge.status_code == 422
 
-# AI endpoint is protected and reports missing provider configuration cleanly in CI.
 ai_without_key = client.post(
     "/api/ai/ask",
     headers=headers,
@@ -198,7 +223,6 @@ ai_without_key = client.post(
 )
 assert ai_without_key.status_code == 503
 
-# Contact form persists even when SMTP secrets are intentionally absent in CI.
 contact = expect(
     client.post(
         "/api/contact/",
@@ -214,7 +238,6 @@ contact = expect(
 )
 assert contact.json()["success"] is True
 
-# Password change invalidates the old JWT/credentials and accepts the new password.
 old_headers = headers
 expect(
     client.post(
@@ -237,7 +260,6 @@ new_login = expect(
 )
 headers = {"Authorization": f"Bearer {new_login.json()['access_token']}"}
 
-# Email change returns a fresh JWT tied to the new email/auth version.
 email_change = expect(
     client.post(
         "/auth/change-email",
@@ -249,7 +271,6 @@ email_change = expect(
 headers = {"Authorization": f"Bearer {email_change['access_token']}"}
 expect(client.get("/auth/me", headers=headers), 200)
 
-# Clean up a task and then delete the account.
 expect(client.delete(f"/api/tasks/{task_id}", headers=headers), 204)
 expect(
     client.post(

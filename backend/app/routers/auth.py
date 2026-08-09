@@ -1,20 +1,31 @@
 import hashlib
+import re
 import secrets
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.auth import create_access_token, get_current_user, get_db
-from app.config import PASSWORD_RESET_EXPIRE_MINUTES
+from app.auth_schemas import OAuthConfigResponse, OAuthCredential, RegistrationResponse, VerificationRequest
+from app.config import (
+    APPLE_CLIENT_ID,
+    APP_URL,
+    EMAIL_VERIFICATION_EXPIRE_MINUTES,
+    GOOGLE_CLIENT_ID,
+    PASSWORD_RESET_EXPIRE_MINUTES,
+)
 from app.email_service import (
     send_account_deleted_email,
     send_email_changed_messages,
     send_password_changed_email,
     send_password_reset_email,
+    send_verification_email,
     send_welcome_email,
 )
+from app.oauth_service import claim_is_true, verify_provider_id_token
 from app.schemas_extended import UserProfileOut, UserProfileUpdate
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -40,24 +51,117 @@ def _token_response(user: models.User) -> dict:
     }
 
 
-def _hash_reset_token(token: str) -> str:
+def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-@router.post("/register", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
-def register(
-    user: schemas.UserCreate,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
-):
+def _create_verification_token(db: Session, user: models.User) -> str:
+    now = datetime.utcnow()
+    db.query(models.EmailVerificationToken).filter(
+        models.EmailVerificationToken.user_id == user.id,
+        models.EmailVerificationToken.used_at.is_(None),
+    ).update({models.EmailVerificationToken.used_at: now}, synchronize_session=False)
+    raw_token = secrets.token_urlsafe(48)
+    db.add(
+        models.EmailVerificationToken(
+            user_id=user.id,
+            token_hash=_hash_token(raw_token),
+            expires_at=now + timedelta(minutes=EMAIL_VERIFICATION_EXPIRE_MINUTES),
+        )
+    )
+    return raw_token
+
+
+def _unique_oauth_username(db: Session, email: str) -> str:
+    base = re.sub(r"[^A-Za-z0-9_.-]", "", email.split("@", 1)[0])[:60] or "user"
+    candidate = base
+    suffix = 1
+    while crud.get_user_by_username(db, candidate):
+        suffix += 1
+        candidate = f"{base[:70]}-{suffix}"
+    return candidate
+
+
+@router.post("/register", response_model=RegistrationResponse, status_code=status.HTTP_201_CREATED)
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     _validate_password(user.password)
-    if crud.get_user_by_username(db, user.username.strip()):
+    username = user.username.strip()
+    email = user.email.lower()
+    if crud.get_user_by_username(db, username):
         raise HTTPException(status_code=400, detail="Username already registered")
-    if crud.get_user_by_email(db, user.email.lower()):
+    if crud.get_user_by_email(db, email):
         raise HTTPException(status_code=400, detail="Email already registered")
-    new_user = crud.create_user(db, user)
-    background_tasks.add_task(send_welcome_email, new_user.email, new_user.username)
-    return new_user
+
+    new_user = models.User(
+        username=username,
+        email=email,
+        hashed_password=crud.get_password_hash(user.password),
+        email_verified=False,
+    )
+    db.add(new_user)
+    db.flush()
+    raw_token = _create_verification_token(db, new_user)
+
+    # Registration only succeeds when Brevo accepts the verification email.
+    # This prevents a user from being told the account is ready when email delivery is unavailable.
+    if not send_verification_email(
+        new_user.email,
+        new_user.username,
+        raw_token,
+        EMAIL_VERIFICATION_EXPIRE_MINUTES,
+    ):
+        db.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail="We could not send the verification email. Check the Brevo SMTP configuration and try again.",
+        )
+
+    db.commit()
+    return {
+        "message": "Account created. Check your email and verify it before signing in.",
+        "email": new_user.email,
+    }
+
+
+@router.get("/verify-email")
+def verify_email(token: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    now = datetime.utcnow()
+    record = db.query(models.EmailVerificationToken).filter(
+        models.EmailVerificationToken.token_hash == _hash_token(token),
+        models.EmailVerificationToken.used_at.is_(None),
+        models.EmailVerificationToken.expires_at > now,
+    ).first()
+    if not record:
+        return RedirectResponse(f"{APP_URL}/login?verification=invalid", status_code=303)
+
+    user = db.query(models.User).filter(models.User.id == record.user_id).first()
+    if not user or not user.is_active:
+        return RedirectResponse(f"{APP_URL}/login?verification=invalid", status_code=303)
+
+    user.email_verified = True
+    user.email_verified_at = now
+    record.used_at = now
+    db.commit()
+    background_tasks.add_task(send_welcome_email, user.email, user.username)
+    return RedirectResponse(f"{APP_URL}/login?verified=1", status_code=303)
+
+
+@router.post("/resend-verification")
+def resend_verification(data: VerificationRequest, db: Session = Depends(get_db)):
+    response = {"message": "If the account still needs verification, a new email has been sent."}
+    user = crud.get_user_by_email(db, data.email.lower())
+    if not user or not user.is_active or user.email_verified:
+        return response
+
+    raw_token = _create_verification_token(db, user)
+    if not send_verification_email(user.email, user.username, raw_token, EMAIL_VERIFICATION_EXPIRE_MINUTES):
+        db.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail="We could not send the verification email. Check the Brevo SMTP configuration and try again.",
+        )
+    db.commit()
+    return response
 
 
 @router.post("/login", response_model=schemas.Token)
@@ -67,19 +171,83 @@ def login(data: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     if not user.is_active:
         raise HTTPException(status_code=403, detail="Account is deactivated")
+    if not user.email_verified:
+        raise HTTPException(status_code=403, detail="Verify your email before signing in.")
+    return _token_response(user)
+
+
+@router.get("/oauth/config", response_model=OAuthConfigResponse)
+def oauth_config():
+    return {
+        "google_client_id": GOOGLE_CLIENT_ID or None,
+        "apple_client_id": APPLE_CLIENT_ID or None,
+    }
+
+
+@router.post("/oauth/login", response_model=schemas.Token)
+def oauth_login(data: OAuthCredential, db: Session = Depends(get_db)):
+    try:
+        claims = verify_provider_id_token(data.provider, data.credential)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=401, detail=str(exc)) from exc
+
+    subject = str(claims["sub"])
+    identity = db.query(models.OAuthIdentity).filter(
+        models.OAuthIdentity.provider == data.provider,
+        models.OAuthIdentity.provider_subject == subject,
+    ).first()
+    if identity:
+        user = db.query(models.User).filter(models.User.id == identity.user_id).first()
+        if not user or not user.is_active:
+            raise HTTPException(status_code=403, detail="Account is unavailable")
+        return _token_response(user)
+
+    email = str(claims.get("email") or "").strip().lower()
+    if not email:
+        raise HTTPException(
+            status_code=400,
+            detail="The provider did not share an email address. Sign in again and allow email access.",
+        )
+    if not claim_is_true(claims.get("email_verified")):
+        raise HTTPException(status_code=401, detail="The provider has not verified this email address")
+
+    user = crud.get_user_by_email(db, email)
+    if not user:
+        user = models.User(
+            username=_unique_oauth_username(db, email),
+            email=email,
+            hashed_password=crud.get_password_hash(secrets.token_urlsafe(48)),
+            first_name=claims.get("given_name"),
+            last_name=claims.get("family_name"),
+            email_verified=True,
+            email_verified_at=datetime.utcnow(),
+        )
+        db.add(user)
+        db.flush()
+    else:
+        if not user.is_active:
+            raise HTTPException(status_code=403, detail="Account is deactivated")
+        user.email_verified = True
+        user.email_verified_at = user.email_verified_at or datetime.utcnow()
+
+    db.add(
+        models.OAuthIdentity(
+            user_id=user.id,
+            provider=data.provider,
+            provider_subject=subject,
+            provider_email=email,
+        )
+    )
+    db.commit()
+    db.refresh(user)
     return _token_response(user)
 
 
 @router.post("/forgot-password")
-def forgot_password(
-    data: schemas.ForgotPasswordRequest,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
-):
-    # Always return the same message so this endpoint cannot be used to enumerate accounts.
-    response = {
-        "message": "If an account exists for that email, a password reset link has been sent."
-    }
+def forgot_password(data: schemas.ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    response = {"message": "If an account exists for that email, a password reset link has been sent."}
     user = crud.get_user_by_email(db, data.email.lower())
     if not user or not user.is_active:
         return response
@@ -89,14 +257,14 @@ def forgot_password(
         models.PasswordResetToken.user_id == user.id,
         models.PasswordResetToken.used_at.is_(None),
     ).update({models.PasswordResetToken.used_at: now}, synchronize_session=False)
-
     raw_token = secrets.token_urlsafe(48)
-    reset_token = models.PasswordResetToken(
-        user_id=user.id,
-        token_hash=_hash_reset_token(raw_token),
-        expires_at=now + timedelta(minutes=PASSWORD_RESET_EXPIRE_MINUTES),
+    db.add(
+        models.PasswordResetToken(
+            user_id=user.id,
+            token_hash=_hash_token(raw_token),
+            expires_at=now + timedelta(minutes=PASSWORD_RESET_EXPIRE_MINUTES),
+        )
     )
-    db.add(reset_token)
     db.commit()
     background_tasks.add_task(
         send_password_reset_email,
@@ -109,25 +277,19 @@ def forgot_password(
 
 
 @router.post("/reset-password")
-def reset_password(
-    data: schemas.ResetPasswordRequest,
-    background_tasks: BackgroundTasks,
-    db: Session = Depends(get_db),
-):
+def reset_password(data: schemas.ResetPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     _validate_password(data.new_password)
     now = datetime.utcnow()
     reset_token = db.query(models.PasswordResetToken).filter(
-        models.PasswordResetToken.token_hash == _hash_reset_token(data.token),
+        models.PasswordResetToken.token_hash == _hash_token(data.token),
         models.PasswordResetToken.used_at.is_(None),
         models.PasswordResetToken.expires_at > now,
     ).first()
     if not reset_token:
         raise HTTPException(status_code=400, detail="Reset link is invalid or has expired")
-
     user = db.query(models.User).filter(models.User.id == reset_token.user_id).first()
     if not user or not user.is_active:
         raise HTTPException(status_code=400, detail="Reset link is invalid or has expired")
-
     user.hashed_password = crud.get_password_hash(data.new_password)
     user.auth_version += 1
     reset_token.used_at = now
@@ -147,17 +309,9 @@ def get_current_user_info(current_user: models.User = Depends(get_current_user))
 
 
 @router.put("/me", response_model=schemas.UserOut)
-def update_current_user(
-    user_update: schemas.UserUpdate,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
+def update_current_user(user_update: schemas.UserUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     data = user_update.model_dump(exclude_unset=True)
-    if (
-        "username" in data
-        and data["username"] != current_user.username
-        and crud.get_user_by_username(db, data["username"])
-    ):
+    if "username" in data and data["username"] != current_user.username and crud.get_user_by_username(db, data["username"]):
         raise HTTPException(status_code=400, detail="Username already taken")
     for key, value in data.items():
         setattr(current_user, key, value)
@@ -167,12 +321,7 @@ def update_current_user(
 
 
 @router.post("/change-password")
-def change_password(
-    data: schemas.PasswordChange,
-    background_tasks: BackgroundTasks,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
+def change_password(data: schemas.PasswordChange, background_tasks: BackgroundTasks, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not crud.verify_password(data.current_password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     _validate_password(data.new_password)
@@ -184,19 +333,12 @@ def change_password(
         models.PasswordResetToken.used_at.is_(None),
     ).update({models.PasswordResetToken.used_at: now}, synchronize_session=False)
     db.commit()
-    background_tasks.add_task(
-        send_password_changed_email, current_user.email, current_user.username
-    )
+    background_tasks.add_task(send_password_changed_email, current_user.email, current_user.username)
     return {"message": "Password updated successfully"}
 
 
 @router.post("/change-email", response_model=schemas.Token)
-def change_email(
-    data: schemas.EmailChange,
-    background_tasks: BackgroundTasks,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
+def change_email(data: schemas.EmailChange, background_tasks: BackgroundTasks, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if not crud.verify_password(data.password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Password is incorrect")
     new_email = data.new_email.lower()
@@ -209,24 +351,21 @@ def change_email(
     current_user.auth_version += 1
     db.commit()
     db.refresh(current_user)
-    background_tasks.add_task(
-        send_email_changed_messages, old_email, new_email, current_user.username
-    )
+    background_tasks.add_task(send_email_changed_messages, old_email, new_email, current_user.username)
     return _token_response(current_user)
 
 
 @router.post("/delete-account")
-def delete_account(
-    data: schemas.DeleteAccountRequest,
-    background_tasks: BackgroundTasks,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
+def delete_account(data: schemas.DeleteAccountRequest, background_tasks: BackgroundTasks, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     if data.confirm_phrase != "DELETE":
         raise HTTPException(status_code=400, detail='Type "DELETE" to confirm account deletion')
     if not crud.verify_password(data.password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Password is incorrect")
     email, username, uid = current_user.email, current_user.username, current_user.id
+    db.query(models.TimeSession).filter(models.TimeSession.user_id == uid).delete(synchronize_session=False)
+    db.query(models.DailyTodo).filter(models.DailyTodo.user_id == uid).delete(synchronize_session=False)
+    db.query(models.EmailVerificationToken).filter(models.EmailVerificationToken.user_id == uid).delete(synchronize_session=False)
+    db.query(models.OAuthIdentity).filter(models.OAuthIdentity.user_id == uid).delete(synchronize_session=False)
     db.query(models.PasswordResetToken).filter(models.PasswordResetToken.user_id == uid).delete(synchronize_session=False)
     db.query(models.HabitEntry).filter(models.HabitEntry.user_id == uid).delete(synchronize_session=False)
     db.query(models.Habit).filter(models.Habit.user_id == uid).delete(synchronize_session=False)
@@ -251,13 +390,8 @@ def verify_token(current_user: models.User = Depends(get_current_user)):
 
 
 @router.get("/profile", response_model=UserProfileOut)
-def get_profile(
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    profile = db.query(models.UserProfile).filter(
-        models.UserProfile.user_id == current_user.id
-    ).first()
+def get_profile(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    profile = db.query(models.UserProfile).filter(models.UserProfile.user_id == current_user.id).first()
     if not profile:
         profile = models.UserProfile(user_id=current_user.id)
         db.add(profile)
@@ -267,18 +401,10 @@ def get_profile(
 
 
 @router.put("/profile", response_model=UserProfileOut)
-def update_profile(
-    data: UserProfileUpdate,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    profile = db.query(models.UserProfile).filter(
-        models.UserProfile.user_id == current_user.id
-    ).first()
+def update_profile(data: UserProfileUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    profile = db.query(models.UserProfile).filter(models.UserProfile.user_id == current_user.id).first()
     if not profile:
-        profile = models.UserProfile(
-            user_id=current_user.id, **data.model_dump(exclude_unset=True)
-        )
+        profile = models.UserProfile(user_id=current_user.id, **data.model_dump(exclude_unset=True))
         db.add(profile)
     else:
         for key, value in data.model_dump(exclude_unset=True).items():
@@ -290,9 +416,5 @@ def update_profile(
 
 
 @router.put("/update-user", response_model=schemas.UserOut)
-def update_user_info(
-    user_update: schemas.UserUpdate,
-    current_user: models.User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
+def update_user_info(user_update: schemas.UserUpdate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     return update_current_user(user_update, current_user, db)

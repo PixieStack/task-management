@@ -178,43 +178,7 @@
 .no-results h2 { margin:.7rem 0 .3rem; color:#dce5f3; font-size:1.1rem; }
 .no-results p { margin:0; }
 
-.contact-cta {
-  display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:2rem;
-  align-items:center;
-  margin-top:2.5rem;
-  padding:clamp(1.3rem,3vw,2rem);
-  border-radius:22px;
-}
-
-.contact-cta h2 {
-  margin:.4rem 0 .4rem;
-  color:#f3f6ff;
-  font-size:clamp(1.6rem,3vw,2.3rem);
-  letter-spacing:-.04em;
-}
-
-.contact-cta p { margin:0; color:#8795aa; }
-
-.btn-primary {
-  min-height:46px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.55rem;
-  padding:.75rem 1rem;
-  border:0;
-  border-radius:13px;
-  color:#fff;
-  background:linear-gradient(135deg,var(--primary),#5b8cff);
-  box-shadow:0 10px 26px rgba(109,66,223,.25);
-  font-weight:850;
-  cursor:pointer;
-}
-
 @media (max-width:700px) {
   .faq-container { width:min(100% - 20px,1180px); padding-top:2rem; }
-  .faq-controls,.contact-cta { grid-template-columns:1fr; }
-  .btn-primary { width:100%; }
+  .faq-controls { grid-template-columns:1fr; }
 }
