@@ -187,6 +187,70 @@
   color: #fca5a5;
 }
 
+.logout-toast {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 500;
+  width: min(420px, calc(100vw - 2rem));
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.8rem;
+  padding: 1rem;
+  box-sizing: border-box;
+  border: 1px solid rgba(251, 113, 133, 0.25);
+  border-radius: 18px;
+  color: #eef2ff;
+  background: linear-gradient(145deg, rgba(25, 31, 48, 0.98), rgba(13, 18, 31, 0.98));
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48), 0 0 40px rgba(244, 63, 94, 0.08);
+}
+
+.logout-toast-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  color: #fecdd3;
+  background: rgba(244, 63, 94, 0.12);
+}
+
+.logout-toast-copy {
+  min-width: 0;
+
+  strong { color: #fff; font-size: 0.88rem; }
+  p { margin: 0.25rem 0 0; color: #8f9db4; font-size: 0.74rem; line-height: 1.45; }
+}
+
+.logout-toast-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+
+  button {
+    min-height: 38px;
+    padding: 0.55rem 0.75rem;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 850;
+    cursor: pointer;
+  }
+}
+
+.stay-button {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.confirm-logout-button {
+  border: 1px solid rgba(251, 113, 133, 0.28);
+  color: #fff;
+  background: linear-gradient(135deg, #be123c, #f43f5e);
+}
+
 @media (max-width: 900px) {
   .workspace-sidebar {
     position: sticky;
@@ -272,15 +336,20 @@
 
 @media (max-width: 560px) {
   .workspace-sidebar {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
 
   .workspace-account {
-    display: none;
+    display: flex;
   }
+
+  .account-link { display: none; }
 
   .workspace-nav a {
     padding-inline: 0.55rem;
     font-size: 0.78rem;
   }
+
+  .logout-toast { right: 0.7rem; bottom: 0.7rem; width: calc(100vw - 1.4rem); }
+  .logout-toast-actions { display: grid; grid-template-columns: 1fr 1fr; }
 }

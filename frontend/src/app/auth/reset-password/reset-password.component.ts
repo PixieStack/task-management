@@ -13,7 +13,7 @@ import { AuthService } from '../../shared/services/auth.service';
   template: `
     <main class="reset-page">
       <section class="reset-card" aria-labelledby="reset-password-title">
-        <a routerLink="/login" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
+        <a routerLink="/access" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
         <div class="brand-icon" aria-hidden="true"><i class="fas fa-lock"></i></div>
         <span class="kicker">Secure reset</span>
         <h1 id="reset-password-title">Choose a new password.</h1>
@@ -28,11 +28,21 @@ import { AuthService } from '../../shared/services/auth.service';
 
         <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
           <label for="new-password">New password</label>
-          <input id="new-password" type="password" formControlName="newPassword" autocomplete="new-password" />
+          <div class="password-field">
+            <input id="new-password" [type]="showNewPassword ? 'text' : 'password'" formControlName="newPassword" autocomplete="new-password" />
+            <button class="password-toggle" type="button" (click)="showNewPassword = !showNewPassword" [attr.aria-label]="showNewPassword ? 'Hide new password' : 'Show new password'" [attr.aria-pressed]="showNewPassword">
+              <i class="fas" [class.fa-eye]="!showNewPassword" [class.fa-eye-slash]="showNewPassword" aria-hidden="true"></i>
+            </button>
+          </div>
           <small *ngIf="form.controls.newPassword.touched && form.controls.newPassword.invalid">Password must be at least 8 characters.</small>
 
           <label for="confirm-password">Confirm new password</label>
-          <input id="confirm-password" type="password" formControlName="confirmPassword" autocomplete="new-password" />
+          <div class="password-field">
+            <input id="confirm-password" [type]="showConfirmPassword ? 'text' : 'password'" formControlName="confirmPassword" autocomplete="new-password" />
+            <button class="password-toggle" type="button" (click)="showConfirmPassword = !showConfirmPassword" [attr.aria-label]="showConfirmPassword ? 'Hide confirmed password' : 'Show confirmed password'" [attr.aria-pressed]="showConfirmPassword">
+              <i class="fas" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword" aria-hidden="true"></i>
+            </button>
+          </div>
           <small *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.invalid">Confirm your new password.</small>
 
           <button type="submit" [disabled]="isLoading || form.invalid || !token || !!message">
@@ -58,6 +68,11 @@ import { AuthService } from '../../shared/services/auth.service';
     label { margin-top:.2rem; color:#b6c1d3; font-size:.8rem; font-weight:800; }
     input { width:100%; min-height:50px; box-sizing:border-box; padding:.75rem .85rem; border:1px solid rgba(148,163,184,.18); border-radius:13px; color:#eef2ff; background:rgba(4,8,15,.48); font:inherit; outline:none; }
     input:focus { border-color:rgba(34,211,238,.5); box-shadow:0 0 0 3px rgba(34,211,238,.08); }
+    .password-field { position:relative; }
+    .password-field input { padding-right:3.15rem; }
+    .password-toggle { position:absolute; top:50%; right:.45rem; display:grid; width:38px; min-height:38px; margin:0; padding:0; place-items:center; transform:translateY(-50%); border:1px solid transparent; border-radius:10px; color:#8795aa; background:transparent; box-shadow:none; }
+    .password-toggle:hover { color:#c4b5fd; background:rgba(139,92,246,.1); }
+    .password-toggle:focus-visible { outline:2px solid #a78bfa; outline-offset:1px; }
     small { color:#fda4af; font-size:.73rem; }
     button { min-height:50px; margin-top:.55rem; border:0; border-radius:13px; color:#fff; background:linear-gradient(135deg,var(--primary),#5b8cff); box-shadow:0 12px 28px rgba(109,66,223,.28); font-weight:900; font-size:.9rem; cursor:pointer; }
     button:disabled { opacity:.48; cursor:not-allowed; }
@@ -82,6 +97,8 @@ export class ResetPasswordComponent {
   });
 
   isLoading = false;
+  showNewPassword = false;
+  showConfirmPassword = false;
   message = '';
   error = '';
 
@@ -106,7 +123,7 @@ export class ResetPasswordComponent {
         next: (response) => {
           this.message = response.message;
           this.form.reset();
-          window.setTimeout(() => this.router.navigate(['/login']), 1400);
+          window.setTimeout(() => this.router.navigate(['/access']), 1400);
         },
         error: (err: Error) => {
           this.error = err.message || 'Unable to reset your password. Request a new link and try again.';

@@ -8,7 +8,7 @@
         an action-capable AI assistant into one connected workspace.
       </p>
       <div class="hero-actions">
-        <a routerLink="/register" class="primary-action">Get started</a>
+        <a routerLink="/access" [queryParams]="{ mode: 'register' }" class="primary-action">Get started</a>
         <a routerLink="/downloads" class="secondary-action">View downloads</a>
       </div>
     </div>
@@ -55,7 +55,6 @@
 
     <div class="flow-grid">
       <article class="flow-card" *ngFor="let item of focusFlow; trackBy: trackByTitle">
-        <span>{{ item.step }}</span>
         <h3>{{ item.title }}</h3>
         <p>{{ item.text }}</p>
       </article>
@@ -75,7 +74,7 @@
         <span>Add daily todos</span>
         <span>Start timers</span>
         <span>Update habits</span>
-        <span>Manage reading & meditation</span>
+        <span>Manage reading & projects</span>
       </div>
     </div>
 
@@ -93,6 +92,6 @@
       <span class="eyebrow">Ready when you are</span>
       <h2>Build a system you can actually keep using.</h2>
     </div>
-    <a routerLink="/register" class="primary-action">Create an account</a>
+    <a routerLink="/access" [queryParams]="{ mode: 'register' }" class="primary-action">Create an account</a>
   </section>
 </main>

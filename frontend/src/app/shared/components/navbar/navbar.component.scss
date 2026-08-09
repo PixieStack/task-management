@@ -120,6 +120,10 @@
     }
 
     .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: .55rem;
       color: #fff;
       background: linear-gradient(135deg, var(--primary), #5b8cff);
       box-shadow: 0 8px 22px rgba(109, 66, 223, 0.28);

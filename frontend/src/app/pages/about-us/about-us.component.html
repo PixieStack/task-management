@@ -6,21 +6,20 @@
     <div class="hero-copy">
       <div class="product-kicker">
         <span class="kicker-dot"></span>
-        About M.O.B TaskManager
+        Designed around your momentum
       </div>
 
       <h1 id="about-title">
-        One workspace to <span class="gradient-text">plan, focus and move forward.</span>
+        Your ambitions, with <span class="gradient-text">less friction in the way.</span>
       </h1>
 
       <p class="hero-lead">
-        M.O.B TaskManager brings your tasks, daily todos, habits, reading, meditation,
-        focus timers and Pomodoro sessions together. Its AI assistant can also help you
-        create and manage your productivity items from a simple conversation.
+        M.O.B TaskManager gives your plans, focus sessions, habits, challenges and projects
+        one calm home. You stay in control while thoughtful automation helps the day move.
       </p>
 
       <div class="hero-actions">
-        <a routerLink="/register" class="primary-action">Start using the app</a>
+        <a routerLink="/access" [queryParams]="{ mode: 'register' }" class="primary-action">Start using the app</a>
         <a routerLink="/key-features" class="secondary-action">Explore features</a>
       </div>
 
@@ -80,17 +79,14 @@
 
     <div class="story-grid">
       <article class="story-card glass-panel">
-        <span class="story-index">01</span>
         <h3>Less switching</h3>
         <p>Tasks, daily todos, habits, challenges and timers stay inside one workspace.</p>
       </article>
       <article class="story-card glass-panel">
-        <span class="story-index">02</span>
         <h3>More useful AI</h3>
         <p>Ask the assistant to create tasks, manage daily todos, work with habits or start and stop your timers.</p>
       </article>
       <article class="story-card glass-panel">
-        <span class="story-index">03</span>
         <h3>Time you can see</h3>
         <p>Your timers keep track of how long you spend on individual tasks and todos.</p>
       </article>
@@ -130,7 +126,6 @@
 
     <div class="pillar-list">
       <article class="pillar" *ngFor="let pillar of pillars; trackBy: trackByTitle">
-        <span>{{ pillar.number }}</span>
         <div>
           <h3>{{ pillar.title }}</h3>
           <p>{{ pillar.description }}</p>
@@ -156,7 +151,7 @@
       </div>
     </div>
 
-    <div class="architecture-diagram glass-panel" aria-label="How AI requests are handled">
+    <div class="architecture-diagram legacy-diagram glass-panel" aria-hidden="true">
       <div class="arch-node user-node"><span>YOU</span><small>Ask in plain language</small></div>
       <div class="arch-line"><i></i></div>
       <div class="arch-node api-node"><span>THE APP</span><small>Checks your request before making changes</small></div>
@@ -164,6 +159,63 @@
         <div class="arch-node"><span>YOUR WORK</span><small>Tasks · todos · habits</small></div>
         <div class="arch-node"><span>AI HELPER</span><small>Understands what you want to do</small></div>
         <div class="arch-node"><span>ACCOUNT SAFETY</span><small>Password & email stay manual</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="trust-experience section-wrap" aria-label="How you stay in control">
+    <div class="trust-console glass-panel">
+      <div class="trust-console-bar"><span><i></i> CONTROL LAYER</span><small>Account scoped</small></div>
+      <div class="trust-tabs" role="tablist" aria-label="Control layers">
+        <button *ngFor="let layer of trustLayers" type="button" role="tab" [attr.aria-selected]="activeTrustKey === layer.key" [class.active]="activeTrustKey === layer.key" (click)="activeTrustKey = layer.key">
+          <i class="fas" [ngClass]="layer.icon" aria-hidden="true"></i><span>{{ layer.label }}</span>
+        </button>
+      </div>
+      <article class="trust-screen" [attr.data-layer]="activeTrustLayer.key">
+        <div class="trust-signal" aria-hidden="true"><span></span><i></i></div>
+        <span class="trust-step">{{ activeTrustLayer.label }}</span>
+        <h3>{{ activeTrustLayer.title }}</h3>
+        <p>{{ activeTrustLayer.description }}</p>
+        <div class="trust-tags"><span *ngFor="let point of activeTrustLayer.points"><i class="fas fa-check"></i>{{ point }}</span></div>
+      </article>
+      <div class="trust-footer-line"><span>Your request</span><i></i><span>Validated action</span></div>
+    </div>
+  </section>
+
+  <section class="creator-section section-wrap glass-panel" aria-labelledby="creator-title">
+    <div class="creator-portrait-wrap">
+      <img src="assets/Eden.jpg" alt="Thembinkosi Eden Thwala, creator of M.O.B TaskManager" class="creator-portrait" />
+    </div>
+
+    <div class="creator-copy">
+      <span class="eyebrow creator-eyebrow">About the creator</span>
+      <h2 id="creator-title">Thembinkosi Eden Thwala</h2>
+      <p>
+        M.O.B TaskManager was designed and developed by <strong>Thembinkosi Eden Thwala</strong>
+        as a full-stack portfolio project focused on bringing planning, focused work and
+        personal growth into one practical digital workspace.
+      </p>
+      <p>
+        The application combines task and Todo management, persistent time tracking,
+        Pomodoro sessions, habit building, reading challenges, project tracking, account
+        security and an action-capable AI assistant. It is built to work across the web,
+        desktop and mobile while keeping sensitive credentials on the server.
+      </p>
+      <p>
+        The project reflects a commitment to thoughtful product design, secure backend
+        engineering and technology that feels useful in everyday life.
+      </p>
+
+      <div class="creator-actions">
+        <a class="download-app-action" routerLink="/downloads" [queryParams]="{ auto: 1 }">
+          <i class="fas fa-download" aria-hidden="true"></i> Download the app
+        </a>
+        <a class="primary-action" href="https://pixiestack.github.io/eden-portfolio" target="_blank" rel="noopener noreferrer">
+          View my portfolio <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i>
+        </a>
+        <button class="stack-action" type="button" (click)="openTechnologyStack()">
+          <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> View technology stack
+        </button>
       </div>
     </div>
   </section>
@@ -178,8 +230,31 @@
       </p>
     </div>
     <div class="closing-actions">
-      <a routerLink="/register" class="primary-action">Create an account</a>
+      <a routerLink="/access" [queryParams]="{ mode: 'register' }" class="primary-action">Create an account</a>
       <a routerLink="/downloads" class="secondary-action">View downloads</a>
     </div>
   </section>
+
+  <div class="stack-modal-backdrop" *ngIf="showTechnologyStack" (click)="closeTechnologyStack()">
+    <section class="stack-modal" role="dialog" aria-modal="true" aria-labelledby="stack-modal-title" (click)="$event.stopPropagation()">
+      <button class="stack-modal-close" type="button" (click)="closeTechnologyStack()" aria-label="Close technology stack">
+        <i class="fas fa-xmark" aria-hidden="true"></i>
+      </button>
+      <div class="stack-modal-heading">
+        <span class="eyebrow">Under the hood</span>
+        <h2 id="stack-modal-title">M.O.B TaskManager technology stack</h2>
+        <p>The tools and services used across this application.</p>
+      </div>
+      <dl class="stack-list">
+        <div *ngFor="let item of technologyStack; trackBy: trackByStackName">
+          <dt>{{ item.name }}</dt>
+          <dd>{{ item.description }}</dd>
+        </div>
+      </dl>
+      <div class="stack-modal-footer">
+        <a href="https://pixiestack.github.io/eden-portfolio" target="_blank" rel="noopener noreferrer">Visit creator portfolio <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>
+        <button type="button" (click)="closeTechnologyStack()">Close</button>
+      </div>
+    </section>
+  </div>
 </main>

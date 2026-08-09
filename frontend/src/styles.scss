@@ -144,6 +144,15 @@ form {
   min-width: 0;
 }
 
+select {
+  color-scheme: dark;
+}
+
+select option {
+  color: #f8fafc;
+  background-color: #111827;
+}
+
 .app-shell-dark {
   color: var(--text);
   background:
@@ -172,52 +181,7 @@ form {
   display: none !important;
 }
 
-/* Shared authentication provider/verification controls. */
-.auth-card .oauth-area {
-  display: grid;
-  gap: 12px;
-  margin: 0 0 24px;
-}
-
-.auth-card .google-provider {
-  min-height: 44px;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.auth-card .oauth-apple {
-  width: 100%;
-  background: #fff !important;
-  color: #111827 !important;
-  border: 1px solid rgba(255, 255, 255, 0.24) !important;
-}
-
-.auth-card .oauth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 0.82rem;
-  text-align: center;
-}
-
-.auth-card .oauth-divider::before,
-.auth-card .oauth-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.auth-card .oauth-terms-note {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.82rem;
-  line-height: 1.5;
-  text-align: center;
-}
-
+/* Shared authentication verification controls. */
 .auth-card .verification-link {
   width: 100%;
   margin-top: 10px;

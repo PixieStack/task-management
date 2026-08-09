@@ -192,6 +192,11 @@ test.describe('responsive layout smoke suite', () => {
 
     await page.locator('#new-password').fill('StrongReset9!');
     await page.locator('#confirm-password').fill('StrongReset9!');
+    await expect(page.locator('#new-password')).toHaveAttribute('type', 'password');
+    await page.getByRole('button', { name: 'Show new password', exact: true }).click();
+    await expect(page.locator('#new-password')).toHaveAttribute('type', 'text');
+    await page.getByRole('button', { name: 'Hide new password', exact: true }).click();
+    await expect(page.locator('#new-password')).toHaveAttribute('type', 'password');
     await page.getByRole('button', { name: 'Reset password', exact: true }).click();
     await expect(page.getByRole('status')).toContainText('Password reset successfully');
     expect(resetPayload).toEqual({ token, new_password: 'StrongReset9!' });
@@ -207,6 +212,11 @@ test.describe('responsive layout smoke suite', () => {
     await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
     await expect(page.locator('.qr-panel img')).toHaveCount(0);
     await expect(page.locator('.download-card:not([data-platform="web"]) a.download-button')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Get app for this device' }).click();
+    await expect(page.getByRole('dialog', { name: 'Which app package do you need?' })).toBeVisible();
+    await expect(page.locator('.chooser-grid > button')).toHaveCount(6);
+    await expect(page.locator('.chooser-grid > button.detected')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Close device chooser' }).click();
     await expectNoHorizontalOverflow(page, '390px unpublished downloads page');
   });
 
@@ -241,14 +251,14 @@ test.describe('responsive layout smoke suite', () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await stubProtectedLayoutApi(page);
       await page.addInitScript(() => {
-        localStorage.setItem('token', 'responsive-layout-test-token');
-        localStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
-        localStorage.setItem('userId', '1');
-        localStorage.setItem('username', 'Responsive Tester');
-        localStorage.setItem('userEmail', 'responsive@example.com');
+        sessionStorage.setItem('token', 'responsive-layout-test-token');
+        sessionStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
+        sessionStorage.setItem('userId', '1');
+        sessionStorage.setItem('username', 'Responsive Tester');
+        sessionStorage.setItem('userEmail', 'responsive@example.com');
       });
 
-      for (const route of ['/dashboard', '/profile', '/focus']) {
+      for (const route of ['/dashboard', '/dashboard#ai', '/profile', '/todo', '/focus-timer']) {
         await page.goto(route, { waitUntil: 'domcontentloaded' });
         await expect(page).toHaveURL(new RegExp(`${route.replace('/', '\\/')}$`));
         await expectNoHorizontalOverflow(page, `${viewport.name} ${route}`);

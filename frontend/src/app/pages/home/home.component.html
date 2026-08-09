@@ -6,7 +6,7 @@
         Make the day feel <span class="gradient-text">clearer, calmer and more intentional.</span>
       </h1>
       <p class="hero-lead">
-        M.O.B TaskManager connects tasks, Daily Todos, habits, reading, meditation,
+        M.O.B TaskManager connects tasks, Daily Todos, habits, reading, projects,
         Pomodoro, persistent time tracking and an action-capable AI assistant.
       </p>
       <p class="welcome-back" *ngIf="user">Welcome back, {{ user.name }}.</p>
@@ -90,7 +90,7 @@
       <p>Use the browser experience or explore the supported desktop and mobile app packages.</p>
     </div>
     <div class="cta-actions">
-      <a routerLink="/register" class="primary-action">Create an account</a>
+      <a routerLink="/access" [queryParams]="{ mode: 'register' }" class="primary-action">Create an account</a>
       <a routerLink="/downloads" class="secondary-action">Downloads</a>
     </div>
   </section>

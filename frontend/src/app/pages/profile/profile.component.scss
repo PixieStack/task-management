@@ -12,6 +12,16 @@
 button,input,select,textarea { font:inherit; }
 button { cursor:pointer; }
 
+.visually-hidden {
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  overflow:hidden !important;
+  clip:rect(0,0,0,0) !important;
+  white-space:nowrap !important;
+  clip-path:inset(50%) !important;
+}
+
 .profile-shell {
   width:min(1180px,calc(100% - 40px));
   margin:0 auto;
@@ -201,8 +211,34 @@ input:focus,select:focus,textarea:focus {
 }
 
 input:disabled { color:#748197; background:rgba(255,255,255,.02); }
-select option { color:#111827; }
+select { color-scheme: dark; }
+select option { color:#f8fafc; background:#111827; }
 textarea { resize:vertical; }
+
+.password-input {
+  position:relative;
+  display:block;
+
+  input { padding-right:3.15rem; }
+
+  button {
+    position:absolute;
+    top:50%;
+    right:.38rem;
+    display:grid;
+    width:36px;
+    height:36px;
+    place-items:center;
+    transform:translateY(-50%);
+    border:1px solid transparent;
+    border-radius:9px;
+    color:#8290a6;
+    background:transparent;
+
+    &:hover { color:#c4b5fd; background:rgba(139,92,246,.1); }
+    &:focus-visible { outline:2px solid #a78bfa; outline-offset:1px; }
+  }
+}
 
 .actions {
   display:flex;
@@ -237,6 +273,35 @@ textarea { resize:vertical; }
   background:linear-gradient(145deg,rgba(251,113,133,.065),rgba(255,255,255,.018));
 }
 
+.recovery-card {
+  grid-column:1 / -1;
+  position:relative;
+  overflow:hidden;
+  border-color:rgba(34,211,238,.18);
+  background:linear-gradient(145deg,rgba(34,211,238,.06),rgba(139,92,246,.035));
+
+  .muted { max-width:68ch; }
+  .muted strong { color:#d9e4f2; }
+}
+
+.security-icon {
+  display:grid;
+  width:40px;
+  height:40px;
+  place-items:center;
+  margin-bottom:.8rem;
+  border:1px solid rgba(34,211,238,.2);
+  border-radius:12px;
+  color:#a5f3fc;
+  background:rgba(34,211,238,.08);
+}
+
+.recovery-button {
+  display:inline-flex;
+  align-items:center;
+  gap:.5rem;
+}
+
 .danger-card .eyebrow { color:#fda4af; }
 
 @media (max-width:760px) {
@@ -244,7 +309,7 @@ textarea { resize:vertical; }
   .profile-heading { align-items:flex-start; flex-direction:column; border-radius:20px; }
   .avatar { width:90px; min-height:90px; border-radius:18px; }
   .form-grid,.security-grid { grid-template-columns:1fr; }
-  .span-two,.danger-card { grid-column:auto; }
+  .span-two,.danger-card,.recovery-card { grid-column:auto; }
   .actions { flex-direction:column-reverse; }
   .actions button,.card form > button { width:100%; }
 }

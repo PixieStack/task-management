@@ -1,18 +1,23 @@
 import json
 import logging
 import re
+import uuid
 from datetime import date, datetime
 from typing import List, Optional
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app import models
+from app.ai_workflows import accept_values, build_action, detect_workflow, form_prompt, start_workflow
+from app.archive_logic import archive_completed_items, set_completion_state
 from app.auth import get_current_user, get_db
 from app.config import GROQ_API_KEY, GROQ_MODEL
-from app.schemas_extended import AIConversationOut, AIFeedback, AIQuestionCreate
+from app.email_service import send_challenge_completion_email, send_project_completion_email
+from app.habit_logic import check_in_habit, get_habit_for_check_in
+from app.schemas_extended import AIChatOut, AIConversationOut, AIFeedback, AIQuestionCreate
 
 router = APIRouter(prefix="/api/ai", tags=["ai-assistant"])
 logger = logging.getLogger(__name__)
@@ -33,17 +38,31 @@ ALLOWED_ACTIONS = {
     "create_challenge",
     "check_in_challenge",
     "delete_challenge",
+    "create_project",
+    "update_project",
+    "delete_project",
     "start_timer",
     "stop_timer",
+    "open_focus_timer",
+}
+
+GUIDED_ACTION_TYPES = {
+    "create_task": "task",
+    "create_todo": "todo",
+    "create_habit": "habit",
+    "create_challenge": "challenge",
+    "create_project": "project",
+    "start_timer": "tracked_timer",
+    "open_focus_timer": "pomodoro",
 }
 
 SYSTEM_PROMPT = """You are the action-capable assistant inside a personal productivity app.
-You can read the signed-in user's app context and, when explicitly asked, propose app actions.
+You help naturally and conversationally. You can read the signed-in user's app context and, when explicitly asked, propose app actions.
 Return ONLY valid JSON with this exact top-level shape:
 {"reply":"short natural-language response","actions":[{"type":"...", ...}]}
 
 Allowed action types:
-- create_task: title, optional description, priority (Low/Medium/High), due_date (ISO date/datetime or null), tags (array), time_estimate (minutes)
+- create_task: title, optional description, required priority (Low/Medium/High), required due_date (ISO datetime including date and time), tags (array), time_estimate (minutes)
 - update_task: target (task title or numeric id), plus any of title, description, priority, due_date, tags, status, time_estimate
 - complete_task: target
 - delete_task: target
@@ -51,12 +70,15 @@ Allowed action types:
 - update_todo: target, plus any of title, notes, todo_date, priority
 - complete_todo: target
 - delete_todo: target
-- create_habit: name, optional description, target_count
+- create_habit: name, optional description, duration_days (21, 30, 60, 90, or custom 1-365)
 - check_in_habit: target
 - delete_habit: target
-- create_challenge: challenge_type (reading/meditation), optional title, duration, optional daily_goal
+- create_challenge: challenge_type (reading), required title (the book title), book_type (fiction/non_fiction), duration, and daily_goal. Use this when the user asks for a reading plan or challenge.
 - check_in_challenge: target
 - delete_challenge: target
+- create_project: required title, description, and category. New projects always begin in progress.
+- update_project: target, plus any of title, description, category, status
+- delete_project: target
 - start_timer: item_type (task/todo), target
 - stop_timer: no additional fields
 
@@ -65,17 +87,22 @@ Rules:
 2. Use the app context to resolve names and avoid duplicate creation when the user clearly refers to an existing item.
 3. If the user asks for advice only, return actions: [].
 4. If a request is ambiguous, ask a short clarification in reply and return actions: [].
-5. Do not claim an action succeeded. The backend executes and reports results after validation.
-6. Keep reply concise.
+5. Do not claim an action succeeded. The backend executes and reports results after validation. For an action request, reply with a short friendly acknowledgement of what you understood.
+6. For ordinary questions, answer warmly in plain language rather than sounding robotic or listing internal action names.
+7. Keep reply concise and never mention JSON, schemas, databases, action types, or implementation details.
+8. Act only on the latest user message. Earlier actions in this chat are completed history and must never be repeated unless the latest message explicitly asks for them again.
 """
 
 
 def _context(db: Session, uid: int) -> dict:
-    tasks = db.query(models.Task).filter(models.Task.owner_id == uid).order_by(models.Task.created_at.desc()).limit(40).all()
-    todos = db.query(models.DailyTodo).filter(models.DailyTodo.user_id == uid).order_by(models.DailyTodo.todo_date.desc(), models.DailyTodo.created_at.desc()).limit(40).all()
-    habits = db.query(models.Habit).filter(models.Habit.user_id == uid).order_by(models.Habit.created_at.desc()).limit(20).all()
-    challenges = db.query(models.Challenge).filter(models.Challenge.user_id == uid).order_by(models.Challenge.created_at.desc()).limit(15).all()
-    active = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None)).first()
+    archive_completed_items(db, uid)
+    tasks = db.query(models.Task).filter(models.Task.owner_id == uid, models.Task.deleted_at.is_(None), models.Task.archived_at.is_(None)).order_by(models.Task.created_at.desc()).limit(40).all()
+    todos = db.query(models.DailyTodo).filter(models.DailyTodo.user_id == uid, models.DailyTodo.deleted_at.is_(None), models.DailyTodo.archived_at.is_(None)).order_by(models.DailyTodo.todo_date.desc(), models.DailyTodo.created_at.desc()).limit(40).all()
+    habits = db.query(models.Habit).filter(models.Habit.user_id == uid, models.Habit.deleted_at.is_(None), models.Habit.archived_at.is_(None)).order_by(models.Habit.created_at.desc()).limit(20).all()
+    challenges = db.query(models.Challenge).filter(models.Challenge.user_id == uid, models.Challenge.deleted_at.is_(None), models.Challenge.archived_at.is_(None)).order_by(models.Challenge.created_at.desc()).limit(15).all()
+    projects = db.query(models.Project).filter(models.Project.user_id == uid, models.Project.deleted_at.is_(None), models.Project.archived_at.is_(None)).order_by(models.Project.updated_at.desc()).limit(20).all()
+    project_categories = db.query(models.ProjectCategory).filter(models.ProjectCategory.user_id == uid).order_by(models.ProjectCategory.name.asc()).all()
+    active = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None), models.TimeSession.deleted_at.is_(None)).first()
     return {
         "today": date.today().isoformat(),
         "tasks": [
@@ -102,7 +129,7 @@ def _context(db: Session, uid: int) -> dict:
             }
             for t in todos
         ],
-        "habits": [{"id": h.id, "name": h.name, "frequency": h.frequency, "target_count": h.target_count} for h in habits],
+        "habits": [{"id": h.id, "name": h.name, "duration_days": h.duration_days, "check_in_count": h.check_in_count, "completed": h.completed, "completion_review_required": h.completion_review_required, "can_check_in": h.can_check_in} for h in habits],
         "challenges": [
             {
                 "id": c.id,
@@ -115,6 +142,16 @@ def _context(db: Session, uid: int) -> dict:
             }
             for c in challenges
         ],
+        "projects": [
+            {
+                "id": project.id,
+                "title": project.title,
+                "category": project.category,
+                "status": project.status,
+            }
+            for project in projects
+        ],
+        "project_categories": [{"id": category.id, "name": category.name} for category in project_categories],
         "active_timer": (
             {
                 "id": active.id,
@@ -174,7 +211,62 @@ def _json_plan(raw: str) -> dict:
     for action in actions:
         if not isinstance(action, dict) or action.get("type") not in ALLOWED_ACTIONS:
             raise HTTPException(status_code=502, detail="AI requested an unsupported action")
-    return {"reply": reply.strip(), "actions": actions[:10]}
+    return {"reply": reply.strip() or "How can I help with that?", "actions": actions[:10]}
+
+
+def _safe_ui_context(value: dict) -> dict:
+    section = value.get("active_section") if isinstance(value, dict) else None
+    return {"active_section": section} if section in {"overview", "tasks", "habits", "challenges", "ai"} else {}
+
+
+def _natural_action_reply(executed: list[dict]) -> str:
+    phrases = []
+    for item in executed:
+        kind = item["type"]
+        label = item.get("title") or item.get("name")
+        quoted = f' “{label}”' if label else ""
+        phrase = {
+            "create_task": f"created the task{quoted}",
+            "update_task": f"updated the task{quoted}",
+            "complete_task": f"completed the task{quoted}",
+            "delete_task": f"deleted the task{quoted}",
+            "create_todo": f"added the Todo{quoted}",
+            "update_todo": f"updated the Todo{quoted}",
+            "complete_todo": f"completed the Todo{quoted}",
+            "delete_todo": f"deleted the Todo{quoted}",
+            "create_habit": f"created the habit{quoted}",
+            "check_in_habit": f"checked in the habit{quoted}",
+            "delete_habit": f"deleted the habit{quoted}",
+            "create_challenge": f"started the reading plan{quoted}",
+            "check_in_challenge": f"checked in the plan{quoted}",
+            "delete_challenge": f"deleted the plan{quoted}",
+            "create_project": f"created the project{quoted}",
+            "update_project": f"updated the project{quoted}",
+            "delete_project": f"deleted the project{quoted}",
+            "start_timer": f"started timing{quoted}",
+            "stop_timer": "stopped the timer and saved the elapsed time",
+            "open_focus_timer": "prepared the Pomodoro timer",
+        }.get(kind, "updated your workspace")
+        phrases.append(phrase)
+    if len(phrases) == 1:
+        summary = phrases[0]
+    else:
+        summary = ", ".join(phrases[:-1]) + f" and {phrases[-1]}"
+    return f"Done — I {summary}."
+
+
+def _workflow_reply(prompt: dict, *, started: bool = False) -> str:
+    if prompt.get("errors"):
+        return "A couple of details still need your attention. Fix them below, then send everything together."
+    return "I just need a few quick details. Answer them together and I’ll take care of the rest."
+
+
+def _save_ai_turn(db: Session, *, uid: int, chat_id: str, question: str, answer: str, context: dict) -> models.AIConversation:
+    obj = models.AIConversation(user_id=uid, chat_id=chat_id, question=question, answer=answer, context=context)
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
 
 
 def _find_by_target(query, model, owner_filter, target, name_field):
@@ -192,19 +284,23 @@ def _find_by_target(query, model, owner_filter, target, name_field):
 
 
 def _find_task(db: Session, uid: int, target):
-    return _find_by_target(db.query(models.Task), models.Task, models.Task.owner_id == uid, target, models.Task.title)
+    return _find_by_target(db.query(models.Task).filter(models.Task.deleted_at.is_(None), models.Task.archived_at.is_(None)), models.Task, models.Task.owner_id == uid, target, models.Task.title)
 
 
 def _find_todo(db: Session, uid: int, target):
-    return _find_by_target(db.query(models.DailyTodo), models.DailyTodo, models.DailyTodo.user_id == uid, target, models.DailyTodo.title)
+    return _find_by_target(db.query(models.DailyTodo).filter(models.DailyTodo.deleted_at.is_(None), models.DailyTodo.archived_at.is_(None)), models.DailyTodo, models.DailyTodo.user_id == uid, target, models.DailyTodo.title)
 
 
 def _find_habit(db: Session, uid: int, target):
-    return _find_by_target(db.query(models.Habit), models.Habit, models.Habit.user_id == uid, target, models.Habit.name)
+    return _find_by_target(db.query(models.Habit).filter(models.Habit.deleted_at.is_(None), models.Habit.archived_at.is_(None)), models.Habit, models.Habit.user_id == uid, target, models.Habit.name)
 
 
 def _find_challenge(db: Session, uid: int, target):
-    return _find_by_target(db.query(models.Challenge), models.Challenge, models.Challenge.user_id == uid, target, models.Challenge.title)
+    return _find_by_target(db.query(models.Challenge).filter(models.Challenge.deleted_at.is_(None), models.Challenge.archived_at.is_(None)), models.Challenge, models.Challenge.user_id == uid, target, models.Challenge.title)
+
+
+def _find_project(db: Session, uid: int, target):
+    return _find_by_target(db.query(models.Project).filter(models.Project.deleted_at.is_(None), models.Project.archived_at.is_(None)), models.Project, models.Project.user_id == uid, target, models.Project.title)
 
 
 def _parse_datetime(value):
@@ -219,7 +315,7 @@ def _parse_datetime(value):
 
 
 def _stop_active_timer(db: Session, uid: int) -> dict:
-    session = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None)).first()
+    session = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None), models.TimeSession.deleted_at.is_(None)).first()
     if not session:
         raise HTTPException(status_code=404, detail="No timer is currently running")
     now = datetime.utcnow()
@@ -240,13 +336,33 @@ def _stop_active_timer(db: Session, uid: int) -> dict:
     return {"type": "stop_timer", "elapsed_seconds": elapsed, "session_id": session.id}
 
 
-def _execute_action(action: dict, db: Session, uid: int) -> dict:
+def _stop_timer_for_item(db: Session, uid: int, *, task_id: int | None = None, todo_id: int | None = None) -> None:
+    query = db.query(models.TimeSession).filter(
+        models.TimeSession.user_id == uid,
+        models.TimeSession.ended_at.is_(None),
+        models.TimeSession.deleted_at.is_(None),
+    )
+    query = query.filter(models.TimeSession.task_id == task_id) if task_id is not None else query.filter(models.TimeSession.todo_id == todo_id)
+    if query.first():
+        _stop_active_timer(db, uid)
+
+
+def _execute_action(
+    action: dict,
+    db: Session,
+    uid: int,
+    current_user: models.User | None = None,
+    background_tasks: BackgroundTasks | None = None,
+) -> dict:
     kind = action["type"]
 
     if kind == "create_task":
-        priority = action.get("priority", "Medium")
+        priority = action.get("priority")
         if priority not in {"Low", "Medium", "High"}:
-            priority = "Medium"
+            raise HTTPException(status_code=400, detail="Task priority is required")
+        due_date = action.get("due_date")
+        if not due_date or not re.search(r"[T ]\d{2}:\d{2}", str(due_date)):
+            raise HTTPException(status_code=400, detail="Task due date and time are required")
         obj = models.Task(
             owner_id=uid,
             title=str(action.get("title", "")).strip(),
@@ -254,7 +370,7 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             completed=False,
             status="Not Started",
             priority=priority,
-            due_date=_parse_datetime(action.get("due_date")),
+            due_date=_parse_datetime(due_date),
             tags=json.dumps(action.get("tags") if isinstance(action.get("tags"), list) else []),
             time_estimate=max(0, int(action.get("time_estimate") or 0)),
             time_spent=0,
@@ -262,6 +378,12 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
         )
         if not obj.title:
             raise HTTPException(status_code=400, detail="AI task title was empty")
+        requested_status = str(action.get("status") or "Not Started")
+        if requested_status not in {"Not Started", "In Progress", "Pending", "Completed"}:
+            raise HTTPException(status_code=400, detail="Invalid task status")
+        obj.status = requested_status
+        obj.completed = requested_status == "Completed"
+        set_completion_state(obj, obj.completed)
         db.add(obj)
         db.flush()
         return {"type": kind, "id": obj.id, "title": obj.title}
@@ -272,22 +394,41 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             raise HTTPException(status_code=404, detail=f"Task not found or target is ambiguous: {action.get('target')}")
         if kind == "delete_task":
             title = task.title
-            db.delete(task)
+            _stop_timer_for_item(db, uid, task_id=task.id)
+            now = datetime.utcnow()
+            task.deleted_at = now
+            task.updated_at = now
+            db.query(models.TimeSession).filter(
+                models.TimeSession.user_id == uid,
+                models.TimeSession.task_id == task.id,
+                models.TimeSession.deleted_at.is_(None),
+            ).update({models.TimeSession.deleted_at: now}, synchronize_session=False)
             return {"type": kind, "id": task.id, "title": title}
         if kind == "complete_task":
+            _stop_timer_for_item(db, uid, task_id=task.id)
             task.completed = True
             task.status = "Completed"
         else:
-            for key in ("title", "description", "priority", "status", "time_estimate"):
+            for key in ("title", "description", "time_estimate"):
                 if key in action and action[key] is not None:
                     setattr(task, key, action[key])
+            if "priority" in action:
+                priority = str(action["priority"])
+                if priority not in {"Low", "Medium", "High"}:
+                    raise HTTPException(status_code=400, detail="Task priority must be Low, Medium, or High")
+                task.priority = priority
+            if "status" in action:
+                status = str(action["status"])
+                if status not in {"Not Started", "In Progress", "Pending", "Completed"}:
+                    raise HTTPException(status_code=400, detail="Invalid task status")
+                task.status = status
+                task.completed = status == "Completed"
             if "due_date" in action:
                 task.due_date = _parse_datetime(action.get("due_date"))
             if isinstance(action.get("tags"), list):
                 task.tags = json.dumps(action["tags"])
-            if task.status == "Completed":
-                task.completed = True
         task.updated_at = datetime.utcnow()
+        set_completion_state(task, task.completed, task.updated_at)
         return {"type": kind, "id": task.id, "title": task.title}
 
     if kind == "create_todo":
@@ -306,9 +447,11 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             notes=str(action.get("notes", "") or "").strip(),
             todo_date=todo_date,
             priority=priority,
+            completed=bool(action.get("completed", False)),
         )
         if not todo.title:
             raise HTTPException(status_code=400, detail="AI todo title was empty")
+        set_completion_state(todo, todo.completed)
         db.add(todo)
         db.flush()
         return {"type": kind, "id": todo.id, "title": todo.title, "todo_date": todo.todo_date.isoformat()}
@@ -319,17 +462,32 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             raise HTTPException(status_code=404, detail=f"Todo not found or target is ambiguous: {action.get('target')}")
         if kind == "delete_todo":
             title = todo.title
-            db.delete(todo)
+            _stop_timer_for_item(db, uid, todo_id=todo.id)
+            now = datetime.utcnow()
+            todo.deleted_at = now
+            todo.updated_at = now
+            db.query(models.TimeSession).filter(
+                models.TimeSession.user_id == uid,
+                models.TimeSession.todo_id == todo.id,
+                models.TimeSession.deleted_at.is_(None),
+            ).update({models.TimeSession.deleted_at: now}, synchronize_session=False)
             return {"type": kind, "id": todo.id, "title": title}
         if kind == "complete_todo":
+            _stop_timer_for_item(db, uid, todo_id=todo.id)
             todo.completed = True
         else:
-            for key in ("title", "notes", "priority"):
+            for key in ("title", "notes"):
                 if key in action and action[key] is not None:
                     setattr(todo, key, action[key])
+            if "priority" in action:
+                priority = str(action["priority"])
+                if priority not in {"Low", "Medium", "High"}:
+                    raise HTTPException(status_code=400, detail="Todo priority must be Low, Medium, or High")
+                todo.priority = priority
             if action.get("todo_date"):
                 todo.todo_date = date.fromisoformat(str(action["todo_date"]))
         todo.updated_at = datetime.utcnow()
+        set_completion_state(todo, todo.completed, todo.updated_at)
         return {"type": kind, "id": todo.id, "title": todo.title}
 
     if kind == "create_habit":
@@ -339,7 +497,8 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             description=str(action.get("description", "") or "").strip(),
             category="personal",
             frequency="daily",
-            target_count=max(1, min(int(action.get("target_count") or 1), 1000)),
+            target_count=1,
+            duration_days=max(1, min(int(action.get("duration_days") or 21), 365)),
             icon="fas fa-check-circle",
         )
         if not habit.name:
@@ -354,45 +513,50 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             raise HTTPException(status_code=404, detail=f"Habit not found or target is ambiguous: {action.get('target')}")
         if kind == "delete_habit":
             name = habit.name
-            db.query(models.HabitEntry).filter(models.HabitEntry.user_id == uid, models.HabitEntry.habit_id == habit.id).delete(synchronize_session=False)
-            db.delete(habit)
+            now = datetime.utcnow()
+            habit.deleted_at = now
+            db.query(models.HabitEntry).filter(
+                models.HabitEntry.user_id == uid,
+                models.HabitEntry.habit_id == habit.id,
+                models.HabitEntry.deleted_at.is_(None),
+            ).update({models.HabitEntry.deleted_at: now}, synchronize_session=False)
             return {"type": kind, "id": habit.id, "name": name}
-        now = datetime.utcnow()
-        start = datetime(now.year, now.month, now.day)
-        entry = db.query(models.HabitEntry).filter(
-            models.HabitEntry.user_id == uid,
-            models.HabitEntry.habit_id == habit.id,
-            models.HabitEntry.date >= start,
-        ).first()
-        if entry:
-            entry.completed = True
-            entry.count = habit.target_count
-            entry.date = now
-        else:
-            entry = models.HabitEntry(user_id=uid, habit_id=habit.id, date=now, completed=True, count=habit.target_count)
-            db.add(entry)
-        return {"type": kind, "id": habit.id, "name": habit.name}
+        habit = get_habit_for_check_in(db, habit.id, uid)
+        _, review_required = check_in_habit(db, habit, uid)
+        return {
+            "type": kind,
+            "id": habit.id,
+            "name": habit.name,
+            "review_required": review_required,
+            "duration_days": habit.duration_days,
+        }
 
     if kind == "create_challenge":
         challenge_type = str(action.get("challenge_type", "")).lower()
-        if challenge_type not in {"reading", "meditation"}:
-            raise HTTPException(status_code=400, detail="Challenge type must be reading or meditation")
-        title = str(action.get("title") or ("Reading Challenge" if challenge_type == "reading" else "Meditation Challenge")).strip()
-        duration = max(1, min(int(action.get("duration") or 21), 365))
-        daily_goal = str(action.get("daily_goal") or "show up and make progress").strip()
+        if challenge_type != "reading":
+            raise HTTPException(status_code=400, detail="Challenge type must be reading")
+        title = str(action.get("title") or "").strip()
+        book_type = str(action.get("book_type") or "").strip().lower()
+        daily_goal = str(action.get("daily_goal") or "").strip()
+        if not title or not daily_goal or action.get("duration") in (None, ""):
+            raise HTTPException(status_code=400, detail="Book title, duration, and daily goal are required")
+        if book_type not in {"fiction", "non_fiction"}:
+            raise HTTPException(status_code=400, detail="Book type must be fiction or non_fiction")
+        duration = max(1, min(int(action["duration"]), 365))
         challenge = models.Challenge(
             user_id=uid,
             title=title,
             description=f"Daily goal: {daily_goal}",
             duration=duration,
             challenge_type=challenge_type,
+            book_type=book_type,
             start_date=datetime.utcnow(),
             xp_reward=0,
-            icon="fas fa-book-open" if challenge_type == "reading" else "fas fa-spa",
+            icon="fas fa-book-open",
         )
         db.add(challenge)
         db.flush()
-        return {"type": kind, "id": challenge.id, "title": challenge.title}
+        return {"type": kind, "id": challenge.id, "title": challenge.title, "challenge_type": challenge.challenge_type}
 
     if kind in {"check_in_challenge", "delete_challenge"}:
         challenge = _find_challenge(db, uid, action.get("target"))
@@ -400,8 +564,10 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
             raise HTTPException(status_code=404, detail=f"Challenge not found or target is ambiguous: {action.get('target')}")
         if kind == "delete_challenge":
             title = challenge.title
-            db.delete(challenge)
+            challenge.deleted_at = datetime.utcnow()
+            challenge.updated_at = challenge.deleted_at
             return {"type": kind, "id": challenge.id, "title": title}
+        was_completed = challenge.completed
         now = datetime.utcnow()
         if challenge.last_check_in and challenge.last_check_in.date() == now.date():
             return {"type": kind, "id": challenge.id, "title": challenge.title, "already_checked_in": True}
@@ -412,11 +578,71 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
         if challenge.current_streak >= challenge.duration:
             challenge.completed = True
             challenge.is_active = False
+        set_completion_state(challenge, challenge.completed, now)
         challenge.updated_at = now
-        return {"type": kind, "id": challenge.id, "title": challenge.title}
+        completed_now = challenge.completed and not was_completed
+        if completed_now and current_user and background_tasks:
+            background_tasks.add_task(
+                send_challenge_completion_email,
+                current_user.email,
+                current_user.username,
+                challenge.title,
+                challenge.duration,
+            )
+        return {"type": kind, "id": challenge.id, "title": challenge.title, "completed_now": completed_now}
+
+    if kind == "create_project":
+        title = str(action.get("title") or "").strip()
+        description = str(action.get("description") or "").strip()
+        category = str(action.get("category") or "").strip()
+        if not title or not description or not category:
+            raise HTTPException(status_code=400, detail="Project title, description, and category are required")
+        project = models.Project(
+            user_id=uid,
+            title=title[:200],
+            description=description[:2000],
+            category=category[:100],
+            status="in_progress",
+        )
+        db.add(project)
+        db.flush()
+        return {"type": kind, "id": project.id, "title": project.title, "status": project.status}
+
+    if kind in {"update_project", "delete_project"}:
+        project = _find_project(db, uid, action.get("target"))
+        if not project:
+            raise HTTPException(status_code=404, detail=f"Project not found or target is ambiguous: {action.get('target')}")
+        if kind == "delete_project":
+            title = project.title
+            project.deleted_at = datetime.utcnow()
+            project.updated_at = project.deleted_at
+            return {"type": kind, "id": project.id, "title": title}
+        was_complete = project.status == "complete"
+        if "title" in action and str(action["title"]).strip():
+            project.title = str(action["title"]).strip()[:200]
+        if "description" in action:
+            project.description = str(action["description"] or "").strip()[:2000]
+        if "category" in action and str(action["category"]).strip():
+            project.category = str(action["category"]).strip()[:100]
+        if "status" in action:
+            project_status = str(action["status"]).strip().lower()
+            if project_status not in {"in_progress", "under_review", "complete"}:
+                raise HTTPException(status_code=400, detail="Invalid project status")
+            project.status = project_status
+        project.updated_at = datetime.utcnow()
+        set_completion_state(project, project.status == "complete", project.updated_at)
+        completed_now = project.status == "complete" and not was_complete
+        if completed_now and current_user and background_tasks:
+            background_tasks.add_task(
+                send_project_completion_email,
+                current_user.email,
+                current_user.username,
+                project.title,
+            )
+        return {"type": kind, "id": project.id, "title": project.title, "status": project.status, "completed_now": completed_now}
 
     if kind == "start_timer":
-        active = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None)).first()
+        active = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None), models.TimeSession.deleted_at.is_(None)).first()
         if active:
             raise HTTPException(status_code=409, detail="A timer is already running. Stop it first.")
         item_type = action.get("item_type")
@@ -443,32 +669,159 @@ def _execute_action(action: dict, db: Session, uid: int) -> dict:
     if kind == "stop_timer":
         return _stop_active_timer(db, uid)
 
+    if kind == "open_focus_timer":
+        minutes = max(1, min(int(action.get("minutes") or 25), 180))
+        return {"type": kind, "title": f"{minutes}-minute Pomodoro", "navigate_to": "/focus-timer", "minutes": minutes, "autostart": True}
+
     raise HTTPException(status_code=400, detail="Unsupported AI action")
 
 
 @router.post("/ask", response_model=AIConversationOut)
 async def ask_ai(
     data: AIQuestionCreate,
+    background_tasks: BackgroundTasks,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    context = {**_context(db, current_user.id), **(data.context or {})}
-    history = db.query(models.AIConversation).filter(models.AIConversation.user_id == current_user.id).order_by(models.AIConversation.created_at.desc()).limit(6).all()
+    chat_id = (data.chat_id or uuid.uuid4().hex).strip()
+    if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", chat_id):
+        raise HTTPException(status_code=400, detail="Invalid chat session")
+    context = _context(db, current_user.id)
+    context["ui"] = _safe_ui_context(data.context or {})
+    history = db.query(models.AIConversation).filter(
+        models.AIConversation.user_id == current_user.id,
+        models.AIConversation.chat_id == chat_id,
+    ).order_by(models.AIConversation.created_at.desc()).limit(12).all()
+
+    submitted_context = data.context if isinstance(data.context, dict) else {}
+    is_workflow_reply = "workflow_values" in submitted_context or bool(submitted_context.get("workflow_cancelled"))
+    requested_workflow = None if is_workflow_reply else detect_workflow(data.question)
+    previous_workflow = None
+    if history and isinstance(history[0].context, dict):
+        candidate = history[0].context.get("workflow")
+        if isinstance(candidate, dict) and candidate.get("active"):
+            previous_workflow = json.loads(json.dumps(candidate))
+
+    # A fresh creation request always replaces an unfinished setup. This keeps
+    # the latest message authoritative instead of replaying the previous action.
+    if requested_workflow:
+        workflow = start_workflow(requested_workflow)
+        prompt = form_prompt(workflow, context)
+        return _save_ai_turn(
+            db,
+            uid=current_user.id,
+            chat_id=chat_id,
+            question=data.question,
+            answer=_workflow_reply(prompt, started=True),
+            context={**context, "workflow": workflow, "form_prompt": prompt, "executed_actions": []},
+        )
+
+    if previous_workflow:
+        if submitted_context.get("workflow_cancelled") or data.question.strip().lower() in {"cancel", "cancel setup", "stop setup"}:
+            previous_workflow["active"] = False
+            previous_workflow["cancelled"] = True
+            return _save_ai_turn(
+                db,
+                uid=current_user.id,
+                chat_id=chat_id,
+                question=data.question,
+                answer="Setup cancelled. Tell me what you would like to do next.",
+                context={**context, "workflow": previous_workflow, "executed_actions": []},
+            )
+        submitted_values = submitted_context.get("workflow_values")
+        if not isinstance(submitted_values, dict):
+            prompt = form_prompt(previous_workflow, context)
+            return _save_ai_turn(
+                db,
+                uid=current_user.id,
+                chat_id=chat_id,
+                question=data.question,
+                answer="Use the quick details card below so I can collect everything together.",
+                context={**context, "workflow": previous_workflow, "form_prompt": prompt, "executed_actions": []},
+            )
+        accepted, errors = accept_values(previous_workflow, submitted_values, context)
+        if not accepted:
+            prompt = form_prompt(previous_workflow, context, errors)
+            return _save_ai_turn(
+                db,
+                uid=current_user.id,
+                chat_id=chat_id,
+                question=data.question,
+                answer=_workflow_reply(prompt),
+                context={**context, "workflow": previous_workflow, "form_prompt": prompt, "executed_actions": []},
+            )
+        action = build_action(previous_workflow)
+        try:
+            executed = [_execute_action(action, db, current_user.id, current_user, background_tasks)]
+            previous_workflow["active"] = False
+            return _save_ai_turn(
+                db,
+                uid=current_user.id,
+                chat_id=chat_id,
+                question=data.question,
+                answer=_natural_action_reply(executed),
+                context={**context, "workflow": previous_workflow, "requested_actions": [action], "executed_actions": executed},
+            )
+        except HTTPException:
+            db.rollback()
+            raise
+        except Exception as exc:
+            db.rollback()
+            logger.exception("Guided AI action execution failed")
+            raise HTTPException(status_code=500, detail="The guided action could not be completed safely") from exc
+
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "system", "content": "App context:\n" + json.dumps(context, default=str)[:16000]},
     ]
     for item in reversed(history):
         messages.append({"role": "user", "content": item.question})
-        messages.append({"role": "assistant", "content": item.answer})
+        messages.append({"role": "assistant", "content": json.dumps({"reply": item.answer, "actions": [], "history_status": "completed; do not repeat"})})
     messages.append({"role": "user", "content": data.question})
 
-    plan = _json_plan(await _ask(messages))
+    raw_plan = await _ask(messages)
+    try:
+        plan = _json_plan(raw_plan)
+    except HTTPException:
+        repair_messages = messages + [
+            {"role": "assistant", "content": raw_plan},
+            {"role": "user", "content": "Return the same answer again as one valid JSON object with only reply and actions."},
+        ]
+        plan = _json_plan(await _ask(repair_messages))
+
+    guided_kind = next(
+        (GUIDED_ACTION_TYPES[action["type"]] for action in plan["actions"] if action["type"] in GUIDED_ACTION_TYPES),
+        None,
+    )
+    if guided_kind:
+        workflow = start_workflow(guided_kind)
+        prompt = form_prompt(workflow, context)
+        return _save_ai_turn(
+            db,
+            uid=current_user.id,
+            chat_id=chat_id,
+            question=data.question,
+            answer=_workflow_reply(prompt, started=True),
+            context={**context, "workflow": workflow, "form_prompt": prompt, "executed_actions": []},
+        )
+
     executed = []
     try:
         for action in plan["actions"]:
-            executed.append(_execute_action(action, db, current_user.id))
+            executed.append(_execute_action(action, db, current_user.id, current_user, background_tasks))
+        final_context = {**context, "requested_actions": plan["actions"], "executed_actions": executed}
+        answer = _natural_action_reply(executed) if executed else plan["reply"]
+        obj = models.AIConversation(
+            user_id=current_user.id,
+            chat_id=chat_id,
+            question=data.question,
+            answer=answer,
+            context=final_context,
+        )
+        db.add(obj)
         db.commit()
+        db.refresh(obj)
+        return obj
     except HTTPException:
         db.rollback()
         raise
@@ -477,30 +830,51 @@ async def ask_ai(
         logger.exception("AI action execution failed")
         raise HTTPException(status_code=500, detail="AI action could not be completed safely") from exc
 
-    final_context = {**context, "requested_actions": plan["actions"], "executed_actions": executed}
-    answer = plan["reply"]
-    if executed:
-        labels = ", ".join(item["type"].replace("_", " ") for item in executed)
-        answer = f"{answer} Done: {labels}.".strip()
-    obj = models.AIConversation(
-        user_id=current_user.id,
-        question=data.question,
-        answer=answer,
-        context=final_context,
-    )
-    db.add(obj)
-    db.commit()
-    db.refresh(obj)
-    return obj
-
 
 @router.get("/conversations", response_model=List[AIConversationOut])
 def conversations(
     limit: int = 20,
+    chat_id: Optional[str] = None,
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    return db.query(models.AIConversation).filter(models.AIConversation.user_id == current_user.id).order_by(models.AIConversation.created_at.desc()).limit(max(1, min(limit, 100))).all()
+    query = db.query(models.AIConversation).filter(models.AIConversation.user_id == current_user.id)
+    if chat_id:
+        query = query.filter(models.AIConversation.chat_id == chat_id)
+    return query.order_by(models.AIConversation.created_at.desc()).limit(max(1, min(limit, 100))).all()
+
+
+@router.get("/chats", response_model=List[AIChatOut])
+def chats(
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    rows = db.query(models.AIConversation).filter(
+        models.AIConversation.user_id == current_user.id,
+    ).order_by(models.AIConversation.created_at.desc()).limit(200).all()
+    grouped: dict[str, dict] = {}
+    for row in rows:
+        chat = grouped.get(row.chat_id)
+        if not chat:
+            grouped[row.chat_id] = {
+                "chat_id": row.chat_id,
+                "title": row.question.strip()[:80] or "New chat",
+                "updated_at": row.created_at,
+                "message_count": 1,
+            }
+        else:
+            chat["message_count"] += 1
+    return list(grouped.values())
+
+
+@router.get("/status")
+def status(current_user: models.User = Depends(get_current_user)):
+    del current_user
+    return {
+        "ready": bool(GROQ_API_KEY),
+        "model": GROQ_MODEL if GROQ_API_KEY else None,
+        "message": "AI is ready" if GROQ_API_KEY else "AI is not configured. Set GROQ_API_KEY on the backend.",
+    }
 
 
 @router.post("/feedback")

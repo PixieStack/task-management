@@ -3,6 +3,7 @@ import smtplib
 import ssl
 from email.message import EmailMessage
 from email.utils import formataddr
+from html import escape
 from urllib.parse import urlencode
 
 from app.config import (
@@ -78,6 +79,67 @@ def send_welcome_email(to_email: str, username: str) -> bool:
         to_email,
         "Welcome to M.O.B TaskManager",
         f"Hi {username},\n\nYour email is verified and your M.O.B TaskManager account is ready.\n\nM.O.B TaskManager",
+    )
+
+
+def send_habit_completion_email(to_email: str, username: str, habit_name: str, duration_days: int) -> bool:
+    safe_name = habit_name.strip() or "your habit"
+    html_username = escape(username)
+    html_name = escape(safe_name)
+    return send_email(
+        to_email,
+        f"You completed your {duration_days}-day habit!",
+        (
+            f"Hi {username},\n\n"
+            f"Congratulations! You completed all {duration_days} daily check-ins for {safe_name}. "
+            "That consistency is worth celebrating.\n\n"
+            "Open M.O.B TaskManager to see your completed habit and choose what you want to build next.\n\n"
+            "M.O.B TaskManager"
+        ),
+        (
+            f"<h2>Congratulations, {html_username}!</h2>"
+            f"<p>You completed all <strong>{duration_days} daily check-ins</strong> for <strong>{html_name}</strong>.</p>"
+            "<p>That consistency is worth celebrating. Open M.O.B TaskManager to see your completed habit and choose what to build next.</p>"
+        ),
+    )
+
+
+def send_challenge_completion_email(to_email: str, username: str, book_title: str, duration_days: int) -> bool:
+    safe_title = book_title.strip() or "your book"
+    return send_email(
+        to_email,
+        f"You completed your reading challenge!",
+        (
+            f"Hi {username},\n\n"
+            f"Congratulations! You completed your {duration_days}-day reading challenge for {safe_title}. "
+            "Your consistency is worth celebrating.\n\n"
+            "Open M.O.B TaskManager to see your completed challenge and choose what to read next.\n\n"
+            "M.O.B TaskManager"
+        ),
+        (
+            f"<h2>Congratulations, {escape(username)}!</h2>"
+            f"<p>You completed your <strong>{duration_days}-day reading challenge</strong> for <strong>{escape(safe_title)}</strong>.</p>"
+            "<p>Open M.O.B TaskManager to celebrate your progress and choose what to read next.</p>"
+        ),
+    )
+
+
+def send_project_completion_email(to_email: str, username: str, project_title: str) -> bool:
+    safe_title = project_title.strip() or "your project"
+    return send_email(
+        to_email,
+        f"You completed {safe_title}!",
+        (
+            f"Hi {username},\n\n"
+            f"Congratulations! You moved {safe_title} to completed. That milestone is worth celebrating.\n\n"
+            "Open M.O.B TaskManager to see your completed project and decide what comes next.\n\n"
+            "M.O.B TaskManager"
+        ),
+        (
+            f"<h2>Congratulations, {escape(username)}!</h2>"
+            f"<p>You completed <strong>{escape(safe_title)}</strong>.</p>"
+            "<p>Open M.O.B TaskManager to celebrate the milestone and decide what comes next.</p>"
+        ),
     )
 
 

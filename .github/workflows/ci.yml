@@ -16,8 +16,6 @@ jobs:
       DATABASE_URL: sqlite:///./ci.db
       ALLOW_SQLITE_FOR_TESTS: "true"
       CORS_ORIGINS: http://localhost:4200,tauri://localhost,http://tauri.localhost
-      GOOGLE_CLIENT_ID: ci-google-client.example
-      APPLE_CLIENT_ID: ci.apple.client
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

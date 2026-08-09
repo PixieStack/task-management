@@ -6,6 +6,11 @@ import { AuthService } from './auth.service';
 export type ProductivityPriority = 'Low' | 'Medium' | 'High';
 export type TimedItemType = 'task' | 'todo';
 
+export function apiTimestampMilliseconds(value: string): number {
+  const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value);
+  return Date.parse(hasTimezone ? value : `${value}Z`);
+}
+
 export interface DailyTodo {
   id: number;
   user_id: number;
@@ -17,6 +22,8 @@ export interface DailyTodo {
   time_spent_seconds: number;
   created_at: string;
   updated_at: string;
+  completed_at?: string;
+  archived_at?: string;
 }
 
 export interface DailyTodoCreate {

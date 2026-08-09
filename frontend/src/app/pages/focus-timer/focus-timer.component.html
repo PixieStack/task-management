@@ -1,0 +1,63 @@
+<div class="timer-page">
+  <header class="timer-heading">
+    <div>
+      <p class="eyebrow">Standalone focus timer</p>
+      <h1>Time anything. Keep nothing.</h1>
+      <p>Use a simple countdown for one-off work, chores, breaks or anything else. This timer is not attached to a task or Todo.</p>
+    </div>
+    <div class="local-status">
+      <strong>{{ completedSessions }}</strong>
+      <span>focus sessions on this device</span>
+    </div>
+  </header>
+
+  <div class="timer-message" *ngIf="message" role="status">{{ message }}</div>
+
+  <main class="timer-layout">
+    <section class="timer-card" aria-labelledby="focus-timer-title">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">Focus timer</p>
+          <h2 id="focus-timer-title">Timer</h2>
+        </div>
+        <span class="privacy-badge"><i class="fas fa-eye-slash" aria-hidden="true"></i> Not tracked</span>
+      </div>
+
+      <div class="mode-tabs" aria-label="Timer modes">
+        <button type="button" [class.active]="mode === 'focus'" (click)="setMode('focus')">Focus 25</button>
+        <button type="button" [class.active]="mode === 'short'" (click)="setMode('short')">Break 5</button>
+        <button type="button" [class.active]="mode === 'long'" (click)="setMode('long')">Long break 15</button>
+      </div>
+
+      <div class="timer-clock" aria-live="polite">{{ display() }}</div>
+      <p class="timer-label">{{ running ? modeLabel + ' in progress' : modeLabel }}</p>
+
+      <div class="timer-actions">
+        <button class="primary" type="button" (click)="toggle()">{{ running ? 'Pause' : 'Start' }}</button>
+        <button class="secondary" type="button" (click)="reset()">Reset</button>
+      </div>
+
+      <div class="custom-timer">
+        <label for="custom-focus-minutes">
+          <span>Custom minutes</span>
+          <input id="custom-focus-minutes" type="number" min="1" max="180" inputmode="numeric" [(ngModel)]="minutes" />
+        </label>
+        <button class="secondary" type="button" (click)="applyCustom()">Set timer</button>
+      </div>
+
+      <p class="persistence-note"><i class="fas fa-rotate" aria-hidden="true"></i> The countdown continues through a page refresh on this device.</p>
+    </section>
+
+    <aside class="info-card">
+      <span class="info-icon" aria-hidden="true"><i class="fas fa-stopwatch"></i></span>
+      <p class="eyebrow">No record created</p>
+      <h2>Just start the clock</h2>
+      <p>This page is for activities you do not want in your productivity history. Nothing here changes your tasks, Todos or tracked totals.</p>
+      <ul>
+        <li><i class="fas fa-check" aria-hidden="true"></i> No task required</li>
+        <li><i class="fas fa-check" aria-hidden="true"></i> No Todo required</li>
+        <li><i class="fas fa-check" aria-hidden="true"></i> No backend time session</li>
+      </ul>
+    </aside>
+  </main>
+</div>

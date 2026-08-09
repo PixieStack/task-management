@@ -20,8 +20,7 @@
       </ul>
 
       <div class="auth-buttons" *ngIf="!user">
-        <button routerLink="/login" class="btn btn-primary">Login</button>
-        <button routerLink="/register" class="btn btn-secondary">Register</button>
+        <button routerLink="/access" class="btn btn-primary">Enter workspace <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
       </div>
 
       <div class="auth-buttons" *ngIf="user">
@@ -53,8 +52,7 @@
     </ul>
 
     <div class="mobile-auth" *ngIf="!user">
-      <button routerLink="/login" class="btn btn-primary" (click)="closeMobileMenu()">Login</button>
-      <button routerLink="/register" class="btn btn-secondary" (click)="closeMobileMenu()">Register</button>
+      <button routerLink="/access" class="btn btn-primary" (click)="closeMobileMenu()">Enter workspace <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
     </div>
 
     <div class="mobile-auth" *ngIf="user">

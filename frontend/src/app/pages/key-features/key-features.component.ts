@@ -51,7 +51,7 @@ export class KeyFeaturesComponent {
       icon: 'fas fa-clock',
       title: 'Pomodoro focus',
       description: 'Run focused study/work intervals with short breaks, long breaks or a custom duration.',
-      detail: 'The Focus workspace combines Pomodoro with your daily list and running task timer.',
+      detail: 'The standalone Focus Timer handles one-off countdowns without recording them, while Todo timing remains attached to the item you chose to track.',
       accent: 'rose',
     },
     {
@@ -70,8 +70,8 @@ export class KeyFeaturesComponent {
     },
     {
       icon: 'fas fa-spa',
-      title: 'Meditation challenges',
-      description: 'Build a consistent meditation practice alongside your work and study goals.',
+      title: 'Project tracking',
+      description: 'Organize projects by category and move them from created through review to complete.',
       detail: 'Daily check-ins, streaks and progress keep the challenge visible without distracting from your main workflow.',
       accent: 'violet',
     },
@@ -85,10 +85,10 @@ export class KeyFeaturesComponent {
   ];
 
   readonly focusFlow = [
-    { step: '01', title: 'Capture', text: 'Add the task, habit or daily action before it becomes mental clutter.' },
-    { step: '02', title: 'Choose', text: 'Use priority and today’s list to decide what deserves attention now.' },
-    { step: '03', title: 'Focus', text: 'Start Pomodoro or a task timer and stay with one meaningful action.' },
-    { step: '04', title: 'Review', text: 'Complete the item and keep your real progress and tracked time visible.' },
+    { title: 'Capture', text: 'Add the task, habit or daily action before it becomes mental clutter.' },
+    { title: 'Choose', text: 'Use priority and today’s list to decide what deserves attention now.' },
+    { title: 'Focus', text: 'Start Pomodoro or a task timer and stay with one meaningful action.' },
+    { title: 'Review', text: 'Complete the item and keep your real progress and tracked time visible.' },
   ];
 
   trackByTitle(_: number, item: { title: string }): string {

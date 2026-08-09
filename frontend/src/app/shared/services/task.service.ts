@@ -17,10 +17,12 @@ export interface Task {
   time_spent_seconds?: number;
   created_at?: string;
   updated_at?: string;
+  completed_at?: string;
+  archived_at?: string;
   owner_id?: number;
 }
 
-export type TaskCreate = Omit<Task, 'id' | 'created_at' | 'updated_at' | 'owner_id'>;
+export type TaskCreate = Omit<Task, 'id' | 'created_at' | 'updated_at' | 'completed_at' | 'archived_at' | 'owner_id' | 'due_date'> & { due_date: string };
 export type TaskUpdate = Partial<TaskCreate>;
 
 @Injectable({ providedIn: 'root' })

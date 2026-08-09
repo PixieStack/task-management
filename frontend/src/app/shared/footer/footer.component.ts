@@ -37,7 +37,7 @@ export class FooterComponent {
 
   navigateToRoute(link: any): void {
     if (link.protected && !this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/access']);
     } else {
       this.router.navigate([link.route]);
     }

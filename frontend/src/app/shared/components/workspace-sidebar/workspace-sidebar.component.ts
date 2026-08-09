@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Subscription, filter } from 'rxjs';
 
@@ -15,6 +15,7 @@ import { AuthService, User } from '../../services/auth.service';
 export class WorkspaceSidebarComponent implements OnInit, OnDestroy {
   user: User | null = null;
   currentUrl = '';
+  showLogoutConfirmation = false;
 
   private userSubscription?: Subscription;
   private routerSubscription?: Subscription;
@@ -48,7 +49,7 @@ export class WorkspaceSidebarComponent implements OnInit, OnDestroy {
     const currentFragment = this.currentUrl.includes('#') ? this.currentUrl.split('#')[1] : '';
     if (currentPath !== path) return false;
     if (fragment) return currentFragment === fragment;
-    return !currentFragment || (path === '/focus' && !['todos', 'pomodoro', 'task-timers'].includes(currentFragment));
+    return !currentFragment || path === '/todo';
   }
 
   get initials(): string {
@@ -56,7 +57,21 @@ export class WorkspaceSidebarComponent implements OnInit, OnDestroy {
     return username.slice(0, 2).toUpperCase();
   }
 
-  logout(): void {
+  requestLogout(): void {
+    this.showLogoutConfirmation = true;
+  }
+
+  cancelLogout(): void {
+    this.showLogoutConfirmation = false;
+  }
+
+  confirmLogout(): void {
+    this.showLogoutConfirmation = false;
     this.authService.logout();
+  }
+
+  @HostListener('document:keydown.escape')
+  dismissLogoutConfirmation(): void {
+    this.cancelLogout();
   }
 }

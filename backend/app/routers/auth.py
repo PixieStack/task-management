@@ -1,5 +1,4 @@
 import hashlib
-import re
 import secrets
 from datetime import datetime, timedelta
 
@@ -9,12 +8,10 @@ from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
 from app.auth import create_access_token, get_current_user, get_db
-from app.auth_schemas import OAuthConfigResponse, OAuthCredential, RegistrationResponse, VerificationRequest
+from app.auth_schemas import RegistrationResponse, VerificationRequest
 from app.config import (
-    APPLE_CLIENT_ID,
     APP_URL,
     EMAIL_VERIFICATION_EXPIRE_MINUTES,
-    GOOGLE_CLIENT_ID,
     PASSWORD_RESET_EXPIRE_MINUTES,
 )
 from app.email_service import (
@@ -25,7 +22,6 @@ from app.email_service import (
     send_verification_email,
     send_welcome_email,
 )
-from app.oauth_service import claim_is_true, verify_provider_id_token
 from app.schemas_extended import UserProfileOut, UserProfileUpdate
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -70,16 +66,6 @@ def _create_verification_token(db: Session, user: models.User) -> str:
         )
     )
     return raw_token
-
-
-def _unique_oauth_username(db: Session, email: str) -> str:
-    base = re.sub(r"[^A-Za-z0-9_.-]", "", email.split("@", 1)[0])[:60] or "user"
-    candidate = base
-    suffix = 1
-    while crud.get_user_by_username(db, candidate):
-        suffix += 1
-        candidate = f"{base[:70]}-{suffix}"
-    return candidate
 
 
 @router.post("/register", response_model=RegistrationResponse, status_code=status.HTTP_201_CREATED)
@@ -173,75 +159,6 @@ def login(data: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=403, detail="Account is deactivated")
     if not user.email_verified:
         raise HTTPException(status_code=403, detail="Verify your email before signing in.")
-    return _token_response(user)
-
-
-@router.get("/oauth/config", response_model=OAuthConfigResponse)
-def oauth_config():
-    return {
-        "google_client_id": GOOGLE_CLIENT_ID or None,
-        "apple_client_id": APPLE_CLIENT_ID or None,
-    }
-
-
-@router.post("/oauth/login", response_model=schemas.Token)
-def oauth_login(data: OAuthCredential, db: Session = Depends(get_db)):
-    try:
-        claims = verify_provider_id_token(data.provider, data.credential)
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-    except ValueError as exc:
-        raise HTTPException(status_code=401, detail=str(exc)) from exc
-
-    subject = str(claims["sub"])
-    identity = db.query(models.OAuthIdentity).filter(
-        models.OAuthIdentity.provider == data.provider,
-        models.OAuthIdentity.provider_subject == subject,
-    ).first()
-    if identity:
-        user = db.query(models.User).filter(models.User.id == identity.user_id).first()
-        if not user or not user.is_active:
-            raise HTTPException(status_code=403, detail="Account is unavailable")
-        return _token_response(user)
-
-    email = str(claims.get("email") or "").strip().lower()
-    if not email:
-        raise HTTPException(
-            status_code=400,
-            detail="The provider did not share an email address. Sign in again and allow email access.",
-        )
-    if not claim_is_true(claims.get("email_verified")):
-        raise HTTPException(status_code=401, detail="The provider has not verified this email address")
-
-    user = crud.get_user_by_email(db, email)
-    if not user:
-        user = models.User(
-            username=_unique_oauth_username(db, email),
-            email=email,
-            hashed_password=crud.get_password_hash(secrets.token_urlsafe(48)),
-            first_name=claims.get("given_name"),
-            last_name=claims.get("family_name"),
-            email_verified=True,
-            email_verified_at=datetime.utcnow(),
-        )
-        db.add(user)
-        db.flush()
-    else:
-        if not user.is_active:
-            raise HTTPException(status_code=403, detail="Account is deactivated")
-        user.email_verified = True
-        user.email_verified_at = user.email_verified_at or datetime.utcnow()
-
-    db.add(
-        models.OAuthIdentity(
-            user_id=user.id,
-            provider=data.provider,
-            provider_subject=subject,
-            provider_email=email,
-        )
-    )
-    db.commit()
-    db.refresh(user)
     return _token_response(user)
 
 
@@ -362,25 +279,34 @@ def delete_account(data: schemas.DeleteAccountRequest, background_tasks: Backgro
     if not crud.verify_password(data.password, current_user.hashed_password):
         raise HTTPException(status_code=400, detail="Password is incorrect")
     email, username, uid = current_user.email, current_user.username, current_user.id
-    db.query(models.TimeSession).filter(models.TimeSession.user_id == uid).delete(synchronize_session=False)
-    db.query(models.DailyTodo).filter(models.DailyTodo.user_id == uid).delete(synchronize_session=False)
-    db.query(models.EmailVerificationToken).filter(models.EmailVerificationToken.user_id == uid).delete(synchronize_session=False)
-    db.query(models.OAuthIdentity).filter(models.OAuthIdentity.user_id == uid).delete(synchronize_session=False)
-    db.query(models.PasswordResetToken).filter(models.PasswordResetToken.user_id == uid).delete(synchronize_session=False)
-    db.query(models.HabitEntry).filter(models.HabitEntry.user_id == uid).delete(synchronize_session=False)
-    db.query(models.Habit).filter(models.Habit.user_id == uid).delete(synchronize_session=False)
-    db.query(models.Challenge).filter(models.Challenge.user_id == uid).delete(synchronize_session=False)
-    db.query(models.AIConversation).filter(models.AIConversation.user_id == uid).delete(synchronize_session=False)
-    db.query(models.UserProfile).filter(models.UserProfile.user_id == uid).delete(synchronize_session=False)
-    db.query(models.Task).filter(models.Task.owner_id == uid).delete(synchronize_session=False)
-    db.delete(current_user)
+    now = datetime.utcnow()
+    current_user.is_active = False
+    current_user.auth_version += 1
+    current_user.deleted_at = now
+    for model, owner_column in (
+        (models.TimeSession, models.TimeSession.user_id),
+        (models.DailyTodo, models.DailyTodo.user_id),
+        (models.HabitEntry, models.HabitEntry.user_id),
+        (models.Habit, models.Habit.user_id),
+        (models.Challenge, models.Challenge.user_id),
+        (models.Project, models.Project.user_id),
+    ):
+        db.query(model).filter(owner_column == uid, model.deleted_at.is_(None)).update(
+            {model.deleted_at: now}, synchronize_session=False
+        )
+    db.query(models.Task).filter(
+        models.Task.owner_id == uid,
+        models.Task.deleted_at.is_(None),
+    ).update({models.Task.deleted_at: now}, synchronize_session=False)
     db.commit()
     background_tasks.add_task(send_account_deleted_email, email, username)
     return {"message": "Account deleted successfully"}
 
 
 @router.post("/logout")
-def logout():
+def logout(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    current_user.auth_version += 1
+    db.commit()
     return {"message": "Successfully logged out"}
 
 

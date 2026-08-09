@@ -70,8 +70,9 @@ create table if not exists public.challenges (
     user_id integer not null references public.users(id) on delete cascade,
     title varchar(200) not null,
     description text,
-    duration integer not null,
-    challenge_type varchar(50) not null,
+      duration integer not null,
+      challenge_type varchar(50) not null,
+      book_type varchar(20) not null,
     start_date timestamp without time zone not null,
     current_streak integer not null default 0,
     best_streak integer not null default 0,
@@ -82,8 +83,9 @@ create table if not exists public.challenges (
     progress double precision not null default 0.0,
     is_active boolean not null default true,
     created_at timestamp without time zone not null default (now() at time zone 'utc'),
-    updated_at timestamp without time zone not null default (now() at time zone 'utc')
-);
+      updated_at timestamp without time zone not null default (now() at time zone 'utc'),
+      constraint ck_challenges_book_type check (book_type in ('fiction', 'non_fiction'))
+  );
 create index if not exists ix_challenges_user_id on public.challenges (user_id);
 
 create table if not exists public.habits (

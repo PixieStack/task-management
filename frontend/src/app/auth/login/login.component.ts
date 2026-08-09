@@ -1,9 +1,8 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { AuthService, OAuthConfig } from '../../shared/services/auth.service';
-import { OAuthProviderService } from '../../shared/services/oauth-provider.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -12,25 +11,20 @@ import { OAuthProviderService } from '../../shared/services/oauth-provider.servi
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
-export class LoginComponent implements OnInit, AfterViewInit {
+export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   isLoading = false;
-  oauthBusy = false;
   resendBusy = false;
   showPassword = false;
   loginError = '';
   statusMessage = '';
   returnUrl = '/dashboard';
-  oauthConfig: OAuthConfig = {};
-  private viewReady = false;
-  private googleRendered = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
     private authService: AuthService,
-    private oauthProvider: OAuthProviderService,
   ) {}
 
   ngOnInit(): void {
@@ -53,16 +47,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
     } else if (this.route.snapshot.queryParams['verification'] === 'invalid') {
       this.loginError = 'That verification link is invalid or expired. Request a new one below.';
     }
-
-    this.authService.getOAuthConfig().subscribe({
-      next: (config) => { this.oauthConfig = config; this.setupGoogle(); },
-      error: () => { this.oauthConfig = {}; },
-    });
-  }
-
-  ngAfterViewInit(): void {
-    this.viewReady = true;
-    this.setupGoogle();
   }
 
   togglePasswordVisibility(): void { this.showPassword = !this.showPassword; }
@@ -91,43 +75,6 @@ export class LoginComponent implements OnInit, AfterViewInit {
     this.authService.resendVerification(emailControl.value).subscribe({
       next: (response) => { this.resendBusy = false; this.statusMessage = response.message; },
       error: (err) => { this.resendBusy = false; this.loginError = err.message; },
-    });
-  }
-
-  async signInWithApple(): Promise<void> {
-    if (!this.oauthConfig.apple_client_id || this.oauthBusy) return;
-    this.oauthBusy = true;
-    this.loginError = '';
-    try {
-      const credential = await this.oauthProvider.signInWithApple(this.oauthConfig.apple_client_id);
-      this.completeOAuth('apple', credential);
-    } catch (error) {
-      this.oauthBusy = false;
-      this.loginError = error instanceof Error ? error.message : 'Apple sign-in failed.';
-    }
-  }
-
-  private setupGoogle(): void {
-    if (!this.viewReady || this.googleRendered || !this.oauthConfig.google_client_id) return;
-    const target = document.getElementById('google-login-button');
-    if (!target) return;
-    this.googleRendered = true;
-    this.oauthProvider.renderGoogleButton(
-      target,
-      this.oauthConfig.google_client_id,
-      (credential) => this.completeOAuth('google', credential),
-    ).catch((error) => {
-      this.googleRendered = false;
-      this.loginError = error instanceof Error ? error.message : 'Google sign-in failed.';
-    });
-  }
-
-  private completeOAuth(provider: 'google' | 'apple', credential: string): void {
-    this.oauthBusy = true;
-    this.loginError = '';
-    this.authService.oauthLogin(provider, credential).subscribe({
-      next: () => { this.oauthBusy = false; this.router.navigateByUrl(this.returnUrl); },
-      error: (err) => { this.oauthBusy = false; this.loginError = err.message || `${provider} sign-in failed.`; },
     });
   }
 

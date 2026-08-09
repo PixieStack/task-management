@@ -3,11 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import {
   ChangeDetectorRef,
   Component,
+  HostListener,
   Inject,
   OnDestroy,
   OnInit,
   PLATFORM_ID,
 } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as QRCodeNamespace from 'qrcode';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -172,6 +174,8 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   isStandalone = false;
   canPromptInstall = false;
   installStatus = '';
+  detectedTarget: keyof DownloadManifest | null = null;
+  showDeviceChooser = false;
 
   private deferredPrompt: BeforeInstallPromptEvent | null = null;
   private readonly beforeInstallHandler = (event: Event): void => {
@@ -184,6 +188,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly http: HttpClient,
     private readonly changeDetectorRef: ChangeDetectorRef,
+    private readonly route: ActivatedRoute,
     @Inject(PLATFORM_ID) private readonly platformId: object,
   ) {}
 
@@ -195,6 +200,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     this.isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
+    this.detectedTarget = this.detectDeviceTarget();
 
     window.addEventListener('beforeinstallprompt', this.beforeInstallHandler);
 
@@ -202,9 +208,11 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       next: (config) => {
         this.manifest = this.mergeManifest(config);
         void this.generateQrCodes();
+        if (this.route.snapshot.queryParamMap.get('auto') === '1') this.downloadForThisDevice();
       },
       error: () => {
         void this.generateQrCodes();
+        if (this.route.snapshot.queryParamMap.get('auto') === '1') this.downloadForThisDevice();
       },
     });
   }
@@ -241,6 +249,71 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     this.installStatus = this.isIos
       ? 'On iPhone/iPad: open this site in Safari, tap Share, then choose Add to Home Screen.'
       : 'Use your browser menu and choose Install app / Add to Home screen when available.';
+  }
+
+  downloadForThisDevice(): void {
+    const targetId = this.detectedTarget;
+    if (targetId === 'web') {
+      void this.installWebApp();
+      return;
+    }
+
+    if (targetId) {
+      const target = this.manifest[targetId];
+      if (target.available && target.url) {
+        window.location.assign(target.url);
+        return;
+      }
+    }
+
+    this.showDeviceChooser = true;
+    this.installStatus = targetId
+      ? `${this.cardTitle(targetId)} was detected, but its native package is not published yet. Choose another option.`
+      : 'We could not identify your device confidently. Choose the platform you want.';
+  }
+
+  chooseDownload(card: DownloadCard): void {
+    if (card.id === 'web') {
+      this.showDeviceChooser = false;
+      void this.installWebApp();
+      return;
+    }
+    const target = this.target(card);
+    if (!target.available || !target.url) return;
+    this.showDeviceChooser = false;
+    window.location.assign(target.url);
+  }
+
+  closeDeviceChooser(): void {
+    this.showDeviceChooser = false;
+  }
+
+  @HostListener('document:keydown.escape')
+  closeDeviceChooserOnEscape(): void {
+    this.closeDeviceChooser();
+  }
+
+  isDetected(card: DownloadCard): boolean {
+    return card.id === this.detectedTarget;
+  }
+
+  private detectDeviceTarget(): keyof DownloadManifest | null {
+    const userAgent = navigator.userAgent.toLowerCase();
+    const platform = (navigator.platform || '').toLowerCase();
+    const isTouchMac = platform.includes('mac') && navigator.maxTouchPoints > 1;
+
+    if (userAgent.includes('android')) return 'android';
+    if (/iphone|ipad|ipod/.test(userAgent) || isTouchMac) return 'ios';
+    if (platform.includes('mac') || userAgent.includes('macintosh')) return 'macos';
+    if (platform.includes('win') || userAgent.includes('windows')) {
+      return /arm64|aarch64/.test(userAgent) ? 'windowsArm64' : 'windowsX64';
+    }
+    if (/linux|cros/.test(userAgent)) return 'web';
+    return null;
+  }
+
+  private cardTitle(id: keyof DownloadManifest): string {
+    return this.cards.find((card) => card.id === id)?.title || 'Your device';
   }
 
   private mergeManifest(config: Partial<DownloadManifest>): DownloadManifest {
