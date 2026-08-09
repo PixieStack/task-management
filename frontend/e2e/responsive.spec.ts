@@ -153,7 +153,16 @@ test.describe('responsive layout smoke suite', () => {
   });
 
   test('Downloads page generates a QR code when a real public release URL is configured', async ({ page }) => {
+    let downloadsManifestRouteHits = 0;
+    const browserErrors: string[] = [];
+
+    page.on('console', (message) => {
+      if (message.type() === 'error') browserErrors.push(`console: ${message.text()}`);
+    });
+    page.on('pageerror', (error) => browserErrors.push(`pageerror: ${error.message}`));
+
     await page.route('**/downloads.json', async (route) => {
+      downloadsManifestRouteHits += 1;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -172,8 +181,45 @@ test.describe('responsive layout smoke suite', () => {
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
     const qrImage = page.getByRole('img', { name: 'QR code for Web / PWA' });
-    await expect(qrImage).toBeVisible();
-    await expect(qrImage).toHaveAttribute('src', /^data:image\/png;base64,/);
+    try {
+      await expect.poll(() => downloadsManifestRouteHits).toBeGreaterThan(0);
+      await expect(qrImage).toBeVisible();
+      await expect(qrImage).toHaveAttribute('src', /^data:image\/png;base64,/);
+    } catch (error) {
+      const diagnostics = await page.locator('app-downloads').evaluate((element) => {
+        const angularDebug = (window as unknown as {
+          ng?: { getComponent?: (target: Element) => unknown };
+        }).ng;
+        const component = angularDebug?.getComponent?.(element) as
+          | {
+              manifest?: unknown;
+              qrCodes?: unknown;
+              qrErrors?: unknown;
+              isBrowser?: unknown;
+            }
+          | undefined;
+
+        return {
+          componentState: component
+            ? {
+                manifest: component.manifest,
+                qrCodes: component.qrCodes,
+                qrErrors: component.qrErrors,
+                isBrowser: component.isBrowser,
+              }
+            : null,
+          webCardText: document.querySelector('[data-platform="web"]')?.textContent?.trim() ?? null,
+          qrImageCount: document.querySelectorAll('.qr-panel img').length,
+        };
+      });
+
+      console.log(
+        'QR_SMOKE_DIAGNOSTICS',
+        JSON.stringify({ downloadsManifestRouteHits, browserErrors, diagnostics }),
+      );
+      throw error;
+    }
+
     await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
     await expectNoHorizontalOverflow(page, '390px published web QR downloads page');
   });
