@@ -173,7 +173,7 @@ test.describe('responsive layout smoke suite', () => {
 
     const qrImage = page.getByRole('img', { name: 'QR code for Web / PWA' });
     await expect(qrImage).toBeVisible();
-    await expect(qrImage).toHaveAttribute('src', /^data:image\/svg\+xml/);
+    await expect(qrImage).toHaveAttribute('src', /^data:image\/png;base64,/);
     await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
     await expectNoHorizontalOverflow(page, '390px published web QR downloads page');
   });
