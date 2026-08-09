@@ -1,102 +1,66 @@
-<div class="auth-container">
+<main class="auth-container">
   <div class="auth-wrapper">
-    <!-- Background decorative elements -->
-    <div class="auth-background">
+    <div class="auth-background" aria-hidden="true">
       <div class="bg-shape bg-shape-1"></div>
       <div class="bg-shape bg-shape-2"></div>
       <div class="bg-shape bg-shape-3"></div>
     </div>
 
-    <div class="auth-card">
+    <section class="auth-card" aria-labelledby="login-title">
       <div class="auth-brand">
-        <div class="brand-icon">
-          <i class="fas fa-tasks"></i>
+        <div class="brand-icon">M</div>
+        <div class="brand-copy">
+          <strong>M.O.B</strong>
+          <span>TaskManager</span>
         </div>
-        <h1>TaskManager</h1>
       </div>
 
       <div class="auth-header">
-        <h2>Welcome Back</h2>
-        <p>Sign in to continue to your dashboard</p>
+        <span class="auth-kicker">Welcome back</span>
+        <h1 id="login-title">Continue your momentum.</h1>
+        <p>Sign in to your tasks, Daily Todos, focus timers and AI workspace.</p>
       </div>
 
-      <div *ngIf="loginError" class="alert-message error-alert">
+      <div *ngIf="loginError" class="alert-message error-alert" role="alert">
         <i class="fas fa-exclamation-circle"></i>
         <span>{{ loginError }}</span>
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
         <div class="form-field">
-          <div class="field-icon">
-            <i class="fas fa-envelope"></i>
-          </div>
+          <div class="field-icon"><i class="fas fa-envelope"></i></div>
           <input
             id="email"
             type="email"
             formControlName="email"
             placeholder=" "
-            [class.error]="
-              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
-            "
+            autocomplete="email"
+            [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
           />
-          <label for="email">Email Address</label>
-          <div class="field-underline"></div>
-          <span
-            class="error-text"
-            *ngIf="
-              loginForm.get('email')?.invalid && loginForm.get('email')?.touched
-            "
-          >
-            <span *ngIf="loginForm.get('email')?.errors?.['required']">
-              Email is required
-            </span>
-            <span *ngIf="loginForm.get('email')?.errors?.['email']">
-              Please enter a valid email
-            </span>
+          <label for="email">Email address</label>
+          <span class="error-text" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+            <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email</span>
           </span>
         </div>
 
         <div class="form-field">
-          <div class="field-icon">
-            <i class="fas fa-lock"></i>
-          </div>
+          <div class="field-icon"><i class="fas fa-lock"></i></div>
           <input
             id="password"
             [type]="showPassword ? 'text' : 'password'"
             formControlName="password"
             placeholder=" "
-            [class.error]="
-              loginForm.get('password')?.invalid &&
-              loginForm.get('password')?.touched
-            "
+            autocomplete="current-password"
+            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
           />
           <label for="password">Password</label>
-          <div class="field-underline"></div>
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="togglePasswordVisibility()"
-            tabindex="-1"
-          >
-            <i
-              class="fas"
-              [class.fa-eye]="!showPassword"
-              [class.fa-eye-slash]="showPassword"
-            ></i>
+          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" aria-label="Toggle password visibility">
+            <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
           </button>
-          <span
-            class="error-text"
-            *ngIf="
-              loginForm.get('password')?.invalid &&
-              loginForm.get('password')?.touched
-            "
-          >
-            <span *ngIf="loginForm.get('password')?.errors?.['required']">
-              Password is required
-            </span>
-            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">
-              Password must be at least 8 characters
-            </span>
+          <span class="error-text" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
           </span>
         </div>
 
@@ -106,33 +70,21 @@
             <span class="checkbox-custom"></span>
             <span class="checkbox-label">Remember me</span>
           </label>
-          <a routerLink="/forgot-password" class="forgot-link">
-            Forgot Password?
-          </a>
+          <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
         </div>
 
-        <button 
-          type="submit" 
-          class="submit-button" 
-          [disabled]="isLoading || loginForm.invalid"
-          [class.loading]="isLoading"
-        >
-          <span class="button-content" *ngIf="!isLoading">
-            <i class="fas fa-sign-in-alt"></i>
-            Sign In
-          </span>
-          <span class="button-loader" *ngIf="isLoading">
-            <span class="loader-dot"></span>
-            <span class="loader-dot"></span>
-            <span class="loader-dot"></span>
+        <button type="submit" class="submit-button" [disabled]="isLoading || loginForm.invalid" [class.loading]="isLoading">
+          <span class="button-content" *ngIf="!isLoading"><i class="fas fa-arrow-right-to-bracket"></i> Sign in</span>
+          <span class="button-loader" *ngIf="isLoading" aria-label="Signing in">
+            <span class="loader-dot"></span><span class="loader-dot"></span><span class="loader-dot"></span>
           </span>
         </button>
 
         <div class="auth-footer">
-          <span>Don't have an account?</span>
-          <a routerLink="/register" class="register-link">Create one</a>
+          <span>New to M.O.B?</span>
+          <a routerLink="/register" class="register-link">Create an account</a>
         </div>
       </form>
-    </div>
+    </section>
   </div>
-</div>
+</main>
