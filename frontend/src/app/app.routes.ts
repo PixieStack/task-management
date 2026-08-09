@@ -4,6 +4,7 @@ import { KeyFeaturesComponent } from './pages/key-features/key-features.componen
 import { AboutUsComponent } from './pages/about-us/about-us.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { AuthGuard } from './auth.guard';
+import { AdminGuard } from './admin.guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -26,6 +27,18 @@ export const routes: Routes = [
   },
   { path: 'profile', loadComponent: () => import('./pages/profile/profile.component').then((m) => m.ProfileComponent), canActivate: [AuthGuard] },
   { path: 'account-security', redirectTo: 'profile', pathMatch: 'full' },
+
+  // Private operations portal. Intentionally not linked from public or user navigation.
+  {
+    path: 'admin/login',
+    loadComponent: () => import('./admin/admin-login/admin-login.component').then((m) => m.AdminLoginComponent),
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./admin/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+    canActivate: [AdminGuard],
+  },
+
   { path: 'faq', loadComponent: () => import('./pages/faq/faq.component').then((m) => m.FaqComponent) },
   { path: 'privacy', loadComponent: () => import('./pages/privacy-policy/privacy-policy.component').then((m) => m.PrivacyPolicyComponent) },
   { path: 'terms', loadComponent: () => import('./pages/terms-of-service/terms-of-service.component').then((m) => m.TermsOfServiceComponent) },
