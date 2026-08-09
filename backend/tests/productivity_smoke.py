@@ -132,7 +132,8 @@ tracked_task = expect(client.get(f"/api/tasks/{task['id']}", headers=headers), 2
 assert tracked_task["time_spent_seconds"] >= 1
 assert tracked_task["status"] == "In Progress"
 
-async def fake_ask(_messages):
+# The chatbot can create real task and todo records.
+async def fake_create(_messages):
     return json.dumps(
         {
             "reply": "I can add that for you.",
@@ -156,7 +157,7 @@ async def fake_ask(_messages):
     )
 
 
-ai_router._ask = fake_ask
+ai_router._ask = fake_create
 conversation = expect(
     client.post(
         "/api/ai/ask",
@@ -176,7 +177,119 @@ all_todos = expect(
 ).json()
 assert any(item["title"] == "AI daily todo" for item in all_todos)
 
+# The chatbot can modify productivity data, create routines and start a timer.
+async def fake_manage(_messages):
+    return json.dumps(
+        {
+            "reply": "I updated your plan and started tracking it.",
+            "actions": [
+                {
+                    "type": "update_task",
+                    "target": "AI-created revision task",
+                    "priority": "Low",
+                    "time_estimate": 30,
+                },
+                {"type": "complete_todo", "target": "AI daily todo"},
+                {
+                    "type": "create_habit",
+                    "name": "Read 20 minutes",
+                    "description": "Daily reading habit",
+                    "target_count": 1,
+                },
+                {
+                    "type": "create_challenge",
+                    "challenge_type": "reading",
+                    "title": "AI reading challenge",
+                    "duration": 7,
+                    "daily_goal": "20 pages",
+                },
+                {
+                    "type": "start_timer",
+                    "item_type": "task",
+                    "target": "AI-created revision task",
+                },
+            ],
+        }
+    )
+
+
+ai_router._ask = fake_manage
+managed = expect(
+    client.post(
+        "/api/ai/ask",
+        headers=headers,
+        json={"question": "Update my revision task, finish the todo, add a reading routine and start timing the task."},
+    ),
+    200,
+).json()
+assert [item["type"] for item in managed["context"]["executed_actions"]] == [
+    "update_task",
+    "complete_todo",
+    "create_habit",
+    "create_challenge",
+    "start_timer",
+]
+
+updated_task = next(
+    item for item in expect(client.get("/api/tasks", headers=headers), 200).json()
+    if item["title"] == "AI-created revision task"
+)
+assert updated_task["priority"] == "Low"
+assert updated_task["time_estimate"] == 30
+updated_todo = next(
+    item for item in expect(
+        client.get("/api/productivity/todos?todo_date=2026-08-09", headers=headers),
+        200,
+    ).json()
+    if item["title"] == "AI daily todo"
+)
+assert updated_todo["completed"] is True
+
+active_ai_timer = expect(client.get("/api/productivity/timer/active", headers=headers), 200).json()
+assert active_ai_timer["item_type"] == "task"
+assert active_ai_timer["task_id"] == updated_task["id"]
+
+# The chatbot can stop tracking and check in user-owned routines/challenges.
+async def fake_check_in(_messages):
+    return json.dumps(
+        {
+            "reply": "Timer saved and your progress is checked in.",
+            "actions": [
+                {"type": "stop_timer"},
+                {"type": "check_in_habit", "target": "Read 20 minutes"},
+                {"type": "check_in_challenge", "target": "AI reading challenge"},
+            ],
+        }
+    )
+
+
+ai_router._ask = fake_check_in
+checked = expect(
+    client.post(
+        "/api/ai/ask",
+        headers=headers,
+        json={"question": "Stop my timer and check in my reading habit and challenge."},
+    ),
+    200,
+).json()
+assert [item["type"] for item in checked["context"]["executed_actions"]] == [
+    "stop_timer",
+    "check_in_habit",
+    "check_in_challenge",
+]
+assert expect(client.get("/api/productivity/timer/active", headers=headers), 200).json() is None
+
+habits = expect(client.get("/api/habits", headers=headers), 200).json()
+reading_habit = next(item for item in habits if item["name"] == "Read 20 minutes")
+habit_entries = expect(client.get("/api/habits/entries", headers=headers), 200).json()
+assert any(item["habit_id"] == reading_habit["id"] and item["completed"] for item in habit_entries)
+
+challenges = expect(client.get("/api/challenges", headers=headers), 200).json()
+reading_challenge = next(item for item in challenges if item["title"] == "AI reading challenge")
+assert reading_challenge["current_streak"] == 1
+assert reading_challenge["progress"] > 0
+
 sessions = expect(client.get("/api/productivity/timer/sessions", headers=headers), 200).json()
-assert len(sessions) >= 2
+assert len(sessions) >= 3
 
 print("Productivity and AI action smoke test passed")
