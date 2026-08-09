@@ -1,11 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { filter, Subscription } from 'rxjs';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { AuthenticatedNavbarComponent } from './pages/authenticated-navbar/authenticated-navbar.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { AuthService } from './shared/services/auth.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -18,20 +18,15 @@ import { Subscription } from 'rxjs';
     FooterComponent,
   ],
   template: `
-    <div class="app-wrapper">
-      <!-- Regular navbar shown only when user is not logged in -->
-      <app-navbar *ngIf="!isLoggedIn"></app-navbar>
+    <div class="app-wrapper" [class.admin-route]="isAdminRoute">
+      <app-navbar *ngIf="!isAdminRoute && !isLoggedIn"></app-navbar>
+      <app-authenticated-navbar *ngIf="!isAdminRoute && isLoggedIn"></app-authenticated-navbar>
 
-      <!-- Authenticated navbar shown only when user is logged in -->
-      <app-authenticated-navbar *ngIf="isLoggedIn"></app-authenticated-navbar>
-
-      <!-- Main content area -->
       <main>
         <router-outlet></router-outlet>
       </main>
 
-  <!-- Footer -->
-  <app-footer *ngIf="!isLoggedIn"></app-footer>
+      <app-footer *ngIf="!isAdminRoute && !isLoggedIn"></app-footer>
     </div>
   `,
   styles: [
@@ -44,30 +39,45 @@ import { Subscription } from 'rxjs';
 
       main {
         flex: 1;
-        min-height: calc(
-          100vh - 60px - 200px
-        ); /* Adjust based on navbar and footer height */
+        min-height: calc(100vh - 60px - 200px);
+      }
+
+      .admin-route main {
+        min-height: 100vh;
       }
     `,
   ],
 })
 export class AppComponent implements OnInit, OnDestroy {
   isLoggedIn = false;
+  isAdminRoute = false;
   private authSubscription?: Subscription;
+  private routerSubscription?: Subscription;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+  ) {}
 
   ngOnInit() {
     this.isLoggedIn = this.authService.isLoggedIn();
+    this.syncRoute(this.router.url);
 
     this.authSubscription = this.authService.user$.subscribe((user) => {
       this.isLoggedIn = !!user;
     });
+
+    this.routerSubscription = this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => this.syncRoute(event.urlAfterRedirects));
   }
 
   ngOnDestroy() {
-    if (this.authSubscription) {
-      this.authSubscription.unsubscribe();
-    }
+    this.authSubscription?.unsubscribe();
+    this.routerSubscription?.unsubscribe();
+  }
+
+  private syncRoute(url: string): void {
+    this.isAdminRoute = url === '/admin' || url.startsWith('/admin/');
   }
 }
