@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 
 export interface User { id: number; username: string; email: string; first_name?: string; last_name?: string; created_at?: string; }
 export interface AuthResponse { access_token: string; token_type: string; expires_in: number; user: User; }
+export interface MessageResponse { message: string; }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -12,6 +13,8 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) { this.checkAuthStatus(); }
   register(data: { username: string; email: string; password: string }): Observable<User> { return this.http.post<User>(`${this.apiUrl}/register`, data).pipe(catchError((e) => this.handleError(e))); }
   login(email: string, password: string): Observable<AuthResponse> { return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }).pipe(tap((r) => this.setSession(r)), catchError((e) => this.handleError(e))); }
+  forgotPassword(email: string): Observable<MessageResponse> { return this.http.post<MessageResponse>(`${this.apiUrl}/forgot-password`, { email }).pipe(catchError((e) => this.handleError(e))); }
+  resetPassword(token: string, newPassword: string): Observable<MessageResponse> { return this.http.post<MessageResponse>(`${this.apiUrl}/reset-password`, { token, new_password: newPassword }).pipe(catchError((e) => this.handleError(e))); }
   refresh(): Observable<AuthResponse> { return this.http.post<AuthResponse>(`${this.apiUrl}/refresh`, {}, { headers: this.headers() }).pipe(tap((r) => this.setSession(r)), catchError((e) => this.handleError(e))); }
   getMe(): Observable<User> { return this.http.get<User>(`${this.apiUrl}/me`, { headers: this.headers() }).pipe(tap((u) => this.updateSessionUser(u)), catchError((e) => this.handleError(e))); }
   updateUser(data: { username?: string; first_name?: string; last_name?: string }): Observable<User> { return this.http.put<User>(`${this.apiUrl}/me`, data, { headers: this.headers() }).pipe(tap((u) => this.updateSessionUser(u)), catchError((e) => this.handleError(e))); }

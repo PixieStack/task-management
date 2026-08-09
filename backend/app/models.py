@@ -16,6 +16,7 @@ class User(Base):
     first_name = Column(String(100))
     last_name = Column(String(100))
     is_active = Column(Boolean, default=True)
+    auth_version = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     tasks = relationship("Task", back_populates="owner", cascade="all, delete-orphan")
@@ -147,5 +148,18 @@ class AIConversation(Base):
     context = Column(JSON)
     feedback = Column(Integer)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User")
+
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    token_hash = Column(String(64), unique=True, index=True, nullable=False)
+    expires_at = Column(DateTime, nullable=False)
+    used_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     user = relationship("User")

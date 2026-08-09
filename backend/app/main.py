@@ -1,17 +1,32 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from . import bcrypt_fix, database, models
+from . import bcrypt_fix
 from .config import CORS_ORIGINS
 from .routers import ai_assistant, analytics, auth, challenges, contact, habits, tasks
 
-models.Base.metadata.create_all(bind=database.engine)
 app = FastAPI(title="Task Manager API", version="2.0.0")
-app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-app.include_router(auth.router); app.include_router(tasks.router); app.include_router(analytics.router); app.include_router(contact.router); app.include_router(challenges.router); app.include_router(habits.router); app.include_router(ai_assistant.router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(auth.router)
+app.include_router(tasks.router)
+app.include_router(analytics.router)
+app.include_router(contact.router)
+app.include_router(challenges.router)
+app.include_router(habits.router)
+app.include_router(ai_assistant.router)
+
 
 @app.get("/", tags=["root"])
-def root(): return {"message": "Task Manager API running"}
+def root():
+    return {"message": "Task Manager API running"}
+
 
 @app.get("/api/health", tags=["health"])
-def health_check(): return {"status": "healthy"}
+def health_check():
+    return {"status": "healthy"}
