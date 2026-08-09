@@ -9,6 +9,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 PASSWORD_RESET_EXPIRE_MINUTES = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "30"))
+EMAIL_VERIFICATION_EXPIRE_MINUTES = int(os.getenv("EMAIL_VERIFICATION_EXPIRE_MINUTES", "60"))
 
 # Production/runtime storage is the Task Manager Supabase Postgres project.
 # DATABASE_URL remains an explicit override for CI/tests or alternate deployments;
@@ -34,6 +35,7 @@ CORS_ORIGINS = [
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 
+# Brevo is the only transactional email provider used by this app.
 BREVO_SMTP_SERVER = os.getenv("BREVO_SMTP_SERVER", "smtp-relay.brevo.com")
 BREVO_SMTP_PORT = int(os.getenv("BREVO_SMTP_PORT", "587"))
 BREVO_SMTP_LOGIN = os.getenv("BREVO_SMTP_LOGIN", "")
@@ -41,4 +43,9 @@ BREVO_SMTP_KEY = os.getenv("BREVO_SMTP_KEY", "")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "")
 SENDER_NAME = os.getenv("SENDER_NAME", "Task Manager")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", SENDER_EMAIL)
-APP_URL = os.getenv("APP_URL", "http://localhost:4200")
+APP_URL = os.getenv("APP_URL", "http://localhost:4200").rstrip("/")
+API_PUBLIC_URL = os.getenv("API_PUBLIC_URL", "http://localhost:8000").rstrip("/")
+
+# OAuth provider client IDs. Supabase Auth is not used for provider sign-in.
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
+APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID", "").strip()
