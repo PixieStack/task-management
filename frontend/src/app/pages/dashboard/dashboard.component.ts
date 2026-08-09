@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { AIConversation, AIService } from '../../shared/services/ai.service';
 import {
@@ -34,7 +36,7 @@ type TaskFilter = 'all' | 'active' | 'completed' | 'overdue';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   activeSection: DashboardSection = 'overview';
   taskFilter: TaskFilter = 'all';
 
@@ -85,7 +87,12 @@ export class DashboardComponent implements OnInit {
     'What should I focus on today?',
   ];
 
+  private fragmentSubscription?: Subscription;
+
   constructor(
+    private changeDetector: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private router: Router,
     private taskService: TaskService,
     private habitService: HabitService,
     private challengeService: ChallengeService,
@@ -94,6 +101,9 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.fragmentSubscription = this.route.fragment.subscribe((fragment) => {
+      this.syncSectionFromFragment(fragment);
+    });
     this.loadTasks();
     this.loadHabits();
     this.loadChallenges();
@@ -101,8 +111,17 @@ export class DashboardComponent implements OnInit {
     this.loadActiveTimer();
   }
 
+  ngOnDestroy(): void {
+    this.fragmentSubscription?.unsubscribe();
+  }
+
   setSection(section: DashboardSection): void {
     this.activeSection = section;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      fragment: section === 'overview' ? undefined : section,
+      replaceUrl: true,
+    });
   }
 
   get totalTasks(): number {
@@ -550,6 +569,13 @@ export class DashboardComponent implements OnInit {
     return item.id;
   }
 
+  private syncSectionFromFragment(fragment: string | null): void {
+    const section = fragment as DashboardSection;
+    const valid: DashboardSection[] = ['overview', 'tasks', 'habits', 'challenges', 'ai'];
+    this.activeSection = valid.includes(section) ? section : 'overview';
+    this.changeDetector.markForCheck();
+  }
+
   private replaceTask(updated: Task): void {
     this.tasks = this.tasks.map((task) =>
       task.id === updated.id ? updated : task,
@@ -558,11 +584,19 @@ export class DashboardComponent implements OnInit {
 
   private showError(message: string): void {
     this.errorMessage = message || 'Something went wrong.';
-    window.setTimeout(() => (this.errorMessage = ''), 5000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.errorMessage = '';
+      this.changeDetector.markForCheck();
+    }, 5000);
   }
 
   private showSuccess(message: string): void {
     this.successMessage = message;
-    window.setTimeout(() => (this.successMessage = ''), 3000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.successMessage = '';
+      this.changeDetector.markForCheck();
+    }, 3000);
   }
 }

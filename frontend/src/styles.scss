@@ -167,6 +167,11 @@ form {
   background-clip: text;
 }
 
+/* The restored authenticated sidebar is the primary workspace navigation. */
+.workspace-main .section-tabs {
+  display: none !important;
+}
+
 /* Shared authentication provider/verification controls. */
 .auth-card .oauth-area {
   display: grid;

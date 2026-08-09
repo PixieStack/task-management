@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { catchError, finalize, forkJoin, of, timeout } from 'rxjs';
 
 import { Task, TaskService } from '../../shared/services/task.service';
 import {
@@ -44,20 +44,24 @@ export class FocusComponent implements OnInit, OnDestroy {
   completedFocusSessions = 0;
 
   private clockInterval?: number;
+  private readonly hashHandler = () => this.scrollToRequestedSection();
 
   constructor(
+    private changeDetector: ChangeDetectorRef,
     private taskService: TaskService,
     private productivityService: ProductivityService,
   ) {}
 
   ngOnInit(): void {
     this.restorePomodoro();
+    window.addEventListener('hashchange', this.hashHandler);
     this.loadWorkspace();
     this.clockInterval = window.setInterval(() => this.tick(), 1000);
   }
 
   ngOnDestroy(): void {
     if (this.clockInterval) window.clearInterval(this.clockInterval);
+    window.removeEventListener('hashchange', this.hashHandler);
   }
 
   get todayLabel(): string {
@@ -97,22 +101,49 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   loadWorkspace(): void {
     this.loading = true;
+    const failedParts: string[] = [];
+
     forkJoin({
-      tasks: this.taskService.getTasks(),
-      todos: this.productivityService.getTodos(this.localDateString()),
-      timer: this.productivityService.getActiveTimer(),
-    }).subscribe({
-      next: ({ tasks, todos, timer }) => {
-        this.tasks = tasks;
-        this.todos = todos;
-        this.activeTimer = timer;
+      tasks: this.taskService.getTasks().pipe(
+        timeout(12000),
+        catchError(() => {
+          failedParts.push('tasks');
+          return of([] as Task[]);
+        }),
+      ),
+      todos: this.productivityService.getTodos(this.localDateString()).pipe(
+        timeout(12000),
+        catchError(() => {
+          failedParts.push('todos');
+          return of([] as DailyTodo[]);
+        }),
+      ),
+      timer: this.productivityService.getActiveTimer().pipe(
+        timeout(12000),
+        catchError(() => {
+          failedParts.push('active timer');
+          return of(null as TimeSession | null);
+        }),
+      ),
+    })
+      .pipe(finalize(() => {
         this.loading = false;
-      },
-      error: (error) => {
-        this.loading = false;
-        this.showError(error.message);
-      },
-    });
+        this.changeDetector.markForCheck();
+      }))
+      .subscribe({
+        next: ({ tasks, todos, timer }) => {
+          this.tasks = tasks;
+          this.todos = todos;
+          this.activeTimer = timer;
+          if (failedParts.length) {
+            this.showError(`Focus opened, but ${failedParts.join(', ')} could not be loaded. Check that the backend is running and try again.`);
+          }
+          window.setTimeout(() => this.scrollToRequestedSection(), 0);
+        },
+        error: (error) => {
+          this.showError(error?.message || 'Focus could not load. Check that the backend is running and try again.');
+        },
+      });
   }
 
   createTodo(): void {
@@ -280,6 +311,14 @@ export class FocusComponent implements OnInit, OnDestroy {
     });
   }
 
+  private scrollToRequestedSection(): void {
+    const target = window.location.hash.replace('#', '');
+    if (!['todos', 'pomodoro', 'task-timers'].includes(target)) return;
+    window.setTimeout(() => {
+      document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }
+
   private localDateString(): string {
     const date = new Date();
     const year = date.getFullYear();
@@ -324,11 +363,19 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   private showError(message: string): void {
     this.errorMessage = message || 'Something went wrong.';
-    window.setTimeout(() => (this.errorMessage = ''), 5000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.errorMessage = '';
+      this.changeDetector.markForCheck();
+    }, 5000);
   }
 
   private showSuccess(message: string): void {
     this.successMessage = message;
-    window.setTimeout(() => (this.successMessage = ''), 3000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.successMessage = '';
+      this.changeDetector.markForCheck();
+    }, 3000);
   }
 }

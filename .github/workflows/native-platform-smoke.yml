@@ -178,7 +178,7 @@ jobs:
           disable-linux-hw-accel: auto
           # The emulator action executes each input line independently. Keep
           # loops in a real script so they run in one shell process.
-          script: bash scripts/android-emulator-smoke.sh
+          script: bash frontend/scripts/android-emulator-smoke.sh
 
   ios-simulator-install:
     name: iOS Simulator build + install + launch
