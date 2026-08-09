@@ -1,6 +1,13 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
+} from '@angular/core';
 import * as QRCodeNamespace from 'qrcode';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -171,10 +178,12 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this.deferredPrompt = event as BeforeInstallPromptEvent;
     this.canPromptInstall = true;
+    this.changeDetectorRef.markForCheck();
   };
 
   constructor(
     private readonly http: HttpClient,
+    private readonly changeDetectorRef: ChangeDetectorRef,
     @Inject(PLATFORM_ID) private readonly platformId: object,
   ) {}
 
@@ -225,6 +234,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
           : 'Install cancelled. You can install it later from this page.';
       this.deferredPrompt = null;
       this.canPromptInstall = false;
+      this.changeDetectorRef.markForCheck();
       return;
     }
 
@@ -260,6 +270,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
           this.qrErrors[card.id] = true;
         }
       }
+      this.changeDetectorRef.markForCheck();
       console.error('Unable to initialize QR code renderer', error);
       return;
     }
@@ -282,5 +293,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
         }
       }),
     );
+
+    this.changeDetectorRef.markForCheck();
   }
 }
