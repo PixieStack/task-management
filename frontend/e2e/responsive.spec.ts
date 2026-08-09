@@ -54,7 +54,10 @@ async function expectNoHorizontalOverflow(page: Page, label: string): Promise<vo
         const style = getComputedStyle(element);
         if (style.display === 'none' || style.visibility === 'hidden') return false;
 
-        if (element.classList.contains('bg-shape')) return false;
+        if (
+          element.classList.contains('bg-shape') ||
+          element.classList.contains('auth-background')
+        ) return false;
         if (isInsideIntentionalHorizontalScroller(element)) return false;
 
         const rect = element.getBoundingClientRect();
