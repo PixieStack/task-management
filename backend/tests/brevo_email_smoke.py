@@ -1,3 +1,5 @@
+from email.utils import parseaddr
+
 from app import email_service
 
 
@@ -58,7 +60,9 @@ assert smtp.ehlo_calls == 2
 assert smtp.login_args == ("ci-smtp-login", "ci-smtp-key")
 assert smtp.message is not None
 assert smtp.message["To"] == "new-user@example.com"
-assert smtp.message["From"] == "M.O.B TaskManager <verified-sender@example.com>"
+sender_name, sender_address = parseaddr(str(smtp.message["From"]))
+assert sender_name == "M.O.B TaskManager"
+assert sender_address == "verified-sender@example.com"
 assert smtp.message["Subject"] == "Verify your M.O.B TaskManager email"
 body = smtp.message.get_body(preferencelist=("plain",)).get_content()
 assert "https://api.example.test/auth/verify-email?token=verification-token-value" in body
