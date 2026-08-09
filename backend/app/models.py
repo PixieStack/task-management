@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -35,11 +35,47 @@ class Task(Base):
     tags = Column(String, default="[]")
     time_estimate = Column(Integer, default=0)
     time_spent = Column(Integer, default=0)
+    time_spent_seconds = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     owner = relationship("User", back_populates="tasks")
+
+
+class DailyTodo(Base):
+    __tablename__ = "daily_todos"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    title = Column(String(250), nullable=False)
+    notes = Column(Text)
+    todo_date = Column(Date, default=date.today, nullable=False, index=True)
+    completed = Column(Boolean, default=False, nullable=False)
+    priority = Column(String(20), default="Medium", nullable=False)
+    time_spent_seconds = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    user = relationship("User")
+
+
+class TimeSession(Base):
+    __tablename__ = "time_sessions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    item_type = Column(String(20), nullable=False)
+    task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"))
+    todo_id = Column(Integer, ForeignKey("daily_todos.id", ondelete="CASCADE"))
+    started_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    ended_at = Column(DateTime)
+    elapsed_seconds = Column(Integer, default=0, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user = relationship("User")
+    task = relationship("Task")
+    todo = relationship("DailyTodo")
 
 
 class ContactMessage(Base):

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AIConversation, AIService } from '../../shared/services/ai.service';
@@ -14,6 +14,10 @@ import {
   HabitEntry,
   HabitService,
 } from '../../shared/services/habit.service';
+import {
+  ProductivityService,
+  TimeSession,
+} from '../../shared/services/productivity.service';
 import {
   Task,
   TaskCreate,
@@ -30,7 +34,7 @@ type TaskFilter = 'all' | 'active' | 'completed' | 'overdue';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   activeSection: DashboardSection = 'overview';
   taskFilter: TaskFilter = 'all';
 
@@ -39,6 +43,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   habitEntries: HabitEntry[] = [];
   challenges: Challenge[] = [];
   conversations: AIConversation[] = [];
+  activeTimer: TimeSession | null = null;
 
   loading = {
     tasks: false,
@@ -74,19 +79,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   aiQuestion = '';
   aiSuggestedPrompts = [
+    'Create a high-priority task to finish my report tomorrow.',
+    'Add Review lecture notes to today\'s todos.',
+    'Start a timer for my highest-priority active task.',
     'What should I focus on today?',
-    'Break my highest-priority task into steps.',
-    'Help me improve my habit consistency.',
-    'Create a reading and meditation plan for this week.',
   ];
-
-  private runningTimers = new Map<number, { startedAt: number; initialMinutes: number }>();
 
   constructor(
     private taskService: TaskService,
     private habitService: HabitService,
     private challengeService: ChallengeService,
     private aiService: AIService,
+    private productivityService: ProductivityService,
   ) {}
 
   ngOnInit(): void {
@@ -94,10 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadHabits();
     this.loadChallenges();
     this.loadAIHistory();
-  }
-
-  ngOnDestroy(): void {
-    this.runningTimers.clear();
+    this.loadActiveTimer();
   }
 
   setSection(section: DashboardSection): void {
@@ -179,6 +180,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .filter(Boolean),
       time_estimate: Number(this.newTask.time_estimate) || 0,
       time_spent: 0,
+      time_spent_seconds: 0,
     };
 
     this.taskService.createTask(payload).subscribe({
@@ -239,7 +241,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.taskService.deleteTask(task.id).subscribe({
       next: () => {
         this.tasks = this.tasks.filter((item) => item.id !== task.id);
-        this.runningTimers.delete(task.id!);
+        if (this.activeTimer?.task_id === task.id) this.activeTimer = null;
         this.showSuccess('Task deleted.');
       },
       error: (error) => this.showError(error.message),
@@ -248,34 +250,43 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   toggleTimer(task: Task): void {
     if (!task.id || task.completed) return;
-
-    const running = this.runningTimers.get(task.id);
-    if (!running) {
-      this.runningTimers.set(task.id, {
-        startedAt: Date.now(),
-        initialMinutes: task.time_spent || 0,
+    if (this.isTimerRunning(task)) {
+      this.productivityService.stopTimer().subscribe({
+        next: (session) => {
+          this.activeTimer = null;
+          this.loadTasks();
+          this.showSuccess(`Saved ${this.formatDuration(session.elapsed_seconds)} to ${task.title}.`);
+        },
+        error: (error) => this.showError(error.message),
       });
       return;
     }
-
-    const elapsedMinutes = Math.max(
-      1,
-      Math.round((Date.now() - running.startedAt) / 60000),
-    );
-    const timeSpent = running.initialMinutes + elapsedMinutes;
-
-    this.taskService.updateTask(task.id, { time_spent: timeSpent }).subscribe({
-      next: (updated) => {
-        this.runningTimers.delete(task.id!);
-        this.replaceTask(updated);
-        this.showSuccess(`Saved ${elapsedMinutes} minute(s) to ${task.title}.`);
+    if (this.activeTimer) {
+      this.showError('Another timer is already running. Stop it first or open Focus & Timers.');
+      return;
+    }
+    this.productivityService.startTimer('task', task.id).subscribe({
+      next: (session) => {
+        this.activeTimer = session;
+        this.loadTasks();
+        this.showSuccess(`Timer started for ${task.title}.`);
       },
       error: (error) => this.showError(error.message),
     });
   }
 
   isTimerRunning(task: Task): boolean {
-    return !!task.id && this.runningTimers.has(task.id);
+    return !!task.id && this.activeTimer?.item_type === 'task' && this.activeTimer.task_id === task.id;
+  }
+
+  formatDuration(seconds: number): string {
+    const safe = Math.max(0, Math.floor(seconds || 0));
+    const hours = Math.floor(safe / 3600);
+    const minutes = Math.floor((safe % 3600) / 60);
+    const secs = safe % 60;
+    return hours > 0
+      ? `${hours}h ${minutes.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`
+      : `${minutes}m ${secs.toString().padStart(2, '0')}s`;
   }
 
   isOverdue(task: Task): boolean {
@@ -486,6 +497,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadActiveTimer(): void {
+    this.productivityService.getActiveTimer().subscribe({
+      next: (session) => (this.activeTimer = session),
+      error: () => (this.activeTimer = null),
+    });
+  }
+
   usePrompt(prompt: string): void {
     this.aiQuestion = prompt;
   }
@@ -502,6 +520,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.conversations = [conversation, ...this.conversations];
           this.aiQuestion = '';
           this.loading.ai = false;
+          const actions = conversation.context?.executed_actions;
+          if (Array.isArray(actions) && actions.length > 0) {
+            this.loadTasks();
+            this.loadHabits();
+            this.loadChallenges();
+            this.loadActiveTimer();
+            this.showSuccess('AI updated your workspace.');
+          }
         },
         error: (error) => {
           this.loading.ai = false;
