@@ -14,7 +14,10 @@ jobs:
     env:
       SECRET_KEY: test-placeholder-value
       DATABASE_URL: sqlite:///./ci.db
+      ALLOW_SQLITE_FOR_TESTS: "true"
       CORS_ORIGINS: http://localhost:4200,tauri://localhost,http://tauri.localhost
+      GOOGLE_CLIENT_ID: ci-google-client.example
+      APPLE_CLIENT_ID: ci.apple.client
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,6 +30,7 @@ jobs:
       - run: python -c "from app.main import app; assert app.title == 'Task Manager API'"
       - run: PYTHONPATH=. python tests/smoke.py
       - run: PYTHONPATH=. python tests/productivity_smoke.py
+      - run: PYTHONPATH=. python tests/auth_verification_oauth_smoke.py
 
   frontend:
     runs-on: ubuntu-latest
