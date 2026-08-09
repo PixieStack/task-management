@@ -12,17 +12,14 @@ PASSWORD_RESET_EXPIRE_MINUTES = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "
 EMAIL_VERIFICATION_EXPIRE_MINUTES = int(os.getenv("EMAIL_VERIFICATION_EXPIRE_MINUTES", "60"))
 
 # Production/runtime storage is the Task Manager Supabase Postgres project.
-# DATABASE_URL remains an explicit override for CI/tests or alternate deployments;
-# there is deliberately no SQLite runtime fallback.
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+ALLOW_SQLITE_FOR_TESTS = os.getenv("ALLOW_SQLITE_FOR_TESTS", "").strip().lower() in {"1", "true", "yes"}
 SUPABASE_DB_HOST = os.getenv("SUPABASE_DB_HOST", "db.mvxkssrpxaldmiknozoz.supabase.co")
 SUPABASE_DB_PORT = int(os.getenv("SUPABASE_DB_PORT", "5432"))
 SUPABASE_DB_NAME = os.getenv("SUPABASE_DB_NAME", "postgres")
 SUPABASE_DB_USER = os.getenv("SUPABASE_DB_USER", "postgres")
 SUPABASE_DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD", "")
 
-# Local Angular development plus Tauri's default native WebView origins.
-# Production should also add the deployed web frontend origin.
 CORS_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
