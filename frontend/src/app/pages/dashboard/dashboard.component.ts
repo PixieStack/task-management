@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AIConversation, AIService } from '../../shared/services/ai.service';
@@ -34,7 +34,7 @@ type TaskFilter = 'all' | 'active' | 'completed' | 'overdue';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   activeSection: DashboardSection = 'overview';
   taskFilter: TaskFilter = 'all';
 
@@ -85,6 +85,8 @@ export class DashboardComponent implements OnInit {
     'What should I focus on today?',
   ];
 
+  private readonly hashHandler = () => this.syncSectionFromHash();
+
   constructor(
     private taskService: TaskService,
     private habitService: HabitService,
@@ -94,6 +96,8 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.syncSectionFromHash();
+    window.addEventListener('hashchange', this.hashHandler);
     this.loadTasks();
     this.loadHabits();
     this.loadChallenges();
@@ -101,8 +105,18 @@ export class DashboardComponent implements OnInit {
     this.loadActiveTimer();
   }
 
+  ngOnDestroy(): void {
+    window.removeEventListener('hashchange', this.hashHandler);
+  }
+
   setSection(section: DashboardSection): void {
     this.activeSection = section;
+    if (section === 'overview') {
+      window.history.replaceState(null, '', window.location.pathname);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    } else if (window.location.hash !== `#${section}`) {
+      window.location.hash = section;
+    }
   }
 
   get totalTasks(): number {
@@ -548,6 +562,12 @@ export class DashboardComponent implements OnInit {
 
   trackById(_: number, item: { id?: number }): number | undefined {
     return item.id;
+  }
+
+  private syncSectionFromHash(): void {
+    const section = window.location.hash.replace('#', '') as DashboardSection;
+    const valid: DashboardSection[] = ['overview', 'tasks', 'habits', 'challenges', 'ai'];
+    this.activeSection = valid.includes(section) ? section : 'overview';
   }
 
   private replaceTask(updated: Task): void {
