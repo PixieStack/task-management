@@ -10,9 +10,14 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./taskmanager.db")
 
+# Local Angular development plus Tauri's default native WebView origins.
+# Production should also add the deployed web frontend origin.
 CORS_ORIGINS = [
     origin.strip()
-    for origin in os.getenv("CORS_ORIGINS", "http://localhost:4200").split(",")
+    for origin in os.getenv(
+        "CORS_ORIGINS",
+        "http://localhost:4200,tauri://localhost,http://tauri.localhost",
+    ).split(",")
     if origin.strip()
 ]
 

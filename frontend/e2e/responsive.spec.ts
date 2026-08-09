@@ -5,6 +5,7 @@ const publicRoutes = [
   '/key-features',
   '/about',
   '/contact',
+  '/downloads',
   '/login',
   '/register',
   '/faq',
@@ -51,11 +52,7 @@ async function expectNoHorizontalOverflow(page: Page, label: string): Promise<vo
         const style = getComputedStyle(element);
         if (style.display === 'none' || style.visibility === 'hidden') return false;
 
-        // Decorative login/register background blobs are intentionally clipped by the page.
         if (element.classList.contains('bg-shape')) return false;
-
-        // Children of an explicit horizontal scroller (for example dashboard tabs)
-        // may sit outside the viewport without creating page-level overflow.
         if (isInsideIntentionalHorizontalScroller(element)) return false;
 
         const rect = element.getBoundingClientRect();
@@ -130,7 +127,7 @@ test.describe('responsive layout smoke suite', () => {
     });
   }
 
-  test('320px mobile navigation opens and remains on-screen', async ({ page }) => {
+  test('320px mobile navigation exposes Downloads and remains on-screen', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
@@ -139,7 +136,46 @@ test.describe('responsive layout smoke suite', () => {
     await toggle.click();
     await expect(page.locator('#mobile-navigation')).toBeVisible();
     await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Key Features' })).toBeVisible();
+    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Downloads' })).toBeVisible();
     await expectNoHorizontalOverflow(page, '320px open mobile navigation');
+  });
+
+  test('Downloads page keeps unpublished release links and QR codes disabled', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.locator('.download-card')).toHaveCount(6);
+    await expect(page.getByRole('button', { name: 'Install web app' })).toHaveCount(2);
+    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
+    await expect(page.locator('.qr-panel img')).toHaveCount(0);
+    await expect(page.locator('.download-card:not([data-platform="web"]) a.download-button')).toHaveCount(0);
+    await expectNoHorizontalOverflow(page, '390px unpublished downloads page');
+  });
+
+  test('Downloads page generates a QR code when a real public release URL is configured', async ({ page }) => {
+    await page.route('**/downloads.json', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          web: { available: true, url: 'https://downloads.example.test/mob-taskmanager' },
+          macos: { available: false, url: '' },
+          windowsX64: { available: false, url: '' },
+          windowsArm64: { available: false, url: '' },
+          android: { available: false, url: '' },
+          ios: { available: false, url: '' },
+        }),
+      });
+    });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
+
+    const qrImage = page.getByRole('img', { name: 'QR code for Web / PWA' });
+    await expect(qrImage).toBeVisible();
+    await expect(qrImage).toHaveAttribute('src', /^data:image\/png;base64,/);
+    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
+    await expectNoHorizontalOverflow(page, '390px published web QR downloads page');
   });
 
   for (const viewport of [viewports[0], viewports[2], viewports[4], viewports[5]]) {

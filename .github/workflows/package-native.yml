@@ -1,0 +1,166 @@
+name: Package Native Apps
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: "Absolute backend URL, e.g. https://your-api.onrender.com"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  windows-x64:
+    name: Windows x64 installers
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      APP_API_BASE_URL: ${{ inputs.api_base_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add x86_64-pc-windows-msvc
+      - run: npm install
+      - run: npm run icons
+      - run: npx tauri build --target x86_64-pc-windows-msvc --bundles nsis,msi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-taskmanager-windows-x64
+          if-no-files-found: error
+          path: |
+            frontend/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+            frontend/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+
+  windows-arm64:
+    name: Windows ARM64 installer
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      APP_API_BASE_URL: ${{ inputs.api_base_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
+      - run: rustup target add aarch64-pc-windows-msvc
+      - run: npm install
+      - run: npm run icons
+      - run: npx tauri build --target aarch64-pc-windows-msvc --bundles nsis
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-taskmanager-windows-arm64
+          if-no-files-found: error
+          path: frontend/src-tauri/target/aarch64-pc-windows-msvc/release/bundle/nsis/*.exe
+
+  macos:
+    name: macOS universal Intel + Apple Silicon
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      APP_API_BASE_URL: ${{ inputs.api_base_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add x86_64-apple-darwin aarch64-apple-darwin
+      - run: npm install
+      - run: npm run desktop:build:mac
+      - name: Verify Universal app includes Intel and Apple Silicon
+        shell: bash
+        run: |
+          BIN="$(find src-tauri/target/universal-apple-darwin/release/bundle/macos -path '*/Contents/MacOS/*' -type f -print -quit)"
+          test -n "$BIN"
+          ARCHS="$(lipo -archs "$BIN")"
+          echo "$ARCHS" | grep -q x86_64
+          echo "$ARCHS" | grep -q arm64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-taskmanager-macos-universal
+          if-no-files-found: error
+          path: |
+            frontend/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+            frontend/src-tauri/target/universal-apple-darwin/release/bundle/macos/*.app
+
+  android:
+    name: Android test APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      APP_API_BASE_URL: ${{ inputs.api_base_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+      - name: Configure Android NDK
+        run: |
+          echo "NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - run: npm install
+      - run: npx tauri android init --ci
+      - run: npm run icons
+      - run: npx tauri android build --debug --apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-taskmanager-android-test-apk
+          if-no-files-found: error
+          path: frontend/src-tauri/gen/android/app/build/outputs/**/*.apk
+
+  ios-simulator:
+    name: iOS simulator app
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      APP_API_BASE_URL: ${{ inputs.api_base_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+      - name: Ensure CocoaPods
+        run: command -v pod >/dev/null 2>&1 || brew install cocoapods
+      - run: npm install
+      - run: npx tauri ios init --ci
+      - run: npm run icons
+      - name: Select simulator architecture
+        run: |
+          if [ "$(uname -m)" = "arm64" ]; then
+            echo "IOS_SIM_TARGET=aarch64-sim" >> "$GITHUB_ENV"
+          else
+            echo "IOS_SIM_TARGET=x86_64" >> "$GITHUB_ENV"
+          fi
+      - run: npx tauri ios build --debug --target "$IOS_SIM_TARGET"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mob-taskmanager-ios-simulator
+          if-no-files-found: error
+          path: frontend/src-tauri/gen/apple/build/**/*.app

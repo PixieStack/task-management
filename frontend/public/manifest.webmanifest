@@ -1,0 +1,20 @@
+{
+  "name": "M.O.B TaskManager",
+  "short_name": "TaskManager",
+  "description": "Tasks, habits, reading, meditation and AI productivity assistance.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2c3e50",
+  "orientation": "any",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/assets/Logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

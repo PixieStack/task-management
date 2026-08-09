@@ -1,0 +1,213 @@
+name: Native Platform Smoke
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "backend/app/config.py"
+      - ".github/workflows/native-platform-smoke.yml"
+      - ".github/workflows/package-native.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  APP_API_BASE_URL: https://example.invalid
+
+jobs:
+  windows-x64-install:
+    name: Windows x64 package + install + launch
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add x86_64-pc-windows-msvc
+      - run: npm install
+      - run: npm run icons
+      - run: npx tauri build --target x86_64-pc-windows-msvc --bundles nsis
+      - name: Silent-install and launch the Windows app
+        shell: pwsh
+        run: |
+          $installer = Get-ChildItem "src-tauri\target\x86_64-pc-windows-msvc\release\bundle\nsis\*.exe" | Select-Object -First 1
+          if (-not $installer) { throw "NSIS installer was not generated" }
+
+          $installDir = Join-Path $env:RUNNER_TEMP "mob-taskmanager-test"
+          New-Item -ItemType Directory -Force -Path $installDir | Out-Null
+
+          $install = Start-Process -FilePath $installer.FullName -ArgumentList "/S", "/D=$installDir" -PassThru -Wait
+          if ($install.ExitCode -ne 0) { throw "Installer exited with code $($install.ExitCode)" }
+
+          $app = Get-ChildItem $installDir -Recurse -Filter "*.exe" |
+            Where-Object { $_.Name -notmatch "uninstall" } |
+            Select-Object -First 1
+          if (-not $app) { throw "Installed app executable was not found in $installDir" }
+
+          $process = Start-Process -FilePath $app.FullName -PassThru
+          Start-Sleep -Seconds 8
+          if ($process.HasExited) { throw "Installed Windows app exited during launch smoke test" }
+          Stop-Process -Id $process.Id -Force
+
+  windows-arm64-build:
+    name: Windows ARM64 native build
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: amd64_arm64
+      - run: rustup target add aarch64-pc-windows-msvc
+      - run: npm install
+      - run: npm run icons
+      - run: npx tauri build --target aarch64-pc-windows-msvc --bundles nsis
+      - name: Verify ARM64 executable
+        shell: pwsh
+        run: |
+          $app = Get-ChildItem "src-tauri\target\aarch64-pc-windows-msvc\release\*.exe" | Select-Object -First 1
+          if (-not $app) { throw "ARM64 app executable was not generated" }
+          $headers = (& dumpbin /headers $app.FullName | Out-String)
+          if ($headers -notmatch "AA64 machine \(ARM64\)") {
+            Write-Host $headers
+            throw "Generated Windows executable is not ARM64"
+          }
+
+  macos-universal-package:
+    name: macOS Universal DMG Intel + Apple Silicon
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add x86_64-apple-darwin aarch64-apple-darwin
+      - run: npm install
+      - run: npm run desktop:build:mac
+      - name: Mount DMG and verify both CPU architectures
+        shell: bash
+        run: |
+          set -euo pipefail
+          DMG="$(find src-tauri/target/universal-apple-darwin/release/bundle/dmg -name '*.dmg' -print -quit)"
+          test -n "$DMG"
+
+          MOUNT="$RUNNER_TEMP/mob-dmg"
+          mkdir -p "$MOUNT"
+          hdiutil attach "$DMG" -mountpoint "$MOUNT" -nobrowse
+          trap 'hdiutil detach "$MOUNT" || true' EXIT
+
+          APP="$(find "$MOUNT" -maxdepth 1 -name '*.app' -print -quit)"
+          test -n "$APP"
+          BIN="$(find "$APP/Contents/MacOS" -maxdepth 1 -type f -print -quit)"
+          test -n "$BIN"
+
+          ARCHS="$(lipo -archs "$BIN")"
+          echo "macOS architectures: $ARCHS"
+          echo "$ARCHS" | grep -q x86_64
+          echo "$ARCHS" | grep -q arm64
+
+  android-emulator-install:
+    name: Android APK + emulator install + launch
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add x86_64-linux-android
+      - name: Configure Android NDK
+        run: |
+          echo "NDK_HOME=$ANDROID_NDK_LATEST_HOME" >> "$GITHUB_ENV"
+          echo "JAVA_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - run: npm install
+      - run: npx tauri android init --ci
+      - run: npm run icons
+      - run: npx tauri android build --debug --apk --target x86_64
+      - name: Locate APK
+        shell: bash
+        run: |
+          APK="$(find "$GITHUB_WORKSPACE/frontend/src-tauri/gen/android/app/build/outputs" -name '*.apk' -print -quit)"
+          test -n "$APK"
+          echo "APK_PATH=$APK" >> "$GITHUB_ENV"
+      - name: Reclaim disk before emulator
+        shell: bash
+        run: |
+          rm -rf "$HOME/.cargo/registry/src" "$HOME/.cargo/registry/cache"
+          rm -rf src-tauri/target
+          df -h
+      - name: Install and launch in Android emulator
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          script: |
+            adb install -r "$APK_PATH"
+            adb shell am start -W -n com.pixiestack.mobtaskmanager/.MainActivity
+            sleep 8
+            adb shell pidof com.pixiestack.mobtaskmanager
+
+  ios-simulator-install:
+    name: iOS Simulator build + install + launch
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22.22.3"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
+      - name: Ensure CocoaPods
+        run: command -v pod >/dev/null 2>&1 || brew install cocoapods
+      - run: npm install
+      - run: npx tauri ios init --ci
+      - run: npm run icons
+      - name: Select simulator architecture
+        shell: bash
+        run: |
+          if [ "$(uname -m)" = "arm64" ]; then
+            echo "IOS_SIM_TARGET=aarch64-sim" >> "$GITHUB_ENV"
+          else
+            echo "IOS_SIM_TARGET=x86_64" >> "$GITHUB_ENV"
+          fi
+      - run: npx tauri ios build --debug --target "$IOS_SIM_TARGET"
+      - name: Install and launch in iOS Simulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP="$(find "$GITHUB_WORKSPACE/frontend/src-tauri/gen/apple/build" -name '*.app' -type d -print -quit)"
+          test -n "$APP"
+
+          UDID="$(xcrun simctl list devices available | awk -F '[()]' '/iPhone/ && /Shutdown/ {print $2; exit}')"
+          test -n "$UDID"
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl launch "$UDID" com.pixiestack.mobtaskmanager
