@@ -144,7 +144,6 @@ form {
   min-width: 0;
 }
 
-/* Shared futuristic utility classes used by new/reworked pages. */
 .app-shell-dark {
   color: var(--text);
   background:
@@ -168,7 +167,74 @@ form {
   background-clip: text;
 }
 
-/* Avoid iOS Safari/WebView zooming form controls smaller than 16px. */
+/* Shared authentication provider/verification controls. */
+.auth-card .oauth-area {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+
+.auth-card .google-provider {
+  min-height: 44px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.auth-card .oauth-apple {
+  width: 100%;
+  background: #fff !important;
+  color: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.24) !important;
+}
+
+.auth-card .oauth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.auth-card .oauth-divider::before,
+.auth-card .oauth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.auth-card .oauth-terms-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.auth-card .verification-link {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  color: #67e8f9;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-card .verification-link:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-card .success-alert {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.32);
+  color: #a7f3d0;
+}
+
 @media (max-width: 768px) {
   input,
   select,
@@ -177,13 +243,11 @@ form {
   }
 }
 
-/* Keyboard accessibility remains visible across the app. */
 :focus-visible {
   outline: 3px solid rgba(34, 211, 238, 0.58);
   outline-offset: 3px;
 }
 
-/* Respect users who request reduced motion. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
