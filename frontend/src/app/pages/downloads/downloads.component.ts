@@ -31,12 +31,43 @@ interface DownloadCard {
   notes: string[];
 }
 
-type QRCodeModule = typeof import('qrcode');
+interface QRCodeBrowserApi {
+  toDataURL(
+    text: string,
+    options?: {
+      errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H';
+      margin?: number;
+      width?: number;
+    },
+  ): Promise<string>;
+}
 
 const EMPTY_TARGET: DownloadTargetConfig = { available: false, url: '' };
-const QR_CODE_API = (
-  (QRCodeNamespace as unknown as { default?: QRCodeModule }).default ?? QRCodeNamespace
-) as QRCodeModule;
+
+function hasToDataUrl(value: unknown): value is QRCodeBrowserApi {
+  if ((typeof value !== 'object' && typeof value !== 'function') || value === null) {
+    return false;
+  }
+
+  return typeof (value as { toDataURL?: unknown }).toDataURL === 'function';
+}
+
+function resolveQRCodeApi(): QRCodeBrowserApi {
+  const namespace = QRCodeNamespace as unknown as { default?: unknown };
+  const defaultExport = namespace.default;
+  const nestedDefault =
+    defaultExport && (typeof defaultExport === 'object' || typeof defaultExport === 'function')
+      ? (defaultExport as { default?: unknown }).default
+      : undefined;
+
+  for (const candidate of [QRCodeNamespace, defaultExport, nestedDefault]) {
+    if (hasToDataUrl(candidate)) {
+      return candidate;
+    }
+  }
+
+  throw new Error('QR code browser renderer is unavailable');
+}
 
 @Component({
   selector: 'app-downloads',
@@ -161,10 +192,10 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     this.http.get<Partial<DownloadManifest>>('/downloads.json').subscribe({
       next: (config) => {
         this.manifest = this.mergeManifest(config);
-        this.generateQrCodes();
+        void this.generateQrCodes();
       },
       error: () => {
-        this.generateQrCodes();
+        void this.generateQrCodes();
       },
     });
   }
@@ -213,38 +244,43 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     };
   }
 
-  private generateQrCodes(): void {
+  private async generateQrCodes(): Promise<void> {
     if (!this.isBrowser) return;
 
     this.qrCodes = {};
     this.qrErrors = {};
 
-    for (const card of this.cards) {
-      const target = this.manifest[card.id];
-      if (!target.available || !target.url) continue;
-
-      try {
-        const qr = QR_CODE_API.create(target.url, { errorCorrectionLevel: 'M' });
-        const matrixSize = qr.modules.size;
-        const quietZone = 4;
-        const size = matrixSize + quietZone * 2;
-        const path: string[] = [];
-
-        for (let y = 0; y < matrixSize; y += 1) {
-          for (let x = 0; x < matrixSize; x += 1) {
-            if (qr.modules.get(x, y)) {
-              path.push(`M${x + quietZone} ${y + quietZone}h1v1h-1z`);
-            }
-          }
+    let qrCodeApi: QRCodeBrowserApi;
+    try {
+      qrCodeApi = resolveQRCodeApi();
+    } catch (error) {
+      for (const card of this.cards) {
+        const target = this.manifest[card.id];
+        if (target.available && target.url) {
+          this.qrErrors[card.id] = true;
         }
-
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="${path.join('')}" fill="#000"/></svg>`;
-        this.qrCodes[card.id] = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
-        this.qrErrors[card.id] = false;
-      } catch (error) {
-        this.qrErrors[card.id] = true;
-        console.error(`Unable to generate QR code for ${card.id}`, error);
       }
+      console.error('Unable to initialize QR code renderer', error);
+      return;
     }
+
+    await Promise.all(
+      this.cards.map(async (card) => {
+        const target = this.manifest[card.id];
+        if (!target.available || !target.url) return;
+
+        try {
+          this.qrCodes[card.id] = await qrCodeApi.toDataURL(target.url, {
+            errorCorrectionLevel: 'M',
+            margin: 4,
+            width: 256,
+          });
+          this.qrErrors[card.id] = false;
+        } catch (error) {
+          this.qrErrors[card.id] = true;
+          console.error(`Unable to generate QR code for ${card.id}`, error);
+        }
+      }),
+    );
   }
 }
