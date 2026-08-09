@@ -1,8 +1,3 @@
-$color-bg-dark: #2c3e50;
-$color-primary: #e67e22;
-$color-primary-dark: #cf711f;
-$color-text-light: white;
-
 :host {
   display: block;
   position: relative;
@@ -10,13 +5,16 @@ $color-text-light: white;
 }
 
 .navbar {
-  background-color: $color-bg-dark;
-  color: $color-text-light;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  color: #e8eef9;
+  background: rgba(7, 11, 20, 0.88);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 10px 35px rgba(3, 7, 18, 0.2);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 
   .container {
-    width: min(1300px, calc(100% - 48px));
-    min-height: 70px;
+    width: min(1400px, calc(100% - 48px));
+    min-height: 72px;
     margin: 0 auto;
     display: flex;
     align-items: center;
@@ -29,19 +27,20 @@ $color-text-light: white;
     display: flex;
     align-items: center;
     gap: 10px;
-    font-weight: 700;
-    font-size: clamp(1rem, 2vw, 1.4rem);
-    color: $color-text-light;
+    color: #f8fafc;
     text-decoration: none;
-    cursor: pointer;
+    font-weight: 850;
+    font-size: clamp(0.98rem, 2vw, 1.2rem);
+    letter-spacing: -0.025em;
 
     .logo-img {
-      width: auto;
-      max-height: 45px;
-      flex: 0 0 auto;
-      border-radius: 6px;
-      object-fit: contain;
-      filter: drop-shadow(0 0 5px rgba($color-primary, 0.4));
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(139, 92, 246, 0.28);
+      box-shadow: 0 0 24px rgba(139, 92, 246, 0.18);
     }
 
     span {
@@ -54,30 +53,41 @@ $color-text-light: white;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: clamp(18px, 2.5vw, 32px);
+    gap: clamp(16px, 2vw, 28px);
   }
 
   .nav-links {
     list-style: none;
     display: flex;
     align-items: center;
-    gap: clamp(14px, 2vw, 32px);
+    gap: 4px;
     margin: 0;
-    padding: 0;
+    padding: 4px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
 
     li a {
-      display: inline-block;
-      color: $color-text-light;
+      display: inline-flex;
+      align-items: center;
+      min-height: 38px;
+      padding: 0.55rem 0.8rem;
+      border-radius: 10px;
+      color: #96a3b9;
       text-decoration: none;
-      font-weight: 500;
-      padding: 0.65rem 0;
+      font-size: 0.86rem;
+      font-weight: 750;
       white-space: nowrap;
-      border-bottom: 3px solid transparent;
-      transition: border-color 0.2s ease, color 0.2s ease;
+      transition: color 0.2s ease, background 0.2s ease;
 
       &.active,
       &:hover {
-        border-bottom-color: $color-primary;
+        color: #f8fafc;
+        background: rgba(255, 255, 255, 0.065);
+      }
+
+      &.active {
+        box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.18);
       }
     }
   }
@@ -86,21 +96,23 @@ $color-text-light: white;
   .mobile-auth {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 
     .welcome-text {
-      font-weight: 600;
-      color: $color-primary;
+      color: #a9b5ca;
+      font-size: 0.84rem;
+      font-weight: 700;
     }
 
     button {
-      min-height: 44px;
-      padding: 0.6rem 1.1rem;
-      border-radius: 6px;
-      font-weight: 600;
-      border: none;
+      min-height: 42px;
+      padding: 0.62rem 1rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
       cursor: pointer;
-      transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+      font-size: 0.86rem;
+      font-weight: 850;
+      transition: transform 0.2s var(--ease), box-shadow 0.2s ease, background 0.2s ease;
 
       &:hover {
         transform: translateY(-1px);
@@ -108,32 +120,21 @@ $color-text-light: white;
     }
 
     .btn-primary {
-      background-color: $color-primary;
-      color: $color-text-light;
-
-      &:hover {
-        background-color: $color-primary-dark;
-      }
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary), #5b8cff);
+      box-shadow: 0 8px 22px rgba(109, 66, 223, 0.28);
     }
 
     .btn-secondary {
-      background-color: transparent;
-      border: 2px solid $color-primary;
-      color: $color-primary;
-
-      &:hover {
-        background-color: $color-primary;
-        color: $color-text-light;
-      }
+      color: #d9e2f2;
+      background: rgba(255, 255, 255, 0.035);
+      border-color: rgba(148, 163, 184, 0.2);
     }
 
     .btn-logout {
-      background-color: #c0392b;
-      color: $color-text-light;
-
-      &:hover {
-        background-color: #a93226;
-      }
+      color: #ffd2da;
+      background: rgba(251, 113, 133, 0.12);
+      border-color: rgba(251, 113, 133, 0.16);
     }
   }
 
@@ -143,9 +144,9 @@ $color-text-light: white;
     height: 44px;
     flex: 0 0 44px;
     padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 8px;
-    background: transparent;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
     cursor: pointer;
 
     span {
@@ -154,7 +155,7 @@ $color-text-light: white;
       height: 2px;
       margin: 4px 0;
       border-radius: 999px;
-      background: white;
+      background: #e8eef9;
     }
   }
 
@@ -166,7 +167,7 @@ $color-text-light: white;
 @media (max-width: 980px) {
   .navbar {
     .container {
-      width: min(100% - 32px, 1300px);
+      width: min(100% - 32px, 1400px);
     }
 
     .desktop-nav {
@@ -180,40 +181,41 @@ $color-text-light: white;
     .mobile-panel {
       display: block;
       width: 100%;
-      padding: 8px 16px 18px;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
-      background: $color-bg-dark;
+      padding: 10px 16px 18px;
+      border-top: 1px solid rgba(148, 163, 184, 0.1);
+      background: rgba(7, 11, 20, 0.98);
     }
 
     .mobile-links {
-      width: min(100%, 520px);
+      width: min(100%, 560px);
       list-style: none;
       display: grid;
-      gap: 4px;
+      gap: 5px;
       margin: 0 auto;
       padding: 8px 0;
 
       a {
-        display: block;
-        min-height: 44px;
+        display: flex;
+        align-items: center;
+        min-height: 46px;
         padding: 11px 12px;
-        border-radius: 8px;
-        color: white;
+        border-radius: 11px;
+        color: #dce4f2;
         text-decoration: none;
-        font-weight: 600;
+        font-weight: 750;
 
         &:hover,
         &:focus-visible {
-          background: rgba(255, 255, 255, 0.08);
+          background: rgba(255, 255, 255, 0.06);
         }
       }
     }
 
     .mobile-auth {
-      width: min(100%, 520px);
+      width: min(100%, 560px);
       margin: 8px auto 0;
       padding-top: 12px;
-      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(148, 163, 184, 0.1);
 
       button {
         flex: 1;
@@ -225,18 +227,21 @@ $color-text-light: white;
 @media (max-width: 430px) {
   .navbar {
     .container {
-      width: min(100% - 24px, 1300px);
+      width: min(100% - 24px, 1400px);
+      min-height: 66px;
     }
 
     .logo {
       gap: 8px;
 
       .logo-img {
-        max-height: 38px;
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
       }
 
       span {
-        max-width: 190px;
+        max-width: 188px;
         overflow: hidden;
         text-overflow: ellipsis;
       }
