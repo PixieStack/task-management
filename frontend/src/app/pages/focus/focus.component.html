@@ -25,9 +25,9 @@
     <button class="stop-button" (click)="stopTimer()">Stop & save</button>
   </section>
 
-  <div class="loading" *ngIf="loading">Loading your focus workspace…</div>
+  <div class="loading" *ngIf="loading">Syncing your tasks and today’s todos…</div>
 
-  <main class="focus-grid" *ngIf="!loading">
+  <main class="focus-grid" [attr.aria-busy]="loading">
     <section id="todos" class="panel todo-panel">
       <div class="panel-header">
         <div>
@@ -60,7 +60,7 @@
         ></textarea>
       </form>
 
-      <div class="empty" *ngIf="!todos.length">Nothing on today’s list yet.</div>
+      <div class="empty" *ngIf="!todos.length && !loading">Nothing on today’s list yet.</div>
       <div class="todo-list">
         <article class="todo-item" *ngFor="let todo of todos; trackBy: trackById" [class.done]="todo.completed">
           <button
@@ -134,7 +134,7 @@
         <span class="counter">{{ activeTasks.length }} active</span>
       </div>
 
-      <div class="empty" *ngIf="!tasks.length">Create a task from the dashboard or ask the AI assistant.</div>
+      <div class="empty" *ngIf="!tasks.length && !loading">Create a task from the dashboard or ask the AI assistant.</div>
       <div class="task-list">
         <article class="task-item" *ngFor="let task of tasks; trackBy: trackById" [class.done]="task.completed">
           <div class="item-copy">
