@@ -14,7 +14,7 @@ export interface Task {
   tags: string[];
   time_estimate: number;
   time_spent: number;
-  time_spent_seconds: number;
+  time_spent_seconds?: number;
   created_at?: string;
   updated_at?: string;
   owner_id?: number;
