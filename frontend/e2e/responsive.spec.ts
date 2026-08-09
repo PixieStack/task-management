@@ -168,16 +168,20 @@ test.describe('responsive layout smoke suite', () => {
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/forgot-password', { waitUntil: 'domcontentloaded' });
-    await page.getByLabel('Email address').fill('reset@example.com');
-    await page.getByRole('button', { name: 'Send reset link' }).click();
+    await page.getByLabel('Email address', { exact: true }).fill('reset@example.com');
+    await page.getByRole('button', { name: 'Send reset link', exact: true }).click();
     await expect(page.getByRole('status')).toContainText('password reset link has been sent');
     expect(forgotPayload).toEqual({ email: 'reset@example.com' });
 
     const token = 'test-reset-token-abcdefghijklmnopqrstuvwxyz-1234567890';
     await page.goto(`/reset-password?token=${token}`, { waitUntil: 'domcontentloaded' });
-    await page.getByLabel('New password').fill('StrongReset9!');
-    await page.getByLabel('Confirm new password').fill('StrongReset9!');
-    await page.getByRole('button', { name: 'Reset password' }).click();
+
+    // These IDs are part of the reset form contract. Using them avoids Playwright's
+    // partial accessible-name matching colliding with "Confirm new password" or
+    // the surrounding "Choose a new password" region.
+    await page.locator('#new-password').fill('StrongReset9!');
+    await page.locator('#confirm-password').fill('StrongReset9!');
+    await page.getByRole('button', { name: 'Reset password', exact: true }).click();
     await expect(page.getByRole('status')).toContainText('Password reset successfully');
     expect(resetPayload).toEqual({ token, new_password: 'StrongReset9!' });
     await expectNoHorizontalOverflow(page, '390px password reset flow');
