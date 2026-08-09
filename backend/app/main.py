@@ -3,9 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from . import bcrypt_fix
 from .config import CORS_ORIGINS
-from .routers import ai_assistant, analytics, auth, challenges, contact, habits, tasks
+from .routers import ai_assistant, analytics, auth, challenges, contact, habits, productivity, tasks
 
-app = FastAPI(title="Task Manager API", version="2.0.0")
+app = FastAPI(title="Task Manager API", version="2.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
@@ -19,6 +19,7 @@ app.include_router(analytics.router)
 app.include_router(contact.router)
 app.include_router(challenges.router)
 app.include_router(habits.router)
+app.include_router(productivity.router)
 app.include_router(ai_assistant.router)
 
 

@@ -1,56 +1,68 @@
-<nav class="dashboard-navbar">
-  <div class="navbar-brand">
-    <h1>Task Manager</h1>
+<nav class="dashboard-navbar" aria-label="Authenticated navigation">
+  <a class="navbar-brand" routerLink="/dashboard" aria-label="M.O.B TaskManager dashboard">
+    <span class="brand-mark">M</span>
+    <div>
+      <strong>M.O.B</strong>
+      <small>TaskManager</small>
+    </div>
+  </a>
+
+  <div class="workspace-links" aria-label="Workspace navigation">
+    <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a routerLink="/focus" routerLinkActive="active">Focus & Timers</a>
   </div>
 
   <div class="user-profile">
     <div class="welcome-message">
-      <span class="greeting-emoji">{{ greetingEmoji }}</span> {{ greeting }},
-      {{ username }}
+      <span class="greeting-emoji">{{ greetingEmoji }}</span>
+      <span><small>{{ greeting }}</small>{{ username }}</span>
     </div>
 
     <div class="profile-dropdown-container">
-      <div class="profile-picture" (click)="toggleProfileDropdown($event)">
+      <button
+        type="button"
+        class="profile-picture"
+        (click)="toggleProfileDropdown($event)"
+        [attr.aria-expanded]="isProfileDropdownOpen"
+        aria-label="Open account menu"
+      >
         <img
           *ngIf="profilePicture"
           [src]="profilePicture"
-          alt="Profile Picture"
+          alt="Profile picture"
         />
-        <div *ngIf="!profilePicture" class="profile-initials">
+        <span *ngIf="!profilePicture" class="profile-initials">
           {{ username?.charAt(0) || "U" }}
-        </div>
-      </div>
+        </span>
+      </button>
 
-      <!-- Profile Dropdown Menu -->
       <div class="profile-dropdown" *ngIf="isProfileDropdownOpen">
         <div class="dropdown-header">
           <div class="user-info">
+            <span class="account-kicker">Signed in</span>
             <h3>{{ username }}</h3>
             <p *ngIf="email">{{ email }}</p>
           </div>
           <button class="change-photo-btn" (click)="addProfilePicture($event)">
-            <i class="fas fa-camera"></i> Change Photo
+            <i class="fas fa-camera"></i> Change photo
           </button>
         </div>
 
         <div class="dropdown-menu">
           <ul>
             <li>
-              <a
-                routerLink="/dashboard"
-                routerLinkActive="active"
-                (click)="closeProfileDropdown()"
-              >
-                <i class="fas fa-tachometer-alt"></i> Dashboard
+              <a routerLink="/dashboard" routerLinkActive="active" (click)="closeProfileDropdown()">
+                <i class="fas fa-table-cells-large"></i> Dashboard
               </a>
             </li>
             <li>
-              <a
-                routerLink="/profile"
-                routerLinkActive="active"
-                (click)="closeProfileDropdown()"
-              >
-                <i class="fas fa-user-circle"></i> Account Settings
+              <a routerLink="/focus" routerLinkActive="active" (click)="closeProfileDropdown()">
+                <i class="fas fa-stopwatch"></i> Focus & Timers
+              </a>
+            </li>
+            <li>
+              <a routerLink="/profile" routerLinkActive="active" (click)="closeProfileDropdown()">
+                <i class="fas fa-user-circle"></i> Account settings
               </a>
             </li>
             <li class="dropdown-divider"></li>

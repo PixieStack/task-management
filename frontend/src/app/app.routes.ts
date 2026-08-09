@@ -21,6 +21,11 @@ export const routes: Routes = [
   { path: 'forgot-password', loadComponent: () => import('./auth/forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent) },
   { path: 'reset-password', loadComponent: () => import('./auth/reset-password/reset-password.component').then((m) => m.ResetPasswordComponent) },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  {
+    path: 'focus',
+    loadComponent: () => import('./pages/focus/focus.component').then((m) => m.FocusComponent),
+    canActivate: [AuthGuard],
+  },
   { path: 'profile', loadComponent: () => import('./pages/profile/profile.component').then((m) => m.ProfileComponent), canActivate: [AuthGuard] },
   { path: 'account-security', redirectTo: 'profile', pathMatch: 'full' },
   { path: 'faq', loadComponent: () => import('./pages/faq/faq.component').then((m) => m.FaqComponent) },

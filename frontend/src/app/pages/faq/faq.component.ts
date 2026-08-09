@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Component } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Router, RouterModule } from '@angular/router';
 
 interface FAQItem {
   question: string;
@@ -15,163 +15,190 @@ interface FAQItem {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './faq.component.html',
-  styleUrls: ['./faq.component.scss']
+  styleUrls: ['./faq.component.scss'],
 })
 export class FaqComponent {
-  searchTerm: string = '';
-  selectedCategory: string = 'all';
+  searchTerm = '';
+  selectedCategory = 'all';
 
-  categories = [
+  readonly categories = [
     { value: 'all', label: 'All Categories' },
     { value: 'general', label: 'General' },
     { value: 'features', label: 'Features' },
     { value: 'account', label: 'Account & Security' },
-    { value: 'technical', label: 'Technical' }
+    { value: 'technical', label: 'Apps & Technical' },
   ];
 
-  faqs: FAQItem[] = [
-    // General
+  readonly faqs: FAQItem[] = [
     {
-      question: 'What is Task Manager?',
-      answer: 'Task Manager is a free, AI-powered productivity application that helps you organize, prioritize, and manage your tasks efficiently. It combines smart automation with intuitive design to boost your productivity.',
+      question: 'What is M.O.B TaskManager?',
+      answer:
+        'M.O.B TaskManager is a personal productivity workspace for tasks, Daily Todos, habits, reading and meditation challenges, Pomodoro focus, persistent time tracking and AI-assisted actions.',
       category: 'general',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'How does the AI assistant work?',
-      answer: 'Our AI assistant analyzes your task patterns, deadlines, and priorities to provide personalized suggestions. It can automatically categorize tasks, suggest optimal scheduling, and send smart reminders based on your work habits.',
+      question: 'What can the AI assistant actually do?',
+      answer:
+        'The assistant can answer questions using your current productivity context and can perform an approved set of actions such as creating or updating tasks and Daily Todos, working with habits and reading or meditation challenges, and starting or stopping task/todo timers. FastAPI validates the action and your ownership before data changes.',
       category: 'general',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Is Task Manager suitable for teams?',
-      answer: 'Yes! Task Manager supports team collaboration with shared boards, task assignments, and progress tracking. Team members can collaborate in real-time while maintaining individual productivity.',
+      question: 'Is this a team project-management app?',
+      answer:
+        'No. The current product is intentionally focused on personal productivity. Shared boards, team assignments and real-time team collaboration are not part of the current feature set.',
       category: 'general',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Is Task Manager really free?',
-      answer: 'Yes! Task Manager is completely free to use. We believe everyone should have access to powerful productivity tools. There are no hidden fees or premium tiers.',
+      question: 'Where is my app data stored?',
+      answer:
+        'Persistent account and productivity data is stored in the Task Manager PostgreSQL database hosted on Supabase. The application accesses that data through the FastAPI backend rather than giving the browser or AI model direct database access.',
       category: 'general',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Who created Task Manager?',
-      answer: 'Task Manager is developed and maintained by PixieStack. It\'s an open-source project aimed at helping people manage their tasks more efficiently using AI technology.',
+      question: 'How are registration and password-reset emails sent?',
+      answer:
+        'Account emails are sent by the FastAPI backend through Brevo SMTP. Supabase is used as the PostgreSQL data store and is not used as the application email provider.',
       category: 'general',
-      isOpen: false
+      isOpen: false,
     },
 
-    // Features
     {
-      question: 'What is the Smart Inbox?',
-      answer: 'Smart Inbox is an AI-powered feature that automatically captures and organizes your tasks from various sources. It prioritizes tasks based on urgency, importance, and your personal patterns.',
+      question: 'What are Daily Todos?',
+      answer:
+        'Daily Todos are a lightweight list for what you want to complete on a particular day. Each todo can have priority and notes, can be completed or reopened, and can track its own accumulated focus time.',
       category: 'features',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'How do Task Boards work?',
-      answer: 'Task Boards provide a visual way to manage your workflow using drag-and-drop functionality. You can create custom columns, move tasks between stages, and track progress at a glance.',
+      question: 'How does task and todo time tracking work?',
+      answer:
+        'Starting a timer creates a persisted time session on the backend. A running session can survive a page refresh, and stopping it adds the elapsed time to that task or Daily Todo. The app allows one active item timer per account at a time.',
       category: 'features',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Can I integrate with other tools?',
-      answer: 'Currently, Task Manager supports integration with popular calendar applications. We are working on adding more integrations including email clients, project management tools, and communication platforms.',
+      question: 'What does the Pomodoro feature include?',
+      answer:
+        'The Focus workspace includes a standard 25-minute focus mode, 5-minute short break, 15-minute long break and custom durations. Pomodoro is separate from an item timer, so you can use the study interval while also measuring time spent on a specific task or todo.',
       category: 'features',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Are there any usage limits?',
-      answer: 'No! There are no limits on the number of tasks, projects, or boards you can create. Use Task Manager as much as you need without any restrictions.',
+      question: 'Which challenges are supported?',
+      answer:
+        'The current app intentionally supports Reading and Meditation challenges. Older generic diet, fasting, coding, exercise and other challenge concepts were removed to keep the product focused.',
       category: 'features',
-      isOpen: false
+      isOpen: false,
+    },
+    {
+      question: 'Can the AI change my password, email address or delete my account?',
+      answer:
+        'No. Sensitive account-security operations remain manual. The AI action layer is limited to approved productivity features and does not receive arbitrary SQL, backend-code or account-security access.',
+      category: 'features',
+      isOpen: false,
     },
 
-    // Account & Security
     {
       question: 'How do I reset my password?',
-      answer: 'Click on "Forgot Password" on the login page. Enter your email address, and we will send you a secure link to reset your password. The link expires after 24 hours for security reasons.',
+      answer:
+        'Choose “Forgot password” on the login page and enter your account email. The backend creates a single-use reset token and sends the reset link through Brevo SMTP. The configured reset-link lifetime is currently 30 minutes.',
       category: 'account',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Is my data secure?',
-      answer: 'Absolutely. We use industry-standard encryption for data in transit and at rest. Your data is stored on secure servers, and we never share your personal information with third parties.',
+      question: 'What happens to existing sessions after I reset or change my password?',
+      answer:
+        'Password reset and password change increment the account authentication version. Existing JWT sessions tied to the older version become invalid and you sign in again using the new credentials.',
       category: 'account',
-      isOpen: false
-    },
-    {
-      question: 'Can I export my data?',
-      answer: 'Yes, you can export all your tasks, projects, and settings at any time from your account settings. We support multiple formats including CSV, JSON, and PDF.',
-      category: 'account',
-      isOpen: false
+      isOpen: false,
     },
     {
       question: 'Can I delete my account?',
-      answer: 'Yes, you can delete your account at any time from your account settings. This will permanently remove all your data. We recommend exporting your data before deletion.',
+      answer:
+        'Yes. Account deletion is available from account settings and requires your password plus the explicit DELETE confirmation phrase. Associated app data is removed as part of the account-deletion flow.',
       category: 'account',
-      isOpen: false
+      isOpen: false,
+    },
+    {
+      question: 'Does the AI have direct access to my database?',
+      answer:
+        'No. Groq receives the context needed to answer or plan an approved action, while FastAPI owns validation and persistence. The AI model cannot issue arbitrary database queries.',
+      category: 'account',
+      isOpen: false,
     },
 
-    // Technical
     {
       question: 'What browsers are supported?',
-      answer: 'Task Manager works best on the latest versions of Chrome, Firefox, Safari, and Edge. We recommend keeping your browser updated for the best experience.',
+      answer:
+        'Use a current version of Chrome, Edge, Firefox or Safari for the web application. The interface is also tested across viewport widths from small phones through ultrawide desktop displays.',
       category: 'technical',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Is there a mobile app?',
-      answer: 'Mobile apps for iOS and Android are currently in development. In the meantime, our web app is fully responsive and works great on mobile browsers.',
+      question: 'Can I install the app instead of only using the website?',
+      answer:
+        'Yes. The project supports an installable PWA plus native packaging targets for macOS, Windows, Android and iPhone/iPad. Native public download buttons and QR codes remain disabled until a real package URL has been published for that platform.',
       category: 'technical',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'What about offline access?',
-      answer: 'Task Manager includes limited offline functionality. Your tasks are cached locally, and changes sync automatically when you reconnect to the internet.',
+      question: 'Will the Mac app work on Intel and Apple Silicon?',
+      answer:
+        'The macOS packaging target is Universal, combining x86_64 for Intel Macs and arm64 for Apple Silicon Macs. The automated native smoke workflow verifies both architectures in the generated macOS app bundle.',
       category: 'technical',
-      isOpen: false
+      isOpen: false,
     },
     {
-      question: 'Is the source code available?',
-      answer: 'Yes! Task Manager is an open-source project. You can find the source code on our GitHub repository at github.com/PixieStack/task-management.',
+      question: 'Can I install the native iPhone app immediately?',
+      answer:
+        'The iOS project and simulator build are supported, but installation on a physical iPhone requires Apple signing and provisioning. Public App Store or signed-device distribution also requires the appropriate Apple developer credentials.',
       category: 'technical',
-      isOpen: false
-    }
+      isOpen: false,
+    },
+    {
+      question: 'Does the app work fully offline?',
+      answer:
+        'No full offline-data mode is promised. The application depends on the FastAPI backend for authenticated data, AI actions and persistent timers. Do not rely on task changes syncing while the backend or network is unavailable.',
+      category: 'technical',
+      isOpen: false,
+    },
   ];
 
   constructor(
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
   ) {}
 
   get filteredFAQs(): FAQItem[] {
-    return this.faqs.filter(faq => {
-      const matchesCategory = this.selectedCategory === 'all' || faq.category === this.selectedCategory;
-      const matchesSearch = this.searchTerm === '' || 
-                          faq.question.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                          faq.answer.toLowerCase().includes(this.searchTerm.toLowerCase());
+    const term = this.searchTerm.trim().toLowerCase();
+    return this.faqs.filter((faq) => {
+      const matchesCategory =
+        this.selectedCategory === 'all' || faq.category === this.selectedCategory;
+      const matchesSearch =
+        !term ||
+        faq.question.toLowerCase().includes(term) ||
+        faq.answer.toLowerCase().includes(term);
       return matchesCategory && matchesSearch;
     });
   }
 
   highlightText(text: string): SafeHtml {
-    if (!this.searchTerm || this.searchTerm.trim() === '') {
-      return text;
-    }
+    const term = this.searchTerm.trim();
+    if (!term) return text;
 
-    const regex = new RegExp(`(${this.searchTerm})`, 'gi');
+    const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedTerm})`, 'gi');
     const highlightedText = text.replace(regex, '<mark class="highlight">$1</mark>');
     return this.sanitizer.sanitize(1, highlightedText) || text;
   }
 
   toggleFAQ(faq: FAQItem): void {
-    // Close all other FAQs
-    this.faqs.forEach(f => {
-      if (f !== faq) {
-        f.isOpen = false;
-      }
+    this.faqs.forEach((item) => {
+      if (item !== faq) item.isOpen = false;
     });
     faq.isOpen = !faq.isOpen;
   }

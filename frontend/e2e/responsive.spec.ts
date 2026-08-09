@@ -54,7 +54,10 @@ async function expectNoHorizontalOverflow(page: Page, label: string): Promise<vo
         const style = getComputedStyle(element);
         if (style.display === 'none' || style.visibility === 'hidden') return false;
 
-        if (element.classList.contains('bg-shape')) return false;
+        if (
+          element.classList.contains('bg-shape') ||
+          element.classList.contains('auth-background')
+        ) return false;
         if (isInsideIntentionalHorizontalScroller(element)) return false;
 
         const rect = element.getBoundingClientRect();
@@ -108,11 +111,22 @@ async function stubProtectedLayoutApi(page: Page): Promise<void> {
     });
   });
 
-  for (const pattern of ['**/api/tasks**', '**/api/habits**', '**/api/challenges**', '**/api/ai/conversations**']) {
+  for (const pattern of [
+    '**/api/tasks**',
+    '**/api/habits**',
+    '**/api/challenges**',
+    '**/api/ai/conversations**',
+    '**/api/productivity/todos**',
+    '**/api/productivity/timer/sessions**',
+  ]) {
     await page.route(pattern, async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
     });
   }
+
+  await page.route('**/api/productivity/timer/active', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
+  });
 }
 
 test.describe('responsive layout smoke suite', () => {
@@ -129,7 +143,7 @@ test.describe('responsive layout smoke suite', () => {
     });
   }
 
-  test('320px mobile navigation exposes Downloads and remains on-screen', async ({ page }) => {
+  test('320px mobile navigation exposes core links and remains on-screen', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 568 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
 
@@ -137,8 +151,9 @@ test.describe('responsive layout smoke suite', () => {
     await expect(toggle).toBeVisible();
     await toggle.click();
     await expect(page.locator('#mobile-navigation')).toBeVisible();
-    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Key Features' })).toBeVisible();
-    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Downloads' })).toBeVisible();
+    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Features', exact: true })).toBeVisible();
+    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Downloads', exact: true })).toBeVisible();
+    await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'About', exact: true })).toBeVisible();
     await expectNoHorizontalOverflow(page, '320px open mobile navigation');
   });
 
@@ -176,9 +191,6 @@ test.describe('responsive layout smoke suite', () => {
     const token = 'test-reset-token-abcdefghijklmnopqrstuvwxyz-1234567890';
     await page.goto(`/reset-password?token=${token}`, { waitUntil: 'domcontentloaded' });
 
-    // These IDs are part of the reset form contract. Using them avoids Playwright's
-    // partial accessible-name matching colliding with "Confirm new password" or
-    // the surrounding "Choose a new password" region.
     await page.locator('#new-password').fill('StrongReset9!');
     await page.locator('#confirm-password').fill('StrongReset9!');
     await page.getByRole('button', { name: 'Reset password', exact: true }).click();
@@ -237,7 +249,7 @@ test.describe('responsive layout smoke suite', () => {
         localStorage.setItem('userEmail', 'responsive@example.com');
       });
 
-      for (const route of ['/dashboard', '/profile']) {
+      for (const route of ['/dashboard', '/profile', '/focus']) {
         await page.goto(route, { waitUntil: 'domcontentloaded' });
         await expect(page).toHaveURL(new RegExp(`${route.replace('/', '\\/')}$`));
         await expectNoHorizontalOverflow(page, `${viewport.name} ${route}`);

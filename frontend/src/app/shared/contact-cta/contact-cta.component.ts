@@ -1,69 +1,32 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Component, Input } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { trigger, transition, style, animate, keyframes } from '@angular/animations';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-contact-cta',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, HttpClientModule],
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule],
   templateUrl: './contact-cta.component.html',
   styleUrls: ['./contact-cta.component.scss'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(30px)' }),
-        animate(
-          '0.6s cubic-bezier(0.35, 0, 0.25, 1)',
-          style({ opacity: 1, transform: 'translateY(0)' }),
-        ),
-      ]),
-    ]),
-    trigger('slideInLeft', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateX(-50px)' }),
-        animate(
-          '0.8s cubic-bezier(0.35, 0, 0.25, 1)',
-          style({ opacity: 1, transform: 'translateX(0)' }),
-        ),
-      ]),
-    ]),
-    trigger('pulse', [
-      transition(':enter', [
-        animate(
-          '2s ease-in-out',
-          keyframes([
-            style({ transform: 'scale(1)', offset: 0 }),
-            style({ transform: 'scale(1.05)', offset: 0.5 }),
-            style({ transform: 'scale(1)', offset: 1 }),
-          ])
-        ),
-      ]),
-    ]),
-  ],
 })
 export class ContactCtaComponent {
-  @Input() title: string = 'Get In Touch';
-  @Input() description: string =
-    'Have a question about TaskManager? We\'re here to help you succeed!';
-  @Input() buttonText: string = 'Send Message';
+  @Input() title = 'Contact M.O.B TaskManager';
+  @Input() description =
+    'Have a question about the app? Send a message and it will be saved through the Task Manager backend.';
+  @Input() buttonText = 'Send message';
 
   contactForm: FormGroup;
   isSubmitting = false;
   submitSuccess = false;
   submitError = false;
-  focusedField: string = '';
-  mousePosition = { x: 0, y: 0 };
 
-  // Use proxy for API calls
-  private apiUrl = '/api';
+  private readonly apiUrl = '/api';
 
   constructor(
     private fb: FormBuilder,
@@ -81,61 +44,32 @@ export class ContactCtaComponent {
     });
   }
 
-  onMouseMove(event: MouseEvent): void {
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    this.mousePosition = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
-    };
-  }
-
-  setFocusedField(fieldName: string): void {
-    this.focusedField = fieldName;
-  }
-
-  clearFocusedField(): void {
-    this.focusedField = '';
-  }
-
   onSubmit(): void {
     if (this.contactForm.invalid) {
-      Object.keys(this.contactForm.controls).forEach((key) => {
-        const control = this.contactForm.get(key);
-        control?.markAsTouched();
-      });
+      this.contactForm.markAllAsTouched();
       return;
     }
 
     this.isSubmitting = true;
     this.submitError = false;
 
-    const contactData = this.contactForm.value;
-
-    this.http.post(`${this.apiUrl}/contact/`, contactData).subscribe({
-      next: (response: any) => {
-        console.log('Contact message sent successfully:', response);
+    this.http.post(`${this.apiUrl}/contact/`, this.contactForm.value).subscribe({
+      next: () => {
         this.isSubmitting = false;
         this.submitSuccess = true;
-
-        // Reset form after showing success message
-        setTimeout(() => {
-          this.contactForm.reset();
-          this.submitSuccess = false;
-        }, 4000);
+        this.contactForm.reset();
       },
-      error: (error) => {
-        console.error('Error sending contact message:', error);
+      error: () => {
         this.isSubmitting = false;
         this.submitError = true;
-
-        setTimeout(() => {
-          this.submitError = false;
-        }, 5000);
       },
     });
   }
 
-  // Helper methods for form validation
+  resetSuccess(): void {
+    this.submitSuccess = false;
+  }
+
   hasError(controlName: string, errorName: string): boolean {
     const control = this.contactForm.get(controlName);
     return !!(control && control.touched && control.hasError(errorName));
@@ -147,27 +81,22 @@ export class ContactCtaComponent {
     if (control?.hasError('required')) {
       return `${this.getFieldLabel(controlName)} is required`;
     }
-
     if (control?.hasError('email')) {
       return 'Please enter a valid email address';
     }
-
     if (control?.hasError('minlength')) {
       const minLength = control.errors?.['minlength'].requiredLength;
       return `Must be at least ${minLength} characters`;
     }
-
-    if (control?.hasError('pattern')) {
-      if (controlName === 'phone') {
-        return 'Please enter a valid phone number';
-      }
+    if (control?.hasError('pattern') && controlName === 'phone') {
+      return 'Please enter a valid phone number';
     }
 
     return 'Invalid input';
   }
 
   private getFieldLabel(controlName: string): string {
-    const labels: { [key: string]: string } = {
+    const labels: Record<string, string> = {
       firstName: 'First name',
       lastName: 'Last name',
       email: 'Email',
@@ -175,11 +104,5 @@ export class ContactCtaComponent {
       message: 'Message',
     };
     return labels[controlName] || controlName;
-  }
-
-  get formCompletion(): number {
-    const fields = Object.keys(this.contactForm.controls);
-    const validFields = fields.filter(key => this.contactForm.get(key)?.valid).length;
-    return Math.round((validFields / fields.length) * 100);
   }
 }

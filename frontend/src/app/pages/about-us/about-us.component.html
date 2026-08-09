@@ -1,165 +1,185 @@
-<div class="about-container">
-  <h1 class="page-title" @fadeIn>_M.O.B_ TASKMANAGER // AI Productivity Suite</h1>
+<main class="about-page app-shell-dark">
+  <section class="hero-section" aria-labelledby="about-title">
+    <div class="hero-orb orb-one bg-shape" aria-hidden="true"></div>
+    <div class="hero-orb orb-two bg-shape" aria-hidden="true"></div>
 
-  <section class="section mission" @fadeIn>
-    <h2 class="thematic-header"><i class="fas fa-satellite-dish"></i> Our Mission: The Core Directive</h2>
-    <div class="content-wrapper">
-      <img src="assets/mission.png" alt="Mission Illustration" class="illustration" />
+    <div class="hero-copy">
+      <div class="product-kicker">
+        <span class="kicker-dot"></span>
+        About M.O.B TaskManager
+      </div>
+
+      <h1 id="about-title">
+        One workspace to <span class="gradient-text">plan, focus and move forward.</span>
+      </h1>
+
+      <p class="hero-lead">
+        M.O.B TaskManager combines tasks, daily todos, habits, reading, meditation,
+        time tracking, Pomodoro focus and an action-capable AI assistant in one
+        connected productivity workspace.
+      </p>
+
+      <div class="hero-actions">
+        <a routerLink="/register" class="primary-action">Start using the app</a>
+        <a routerLink="/key-features" class="secondary-action">Explore features</a>
+      </div>
+
+      <div class="platform-row" aria-label="Supported platforms">
+        <span *ngFor="let platform of platformBadges; trackBy: trackByValue">{{ platform }}</span>
+      </div>
+    </div>
+
+    <div class="hero-console glass-panel" aria-label="Product overview">
+      <div class="console-topbar">
+        <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <span>focus.workspace</span>
+        <span class="live-chip"><i></i> Connected</span>
+      </div>
+
+      <div class="console-body">
+        <div class="focus-card">
+          <span class="card-label">Current focus</span>
+          <strong>Deep work session</strong>
+          <div class="timer-display">24:18</div>
+          <div class="focus-progress"><span></span></div>
+        </div>
+
+        <div class="console-grid">
+          <div class="metric-card">
+            <span>Today</span>
+            <strong>6 / 8</strong>
+            <small>actions complete</small>
+          </div>
+          <div class="metric-card accent-card">
+            <span>Tracked</span>
+            <strong>2h 41m</strong>
+            <small>focused time</small>
+          </div>
+        </div>
+
+        <div class="ai-preview">
+          <div class="ai-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <div>
+            <span>AI Assistant</span>
+            <p>“Create my top three study tasks for today and start with ServiceNow.”</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="product-story section-wrap" aria-labelledby="why-title">
+    <div class="section-heading">
+      <span class="eyebrow">Why it exists</span>
+      <h2 id="why-title">Productivity without the clutter.</h2>
+      <p>
+        The app is designed around a simple idea: your work, personal routines and
+        focus tools should live together, while still staying clear enough to use every day.
+      </p>
+    </div>
+
+    <div class="story-grid">
+      <article class="story-card glass-panel">
+        <span class="story-index">01</span>
+        <h3>Less switching</h3>
+        <p>Tasks, daily todos, habits, challenges and timers stay inside one workspace.</p>
+      </article>
+      <article class="story-card glass-panel">
+        <span class="story-index">02</span>
+        <h3>More useful AI</h3>
+        <p>The assistant can do more than answer questions—it can perform approved productivity actions.</p>
+      </article>
+      <article class="story-card glass-panel">
+        <span class="story-index">03</span>
+        <h3>Time you can see</h3>
+        <p>Persistent timers help you understand how long individual tasks and todos actually take.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="features-section section-wrap" aria-labelledby="features-title">
+    <div class="section-heading split-heading">
       <div>
-        <p>
-          Our mission is to empower individuals and teams to efficiently manage
-          their tasks and time with the help of <strong>smart AI-powered tools</strong>, enhancing
-          productivity and reducing stress. We believe that everyone deserves
-          tools that adapt to their unique workflow.
-        </p>
+        <span class="eyebrow">Built around your day</span>
+        <h2 id="features-title">The core experience.</h2>
+      </div>
+      <p>
+        Each feature has a clear job. The goal is not to add more screens—it is to make
+        planning, doing and reviewing your day feel connected.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      <article
+        class="feature-card glass-panel"
+        *ngFor="let feature of productFeatures; trackBy: trackByTitle"
+        [attr.data-accent]="feature.accent"
+      >
+        <div class="feature-icon"><i class="fas" [ngClass]="feature.icon"></i></div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="workflow-section section-wrap" aria-labelledby="workflow-title">
+    <div class="section-heading">
+      <span class="eyebrow">How it fits together</span>
+      <h2 id="workflow-title">A simple loop for meaningful progress.</h2>
+    </div>
+
+    <div class="pillar-list">
+      <article class="pillar" *ngFor="let pillar of pillars; trackBy: trackByTitle">
+        <span>{{ pillar.number }}</span>
+        <div>
+          <h3>{{ pillar.title }}</h3>
+          <p>{{ pillar.description }}</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="architecture-section section-wrap" aria-labelledby="trust-title">
+    <div class="architecture-copy">
+      <span class="eyebrow">Designed with boundaries</span>
+      <h2 id="trust-title">Useful automation without handing AI the keys.</h2>
+      <p>
+        The AI assistant works through FastAPI and a controlled action layer. It does not
+        receive arbitrary database access. Account-security actions such as password and
+        email changes stay manual.
+      </p>
+
+      <div class="trust-points">
+        <div><i class="fas fa-shield-halved"></i><span>Validated, user-owned actions</span></div>
+        <div><i class="fas fa-database"></i><span>Account data stored in PostgreSQL on Supabase</span></div>
+        <div><i class="fas fa-envelope"></i><span>Transactional email handled by the backend mail service</span></div>
+      </div>
+    </div>
+
+    <div class="architecture-diagram glass-panel" aria-label="Application architecture">
+      <div class="arch-node user-node"><span>YOU</span><small>Web · Desktop · Mobile</small></div>
+      <div class="arch-line"><i></i></div>
+      <div class="arch-node api-node"><span>FASTAPI</span><small>Auth · validation · actions</small></div>
+      <div class="arch-branches">
+        <div class="arch-node"><span>SUPABASE</span><small>PostgreSQL data</small></div>
+        <div class="arch-node"><span>GROQ</span><small>AI reasoning</small></div>
+        <div class="arch-node"><span>BREVO</span><small>Transactional email</small></div>
       </div>
     </div>
   </section>
 
-  <section class="section vision" @fadeIn>
-    <h2 class="thematic-header"><i class="fas fa-lightbulb"></i> Our Vision: Autonomous Organization</h2>
-    <div class="content-wrapper reverse">
-      <div>
-                <p>
-          We envision a future where every person can effortlessly organize their
-          work and personal life, seamlessly integrating AI assistance to boost
-          focus and creativity. TaskManager aims to be at the forefront of this
-          productivity revolution, making advanced task management accessible to
-          everyone.
-        </p>
-      </div>
-      <img src="assets/vision.png" alt="Vision Illustration" class="illustration" />
+  <section class="closing-section section-wrap glass-panel">
+    <div>
+      <span class="eyebrow">Built to keep evolving</span>
+      <h2>A calmer system for ambitious days.</h2>
+      <p>
+        M.O.B TaskManager is becoming a focused productivity environment where planning,
+        action, reflection and intelligent assistance work together without getting in your way.
+      </p>
+    </div>
+    <div class="closing-actions">
+      <a routerLink="/register" class="primary-action">Create an account</a>
+      <a routerLink="/downloads" class="secondary-action">View downloads</a>
     </div>
   </section>
-
-  <section class="section values" @fadeIn>
-    <h2 class="thematic-header"><i class="fas fa-gem"></i> Core Values: Operational Integrity</h2>
-    <div class="content-wrapper">
-      <img src="assets/values.jpg" alt="Values Illustration" class="illustration" />
-      <div>
-        <ul>
-          <li><strong>Innovation:</strong> Constantly improving with cutting-edge AI technology.</li>
-          <li><strong>User Focus:</strong> Designed for simplicity and maximum usefulness.</li>
-          <li><strong>Integrity:</strong> Respecting your privacy and data security.</li>
-          <li><strong>Collaboration:</strong> Helping teams work better together.</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="section what-is-app" @fadeIn>
-    <h2 class="thematic-header"><i class="fas fa-bolt"></i> What is M.O.B TaskManager?</h2>
-    <div class="cards-container">
-      <div class="feature-card" *ngFor="let card of featureCards; trackBy: trackByFn" @fadeIn>
-        <div class="card-icon">
-          <i class="fas" [ngClass]="card.icon"></i>
-        </div>
-        <h3>{{ card.title }}</h3>
-        <p>{{ card.description }}</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section chatbot" @fadeIn>
-    <h2 class="thematic-header"><i class="fas fa-robot"></i> Mini — App Assistant</h2>
-
-    <div class="chatbot-wrapper developer-profile">
-      <div class="mini-header">
-        <img src="assets/mini-bot.jpg" alt="Mini AI Avatar" class="mini-avatar" />
-        <div class="mini-title">
-          <strong>Mini</strong><br /><small>M.O.B TaskManager Assistant</small>
-        </div>
-        <button class="refresh-btn" (click)="refreshChat()" title="Restart conversation">
-          <i class="fas fa-sync-alt"></i>
-        </button>
-      </div>
-
-      <div class="chat-window" role="log" aria-live="polite">
-        <div class="message" *ngFor="let msg of chatMessages; let i = index; trackBy: trackByFn">
-          <div class="msg user" *ngIf="msg.sender === 'user'">
-            <div class="msg-content">{{ msg.text }}</div>
-          </div>
-          <div class="msg bot" *ngIf="msg.sender === 'bot'">
-            <div class="msg-content" [innerHTML]="msg.text"></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="suggestions" *ngIf="showSuggestions" @fadeHide>
-        <!-- Show all categories if showCategories is true -->
-        <div class="category" *ngFor="let cat of miniKnowledge; let ci = index" [class.hidden]="!showCategories && activeCategory !== ci">
-          <button class="category-btn" (click)="toggleCategory(ci)" *ngIf="showCategories || activeCategory === ci">
-            {{ cat.title }}
-          </button>
-          
-          <!-- Back button when viewing a single category -->
-          <button class="back-btn" *ngIf="!showCategories && activeCategory === ci" (click)="backToCategories()">
-            ← Back to Categories
-          </button>
-          
-          <div class="suggested-questions" *ngIf="activeCategory === ci">
-            <button class="suggestion-btn" *ngFor="let q of cat.questions; let qi = index"
-              (click)="selectQuestion(ci, qi)">
-              {{ q.q }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="chat-input">
-        <input type="text" placeholder="Type 'hello' to start..." [(ngModel)]="userInput" (keydown.enter)="handleUserInput()" />
-        <button class="btn" (click)="handleUserInput()">Send</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="section developer" @fadeIn>
-    <h2 class="thematic-header"><i class="fas fa-terminal"></i> Developer Profile: Thembinkosi E. T.</h2>
-
-    <div class="developer-profile">
-      <div class="developer-header">
-        <img src="assets/Eden.jpg" alt="Thembinkosi Eden Thwala" class="developer-photo" />
-        <div class="developer-intro">
-          <h3>Thembinkosi Eden Thwala</h3>
-          <p class="developer-title">Full Stack Developer | AI Systems Integrator</p>
-          <p class="developer-bio">
-            Passionate about building intuitive, AI-powered productivity apps
-            that make life easier. With over 5 years of experience developing
-            web applications, I specialize in creating responsive, user-friendly
-            interfaces with powerful backend functionality.
-          </p>
-
-          <div class="social-links">
-            <a *ngFor="let social of socialLinks; trackBy: trackByFn" [href]="social.url" target="_blank" class="social-icon">
-              <i class="fab" [ngClass]="social.icon"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="skills-section">
-        <h4>// Full-Stack Capabilities</h4>
-
-        <div class="skill" *ngFor="let skill of developerSkills; trackBy: trackByFn">
-          <div class="skill-info">
-            <span class="skill-name">{{ skill.name }}</span>
-            <span class="skill-percent">{{ skill.animatedLevel | number:'1.0-0' }}%</span>
-          </div>
-          <div class="skill-bar" #skillBar>
-            <div class="skill-progress" [style.width.%]="skill.animatedLevel"></div>
-          </div>
-          <div class="skill-technologies">
-            <span class="tech-tag" *ngFor="let tech of skill.technologies; trackBy: trackByFn">{{ tech }}</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="developer-statement">
-        <h4>Developer Statement: Focus on User Experience</h4>
-        <blockquote>
-          Creating M.O.B TaskManager was driven by the need for a task app that is both powerful for professionals and simple for everyone else. The integration of modern technology and a seamless user experience is my primary goal.
-        </blockquote>
-      </div>
-    </div>
-  </section>
-</div>
+</main>

@@ -1,111 +1,98 @@
-<div class="key-features-container">
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <h1 class="page-title">M.O.B TaskManager Ultimate</h1>
-    <p class="page-subtitle">
-      Transform your life with AI-powered challenges, project tracking, and intelligent habit management
-    </p>
+<main class="features-page app-shell-dark">
+  <section class="features-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">Features</span>
+      <h1>Everything you need to turn <span class="gradient-text">intention into progress.</span></h1>
+      <p>
+        M.O.B TaskManager brings planning, daily execution, focus tools, routines and
+        an action-capable AI assistant into one connected workspace.
+      </p>
+      <div class="hero-actions">
+        <a routerLink="/register" class="primary-action">Get started</a>
+        <a routerLink="/downloads" class="secondary-action">View downloads</a>
+      </div>
+    </div>
+
+    <div class="hero-signal glass-panel" aria-label="Feature summary">
+      <div class="signal-row"><span>PLAN</span><i></i><strong>Tasks + Daily Todos</strong></div>
+      <div class="signal-row"><span>FOCUS</span><i></i><strong>Pomodoro + Timers</strong></div>
+      <div class="signal-row"><span>BUILD</span><i></i><strong>Habits + Challenges</strong></div>
+      <div class="signal-row"><span>ASSIST</span><i></i><strong>AI Actions</strong></div>
+    </div>
   </section>
 
-  <!-- Main 8 Features Grid -->
-  <section class="main-features-section">
-    <h2 class="section-title">✨ Complete Feature Suite</h2>
-    <div class="main-features-grid">
-      <div class="feature-card" [ngClass]="feature.gradient" *ngFor="let feature of mainFeatures">
-        <div class="feature-header">
-          <i [class]="feature.icon" class="feature-icon"></i>
+  <section class="feature-section section-wrap">
+    <div class="section-heading">
+      <span class="eyebrow">Core capabilities</span>
+      <h2>A focused feature set, not a pile of extras.</h2>
+      <p>
+        We removed the old diet, generic challenge, roadmap, project and gamification
+        concepts so the product can stay centered on real productivity and personal consistency.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      <article
+        class="feature-card glass-panel"
+        *ngFor="let feature of mainFeatures; trackBy: trackByTitle"
+        [attr.data-accent]="feature.accent"
+      >
+        <div class="feature-icon"><i [class]="feature.icon"></i></div>
+        <div class="feature-copy">
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+          <small>{{ feature.detail }}</small>
         </div>
-        <h3>{{ feature.title }}</h3>
-        <p>{{ feature.description }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="flow-section section-wrap">
+    <div class="section-heading">
+      <span class="eyebrow">The workflow</span>
+      <h2>From idea to focused execution.</h2>
+    </div>
+
+    <div class="flow-grid">
+      <article class="flow-card" *ngFor="let item of focusFlow; trackBy: trackByTitle">
+        <span>{{ item.step }}</span>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.text }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="ai-section section-wrap glass-panel">
+    <div class="ai-copy">
+      <span class="eyebrow">AI that can help do the work</span>
+      <h2>Ask naturally. Keep actions controlled.</h2>
+      <p>
+        The assistant can understand your request, produce a structured action and let
+        FastAPI validate ownership and allowed behavior before anything changes.
+      </p>
+      <div class="ai-chips">
+        <span>Create tasks</span>
+        <span>Add daily todos</span>
+        <span>Start timers</span>
+        <span>Update habits</span>
+        <span>Manage reading & meditation</span>
+      </div>
+    </div>
+
+    <div class="ai-demo">
+      <div class="demo-message user">Create three study todos for today and make ServiceNow the highest priority.</div>
+      <div class="demo-message assistant">
+        <strong>Done.</strong>
+        <span>I created your daily study list and marked ServiceNow as high priority.</span>
       </div>
     </div>
   </section>
 
-  <!-- Challenges Detail Section -->
-  <section class="detail-section challenges-section">
-    <h2 class="section-title">21-30 Day Life-Changing Challenges</h2>
-    <p class="section-subtitle">Short-term commitments for long-lasting transformation</p>
-    <div class="challenge-grid">
-      <div class="challenge-item" *ngFor="let challenge of challengeTypes">
-        <i [class]="challenge.icon" class="challenge-icon"></i>
-        <h4>{{ challenge.name }}</h4>
-        <span class="duration">{{ challenge.duration }}</span>
-      </div>
+  <section class="features-cta section-wrap">
+    <div>
+      <span class="eyebrow">Ready when you are</span>
+      <h2>Build a system you can actually keep using.</h2>
     </div>
+    <a routerLink="/register" class="primary-action">Create an account</a>
   </section>
-
-  <!-- Projects Detail Section -->
-  <section class="detail-section projects-section">
-    <h2 class="section-title">📊 Long-Term Project Planning</h2>
-    <p class="section-subtitle">Structured milestone tracking for major achievements</p>
-    <div class="project-timeline">
-      <div class="timeline-item" *ngFor="let project of projectTypes">
-        <div class="timeline-marker">
-          <i [class]="project.icon"></i>
-        </div>
-        <div class="timeline-content">
-          <h4>{{ project.name }}</h4>
-          <span>{{ project.duration }}</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Diet Management Section -->
-  <section class="detail-section diet-section">
-    <h2 class="section-title">🥗 Smart Diet & Hydration Management</h2>
-    <p class="section-subtitle">Time-based suggestions for optimal health</p>
-    <div class="diet-timeline">
-      <div class="diet-time-block" *ngFor="let diet of dietFeatures">
-        <div class="time-label">{{ diet.time }}</div>
-        <div class="suggestion">{{ diet.suggestion }}</div>
-      </div>
-    </div>
-    <div class="diet-features">
-      <div class="diet-feature">
-        <i class="fas fa-leaf"></i>
-        <span>Custom diet types: Keto, Vegan, Low Sugar</span>
-      </div>
-      <div class="diet-feature">
-        <i class="fas fa-tint"></i>
-        <span>Hydration tracking & reminders</span>
-      </div>
-      <div class="diet-feature">
-        <i class="fas fa-heart"></i>
-        <span>Motivational messages after 6 PM</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Gamification Section -->
-  <section class="detail-section gamification-section">
-    <h2 class="section-title">🎮 Gamification & Rewards</h2>
-    <p class="section-subtitle">Stay motivated with achievements and progression</p>
-    <div class="gamification-grid">
-      <div class="gamification-item" *ngFor="let element of gamificationElements">
-        <i [class]="element.icon" class="gamification-icon"></i>
-        <span>{{ element.name }}</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <div class="cta-content">
-      <h2>Ready to Transform Your Life?</h2>
-      <p>Join thousands achieving their goals with AI-powered guidance</p>
-      <div class="platform-options">
-        <button class="download-btn">
-          <i class="fas fa-download"></i>
-          Download for Your Platform
-        </button>
-        <div class="platform-icons">
-          <i class="fab fa-windows"></i>
-          <i class="fab fa-apple"></i>
-          <i class="fab fa-android"></i>
-          <i class="fab fa-app-store-ios"></i>
-        </div>
-      </div>
-    </div>
-  </section>
-</div>
+</main>

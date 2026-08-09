@@ -26,6 +26,7 @@ jobs:
       - run: python -m compileall app
       - run: python -c "from app.main import app; assert app.title == 'Task Manager API'"
       - run: PYTHONPATH=. python tests/smoke.py
+      - run: PYTHONPATH=. python tests/productivity_smoke.py
 
   frontend:
     runs-on: ubuntu-latest

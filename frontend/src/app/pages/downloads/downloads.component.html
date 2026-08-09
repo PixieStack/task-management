@@ -109,8 +109,8 @@
       <div>
         <strong>macOS</strong>
         <p>
-          The Universal package contains both Intel x86_64 and Apple Silicon arm64 code. Your 2019
-          Intel MacBook is in the Intel target; current M-series Macs use the Apple Silicon target.
+          The Universal package contains both Intel x86_64 and Apple Silicon arm64 code. A 2019
+          Intel MacBook uses the Intel side; current M-series Macs use the Apple Silicon side.
         </p>
       </div>
       <div>
@@ -123,15 +123,15 @@
       <div>
         <strong>Windows</strong>
         <p>
-          Separate x64 and ARM64 packages are planned so normal Intel/AMD PCs and newer ARM Windows
-          devices do not have to share one installer target.
+          Separate x64 and ARM64 package targets are configured so Intel/AMD PCs and ARM Windows
+          devices can use native installers built for their architecture.
         </p>
       </div>
       <div>
         <strong>Android</strong>
         <p>
-          The build pipeline can create an APK for direct device testing and an AAB for future Play
-          distribution. Production distribution requires a persistent release signing key.
+          The build pipeline can create an APK for direct device testing and can be prepared for a
+          signed store release. Production distribution requires a persistent release signing key.
         </p>
       </div>
     </div>

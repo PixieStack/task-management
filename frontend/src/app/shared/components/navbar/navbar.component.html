@@ -14,10 +14,10 @@
             [routerLinkActiveOptions]="{ exact: true }"
           >Home</a>
         </li>
-        <li><a routerLink="/key-features" routerLinkActive="active">Key Features</a></li>
+        <li><a routerLink="/key-features" routerLinkActive="active">Features</a></li>
         <li><a routerLink="/downloads" routerLinkActive="active">Downloads</a></li>
-        <li><a routerLink="/about" routerLinkActive="active">About Us</a></li>
-        <li><a routerLink="/contact" routerLinkActive="active">Contact Us</a></li>
+        <li><a routerLink="/about" routerLinkActive="active">About</a></li>
+        <li><a routerLink="/contact" routerLinkActive="active">Contact</a></li>
       </ul>
 
       <div class="auth-buttons" *ngIf="!user">
@@ -48,10 +48,10 @@
   <div id="mobile-navigation" class="mobile-panel" *ngIf="menuOpen">
     <ul class="mobile-links">
       <li><a routerLink="/" (click)="closeMobileMenu()">Home</a></li>
-      <li><a routerLink="/key-features" (click)="closeMobileMenu()">Key Features</a></li>
+      <li><a routerLink="/key-features" (click)="closeMobileMenu()">Features</a></li>
       <li><a routerLink="/downloads" (click)="closeMobileMenu()">Downloads</a></li>
-      <li><a routerLink="/about" (click)="closeMobileMenu()">About Us</a></li>
-      <li><a routerLink="/contact" (click)="closeMobileMenu()">Contact Us</a></li>
+      <li><a routerLink="/about" (click)="closeMobileMenu()">About</a></li>
+      <li><a routerLink="/contact" (click)="closeMobileMenu()">Contact</a></li>
     </ul>
 
     <div class="mobile-auth" *ngIf="!user">
