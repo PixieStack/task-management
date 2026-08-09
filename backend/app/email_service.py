@@ -2,47 +2,130 @@ import logging
 import smtplib
 from email.message import EmailMessage
 from email.utils import formataddr
+from urllib.parse import urlencode
 
-from app.config import ADMIN_EMAIL, BREVO_SMTP_KEY, BREVO_SMTP_LOGIN, BREVO_SMTP_PORT, BREVO_SMTP_SERVER, SENDER_EMAIL, SENDER_NAME
+from app.config import (
+    ADMIN_EMAIL,
+    APP_URL,
+    BREVO_SMTP_KEY,
+    BREVO_SMTP_LOGIN,
+    BREVO_SMTP_PORT,
+    BREVO_SMTP_SERVER,
+    SENDER_EMAIL,
+    SENDER_NAME,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def send_email(to_email: str, subject: str, text_body: str, html_body: str | None = None, reply_to: str | None = None) -> bool:
+def send_email(
+    to_email: str,
+    subject: str,
+    text_body: str,
+    html_body: str | None = None,
+    reply_to: str | None = None,
+) -> bool:
     if not (BREVO_SMTP_LOGIN and BREVO_SMTP_KEY and SENDER_EMAIL):
         logger.warning("Brevo SMTP is not configured; skipping email to %s", to_email)
         return False
+
     message = EmailMessage()
-    message["From"] = formataddr((SENDER_NAME, SENDER_EMAIL)); message["To"] = to_email; message["Subject"] = subject
-    if reply_to: message["Reply-To"] = reply_to
+    message["From"] = formataddr((SENDER_NAME, SENDER_EMAIL))
+    message["To"] = to_email
+    message["Subject"] = subject
+    if reply_to:
+        message["Reply-To"] = reply_to
     message.set_content(text_body)
-    if html_body: message.add_alternative(html_body, subtype="html")
+    if html_body:
+        message.add_alternative(html_body, subtype="html")
+
     try:
         with smtplib.SMTP(BREVO_SMTP_SERVER, BREVO_SMTP_PORT, timeout=20) as smtp:
-            smtp.ehlo(); smtp.starttls(); smtp.ehlo(); smtp.login(BREVO_SMTP_LOGIN, BREVO_SMTP_KEY); smtp.send_message(message)
+            smtp.ehlo()
+            smtp.starttls()
+            smtp.ehlo()
+            smtp.login(BREVO_SMTP_LOGIN, BREVO_SMTP_KEY)
+            smtp.send_message(message)
         return True
     except Exception:
-        logger.exception("Brevo SMTP delivery failed for %s", to_email); return False
+        logger.exception("Brevo SMTP delivery failed for %s", to_email)
+        return False
 
 
 def send_welcome_email(to_email: str, username: str) -> bool:
-    return send_email(to_email, "Welcome to Task Manager", f"Hi {username},\n\nYour Task Manager account is ready. Manage tasks, build habits, track reading and meditation challenges, and use the AI assistant.\n\nTask Manager")
+    return send_email(
+        to_email,
+        "Welcome to Task Manager",
+        f"Hi {username},\n\nYour Task Manager account is ready. Manage tasks, build habits, track reading and meditation challenges, and use the AI assistant.\n\nTask Manager",
+    )
+
+
+def send_password_reset_email(
+    to_email: str,
+    username: str,
+    token: str,
+    expires_minutes: int,
+) -> bool:
+    reset_url = f"{APP_URL.rstrip('/')}/reset-password?{urlencode({'token': token})}"
+    return send_email(
+        to_email,
+        "Reset your Task Manager password",
+        (
+            f"Hi {username},\n\n"
+            "A password reset was requested for your Task Manager account.\n\n"
+            f"Reset your password here: {reset_url}\n\n"
+            f"This link expires in {expires_minutes} minutes and can only be used once. "
+            "If you did not request a reset, you can ignore this email.\n\n"
+            "Task Manager"
+        ),
+    )
 
 
 def send_password_changed_email(to_email: str, username: str) -> bool:
-    return send_email(to_email, "Your Task Manager password was changed", f"Hi {username},\n\nYour password was changed successfully. If you did not make this change, contact support immediately.\n\nTask Manager")
+    return send_email(
+        to_email,
+        "Your Task Manager password was changed",
+        f"Hi {username},\n\nYour password was changed successfully. If you did not make this change, contact support immediately.\n\nTask Manager",
+    )
 
 
 def send_email_changed_messages(old_email: str, new_email: str, username: str) -> None:
-    send_email(old_email, "Your Task Manager email address was changed", f"Hi {username},\n\nYour account email was changed to {new_email}. If you did not make this change, contact support immediately.\n\nTask Manager")
-    send_email(new_email, "Your new Task Manager email is active", f"Hi {username},\n\nThis email address is now connected to your Task Manager account.\n\nTask Manager")
+    send_email(
+        old_email,
+        "Your Task Manager email address was changed",
+        f"Hi {username},\n\nYour account email was changed to {new_email}. If you did not make this change, contact support immediately.\n\nTask Manager",
+    )
+    send_email(
+        new_email,
+        "Your new Task Manager email is active",
+        f"Hi {username},\n\nThis email address is now connected to your Task Manager account.\n\nTask Manager",
+    )
 
 
 def send_account_deleted_email(to_email: str, username: str) -> bool:
-    return send_email(to_email, "Your Task Manager account was deleted", f"Hi {username},\n\nYour Task Manager account and associated application data were deleted.\n\nTask Manager")
+    return send_email(
+        to_email,
+        "Your Task Manager account was deleted",
+        f"Hi {username},\n\nYour Task Manager account and associated application data were deleted.\n\nTask Manager",
+    )
 
 
-def send_contact_notifications(first_name: str, last_name: str, email: str, phone: str, message_text: str) -> None:
+def send_contact_notifications(
+    first_name: str,
+    last_name: str,
+    email: str,
+    phone: str,
+    message_text: str,
+) -> None:
     if ADMIN_EMAIL:
-        send_email(ADMIN_EMAIL, f"New Task Manager contact message from {first_name} {last_name}", f"Name: {first_name} {last_name}\nEmail: {email}\nPhone: {phone}\n\nMessage:\n{message_text}", reply_to=email)
-    send_email(email, "We received your Task Manager message", f"Hi {first_name},\n\nThanks for contacting Task Manager. Your message was received and we'll respond as soon as possible.\n\nTask Manager")
+        send_email(
+            ADMIN_EMAIL,
+            f"New Task Manager contact message from {first_name} {last_name}",
+            f"Name: {first_name} {last_name}\nEmail: {email}\nPhone: {phone}\n\nMessage:\n{message_text}",
+            reply_to=email,
+        )
+    send_email(
+        email,
+        "We received your Task Manager message",
+        f"Hi {first_name},\n\nThanks for contacting Task Manager. Your message was received and we'll respond as soon as possible.\n\nTask Manager",
+    )

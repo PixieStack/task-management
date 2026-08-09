@@ -1,9 +1,8 @@
-from datetime import datetime, timezone
-
 from fastapi.testclient import TestClient
 
 from app import database, models
 from app.main import app
+from app.routers import auth as auth_router
 
 
 models.Base.metadata.drop_all(bind=database.engine)
@@ -13,13 +12,17 @@ client = TestClient(app)
 
 
 def expect(response, status_code):
-    assert response.status_code == status_code, f"{response.request.method} {response.request.url}: {response.status_code} {response.text}"
+    assert response.status_code == status_code, (
+        f"{response.request.method} {response.request.url}: "
+        f"{response.status_code} {response.text}"
+    )
     return response
 
 
 # Registration and authentication
 password = "StrongPass1!"
-new_password = "ChangedPass2!"
+reset_password = "ResetPass2!"
+new_password = "ChangedPass3!"
 
 register = expect(
     client.post(
@@ -30,19 +33,74 @@ register = expect(
 )
 assert register.json()["email"] == "ci@example.com"
 
-login = expect(client.post("/auth/login", json={"email": "ci@example.com", "password": password}), 200)
+login = expect(
+    client.post("/auth/login", json={"email": "ci@example.com", "password": password}),
+    200,
+)
 token = login.json()["access_token"]
 headers = {"Authorization": f"Bearer {token}"}
 
 expect(client.get("/auth/me", headers=headers), 200)
 expect(client.post("/auth/verify-token", headers=headers), 200)
 
+# Password reset is app-managed and sends through the configured email service.
+# Capture the reset token in CI instead of requiring SMTP credentials.
+captured_reset = {}
+
+
+def capture_reset_email(to_email, username, token, expires_minutes):
+    captured_reset["to_email"] = to_email
+    captured_reset["token"] = token
+    captured_reset["expires_minutes"] = expires_minutes
+    return True
+
+
+auth_router.send_password_reset_email = capture_reset_email
+forgot = expect(
+    client.post("/auth/forgot-password", json={"email": "ci@example.com"}),
+    200,
+)
+assert "If an account exists" in forgot.json()["message"]
+assert captured_reset["to_email"] == "ci@example.com"
+assert captured_reset["token"]
+
+expect(
+    client.post(
+        "/auth/reset-password",
+        json={"token": captured_reset["token"], "new_password": reset_password},
+    ),
+    200,
+)
+# Existing JWTs and old credentials are invalid after a reset.
+assert client.get("/auth/me", headers=headers).status_code == 401
+assert client.post(
+    "/auth/login", json={"email": "ci@example.com", "password": password}
+).status_code == 401
+reset_login = expect(
+    client.post(
+        "/auth/login",
+        json={"email": "ci@example.com", "password": reset_password},
+    ),
+    200,
+)
+headers = {"Authorization": f"Bearer {reset_login.json()['access_token']}"}
+
+# A reset link is single-use.
+assert client.post(
+    "/auth/reset-password",
+    json={"token": captured_reset["token"], "new_password": "AnotherPass4!"},
+).status_code == 400
+
 # Profile
 profile = expect(
     client.put(
         "/auth/profile",
         headers=headers,
-        json={"city": "Johannesburg", "country": "South Africa", "bio": "CI smoke test profile"},
+        json={
+            "city": "Johannesburg",
+            "country": "South Africa",
+            "bio": "CI smoke test profile",
+        },
     ),
     200,
 )
@@ -96,10 +154,16 @@ habit = expect(
 ).json()
 habit_id = habit["id"]
 
-habit_check_in = expect(client.post(f"/api/habits/{habit_id}/check-in", headers=headers), 200).json()
+habit_check_in = expect(
+    client.post(f"/api/habits/{habit_id}/check-in", headers=headers),
+    200,
+).json()
 assert habit_check_in["completed"] is True
 
-habit_entries = expect(client.get(f"/api/habits/entries?habit_id={habit_id}&days=30", headers=headers), 200).json()
+habit_entries = expect(
+    client.get(f"/api/habits/entries?habit_id={habit_id}&days=30", headers=headers),
+    200,
+).json()
 assert len(habit_entries) == 1
 
 # Reading and meditation challenges
@@ -112,7 +176,10 @@ for challenge_type, title in (("reading", "Read Daily"), ("meditation", "Meditat
         ),
         201,
     ).json()
-    checked = expect(client.post(f"/api/challenges/check-in/{challenge['id']}", headers=headers), 200).json()
+    checked = expect(
+        client.post(f"/api/challenges/check-in/{challenge['id']}", headers=headers),
+        200,
+    ).json()
     assert checked["current_streak"] == 1
     assert checked["progress"] > 0
 
@@ -124,7 +191,11 @@ invalid_challenge = client.post(
 assert invalid_challenge.status_code == 422
 
 # AI endpoint is protected and reports missing provider configuration cleanly in CI.
-ai_without_key = client.post("/api/ai/ask", headers=headers, json={"question": "What should I do next?"})
+ai_without_key = client.post(
+    "/api/ai/ask",
+    headers=headers,
+    json={"question": "What should I do next?"},
+)
 assert ai_without_key.status_code == 503
 
 # Contact form persists even when SMTP secrets are intentionally absent in CI.
@@ -143,20 +214,30 @@ contact = expect(
 )
 assert contact.json()["success"] is True
 
-# Password change invalidates the old credentials for login and accepts the new ones.
+# Password change invalidates the old JWT/credentials and accepts the new password.
+old_headers = headers
 expect(
     client.post(
         "/auth/change-password",
         headers=headers,
-        json={"current_password": password, "new_password": new_password},
+        json={"current_password": reset_password, "new_password": new_password},
     ),
     200,
 )
-assert client.post("/auth/login", json={"email": "ci@example.com", "password": password}).status_code == 401
-new_login = expect(client.post("/auth/login", json={"email": "ci@example.com", "password": new_password}), 200)
+assert client.get("/auth/me", headers=old_headers).status_code == 401
+assert client.post(
+    "/auth/login", json={"email": "ci@example.com", "password": reset_password}
+).status_code == 401
+new_login = expect(
+    client.post(
+        "/auth/login",
+        json={"email": "ci@example.com", "password": new_password},
+    ),
+    200,
+)
 headers = {"Authorization": f"Bearer {new_login.json()['access_token']}"}
 
-# Email change returns a fresh JWT tied to the new email.
+# Email change returns a fresh JWT tied to the new email/auth version.
 email_change = expect(
     client.post(
         "/auth/change-email",

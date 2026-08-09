@@ -8,6 +8,8 @@ const publicRoutes = [
   '/downloads',
   '/login',
   '/register',
+  '/forgot-password',
+  '/reset-password?token=responsive-reset-token',
   '/faq',
   '/privacy',
   '/terms',
@@ -138,6 +140,47 @@ test.describe('responsive layout smoke suite', () => {
     await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Key Features' })).toBeVisible();
     await expect(page.locator('#mobile-navigation').getByRole('link', { name: 'Downloads' })).toBeVisible();
     await expectNoHorizontalOverflow(page, '320px open mobile navigation');
+  });
+
+  test('forgot/reset password UI calls the application auth endpoints', async ({ page }) => {
+    let forgotPayload: unknown;
+    let resetPayload: unknown;
+
+    await page.route('**/auth/forgot-password', async (route) => {
+      forgotPayload = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          message: 'If an account exists for that email, a password reset link has been sent.',
+        }),
+      });
+    });
+
+    await page.route('**/auth/reset-password', async (route) => {
+      resetPayload = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Password reset successfully. You can now sign in with your new password.' }),
+      });
+    });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/forgot-password', { waitUntil: 'domcontentloaded' });
+    await page.getByLabel('Email address').fill('reset@example.com');
+    await page.getByRole('button', { name: 'Send reset link' }).click();
+    await expect(page.getByRole('status')).toContainText('password reset link has been sent');
+    expect(forgotPayload).toEqual({ email: 'reset@example.com' });
+
+    const token = 'test-reset-token-abcdefghijklmnopqrstuvwxyz-1234567890';
+    await page.goto(`/reset-password?token=${token}`, { waitUntil: 'domcontentloaded' });
+    await page.getByLabel('New password').fill('StrongReset9!');
+    await page.getByLabel('Confirm new password').fill('StrongReset9!');
+    await page.getByRole('button', { name: 'Reset password' }).click();
+    await expect(page.getByRole('status')).toContainText('Password reset successfully');
+    expect(resetPayload).toEqual({ token, new_password: 'StrongReset9!' });
+    await expectNoHorizontalOverflow(page, '390px password reset flow');
   });
 
   test('Downloads page keeps unpublished release links and QR codes disabled', async ({ page }) => {
