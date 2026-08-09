@@ -108,11 +108,22 @@ async function stubProtectedLayoutApi(page: Page): Promise<void> {
     });
   });
 
-  for (const pattern of ['**/api/tasks**', '**/api/habits**', '**/api/challenges**', '**/api/ai/conversations**']) {
+  for (const pattern of [
+    '**/api/tasks**',
+    '**/api/habits**',
+    '**/api/challenges**',
+    '**/api/ai/conversations**',
+    '**/api/productivity/todos**',
+    '**/api/productivity/timer/sessions**',
+  ]) {
     await page.route(pattern, async (route) => {
       await route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
     });
   }
+
+  await page.route('**/api/productivity/timer/active', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
+  });
 }
 
 test.describe('responsive layout smoke suite', () => {
@@ -237,7 +248,7 @@ test.describe('responsive layout smoke suite', () => {
         localStorage.setItem('userEmail', 'responsive@example.com');
       });
 
-      for (const route of ['/dashboard', '/profile']) {
+      for (const route of ['/dashboard', '/profile', '/focus']) {
         await page.goto(route, { waitUntil: 'domcontentloaded' });
         await expect(page).toHaveURL(new RegExp(`${route.replace('/', '\\/')}$`));
         await expectNoHorizontalOverflow(page, `${viewport.name} ${route}`);
