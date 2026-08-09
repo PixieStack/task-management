@@ -21,7 +21,6 @@
         </div>
       </div>
 
-      <!-- Profile Dropdown Menu -->
       <div class="profile-dropdown" *ngIf="isProfileDropdownOpen">
         <div class="dropdown-header">
           <div class="user-info">
@@ -42,6 +41,15 @@
                 (click)="closeProfileDropdown()"
               >
                 <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+            </li>
+            <li>
+              <a
+                routerLink="/focus"
+                routerLinkActive="active"
+                (click)="closeProfileDropdown()"
+              >
+                <i class="fas fa-stopwatch"></i> Focus & Timers
               </a>
             </li>
             <li>
