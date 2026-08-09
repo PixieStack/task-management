@@ -1,4 +1,5 @@
 from email.utils import parseaddr
+import ssl
 
 from app import email_service
 
@@ -12,6 +13,7 @@ class FakeSMTP:
         self.timeout = timeout
         self.ehlo_calls = 0
         self.started_tls = False
+        self.tls_context = None
         self.login_args = None
         self.message = None
         FakeSMTP.instances.append(self)
@@ -25,8 +27,9 @@ class FakeSMTP:
     def ehlo(self):
         self.ehlo_calls += 1
 
-    def starttls(self):
+    def starttls(self, context=None):
         self.started_tls = True
+        self.tls_context = context
 
     def login(self, username, password):
         self.login_args = (username, password)
@@ -56,6 +59,7 @@ smtp = FakeSMTP.instances[0]
 assert smtp.host == "smtp-relay.brevo.com"
 assert smtp.port == 587
 assert smtp.started_tls is True
+assert isinstance(smtp.tls_context, ssl.SSLContext)
 assert smtp.ehlo_calls == 2
 assert smtp.login_args == ("ci-smtp-login", "ci-smtp-key")
 assert smtp.message is not None
