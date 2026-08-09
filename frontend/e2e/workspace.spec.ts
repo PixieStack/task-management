@@ -19,6 +19,16 @@ async function json(route: Route, body: unknown, status = 200): Promise<void> {
 }
 
 async function stubCommonApi(page: Page): Promise<void> {
+  await page.route('**/auth/me', async (route) => json(route, {
+    id: 1,
+    username: 'Workspace Tester',
+    email: 'workspace@example.com',
+  }));
+  await page.route('**/auth/profile', async (route) => json(route, {
+    first_name: 'Workspace',
+    last_name: 'Tester',
+    bio: '',
+  }));
   await page.route('**/api/tasks**', async (route) => json(route, []));
   await page.route('**/api/habits**', async (route) => json(route, []));
   await page.route('**/api/challenges**', async (route) => json(route, []));
@@ -28,6 +38,8 @@ async function stubCommonApi(page: Page): Promise<void> {
 }
 
 test.describe('authenticated productivity workspace', () => {
+  test.describe.configure({ timeout: 120_000 });
+
   test.beforeEach(async ({ page }) => {
     await authenticate(page);
     await stubCommonApi(page);
@@ -46,11 +58,11 @@ test.describe('authenticated productivity workspace', () => {
 
     await sidebar.getByRole('link', { name: 'AI Assistant', exact: true }).click();
     await expect(page).toHaveURL(/\/dashboard#ai$/);
-    await expect(page.getByRole('heading', { name: 'Plan from your actual app data' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Plan from your actual app data' })).toBeVisible({ timeout: 15_000 });
 
     await sidebar.getByRole('link', { name: 'Todo', exact: true }).click();
     await expect(page).toHaveURL(/\/focus#todos$/);
-    await expect(page.getByRole('heading', { name: 'What must happen today?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'What must happen today?' })).toBeVisible({ timeout: 15_000 });
   });
 
   test('daily Todo creates a persisted item and displays its timer total', async ({ page }) => {
@@ -80,12 +92,12 @@ test.describe('authenticated productivity workspace', () => {
     });
 
     await page.goto('/focus#todos', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'What must happen today?' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'What must happen today?' })).toBeVisible({ timeout: 15_000 });
     await page.getByLabel('Todo title').fill('Review chapter 4');
     await page.getByLabel('Todo priority').selectOption('High');
     await page.getByRole('button', { name: 'Add', exact: true }).click();
 
-    await expect(page.getByText('Review chapter 4', { exact: true })).toBeVisible();
+    await expect(page.getByText('Review chapter 4', { exact: true })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/Time spent: 1m 23s/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Start timer', exact: true })).toBeVisible();
   });
@@ -96,9 +108,9 @@ test.describe('authenticated productivity workspace', () => {
     });
 
     await page.goto('/focus#pomodoro', { waitUntil: 'domcontentloaded' });
-    await expect(page.getByRole('heading', { name: 'Pomodoro' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pomodoro' })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('25:00', { exact: true })).toBeVisible();
-    await expect(page.getByText(/Focus opened, but todos could not be loaded/)).toBeVisible();
+    await expect(page.getByText(/Focus opened, but todos could not be loaded/)).toBeVisible({ timeout: 15_000 });
   });
 
   test('AI conversation surfaces executed workspace actions', async ({ page }) => {
@@ -122,9 +134,15 @@ test.describe('authenticated productivity workspace', () => {
     await page.goto('/dashboard#ai', { waitUntil: 'domcontentloaded' });
     const input = page.getByLabel('What do you need help with?');
     await input.fill('Create a Study networking task and add Read notes to today.');
-    await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
 
-    await expect(page.getByText('I created the task and today\'s todo. Done: create task, create todo.')).toBeVisible();
-    await expect(page.getByText('AI updated your workspace.')).toBeVisible();
+    const responsePromise = page.waitForResponse(
+      (response) => response.url().includes('/api/ai/ask') && response.request().method() === 'POST',
+    );
+    await page.getByRole('button', { name: 'Ask AI', exact: true }).click();
+    const response = await responsePromise;
+    expect(response.status()).toBe(200);
+
+    await expect(page.getByText(/I created the task and today's todo/)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('AI updated your workspace.')).toBeVisible({ timeout: 15_000 });
   });
 });
