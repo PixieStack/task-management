@@ -1,0 +1,154 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar" aria-label="Admin navigation">
+    <div class="admin-brand">
+      <span class="brand-mark">M</span>
+      <div><strong>Control Center</strong><small>Private admin portal</small></div>
+    </div>
+
+    <nav>
+      <button [class.active]="section === 'overview'" (click)="setSection('overview')"><i class="fas fa-grid-2"></i><span>Overview</span></button>
+      <button [class.active]="section === 'accounts'" (click)="setSection('accounts')"><i class="fas fa-users"></i><span>Accounts</span></button>
+      <button [class.active]="section === 'health'" (click)="setSection('health')"><i class="fas fa-heart-pulse"></i><span>System Health</span></button>
+      <button [class.active]="section === 'api'" (click)="setSection('api')"><i class="fas fa-wave-square"></i><span>API Monitor</span></button>
+      <button [class.active]="section === 'ai'" (click)="setSection('ai')"><i class="fas fa-wand-magic-sparkles"></i><span>AI Activity</span></button>
+      <button [class.active]="section === 'audit'" (click)="setSection('audit')"><i class="fas fa-clock-rotate-left"></i><span>Audit Logs</span></button>
+    </nav>
+
+    <div class="admin-account">
+      <span class="avatar">{{ adminName.slice(0, 1).toUpperCase() }}</span>
+      <div><strong>{{ adminName }}</strong><small>{{ adminEmail }}</small></div>
+      <button class="icon-button" (click)="logout()" title="Log out" aria-label="Log out"><i class="fas fa-arrow-right-from-bracket"></i></button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <header class="admin-header">
+      <div>
+        <p class="eyebrow">Operations</p>
+        <h1>{{ section === 'overview' ? 'Platform overview' : section === 'accounts' ? 'Account management' : section === 'health' ? 'System health' : section === 'api' ? 'API monitor' : section === 'ai' ? 'AI activity' : 'Audit logs' }}</h1>
+      </div>
+      <div class="header-actions">
+        <span class="privacy-badge"><i class="fas fa-lock"></i> Admin only</span>
+        <button class="refresh-button" (click)="refreshAll()"><i class="fas fa-rotate"></i> Refresh</button>
+      </div>
+    </header>
+
+    <div class="toast error" *ngIf="errorMessage">{{ errorMessage }}</div>
+    <div class="toast success" *ngIf="successMessage">{{ successMessage }}</div>
+
+    <section *ngIf="section === 'overview'" class="section-stack">
+      <div class="status-strip" *ngIf="health">
+        <div><span class="dot" [class.bad]="health.backend.status !== 'operational'"></span><strong>Backend</strong><small>{{ statusLabel(health.backend.status) }}</small></div>
+        <div><span class="dot" [class.bad]="health.database.status !== 'operational'"></span><strong>Database</strong><small>{{ health.database.latency_ms }}ms</small></div>
+        <div><span class="dot configured" [class.bad]="health.ai.status !== 'configured'"></span><strong>AI</strong><small>{{ statusLabel(health.ai.status) }}</small></div>
+        <div><span class="dot configured" [class.bad]="health.email.status !== 'configured'"></span><strong>Email</strong><small>{{ statusLabel(health.email.status) }}</small></div>
+      </div>
+
+      <div class="metric-grid" *ngIf="overview">
+        <article class="metric-card"><span>Total accounts</span><strong>{{ overview.accounts.total }}</strong><small>{{ overview.accounts.active }} active</small></article>
+        <article class="metric-card"><span>Unverified</span><strong>{{ overview.accounts.unverified }}</strong><small>{{ overview.accounts.verified }} verified</small></article>
+        <article class="metric-card"><span>Deleted accounts</span><strong>{{ overview.accounts.deleted }}</strong><small>Archived metadata only</small></article>
+        <article class="metric-card"><span>AI requests today</span><strong>{{ overview.productivity.ai_requests_today }}</strong><small>Action + advice requests</small></article>
+        <article class="metric-card"><span>Tasks</span><strong>{{ overview.productivity.tasks }}</strong><small>Across active accounts</small></article>
+        <article class="metric-card"><span>Daily todos</span><strong>{{ overview.productivity.todos }}</strong><small>{{ overview.productivity.active_timers }} timers running</small></article>
+        <article class="metric-card"><span>Habits</span><strong>{{ overview.productivity.habits }}</strong><small>Tracked habits</small></article>
+        <article class="metric-card"><span>Challenges</span><strong>{{ overview.productivity.challenges }}</strong><small>Reading + meditation</small></article>
+      </div>
+
+      <div class="overview-grid">
+        <article class="panel" *ngIf="overview">
+          <div class="panel-heading"><div><p class="eyebrow">Authentication</p><h2>Account mix</h2></div></div>
+          <div class="list-stat"><span>Password / other</span><strong>{{ overview.accounts.total - overview.accounts.google - overview.accounts.apple }}</strong></div>
+          <div class="list-stat"><span>Google identities</span><strong>{{ overview.accounts.google }}</strong></div>
+          <div class="list-stat"><span>Apple identities</span><strong>{{ overview.accounts.apple }}</strong></div>
+          <div class="list-stat"><span>Suspended / inactive</span><strong>{{ overview.accounts.inactive }}</strong></div>
+        </article>
+
+        <article class="panel" *ngIf="health">
+          <div class="panel-heading"><div><p class="eyebrow">Runtime</p><h2>Application status</h2></div></div>
+          <div class="list-stat"><span>API version</span><strong>v{{ health.backend.version }}</strong></div>
+          <div class="list-stat"><span>Backend uptime</span><strong>{{ formatUptime(health.uptime_seconds) }}</strong></div>
+          <div class="list-stat"><span>Database latency</span><strong>{{ health.database.latency_ms }}ms</strong></div>
+          <div class="list-stat"><span>Recorded API routes</span><strong>{{ metrics.length }}</strong></div>
+        </article>
+      </div>
+    </section>
+
+    <section *ngIf="section === 'accounts'" class="section-stack">
+      <div class="toolbar">
+        <div class="segmented">
+          <button [class.active]="accountView === 'live'" (click)="accountView = 'live'">Live accounts</button>
+          <button [class.active]="accountView === 'deleted'" (click)="accountView = 'deleted'">Deleted accounts</button>
+        </div>
+        <select *ngIf="accountView === 'live'" [(ngModel)]="accountFilter" (ngModelChange)="reloadAccounts()" aria-label="Account filter">
+          <option value="all">All accounts</option>
+          <option value="active">Active</option>
+          <option value="inactive">Suspended / inactive</option>
+          <option value="unverified">Unverified</option>
+          <option value="admins">Administrators</option>
+        </select>
+      </div>
+
+      <div class="table-card" *ngIf="accountView === 'live'">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Account</th><th>Status</th><th>Sign-in</th><th>Usage</th><th>Joined</th><th>Actions</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let account of accounts">
+                <td><div class="account-cell"><span class="avatar small">{{ account.username.slice(0,1).toUpperCase() }}</span><div><strong>{{ account.username }}</strong><small>{{ account.email }}</small></div></div></td>
+                <td><div class="badge-row"><span class="badge" [class.good]="account.is_active" [class.bad]="!account.is_active">{{ account.is_active ? 'Active' : 'Suspended' }}</span><span class="badge" [class.good]="account.email_verified">{{ account.email_verified ? 'Verified' : 'Unverified' }}</span><span class="badge purple" *ngIf="account.is_admin">Admin</span></div></td>
+                <td><span *ngIf="account.google_linked">Google</span><span *ngIf="account.apple_linked">{{ account.google_linked ? ' · ' : '' }}Apple</span><span *ngIf="!account.google_linked && !account.apple_linked">Password</span></td>
+                <td><small>{{ account.tasks_count }} tasks · {{ account.todos_count }} todos<br>{{ account.habits_count }} habits · {{ account.challenges_count }} challenges</small></td>
+                <td>{{ account.created_at | date:'mediumDate' }}</td>
+                <td><div class="row-actions"><button *ngIf="account.is_active && !account.is_admin" (click)="suspend(account)">Suspend</button><button *ngIf="!account.is_active" (click)="reactivate(account)">Reactivate</button><button (click)="forceLogout(account)">Force logout</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="empty" *ngIf="!accounts.length">No accounts match this filter.</div>
+      </div>
+
+      <div class="table-card" *ngIf="accountView === 'deleted'">
+        <div class="notice"><i class="fas fa-circle-info"></i> Deleted accounts keep only minimal account-history metadata. Passwords, OAuth tokens and private workspace content are not archived here.</div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Former account</th><th>Original ID</th><th>Joined</th><th>Deleted</th><th>Reason</th></tr></thead>
+            <tbody><tr *ngFor="let account of deletedAccounts"><td><strong>{{ account.username }}</strong><br><small>{{ account.email }}</small></td><td>{{ account.original_user_id || '—' }}</td><td>{{ account.account_created_at ? (account.account_created_at | date:'mediumDate') : '—' }}</td><td>{{ account.deleted_at | date:'medium' }}</td><td>{{ account.deletion_reason }}</td></tr></tbody>
+          </table>
+        </div>
+        <div class="empty" *ngIf="!deletedAccounts.length">No deleted accounts have been archived.</div>
+      </div>
+    </section>
+
+    <section *ngIf="section === 'health'" class="section-stack">
+      <div class="health-grid" *ngIf="health">
+        <article class="health-card"><span class="health-icon"><i class="fas fa-server"></i></span><div><p>Backend API</p><h2>{{ statusLabel(health.backend.status) }}</h2><small>Version {{ health.backend.version }} · uptime {{ formatUptime(health.uptime_seconds) }}</small></div></article>
+        <article class="health-card"><span class="health-icon"><i class="fas fa-database"></i></span><div><p>Supabase database</p><h2>{{ statusLabel(health.database.status) }}</h2><small>{{ health.database.latency_ms }}ms query latency</small></div></article>
+        <article class="health-card"><span class="health-icon"><i class="fas fa-wand-magic-sparkles"></i></span><div><p>AI service</p><h2>{{ statusLabel(health.ai.status) }}</h2><small>Configuration status</small></div></article>
+        <article class="health-card"><span class="health-icon"><i class="fas fa-envelope"></i></span><div><p>Transactional email</p><h2>{{ statusLabel(health.email.status) }}</h2><small>Brevo SMTP configuration status</small></div></article>
+        <article class="health-card"><span class="health-icon"><i class="fab fa-google"></i></span><div><p>Google sign-in</p><h2>{{ statusLabel(health.google_sign_in.status) }}</h2><small>Provider configuration status</small></div></article>
+        <article class="health-card"><span class="health-icon"><i class="fab fa-apple"></i></span><div><p>Apple sign-in</p><h2>{{ statusLabel(health.apple_sign_in.status) }}</h2><small>Provider configuration status</small></div></article>
+      </div>
+      <div class="notice">External AI/email cards say <strong>Configured</strong>, not “Operational”, unless the backend has performed a live provider request. Database health is checked live with a real query.</div>
+    </section>
+
+    <section *ngIf="section === 'api'" class="section-stack">
+      <div class="table-card"><div class="table-scroll"><table><thead><tr><th>Endpoint</th><th>Requests</th><th>Errors</th><th>Average</th><th>Last status</th><th>Last seen</th></tr></thead><tbody><tr *ngFor="let metric of metrics"><td><code>{{ metric.endpoint }}</code></td><td>{{ metric.requests }}</td><td [class.error-text]="metric.errors > 0">{{ metric.errors }}</td><td>{{ metric.average_ms }}ms</td><td>{{ metric.last_status || '—' }}</td><td>{{ metric.last_seen ? (metric.last_seen | date:'mediumTime') : '—' }}</td></tr></tbody></table></div><div class="empty" *ngIf="!metrics.length">No API traffic has been recorded by this backend process yet.</div></div>
+      <div class="notice">API metrics are runtime/process metrics. They reset when the backend restarts and do not contain request bodies or secrets.</div>
+    </section>
+
+    <section *ngIf="section === 'ai'" class="section-stack">
+      <article class="activity-card" *ngFor="let item of aiActivity">
+        <div class="activity-head"><div><strong>{{ item.username }}</strong><small>{{ item.email }} · {{ item.created_at | date:'medium' }}</small></div><span class="badge purple">{{ item.executed_actions.length }} actions</span></div>
+        <p><strong>User:</strong> {{ item.question }}</p>
+        <p class="ai-answer"><strong>AI:</strong> {{ item.answer }}</p>
+        <div class="action-chips" *ngIf="item.executed_actions.length"><span *ngFor="let action of item.executed_actions">{{ action['type'] || 'action' }}</span></div>
+      </article>
+      <div class="empty" *ngIf="!aiActivity.length">No AI activity recorded yet.</div>
+    </section>
+
+    <section *ngIf="section === 'audit'" class="section-stack">
+      <div class="table-card"><div class="table-scroll"><table><thead><tr><th>Time</th><th>Admin</th><th>Action</th><th>Target</th><th>Details</th></tr></thead><tbody><tr *ngFor="let log of auditLogs"><td>{{ log.created_at | date:'medium' }}</td><td>{{ log.admin_username || 'System / deleted admin' }}</td><td><code>{{ log.action }}</code></td><td>{{ log.target_type || '—' }} {{ log.target_id || '' }}</td><td><small>{{ auditDetails(log) || '—' }}</small></td></tr></tbody></table></div><div class="empty" *ngIf="!auditLogs.length">No administrator actions recorded yet.</div></div>
+    </section>
+  </main>
+</div>
