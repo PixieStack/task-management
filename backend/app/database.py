@@ -3,6 +3,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from .config import (
+    ALLOW_SQLITE_FOR_TESTS,
     DATABASE_URL,
     SUPABASE_DB_HOST,
     SUPABASE_DB_NAME,
@@ -14,12 +15,17 @@ from .config import (
 
 def _build_database_url():
     if DATABASE_URL:
+        if DATABASE_URL.startswith("sqlite") and not ALLOW_SQLITE_FOR_TESTS:
+            raise RuntimeError(
+                "SQLite is test-only. Remove DATABASE_URL=sqlite... from backend/.env and use the Supabase Postgres settings. "
+                "CI/tests must explicitly set ALLOW_SQLITE_FOR_TESTS=true."
+            )
         return DATABASE_URL
 
     if not SUPABASE_DB_PASSWORD:
         raise RuntimeError(
             "SUPABASE_DB_PASSWORD is required. Set it in backend/.env or the deployment environment. "
-            "DATABASE_URL may be used only as an explicit override, such as CI tests."
+            "Task Manager does not fall back to SQLite at runtime."
         )
 
     return URL.create(
@@ -36,7 +42,6 @@ def _build_database_url():
 DATABASE_CONNECTION = _build_database_url()
 engine_kwargs = {"pool_pre_ping": True}
 
-# SQLite is supported only when explicitly supplied through DATABASE_URL for tests.
 if str(DATABASE_CONNECTION).startswith("sqlite"):
     engine_kwargs["connect_args"] = {"check_same_thread": False}
 else:

@@ -132,7 +132,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -158,18 +158,27 @@ jobs:
           rm -rf "$HOME/.cargo/registry/src" "$HOME/.cargo/registry/cache"
           rm -rf src-tauri/target
           df -h
+      - name: Enable KVM access when available
+        shell: bash
+        run: |
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm
+            ls -l /dev/kvm
+          else
+            echo "/dev/kvm is unavailable; emulator runner will fall back to software acceleration."
+          fi
       - name: Install and launch in Android emulator
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: 35
           arch: x86_64
           profile: pixel_6
-          disable-animations: true
-          script: |
-            adb install -r "$APK_PATH"
-            adb shell am start -W -n com.pixiestack.mobtaskmanager/.MainActivity
-            sleep 8
-            adb shell pidof com.pixiestack.mobtaskmanager
+          emulator-boot-timeout: 900
+          disable-animations: false
+          disable-linux-hw-accel: auto
+          # The emulator action executes each input line independently. Keep
+          # loops in a real script so they run in one shell process.
+          script: bash scripts/android-emulator-smoke.sh
 
   ios-simulator-install:
     name: iOS Simulator build + install + launch

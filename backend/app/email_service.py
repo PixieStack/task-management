@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 
 from app.config import (
     ADMIN_EMAIL,
+    API_PUBLIC_URL,
     APP_URL,
     BREVO_SMTP_KEY,
     BREVO_SMTP_LOGIN,
@@ -53,21 +54,35 @@ def send_email(
         return False
 
 
+def send_verification_email(to_email: str, username: str, token: str, expires_minutes: int) -> bool:
+    verify_url = f"{API_PUBLIC_URL}/auth/verify-email?{urlencode({'token': token})}"
+    text = (
+        f"Hi {username},\n\n"
+        "Verify your email address to activate your M.O.B TaskManager account.\n\n"
+        f"Verify email: {verify_url}\n\n"
+        f"This link expires in {expires_minutes} minutes and can only be used once. "
+        "If you did not create this account, you can ignore this email.\n\n"
+        "M.O.B TaskManager"
+    )
+    html = (
+        f"<p>Hi {username},</p>"
+        "<p>Verify your email address to activate your M.O.B TaskManager account.</p>"
+        f'<p><a href="{verify_url}">Verify my email</a></p>'
+        f"<p>This link expires in {expires_minutes} minutes and can only be used once.</p>"
+    )
+    return send_email(to_email, "Verify your M.O.B TaskManager email", text, html)
+
+
 def send_welcome_email(to_email: str, username: str) -> bool:
     return send_email(
         to_email,
-        "Welcome to Task Manager",
-        f"Hi {username},\n\nYour Task Manager account is ready. Manage tasks, build habits, track reading and meditation challenges, and use the AI assistant.\n\nTask Manager",
+        "Welcome to M.O.B TaskManager",
+        f"Hi {username},\n\nYour email is verified and your M.O.B TaskManager account is ready.\n\nM.O.B TaskManager",
     )
 
 
-def send_password_reset_email(
-    to_email: str,
-    username: str,
-    token: str,
-    expires_minutes: int,
-) -> bool:
-    reset_url = f"{APP_URL.rstrip('/')}/reset-password?{urlencode({'token': token})}"
+def send_password_reset_email(to_email: str, username: str, token: str, expires_minutes: int) -> bool:
+    reset_url = f"{APP_URL}/reset-password?{urlencode({'token': token})}"
     return send_email(
         to_email,
         "Reset your Task Manager password",
@@ -111,13 +126,7 @@ def send_account_deleted_email(to_email: str, username: str) -> bool:
     )
 
 
-def send_contact_notifications(
-    first_name: str,
-    last_name: str,
-    email: str,
-    phone: str,
-    message_text: str,
-) -> None:
+def send_contact_notifications(first_name: str, last_name: str, email: str, phone: str, message_text: str) -> None:
     if ADMIN_EMAIL:
         send_email(
             ADMIN_EMAIL,
