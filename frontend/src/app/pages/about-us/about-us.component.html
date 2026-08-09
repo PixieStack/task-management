@@ -14,9 +14,9 @@
       </h1>
 
       <p class="hero-lead">
-        M.O.B TaskManager combines tasks, daily todos, habits, reading, meditation,
-        time tracking, Pomodoro focus and an action-capable AI assistant in one
-        connected productivity workspace.
+        M.O.B TaskManager brings your tasks, daily todos, habits, reading, meditation,
+        focus timers and Pomodoro sessions together. Its AI assistant can also help you
+        create and manage your productivity items from a simple conversation.
       </p>
 
       <div class="hero-actions">
@@ -87,12 +87,12 @@
       <article class="story-card glass-panel">
         <span class="story-index">02</span>
         <h3>More useful AI</h3>
-        <p>The assistant can do more than answer questions—it can perform approved productivity actions.</p>
+        <p>Ask the assistant to create tasks, manage daily todos, work with habits or start and stop your timers.</p>
       </article>
       <article class="story-card glass-panel">
         <span class="story-index">03</span>
         <h3>Time you can see</h3>
-        <p>Persistent timers help you understand how long individual tasks and todos actually take.</p>
+        <p>Your timers keep track of how long you spend on individual tasks and todos.</p>
       </article>
     </div>
   </section>
@@ -141,29 +141,29 @@
 
   <section class="architecture-section section-wrap" aria-labelledby="trust-title">
     <div class="architecture-copy">
-      <span class="eyebrow">Designed with boundaries</span>
-      <h2 id="trust-title">Useful automation without handing AI the keys.</h2>
+      <span class="eyebrow">Your privacy & control</span>
+      <h2 id="trust-title">The AI can help with your work, but it does not control your account.</h2>
       <p>
-        The AI assistant works through FastAPI and a controlled action layer. It does not
-        receive arbitrary database access. Account-security actions such as password and
-        email changes stay manual.
+        You can ask the assistant to help with tasks, daily todos, habits, challenges and timers.
+        Before the app makes a change, it checks that the action is allowed and belongs to your account.
+        Sensitive settings such as your password, email address and account deletion stay in your hands.
       </p>
 
       <div class="trust-points">
-        <div><i class="fas fa-shield-halved"></i><span>Validated, user-owned actions</span></div>
-        <div><i class="fas fa-database"></i><span>Account data stored in PostgreSQL on Supabase</span></div>
-        <div><i class="fas fa-envelope"></i><span>Transactional email handled by the backend mail service</span></div>
+        <div><i class="fas fa-shield-halved"></i><span>The AI can only work with your own productivity items</span></div>
+        <div><i class="fas fa-database"></i><span>Your saved tasks, todos and progress stay connected to your account</span></div>
+        <div><i class="fas fa-envelope"></i><span>Verification and password-reset emails are sent securely</span></div>
       </div>
     </div>
 
-    <div class="architecture-diagram glass-panel" aria-label="Application architecture">
-      <div class="arch-node user-node"><span>YOU</span><small>Web · Desktop · Mobile</small></div>
+    <div class="architecture-diagram glass-panel" aria-label="How AI requests are handled">
+      <div class="arch-node user-node"><span>YOU</span><small>Ask in plain language</small></div>
       <div class="arch-line"><i></i></div>
-      <div class="arch-node api-node"><span>FASTAPI</span><small>Auth · validation · actions</small></div>
+      <div class="arch-node api-node"><span>THE APP</span><small>Checks your request before making changes</small></div>
       <div class="arch-branches">
-        <div class="arch-node"><span>SUPABASE</span><small>PostgreSQL data</small></div>
-        <div class="arch-node"><span>GROQ</span><small>AI reasoning</small></div>
-        <div class="arch-node"><span>BREVO</span><small>Transactional email</small></div>
+        <div class="arch-node"><span>YOUR WORK</span><small>Tasks · todos · habits</small></div>
+        <div class="arch-node"><span>AI HELPER</span><small>Understands what you want to do</small></div>
+        <div class="arch-node"><span>ACCOUNT SAFETY</span><small>Password & email stay manual</small></div>
       </div>
     </div>
   </section>
