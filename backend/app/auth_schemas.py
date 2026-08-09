@@ -20,3 +20,4 @@ class RegistrationResponse(BaseModel):
 class OAuthConfigResponse(BaseModel):
     google_client_id: str | None = None
     apple_client_id: str | None = None
+    apple_redirect_uri: str | None = None
