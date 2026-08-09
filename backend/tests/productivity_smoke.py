@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.routers import ai_assistant as ai_router
+from app.routers import auth as auth_router
 
 client = TestClient(app)
 
@@ -18,7 +19,16 @@ def expect(response, status_code):
 
 password = "FocusPass9!"
 email = "focus-ci@example.com"
+captured_verification = {}
 
+
+def capture_verification_email(to_email, username, token, expires_minutes):
+    captured_verification["token"] = token
+    return True
+
+
+auth_router.send_verification_email = capture_verification_email
+auth_router.send_welcome_email = lambda *_args, **_kwargs: True
 expect(
     client.post(
         "/auth/register",
@@ -26,6 +36,12 @@ expect(
     ),
     201,
 )
+assert client.post("/auth/login", json={"email": email, "password": password}).status_code == 403
+verify = client.get(
+    f"/auth/verify-email?token={captured_verification['token']}",
+    follow_redirects=False,
+)
+assert verify.status_code == 303
 login = expect(client.post("/auth/login", json={"email": email, "password": password}), 200).json()
 headers = {"Authorization": f"Bearer {login['access_token']}"}
 
@@ -51,7 +67,6 @@ todos = expect(
 ).json()
 assert any(item["id"] == todo["id"] for item in todos)
 
-# A running todo timer survives as server state and writes exact seconds on stop.
 started_todo_timer = expect(
     client.post(
         "/api/productivity/timer/start",
@@ -64,7 +79,6 @@ assert started_todo_timer["todo_id"] == todo["id"]
 active = expect(client.get("/api/productivity/timer/active", headers=headers), 200).json()
 assert active["id"] == started_todo_timer["id"]
 
-# Only one timer may run for a user at once.
 conflict = client.post(
     "/api/productivity/timer/start",
     headers=headers,
@@ -93,7 +107,6 @@ completed_todo = expect(
 ).json()
 assert completed_todo["completed"] is True
 
-# Task timing uses the same persistent timer and maintains second/minute compatibility.
 task = expect(
     client.post(
         "/api/tasks",
@@ -119,7 +132,6 @@ tracked_task = expect(client.get(f"/api/tasks/{task['id']}", headers=headers), 2
 assert tracked_task["time_spent_seconds"] >= 1
 assert tracked_task["status"] == "In Progress"
 
-# Exercise the action-capable AI without requiring a real Groq key in CI.
 async def fake_ask(_messages):
     return json.dumps(
         {

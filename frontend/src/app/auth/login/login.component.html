@@ -9,10 +9,7 @@
     <section class="auth-card" aria-labelledby="login-title">
       <div class="auth-brand">
         <div class="brand-icon">M</div>
-        <div class="brand-copy">
-          <strong>M.O.B</strong>
-          <span>TaskManager</span>
-        </div>
+        <div class="brand-copy"><strong>M.O.B</strong><span>TaskManager</span></div>
       </div>
 
       <div class="auth-header">
@@ -21,22 +18,32 @@
         <p>Sign in to your tasks, Daily Todos, focus timers and AI workspace.</p>
       </div>
 
+      <div *ngIf="statusMessage" class="alert-message success-alert" role="status">
+        <i class="fas fa-circle-check"></i><span>{{ statusMessage }}</span>
+      </div>
       <div *ngIf="loginError" class="alert-message error-alert" role="alert">
-        <i class="fas fa-exclamation-circle"></i>
-        <span>{{ loginError }}</span>
+        <i class="fas fa-exclamation-circle"></i><span>{{ loginError }}</span>
+      </div>
+
+      <div class="oauth-area" *ngIf="oauthConfig.google_client_id || oauthConfig.apple_client_id">
+        <div id="google-login-button" class="google-provider" *ngIf="oauthConfig.google_client_id" aria-label="Continue with Google"></div>
+        <button
+          *ngIf="oauthConfig.apple_client_id"
+          type="button"
+          class="submit-button oauth-apple"
+          (click)="signInWithApple()"
+          [disabled]="oauthBusy"
+        >
+          <span class="button-content"><i class="fab fa-apple"></i> Continue with Apple</span>
+        </button>
+        <div class="oauth-divider"><span>or use your email</span></div>
       </div>
 
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
         <div class="form-field">
           <div class="field-icon"><i class="fas fa-envelope"></i></div>
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder=" "
-            autocomplete="email"
-            [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-          />
+          <input id="email" type="email" formControlName="email" placeholder=" " autocomplete="email"
+            [class.error]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" />
           <label for="email">Email address</label>
           <span class="error-text" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
             <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
@@ -46,14 +53,8 @@
 
         <div class="form-field">
           <div class="field-icon"><i class="fas fa-lock"></i></div>
-          <input
-            id="password"
-            [type]="showPassword ? 'text' : 'password'"
-            formControlName="password"
-            placeholder=" "
-            autocomplete="current-password"
-            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-          />
+          <input id="password" [type]="showPassword ? 'text' : 'password'" formControlName="password" placeholder=" " autocomplete="current-password"
+            [class.error]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" />
           <label for="password">Password</label>
           <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" aria-label="Toggle password visibility">
             <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
@@ -67,23 +68,21 @@
         <div class="form-options">
           <label class="remember-me">
             <input type="checkbox" formControlName="rememberMe" />
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-label">Remember me</span>
+            <span class="checkbox-custom"></span><span class="checkbox-label">Remember me</span>
           </label>
           <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
         </div>
 
         <button type="submit" class="submit-button" [disabled]="isLoading || loginForm.invalid" [class.loading]="isLoading">
           <span class="button-content" *ngIf="!isLoading"><i class="fas fa-arrow-right-to-bracket"></i> Sign in</span>
-          <span class="button-loader" *ngIf="isLoading" aria-label="Signing in">
-            <span class="loader-dot"></span><span class="loader-dot"></span><span class="loader-dot"></span>
-          </span>
+          <span class="button-loader" *ngIf="isLoading" aria-label="Signing in"><span class="loader-dot"></span><span class="loader-dot"></span><span class="loader-dot"></span></span>
         </button>
 
-        <div class="auth-footer">
-          <span>New to M.O.B?</span>
-          <a routerLink="/register" class="register-link">Create an account</a>
-        </div>
+        <button type="button" class="verification-link" (click)="resendVerification()" [disabled]="resendBusy">
+          {{ resendBusy ? 'Sending verification…' : 'Need a new verification email?' }}
+        </button>
+
+        <div class="auth-footer"><span>New to M.O.B?</span><a routerLink="/register" class="register-link">Create an account</a></div>
       </form>
     </section>
   </div>

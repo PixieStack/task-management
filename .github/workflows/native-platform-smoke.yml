@@ -132,7 +132,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -158,18 +158,58 @@ jobs:
           rm -rf "$HOME/.cargo/registry/src" "$HOME/.cargo/registry/cache"
           rm -rf src-tauri/target
           df -h
+      - name: Enable KVM access when available
+        shell: bash
+        run: |
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm
+            ls -l /dev/kvm
+          else
+            echo "/dev/kvm is unavailable; emulator runner will fall back to software acceleration."
+          fi
       - name: Install and launch in Android emulator
         uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: 35
           arch: x86_64
           profile: pixel_6
-          disable-animations: true
+          emulator-boot-timeout: 900
+          disable-animations: false
+          disable-linux-hw-accel: auto
           script: |
-            adb install -r "$APK_PATH"
+            set -eu
+            adb wait-for-device
+
+            boot_completed=""
+            for attempt in $(seq 1 30); do
+              boot_completed="$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+              if [ "$boot_completed" = "1" ]; then
+                break
+              fi
+              sleep 5
+            done
+            test "$boot_completed" = "1"
+
+            installed=false
+            for attempt in 1 2 3; do
+              if adb install -r "$APK_PATH"; then
+                installed=true
+                break
+              fi
+              echo "APK install attempt $attempt failed; reconnecting ADB before retry."
+              adb kill-server || true
+              adb start-server
+              adb wait-for-device
+              sleep 5
+            done
+            test "$installed" = "true"
+
+            adb shell am force-stop com.pixiestack.mobtaskmanager || true
             adb shell am start -W -n com.pixiestack.mobtaskmanager/.MainActivity
             sleep 8
-            adb shell pidof com.pixiestack.mobtaskmanager
+            PID="$(adb shell pidof com.pixiestack.mobtaskmanager | tr -d '\r')"
+            test -n "$PID"
+            echo "Android app launched successfully with PID $PID"
 
   ios-simulator-install:
     name: iOS Simulator build + install + launch

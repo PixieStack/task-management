@@ -17,7 +17,6 @@
         <li><a routerLink="/key-features" routerLinkActive="active">Features</a></li>
         <li><a routerLink="/downloads" routerLinkActive="active">Downloads</a></li>
         <li><a routerLink="/about" routerLinkActive="active">About</a></li>
-        <li><a routerLink="/contact" routerLinkActive="active">Contact</a></li>
       </ul>
 
       <div class="auth-buttons" *ngIf="!user">
@@ -51,7 +50,6 @@
       <li><a routerLink="/key-features" (click)="closeMobileMenu()">Features</a></li>
       <li><a routerLink="/downloads" (click)="closeMobileMenu()">Downloads</a></li>
       <li><a routerLink="/about" (click)="closeMobileMenu()">About</a></li>
-      <li><a routerLink="/contact" (click)="closeMobileMenu()">Contact</a></li>
     </ul>
 
     <div class="mobile-auth" *ngIf="!user">
