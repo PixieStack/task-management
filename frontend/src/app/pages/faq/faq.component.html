@@ -1,80 +1,63 @@
-<div class="faq-container">
-  <!-- Hero Section -->
+<main class="faq-container app-shell-dark">
   <section class="faq-hero">
-    <h1>Frequently Asked Questions</h1>
-    <p>Find answers to common questions about Task Manager</p>
+    <span class="eyebrow">Help center</span>
+    <h1>Answers without the guesswork.</h1>
+    <p>Search the current M.O.B TaskManager features, account behavior and app support.</p>
   </section>
 
-  <!-- Search and Filter Section -->
-  <section class="faq-controls">
-    <div class="search-box">
-      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+  <section class="faq-controls" aria-label="FAQ filters">
+    <label class="search-box">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
       </svg>
-      <input 
-        type="text" 
-        placeholder="Search FAQs..." 
+      <span class="sr-only">Search FAQs</span>
+      <input
+        type="search"
+        placeholder="Search questions…"
         [value]="searchTerm"
         (input)="onSearch($any($event.target).value)"
         class="search-input"
       />
-    </div>
-    
-    <select 
-      class="category-select" 
-      [value]="selectedCategory"
-      (change)="onCategoryChange($any($event.target).value)"
-    >
-      <option *ngFor="let cat of categories" [value]="cat.value">
-        {{ cat.label }}
-      </option>
-    </select>
+    </label>
+
+    <label class="category-wrap">
+      <span class="sr-only">FAQ category</span>
+      <select class="category-select" [value]="selectedCategory" (change)="onCategoryChange($any($event.target).value)">
+        <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+      </select>
+    </label>
   </section>
 
-  <!-- FAQ Items -->
-  <section class="faq-content">
+  <section class="faq-content" aria-live="polite">
     <div class="faq-list" *ngIf="filteredFAQs.length > 0">
-      <div 
-        *ngFor="let faq of filteredFAQs" 
-        class="faq-item"
-        [class.active]="faq.isOpen"
-      >
-        <div class="faq-question" (click)="toggleFAQ(faq)">
-          <h3 [innerHTML]="highlightText(faq.question)"></h3>
-          <svg 
-            class="chevron-icon" 
-            [class.rotated]="faq.isOpen"
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
+      <article *ngFor="let faq of filteredFAQs" class="faq-item" [class.active]="faq.isOpen">
+        <button type="button" class="faq-question" (click)="toggleFAQ(faq)" [attr.aria-expanded]="faq.isOpen">
+          <h2 [innerHTML]="highlightText(faq.question)"></h2>
+          <svg class="chevron-icon" [class.rotated]="faq.isOpen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
           </svg>
-        </div>
+        </button>
         <div class="faq-answer" *ngIf="faq.isOpen">
           <p [innerHTML]="highlightText(faq.answer)"></p>
         </div>
-      </div>
+      </article>
     </div>
 
-    <!-- No Results Message -->
     <div *ngIf="filteredFAQs.length === 0" class="no-results">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <h3>No FAQs found</h3>
-      <p>Try adjusting your search or filter criteria</p>
+      <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+      <h2>No matching questions</h2>
+      <p>Try a different search phrase or category.</p>
     </div>
   </section>
 
-  <!-- Contact CTA -->
-  <section class="contact-cta">
-    <h2>Still have questions?</h2>
-    <p>Our support team is here to help</p>
-    <button class="btn-primary" (click)="navigateToContact()">
-      <span class="btn-icon">📧</span>
-      Contact Support
+  <section class="contact-cta glass-panel">
+    <div>
+      <span class="eyebrow">Need something specific?</span>
+      <h2>Contact the app team.</h2>
+      <p>If the FAQ doesn’t cover it, send a message through the contact form.</p>
+    </div>
+    <button class="btn-primary" type="button" (click)="navigateToContact()">
+      Contact support <i class="fas fa-arrow-right" aria-hidden="true"></i>
     </button>
   </section>
-</div>
+</main>

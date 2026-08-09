@@ -1,197 +1,113 @@
-<div class="auth-container">
+<main class="auth-container">
   <div class="auth-wrapper">
-    <!-- Background decorative elements -->
-    <div class="auth-background">
+    <div class="auth-background" aria-hidden="true">
       <div class="bg-shape bg-shape-1"></div>
       <div class="bg-shape bg-shape-2"></div>
       <div class="bg-shape bg-shape-3"></div>
     </div>
 
-    <div class="auth-card">
+    <section class="auth-card" aria-labelledby="register-title">
       <div class="auth-brand">
-        <div class="brand-icon">
-          <i class="fas fa-tasks"></i>
+        <div class="brand-icon">M</div>
+        <div class="brand-copy">
+          <strong>M.O.B</strong>
+          <span>TaskManager</span>
         </div>
-        <h1>TaskManager</h1>
       </div>
 
       <div class="auth-header">
-        <h2>Create Account</h2>
-        <p>Join us to start managing your tasks efficiently</p>
+        <span class="auth-kicker">Create your workspace</span>
+        <h1 id="register-title">Start with a clearer system.</h1>
+        <p>Your account keeps tasks, Daily Todos, habits, challenges and tracked focus time connected.</p>
       </div>
 
-      <div *ngIf="registrationError" class="alert-message error-alert">
+      <div *ngIf="registrationError" class="alert-message error-alert" role="alert">
         <i class="fas fa-exclamation-circle"></i>
         <span>{{ registrationError }}</span>
       </div>
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
         <div class="form-field">
-          <div class="field-icon">
-            <i class="fas fa-user"></i>
-          </div>
+          <div class="field-icon"><i class="fas fa-user"></i></div>
           <input
             id="username"
             type="text"
             formControlName="username"
             placeholder=" "
-            [class.error]="
-              registerForm.get('username')?.invalid &&
-              registerForm.get('username')?.touched
-            "
+            autocomplete="username"
+            [class.error]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
           />
           <label for="username">Username</label>
-          <div class="field-underline"></div>
-          <span
-            class="error-text"
-            *ngIf="
-              registerForm.get('username')?.invalid &&
-              registerForm.get('username')?.touched
-            "
-          >
-            <span *ngIf="registerForm.get('username')?.errors?.['required']">
-              Username is required
-            </span>
-            <span *ngIf="registerForm.get('username')?.errors?.['minlength']">
-              Username must be at least 3 characters
-            </span>
+          <span class="error-text" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+            <span *ngIf="registerForm.get('username')?.errors?.['required']">Username is required</span>
+            <span *ngIf="registerForm.get('username')?.errors?.['minlength']">Username must be at least 3 characters</span>
           </span>
         </div>
 
         <div class="form-field">
-          <div class="field-icon">
-            <i class="fas fa-envelope"></i>
-          </div>
+          <div class="field-icon"><i class="fas fa-envelope"></i></div>
           <input
             id="email"
             type="email"
             formControlName="email"
             placeholder=" "
-            [class.error]="
-              registerForm.get('email')?.invalid &&
-              registerForm.get('email')?.touched
-            "
+            autocomplete="email"
+            [class.error]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
           />
-          <label for="email">Email Address</label>
-          <div class="field-underline"></div>
-          <span
-            class="error-text"
-            *ngIf="
-              registerForm.get('email')?.invalid &&
-              registerForm.get('email')?.touched
-            "
-          >
-            <span *ngIf="registerForm.get('email')?.errors?.['required']">
-              Email is required
-            </span>
-            <span *ngIf="registerForm.get('email')?.errors?.['email']">
-              Please enter a valid email
-            </span>
+          <label for="email">Email address</label>
+          <span class="error-text" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+            <span *ngIf="registerForm.get('email')?.errors?.['required']">Email is required</span>
+            <span *ngIf="registerForm.get('email')?.errors?.['email']">Please enter a valid email</span>
           </span>
         </div>
 
         <div class="form-field">
-          <div class="field-icon">
-            <i class="fas fa-lock"></i>
-          </div>
+          <div class="field-icon"><i class="fas fa-lock"></i></div>
           <input
             id="password"
             [type]="showPassword ? 'text' : 'password'"
             formControlName="password"
             placeholder=" "
-            [class.error]="
-              registerForm.get('password')?.invalid &&
-              registerForm.get('password')?.touched
-            "
+            autocomplete="new-password"
+            [class.error]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
           />
           <label for="password">Password</label>
-          <div class="field-underline"></div>
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="togglePasswordVisibility()"
-            tabindex="-1"
-          >
-            <i
-              class="fas"
-              [class.fa-eye]="!showPassword"
-              [class.fa-eye-slash]="showPassword"
-            ></i>
+          <button type="button" class="password-toggle" (click)="togglePasswordVisibility()" tabindex="-1" aria-label="Toggle password visibility">
+            <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
           </button>
-          <span
-            class="error-text"
-            *ngIf="
-              registerForm.get('password')?.invalid &&
-              registerForm.get('password')?.touched
-            "
-          >
-            <span *ngIf="registerForm.get('password')?.errors?.['required']">
-              Password is required
-            </span>
-            <span *ngIf="registerForm.get('password')?.errors?.['minlength']">
-              Password must be at least 8 characters
-            </span>
-            <span *ngIf="registerForm.get('password')?.errors?.['weakPassword']">
-              Include uppercase, lowercase, number, and special character
-            </span>
+          <span class="error-text" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+            <span *ngIf="registerForm.get('password')?.errors?.['required']">Password is required</span>
+            <span *ngIf="registerForm.get('password')?.errors?.['minlength']">Password must be at least 8 characters</span>
+            <span *ngIf="registerForm.get('password')?.errors?.['weakPassword']">Include uppercase, lowercase, a number and a special character</span>
           </span>
 
-          <!-- Password strength indicator -->
           <div class="password-strength" *ngIf="registerForm.get('password')?.value">
             <div class="strength-meter">
-              <div
-                class="strength-meter-fill"
-                [style.width.%]="passwordStrength.value"
-                [class]="passwordStrength.class"
-              ></div>
+              <div class="strength-meter-fill" [style.width.%]="passwordStrength.value" [class]="passwordStrength.class"></div>
             </div>
             <div class="strength-text" [class]="passwordStrength.class">
-              <i class="fas fa-shield-alt"></i>
-              {{ passwordStrength.label }}
+              <i class="fas fa-shield-halved"></i> {{ passwordStrength.label }}
             </div>
           </div>
         </div>
 
         <div class="form-field">
-          <div class="field-icon">
-            <i class="fas fa-lock"></i>
-          </div>
+          <div class="field-icon"><i class="fas fa-lock"></i></div>
           <input
             id="confirmPassword"
             [type]="showConfirmPassword ? 'text' : 'password'"
             formControlName="confirmPassword"
             placeholder=" "
-            [class.error]="
-              registerForm.errors?.['passwordMismatch'] &&
-              registerForm.get('confirmPassword')?.touched
-            "
+            autocomplete="new-password"
+            [class.error]="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched"
           />
-          <label for="confirmPassword">Confirm Password</label>
-          <div class="field-underline"></div>
-          <button
-            type="button"
-            class="password-toggle"
-            (click)="toggleConfirmPasswordVisibility()"
-            tabindex="-1"
-          >
-            <i
-              class="fas"
-              [class.fa-eye]="!showConfirmPassword"
-              [class.fa-eye-slash]="showConfirmPassword"
-            ></i>
+          <label for="confirmPassword">Confirm password</label>
+          <button type="button" class="password-toggle" (click)="toggleConfirmPasswordVisibility()" tabindex="-1" aria-label="Toggle confirm password visibility">
+            <i class="fas" [class.fa-eye]="!showConfirmPassword" [class.fa-eye-slash]="showConfirmPassword"></i>
           </button>
-          <span
-            class="error-text"
-            *ngIf="registerForm.get('confirmPassword')?.touched"
-          >
-            <span
-              *ngIf="registerForm.get('confirmPassword')?.errors?.['required']"
-            >
-              Please confirm your password
-            </span>
-            <span *ngIf="registerForm.errors?.['passwordMismatch']">
-              Passwords do not match
-            </span>
+          <span class="error-text" *ngIf="registerForm.get('confirmPassword')?.touched">
+            <span *ngIf="registerForm.get('confirmPassword')?.errors?.['required']">Please confirm your password</span>
+            <span *ngIf="registerForm.errors?.['passwordMismatch']">Passwords do not match</span>
           </span>
         </div>
 
@@ -200,61 +116,27 @@
             <input type="checkbox" formControlName="termsAccepted" />
             <span class="checkbox-custom"></span>
             <span class="checkbox-label">
-              I agree to the
-              <a href="/terms" target="_blank">Terms of Service</a>
-              and
-              <a href="/privacy" target="_blank">Privacy Policy</a>
+              I agree to the <a href="/terms" target="_blank" rel="noopener">Terms of Service</a>
+              and <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>
             </span>
           </label>
         </div>
-        <span
-          class="error-text centered"
-          *ngIf="
-            registerForm.get('termsAccepted')?.invalid &&
-            registerForm.get('termsAccepted')?.touched
-          "
-        >
+        <span class="error-text centered" *ngIf="registerForm.get('termsAccepted')?.invalid && registerForm.get('termsAccepted')?.touched">
           You must accept the terms to continue
         </span>
 
-        <button 
-          type="submit" 
-          class="submit-button" 
-          [disabled]="isLoading || registerForm.invalid"
-          [class.loading]="isLoading"
-        >
-          <span class="button-content" *ngIf="!isLoading">
-            <i class="fas fa-user-plus"></i>
-            Create Account
-          </span>
-          <span class="button-loader" *ngIf="isLoading">
-            <span class="loader-dot"></span>
-            <span class="loader-dot"></span>
-            <span class="loader-dot"></span>
+        <button type="submit" class="submit-button" [disabled]="isLoading || registerForm.invalid" [class.loading]="isLoading">
+          <span class="button-content" *ngIf="!isLoading"><i class="fas fa-arrow-right"></i> Create account</span>
+          <span class="button-loader" *ngIf="isLoading" aria-label="Creating account">
+            <span class="loader-dot"></span><span class="loader-dot"></span><span class="loader-dot"></span>
           </span>
         </button>
-
-        <!-- Social Login Options -->
-        <div class="divider">
-          <span>or sign up with</span>
-        </div>
-
-        <div class="social-logins">
-          <button type="button" class="social-btn google-btn">
-            <i class="fab fa-google"></i>
-            <span>Google</span>
-          </button>
-          <button type="button" class="social-btn apple-btn">
-            <i class="fab fa-apple"></i>
-            <span>Apple</span>
-          </button>
-        </div>
 
         <div class="auth-footer">
           <span>Already have an account?</span>
           <a routerLink="/login" class="login-link">Sign in</a>
         </div>
       </form>
-    </div>
+    </section>
   </div>
-</div>
+</main>

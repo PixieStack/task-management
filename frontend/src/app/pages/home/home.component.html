@@ -1,26 +1,97 @@
-<div class="home-container">
-  <div class="hero-card">
-    <div class="hero-text">
-      <h1>Welcome to <span class="highlight">M.O.B Task Manager</span></h1>
-      <p>Your AI-powered productivity companion. Organized. Smart. Efficient.</p>
-      <p *ngIf="user">Welcome back, {{ user.name }}!</p>
-      <button class="btn-primary" (click)="onGetStarted()">
-        🚀 Get Started
-      </button>
-    </div>
-    <div class="hero-visual-container">
-      <img src="assets/ai-task-visual.png" alt="AI Task Manager Visual" class="hero-illustration" />
-    </div>
-  </div>
+<main class="home-page app-shell-dark">
+  <section class="hero-section">
+    <div class="hero-copy">
+      <div class="hero-badge"><span></span> Productivity, focus and AI in one workspace</div>
+      <h1>
+        Make the day feel <span class="gradient-text">clearer, calmer and more intentional.</span>
+      </h1>
+      <p class="hero-lead">
+        M.O.B TaskManager connects tasks, Daily Todos, habits, reading, meditation,
+        Pomodoro, persistent time tracking and an action-capable AI assistant.
+      </p>
+      <p class="welcome-back" *ngIf="user">Welcome back, {{ user.name }}.</p>
 
-  <div class="features-section">
-    <h2 class="section-title">✨ Key Features</h2>
-    <div class="features-grid">
-      <div class="card" *ngFor="let feature of features">
-        <i [class]="feature.icon" class="icon-placeholder"></i>
-        <h3>{{ feature.title }}</h3>
-        <p>{{ feature.description }}</p>
+      <div class="hero-actions">
+        <button class="primary-action" type="button" (click)="onGetStarted()">Get started</button>
+        <a class="secondary-action" routerLink="/key-features">Explore features</a>
+      </div>
+
+      <div class="hero-proof">
+        <span><i class="fas fa-check"></i> Web + installable apps</span>
+        <span><i class="fas fa-check"></i> Persistent timers</span>
+        <span><i class="fas fa-check"></i> AI actions with backend validation</span>
       </div>
     </div>
-  </div>
-</div>
+
+    <div class="workspace-preview glass-panel" aria-label="TaskManager workspace preview">
+      <div class="preview-topbar">
+        <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+        <span>today.workspace</span>
+        <span class="status-chip"><i></i> Focus mode</span>
+      </div>
+
+      <div class="preview-content">
+        <div class="preview-heading">
+          <div>
+            <small>Today</small>
+            <strong>Build momentum</strong>
+          </div>
+          <span class="date-pill">08 AUG</span>
+        </div>
+
+        <div class="focus-strip">
+          <div>
+            <small>Active timer</small>
+            <strong>ServiceNow study</strong>
+          </div>
+          <span class="live-timer">38:12</span>
+        </div>
+
+        <div class="preview-list">
+          <div class="preview-task done"><i class="fas fa-check"></i><span>Review yesterday’s notes</span><small>24m</small></div>
+          <div class="preview-task"><i></i><span>Complete CSA module</span><small>1h 10m</small></div>
+          <div class="preview-task"><i></i><span>Portfolio deep work</span><small>45m</small></div>
+        </div>
+
+        <div class="ai-preview">
+          <div class="ai-mark"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <div>
+            <small>AI Assistant</small>
+            <p>“Add a high-priority todo to review Python after ServiceNow.”</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section section-wrap">
+    <div class="section-heading">
+      <span class="eyebrow">A focused productivity system</span>
+      <h2>Do less switching. Make more progress.</h2>
+      <p>
+        Each part of the app is designed to support a simple loop: decide what matters,
+        focus on it, track the effort and keep your routines moving.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <article class="feature-card glass-panel" *ngFor="let feature of features">
+        <div class="feature-icon"><i [class]="feature.icon"></i></div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="home-cta section-wrap glass-panel">
+    <div>
+      <span class="eyebrow">Your workspace, wherever you work</span>
+      <h2>Start on the web. Take it with you.</h2>
+      <p>Use the browser experience or explore the supported desktop and mobile app packages.</p>
+    </div>
+    <div class="cta-actions">
+      <a routerLink="/register" class="primary-action">Create an account</a>
+      <a routerLink="/downloads" class="secondary-action">Downloads</a>
+    </div>
+  </section>
+</main>

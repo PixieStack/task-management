@@ -1,100 +1,97 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+
+interface FeatureItem {
+  icon: string;
+  title: string;
+  description: string;
+  detail: string;
+  accent: 'violet' | 'cyan' | 'amber' | 'green' | 'rose' | 'blue';
+}
 
 @Component({
   standalone: true,
   selector: 'app-key-features',
   templateUrl: './key-features.component.html',
   styleUrls: ['./key-features.component.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
 })
 export class KeyFeaturesComponent {
-  // MAIN 8 FEATURES
-  mainFeatures = [
+  readonly mainFeatures: FeatureItem[] = [
     {
-      icon: 'fas fa-calendar-check',
-      title: '21-30 Day Challenges',
-      description: 'Transform your life with eating/fasting, no-social-media, productivity, meditation, coding, and reading challenges.',
-      gradient: 'challenge-gradient'
+      icon: 'fas fa-list-check',
+      title: 'Tasks that stay practical',
+      description: 'Create, prioritize, schedule, complete and track the work that matters.',
+      detail: 'Priorities, due dates, tags, status, estimates and persistent tracked time are all part of the same task record.',
+      accent: 'blue',
     },
     {
-      icon: 'fas fa-project-diagram',
-      title: '3-6 Month Projects',
-      description: 'Build AI projects, data dashboards, apps, or launch a side business with structured milestone tracking.',
-      gradient: 'project-gradient'
+      icon: 'fas fa-sparkles',
+      title: 'Action-capable AI assistant',
+      description: 'Ask for help in natural language and let the assistant perform approved productivity actions.',
+      detail: 'It can work with tasks, daily todos, habits, challenges and timers through validated FastAPI actions.',
+      accent: 'violet',
     },
     {
-      icon: 'fas fa-road',
-      title: '12 Month Roadmaps',
-      description: 'Long-term professional development, startup launch plans, and quarterly goal tracking for major achievements.',
-      gradient: 'roadmap-gradient'
+      icon: 'fas fa-calendar-day',
+      title: 'Daily Todos',
+      description: 'Keep today separate from your larger task backlog and focus on what should happen now.',
+      detail: 'Daily todos support priority, notes, completion and individual time tracking.',
+      accent: 'cyan',
     },
     {
-      icon: 'fas fa-utensils',
-      title: 'Smart Diet Management',
-      description: 'Time-based meal suggestions, hunger tracking, and hydration reminders. Last meal by 6 PM with AI motivation.',
-      gradient: 'diet-gradient'
+      icon: 'fas fa-stopwatch',
+      title: 'Persistent time tracking',
+      description: 'Start a timer on a task or todo and keep the running session even after a refresh.',
+      detail: 'Tracked time is saved to your account so you can see how long each item actually took.',
+      accent: 'amber',
     },
     {
-      icon: 'fas fa-chart-line',
-      title: 'Habit Analytics',
-      description: 'Track daily habits, weekly progress, monthly summaries, and correlate mood/energy with your activities.',
-      gradient: 'analytics-gradient'
+      icon: 'fas fa-clock',
+      title: 'Pomodoro focus',
+      description: 'Run focused study/work intervals with short breaks, long breaks or a custom duration.',
+      detail: 'The Focus workspace combines Pomodoro with your daily list and running task timer.',
+      accent: 'rose',
     },
     {
-      icon: 'fas fa-robot',
-      title: 'AI-Powered Assistant',
-      description: 'Get personalized recommendations, automated tracking, weekly summaries, and optimization suggestions.',
-      gradient: 'ai-gradient'
+      icon: 'fas fa-repeat',
+      title: 'Habit tracking',
+      description: 'Create daily or weekly habits, check in and build visible consistency over time.',
+      detail: 'Habit history stays connected to your account instead of being stored only in the browser.',
+      accent: 'green',
     },
     {
-      icon: 'fas fa-trophy',
-      title: 'Gamification System',
-      description: 'Earn XP, unlock badges, level up from beginner to expert, and compete on optional leaderboards.',
-      gradient: 'gamification-gradient'
+      icon: 'fas fa-book-open-reader',
+      title: 'Reading challenges',
+      description: 'Create a focused reading commitment and track progress one check-in at a time.',
+      detail: 'Reading remains intentionally simple so it supports your routine without turning into another complex project system.',
+      accent: 'blue',
     },
     {
-      icon: 'fas fa-mobile-alt',
-      title: 'Cross-Platform Support',
-      description: 'Available on Mac, Windows, Android, and iOS with offline mode and seamless data sync across devices.',
-      gradient: 'platform-gradient'
-    }
+      icon: 'fas fa-spa',
+      title: 'Meditation challenges',
+      description: 'Build a consistent meditation practice alongside your work and study goals.',
+      detail: 'Daily check-ins, streaks and progress keep the challenge visible without distracting from your main workflow.',
+      accent: 'violet',
+    },
+    {
+      icon: 'fas fa-laptop-mobile',
+      title: 'Cross-platform experience',
+      description: 'Use the web/PWA experience and supported native builds across desktop and mobile.',
+      detail: 'The same FastAPI backend and account data serve web, macOS, Windows, Android and iOS targets.',
+      accent: 'cyan',
+    },
   ];
 
-  // CHALLENGE TYPES (21-30 Days) - Updated with 4 more
-  challengeTypes = [
-    { icon: 'fas fa-hamburger', name: 'Eating/Fasting', duration: '21 days' },
-    { icon: 'fas fa-ban', name: 'No Social Media', duration: '21 days' },
-    { icon: 'fas fa-tasks', name: 'Productivity', duration: '30 days' },
-    { icon: 'fas fa-om', name: 'Meditation', duration: '21 days' },
-    { icon: 'fas fa-code', name: 'Daily Coding', duration: '30 days' },
-    { icon: 'fas fa-book', name: 'Reading Challenge', duration: '30 days' },
-    { icon: 'fas fa-dumbbell', name: 'Daily Exercise', duration: '30 days' },
-    { icon: 'fas fa-bed', name: 'Sleep Optimization', duration: '21 days' },
-    { icon: 'fas fa-money-bill', name: 'Financial Discipline', duration: '30 days' },
-    { icon: 'fas fa-language', name: 'Language Learning', duration: '30 days' }
+  readonly focusFlow = [
+    { step: '01', title: 'Capture', text: 'Add the task, habit or daily action before it becomes mental clutter.' },
+    { step: '02', title: 'Choose', text: 'Use priority and today’s list to decide what deserves attention now.' },
+    { step: '03', title: 'Focus', text: 'Start Pomodoro or a task timer and stay with one meaningful action.' },
+    { step: '04', title: 'Review', text: 'Complete the item and keep your real progress and tracked time visible.' },
   ];
 
-  // PROJECT TYPES (3-12 Months)
-  projectTypes = [
-    { icon: 'fas fa-brain', name: 'AI/ML Projects', duration: '3-12 months' },
-    { icon: 'fas fa-chart-bar', name: 'Data Dashboards', duration: '3-6 months' },
-    { icon: 'fas fa-mobile', name: 'App Development', duration: '6 months' },
-    { icon: 'fas fa-briefcase', name: 'Business Launch', duration: '6-12 months' }
-  ];
-
-  // DIET FEATURES
-  dietFeatures = [
-    { time: 'Before 4 PM', suggestion: 'Healthy snacks, fruits, water' },
-    { time: '4-6 PM', suggestion: 'Last meal window reminder' },
-    { time: 'After 6 PM', suggestion: 'Water & herbal tea only' }
-  ];
-
-  // GAMIFICATION ELEMENTS
-  gamificationElements = [
-    { icon: 'fas fa-star', name: 'XP Points' },
-    { icon: 'fas fa-medal', name: 'Achievement Badges' },
-    { icon: 'fas fa-level-up-alt', name: 'Level Progression' },
-    { icon: 'fas fa-fire', name: 'Streak Tracking' }
-  ];
+  trackByTitle(_: number, item: { title: string }): string {
+    return item.title;
+  }
 }
