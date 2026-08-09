@@ -76,6 +76,7 @@ class TaskBase(BaseModel):
     tags: List[str] = Field(default_factory=list)
     time_estimate: int = Field(default=0, ge=0)
     time_spent: int = Field(default=0, ge=0)
+    time_spent_seconds: int = Field(default=0, ge=0)
 
     @field_validator("status")
     @classmethod
@@ -108,6 +109,7 @@ class TaskUpdate(BaseModel):
     tags: Optional[List[str]] = None
     time_estimate: Optional[int] = Field(default=None, ge=0)
     time_spent: Optional[int] = Field(default=None, ge=0)
+    time_spent_seconds: Optional[int] = Field(default=None, ge=0)
 
     @field_validator("status")
     @classmethod
@@ -140,6 +142,7 @@ class TaskOut(BaseModel):
     tags: List[str] = Field(default_factory=list)
     time_estimate: int = 0
     time_spent: int = 0
+    time_spent_seconds: int = 0
     owner_id: int
     created_at: datetime
     updated_at: datetime
