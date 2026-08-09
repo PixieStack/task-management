@@ -1,3 +1,14 @@
+import os
+
+# The smoke suite must never use developer or deployment provider credentials
+# loaded from backend/.env. Email delivery is captured below and AI is expected
+# to report that no provider is configured.
+os.environ["BREVO_SMTP_LOGIN"] = ""
+os.environ["BREVO_SMTP_KEY"] = ""
+os.environ["SENDER_EMAIL"] = ""
+os.environ["ADMIN_EMAIL"] = ""
+os.environ["GROQ_API_KEY"] = ""
+
 from fastapi.testclient import TestClient
 
 from app import database, models
@@ -9,6 +20,17 @@ models.Base.metadata.drop_all(bind=database.engine)
 models.Base.metadata.create_all(bind=database.engine)
 
 client = TestClient(app)
+
+captured_welcome = {}
+
+
+def capture_welcome_email(to_email, username):
+    captured_welcome["to_email"] = to_email
+    captured_welcome["username"] = username
+    return True
+
+
+auth_router.send_welcome_email = capture_welcome_email
 
 
 def expect(response, status_code):
@@ -32,6 +54,10 @@ register = expect(
     201,
 )
 assert register.json()["email"] == "ci@example.com"
+assert captured_welcome == {
+    "to_email": "ci@example.com",
+    "username": "ci-user",
+}
 
 login = expect(
     client.post("/auth/login", json={"email": "ci@example.com", "password": password}),

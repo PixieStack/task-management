@@ -29,7 +29,7 @@ def _build_database_url():
         host=SUPABASE_DB_HOST,
         port=SUPABASE_DB_PORT,
         database=SUPABASE_DB_NAME,
-        query={"sslmode": "require"},
+        query={"sslmode": "require", "connect_timeout": "10"},
     )
 
 

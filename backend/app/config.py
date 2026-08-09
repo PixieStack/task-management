@@ -14,10 +14,17 @@ PASSWORD_RESET_EXPIRE_MINUTES = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "
 # DATABASE_URL remains an explicit override for CI/tests or alternate deployments;
 # there is deliberately no SQLite runtime fallback.
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
-SUPABASE_DB_HOST = os.getenv("SUPABASE_DB_HOST", "db.mvxkssrpxaldmiknozoz.supabase.co")
+# Supavisor session mode is IPv4-compatible and supports SQLAlchemy's persistent
+# connection pool. The direct db.<project>.supabase.co endpoint is IPv6-only
+# unless the project has Supabase's dedicated IPv4 add-on.
+SUPABASE_DB_HOST = os.getenv(
+    "SUPABASE_DB_HOST", "aws-1-eu-west-1.pooler.supabase.com"
+)
 SUPABASE_DB_PORT = int(os.getenv("SUPABASE_DB_PORT", "5432"))
 SUPABASE_DB_NAME = os.getenv("SUPABASE_DB_NAME", "postgres")
-SUPABASE_DB_USER = os.getenv("SUPABASE_DB_USER", "postgres")
+SUPABASE_DB_USER = os.getenv(
+    "SUPABASE_DB_USER", "postgres.mvxkssrpxaldmiknozoz"
+)
 SUPABASE_DB_PASSWORD = os.getenv("SUPABASE_DB_PASSWORD", "")
 
 # Local Angular development plus Tauri's default native WebView origins.

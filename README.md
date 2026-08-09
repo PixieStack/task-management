@@ -27,7 +27,7 @@ A focused full-stack productivity app built with Angular and FastAPI, with web/P
 - Python 3.14.7
 - FastAPI
 - SQLAlchemy
-- SQLite by default
+- Supabase Postgres for runtime persistence
 - Groq for the AI assistant
 - Brevo SMTP for transactional email
 
@@ -61,12 +61,14 @@ Set the real credentials only in `backend/.env` (or your deployment provider's s
 Required production values:
 
 - `SECRET_KEY`
+- `SUPABASE_DB_PASSWORD`
 - `GROQ_API_KEY`
 - `BREVO_SMTP_LOGIN`
 - `BREVO_SMTP_KEY`
 - `SENDER_EMAIL`
 
-The sender email must be verified in Brevo.
+The default database host/user use the Task Manager project's IPv4-compatible
+Supavisor Session pooler. The sender email must be verified in Brevo.
 
 ### Frontend web app
 

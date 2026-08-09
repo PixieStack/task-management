@@ -1,5 +1,6 @@
 import logging
 import smtplib
+import ssl
 from email.message import EmailMessage
 from email.utils import formataddr
 from urllib.parse import urlencode
@@ -42,7 +43,7 @@ def send_email(
     try:
         with smtplib.SMTP(BREVO_SMTP_SERVER, BREVO_SMTP_PORT, timeout=20) as smtp:
             smtp.ehlo()
-            smtp.starttls()
+            smtp.starttls(context=ssl.create_default_context())
             smtp.ehlo()
             smtp.login(BREVO_SMTP_LOGIN, BREVO_SMTP_KEY)
             smtp.send_message(message)
