@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { catchError, finalize, forkJoin, of, timeout } from 'rxjs';
 
@@ -47,6 +47,7 @@ export class FocusComponent implements OnInit, OnDestroy {
   private readonly hashHandler = () => this.scrollToRequestedSection();
 
   constructor(
+    private changeDetector: ChangeDetectorRef,
     private taskService: TaskService,
     private productivityService: ProductivityService,
   ) {}
@@ -125,7 +126,10 @@ export class FocusComponent implements OnInit, OnDestroy {
         }),
       ),
     })
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.changeDetector.markForCheck();
+      }))
       .subscribe({
         next: ({ tasks, todos, timer }) => {
           this.tasks = tasks;
@@ -359,11 +363,19 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   private showError(message: string): void {
     this.errorMessage = message || 'Something went wrong.';
-    window.setTimeout(() => (this.errorMessage = ''), 5000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.errorMessage = '';
+      this.changeDetector.markForCheck();
+    }, 5000);
   }
 
   private showSuccess(message: string): void {
     this.successMessage = message;
-    window.setTimeout(() => (this.successMessage = ''), 3000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.successMessage = '';
+      this.changeDetector.markForCheck();
+    }, 3000);
   }
 }
