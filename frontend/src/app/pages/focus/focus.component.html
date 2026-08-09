@@ -28,10 +28,10 @@
   <div class="loading" *ngIf="loading">Loading your focus workspace…</div>
 
   <main class="focus-grid" *ngIf="!loading">
-    <section class="panel todo-panel">
+    <section id="todos" class="panel todo-panel">
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Daily todos</p>
+          <p class="eyebrow">Daily todo</p>
           <h2>What must happen today?</h2>
         </div>
         <span class="counter">{{ completedTodos }}/{{ todos.length }}</span>
@@ -75,7 +75,7 @@
               <span class="priority" [class.high]="todo.priority === 'High'">{{ todo.priority }}</span>
             </div>
             <p *ngIf="todo.notes">{{ todo.notes }}</p>
-            <small>Tracked: {{ formatDuration(todoElapsed(todo)) }}</small>
+            <small>Time spent: {{ formatDuration(todoElapsed(todo)) }}</small>
           </div>
           <div class="item-actions">
             <button
@@ -84,14 +84,14 @@
               (click)="startTimer('todo', todo.id)"
               [disabled]="todo.completed || !!activeTimer"
             >Start timer</button>
-            <button *ngIf="isTimingTodo(todo)" class="stop-inline" (click)="stopTimer()">Stop</button>
+            <button *ngIf="isTimingTodo(todo)" class="stop-inline" (click)="stopTimer()">Stop & save</button>
             <button class="danger-text" (click)="deleteTodo(todo)">Delete</button>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="panel pomodoro-panel">
+    <section id="pomodoro" class="panel pomodoro-panel">
       <div class="panel-header">
         <div>
           <p class="eyebrow">Study timer</p>
@@ -125,7 +125,7 @@
       <p class="muted">Pomodoro keeps its countdown through a page refresh on this device.</p>
     </section>
 
-    <section class="panel task-panel">
+    <section id="task-timers" class="panel task-panel">
       <div class="panel-header">
         <div>
           <p class="eyebrow">Task timing</p>
@@ -146,7 +146,7 @@
             <div class="task-meta">
               <span>{{ task.status }}</span>
               <span *ngIf="task.time_estimate">Estimate {{ task.time_estimate }}m</span>
-              <span>Tracked {{ formatDuration(taskElapsed(task)) }}</span>
+              <span>Time spent {{ formatDuration(taskElapsed(task)) }}</span>
             </div>
           </div>
           <div class="item-actions">
@@ -156,7 +156,7 @@
               (click)="startTimer('task', task.id!)"
               [disabled]="task.completed || !task.id || !!activeTimer"
             >Start timer</button>
-            <button *ngIf="isTimingTask(task)" class="stop-inline" (click)="stopTimer()">Stop</button>
+            <button *ngIf="isTimingTask(task)" class="stop-inline" (click)="stopTimer()">Stop & save</button>
           </div>
         </article>
       </div>
