@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { catchError, finalize, forkJoin, of, switchMap, timeout } from 'rxjs';
 
 import { Task, TaskService } from '../../shared/services/task.service';
 import {
@@ -10,9 +10,10 @@ import {
   ProductivityService,
   TimeSession,
   TimedItemType,
+  apiTimestampMilliseconds,
 } from '../../shared/services/productivity.service';
 
-type PomodoroMode = 'focus' | 'short' | 'long';
+type TodoFilter = 'active' | 'completed' | 'archived';
 
 @Component({
   selector: 'app-focus',
@@ -29,6 +30,9 @@ export class FocusComponent implements OnInit, OnDestroy {
   loading = true;
   errorMessage = '';
   successMessage = '';
+  todoFilter: TodoFilter = 'active';
+  todoSearch = '';
+  todoPriorityFilter: 'all' | ProductivityPriority = 'all';
 
   newTodo = {
     title: '',
@@ -36,28 +40,24 @@ export class FocusComponent implements OnInit, OnDestroy {
     priority: 'Medium' as ProductivityPriority,
   };
 
-  pomodoroMode: PomodoroMode = 'focus';
-  pomodoroMinutes = 25;
-  pomodoroRemainingSeconds = 25 * 60;
-  pomodoroRunning = false;
-  pomodoroEndAt: number | null = null;
-  completedFocusSessions = 0;
-
   private clockInterval?: number;
+  private readonly hashHandler = () => this.scrollToRequestedSection();
 
   constructor(
+    private changeDetector: ChangeDetectorRef,
     private taskService: TaskService,
     private productivityService: ProductivityService,
   ) {}
 
   ngOnInit(): void {
-    this.restorePomodoro();
+    window.addEventListener('hashchange', this.hashHandler);
     this.loadWorkspace();
     this.clockInterval = window.setInterval(() => this.tick(), 1000);
   }
 
   ngOnDestroy(): void {
     if (this.clockInterval) window.clearInterval(this.clockInterval);
+    window.removeEventListener('hashchange', this.hashHandler);
   }
 
   get todayLabel(): string {
@@ -68,12 +68,8 @@ export class FocusComponent implements OnInit, OnDestroy {
     }).format(new Date());
   }
 
-  get activeTasks(): Task[] {
-    return this.tasks.filter((task) => !task.completed);
-  }
-
   get completedTodos(): number {
-    return this.todos.filter((todo) => todo.completed).length;
+    return this.todos.filter((todo) => todo.completed && !todo.archived_at).length;
   }
 
   get totalTrackedTodaySeconds(): number {
@@ -84,7 +80,35 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   get currentActiveElapsedSeconds(): number {
     if (!this.activeTimer) return 0;
-    return Math.max(0, Math.floor((this.now - new Date(this.activeTimer.started_at).getTime()) / 1000));
+    return Math.max(0, Math.floor((this.now - apiTimestampMilliseconds(this.activeTimer.started_at)) / 1000));
+  }
+
+  get activeTodos(): number {
+    return this.todos.filter((todo) => !todo.completed && !todo.archived_at).length;
+  }
+
+  get filteredTodos(): DailyTodo[] {
+    const search = this.todoSearch.trim().toLowerCase();
+    return this.todos.filter((todo) => {
+      const matchesView = this.todoFilter === 'archived' ? Boolean(todo.archived_at)
+        : !todo.archived_at && (this.todoFilter === 'completed' ? todo.completed : !todo.completed);
+      return matchesView
+        && (this.todoPriorityFilter === 'all' || todo.priority === this.todoPriorityFilter)
+        && (!search || `${todo.title} ${todo.notes || ''}`.toLowerCase().includes(search));
+    });
+  }
+
+  get archivedTodos(): number { return this.todos.filter((todo) => todo.archived_at).length; }
+  get visibleTodoTotal(): number { return this.todos.filter((todo) => !todo.archived_at).length; }
+
+  get activeItemElapsedSeconds(): number {
+    if (!this.activeTimer) return 0;
+    if (this.activeTimer.item_type === 'task') {
+      const task = this.tasks.find((item) => item.id === this.activeTimer?.task_id);
+      return (task?.time_spent_seconds || (task?.time_spent || 0) * 60) + this.currentActiveElapsedSeconds;
+    }
+    const todo = this.todos.find((item) => item.id === this.activeTimer?.todo_id);
+    return (todo?.time_spent_seconds || 0) + this.currentActiveElapsedSeconds;
   }
 
   get activeTimerLabel(): string {
@@ -97,22 +121,49 @@ export class FocusComponent implements OnInit, OnDestroy {
 
   loadWorkspace(): void {
     this.loading = true;
+    const failedParts: string[] = [];
+
     forkJoin({
-      tasks: this.taskService.getTasks(),
-      todos: this.productivityService.getTodos(this.localDateString()),
-      timer: this.productivityService.getActiveTimer(),
-    }).subscribe({
-      next: ({ tasks, todos, timer }) => {
-        this.tasks = tasks;
-        this.todos = todos;
-        this.activeTimer = timer;
+      tasks: this.taskService.getTasks().pipe(
+        timeout(12000),
+        catchError(() => {
+          failedParts.push('tasks');
+          return of([] as Task[]);
+        }),
+      ),
+      todos: this.productivityService.getTodos(this.localDateString()).pipe(
+        timeout(12000),
+        catchError(() => {
+          failedParts.push('todos');
+          return of([] as DailyTodo[]);
+        }),
+      ),
+      timer: this.productivityService.getActiveTimer().pipe(
+        timeout(12000),
+        catchError(() => {
+          failedParts.push('active timer');
+          return of(null as TimeSession | null);
+        }),
+      ),
+    })
+      .pipe(finalize(() => {
         this.loading = false;
-      },
-      error: (error) => {
-        this.loading = false;
-        this.showError(error.message);
-      },
-    });
+        this.changeDetector.markForCheck();
+      }))
+      .subscribe({
+        next: ({ tasks, todos, timer }) => {
+          this.tasks = tasks;
+          this.todos = todos;
+          this.activeTimer = timer;
+          if (failedParts.length) {
+            this.showError(`Todo opened, but ${failedParts.join(', ')} could not be loaded. Check that the backend is running and try again.`);
+          }
+          window.setTimeout(() => this.scrollToRequestedSection(), 0);
+        },
+        error: (error) => {
+          this.showError(error?.message || 'Todo could not load. Check that the backend is running and try again.');
+        },
+      });
   }
 
   createTodo(): void {
@@ -130,6 +181,7 @@ export class FocusComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: (todo) => {
         this.todos = [todo, ...this.todos];
+        this.todoFilter = 'active';
         this.newTodo = { title: '', notes: '', priority: 'Medium' };
         this.showSuccess('Added to today.');
       },
@@ -138,10 +190,17 @@ export class FocusComponent implements OnInit, OnDestroy {
   }
 
   toggleTodo(todo: DailyTodo): void {
-    this.productivityService.updateTodo(todo.id, { completed: !todo.completed }).subscribe({
+    const completed = !todo.completed;
+    const update$ = completed && this.isTimingTodo(todo)
+      ? this.productivityService.stopTimer().pipe(
+          switchMap(() => this.productivityService.updateTodo(todo.id, { completed })),
+        )
+      : this.productivityService.updateTodo(todo.id, { completed });
+    update$.subscribe({
       next: (updated) => {
+        if (completed) this.activeTimer = null;
         this.todos = this.todos.map((item) => item.id === updated.id ? updated : item);
-        this.showSuccess(updated.completed ? 'Todo completed.' : 'Todo reopened.');
+        this.showSuccess(updated.completed ? 'Todo completed and tracked time saved.' : 'Todo reopened.');
       },
       error: (error) => this.showError(error.message),
     });
@@ -167,84 +226,30 @@ export class FocusComponent implements OnInit, OnDestroy {
       next: (session) => {
         this.activeTimer = session;
         this.now = Date.now();
-        this.loadTasksOnly();
         this.showSuccess('Timer started.');
       },
       error: (error) => this.showError(error.message),
     });
   }
 
-  stopTimer(): void {
+  pauseTimer(): void {
     if (!this.activeTimer) return;
     this.productivityService.stopTimer().subscribe({
       next: (session) => {
         this.activeTimer = null;
         this.loadWorkspace();
-        this.showSuccess(`Saved ${this.formatDuration(session.elapsed_seconds)}.`);
+        this.showSuccess(`Paused and saved ${this.formatDuration(session.elapsed_seconds)}. Resume from the list when ready.`);
       },
       error: (error) => this.showError(error.message),
     });
-  }
-
-  isTimingTask(task: Task): boolean {
-    return !!task.id && this.activeTimer?.item_type === 'task' && this.activeTimer.task_id === task.id;
   }
 
   isTimingTodo(todo: DailyTodo): boolean {
     return this.activeTimer?.item_type === 'todo' && this.activeTimer.todo_id === todo.id;
   }
 
-  taskElapsed(task: Task): number {
-    return (task.time_spent_seconds || 0) + (this.isTimingTask(task) ? this.currentActiveElapsedSeconds : 0);
-  }
-
   todoElapsed(todo: DailyTodo): number {
     return (todo.time_spent_seconds || 0) + (this.isTimingTodo(todo) ? this.currentActiveElapsedSeconds : 0);
-  }
-
-  setPomodoroMode(mode: PomodoroMode): void {
-    this.pomodoroMode = mode;
-    this.pomodoroMinutes = mode === 'focus' ? 25 : mode === 'short' ? 5 : 15;
-    this.pomodoroRemainingSeconds = this.pomodoroMinutes * 60;
-    this.pomodoroRunning = false;
-    this.pomodoroEndAt = null;
-    this.savePomodoro();
-  }
-
-  applyCustomPomodoro(): void {
-    const minutes = Math.max(1, Math.min(Number(this.pomodoroMinutes) || 25, 180));
-    this.pomodoroMinutes = minutes;
-    this.pomodoroRemainingSeconds = minutes * 60;
-    this.pomodoroRunning = false;
-    this.pomodoroEndAt = null;
-    this.savePomodoro();
-  }
-
-  togglePomodoro(): void {
-    if (this.pomodoroRunning) {
-      this.pomodoroRunning = false;
-      this.pomodoroEndAt = null;
-    } else {
-      if (this.pomodoroRemainingSeconds <= 0) {
-        this.pomodoroRemainingSeconds = this.pomodoroMinutes * 60;
-      }
-      this.pomodoroRunning = true;
-      this.pomodoroEndAt = Date.now() + this.pomodoroRemainingSeconds * 1000;
-    }
-    this.savePomodoro();
-  }
-
-  resetPomodoro(): void {
-    this.pomodoroRunning = false;
-    this.pomodoroEndAt = null;
-    this.pomodoroRemainingSeconds = this.pomodoroMinutes * 60;
-    this.savePomodoro();
-  }
-
-  pomodoroDisplay(): string {
-    const minutes = Math.floor(this.pomodoroRemainingSeconds / 60).toString().padStart(2, '0');
-    const seconds = (this.pomodoroRemainingSeconds % 60).toString().padStart(2, '0');
-    return `${minutes}:${seconds}`;
   }
 
   formatDuration(seconds: number): string {
@@ -256,28 +261,30 @@ export class FocusComponent implements OnInit, OnDestroy {
     return `${minutes}m ${secs.toString().padStart(2, '0')}s`;
   }
 
+  formatRunningDuration(seconds: number): string {
+    const safe = Math.max(0, Math.floor(seconds || 0));
+    const hours = Math.floor(safe / 3600);
+    const minutes = Math.floor((safe % 3600) / 60);
+    const secs = safe % 60;
+    return `${hours}h ${minutes.toString().padStart(2, '0')}m ${secs.toString().padStart(2, '0')}s`;
+  }
+
   trackById(_: number, item: { id?: number }): number | undefined {
     return item.id;
   }
 
   private tick(): void {
     this.now = Date.now();
-    if (!this.pomodoroRunning || !this.pomodoroEndAt) return;
-    const remaining = Math.max(0, Math.ceil((this.pomodoroEndAt - this.now) / 1000));
-    this.pomodoroRemainingSeconds = remaining;
-    if (remaining === 0) {
-      this.pomodoroRunning = false;
-      this.pomodoroEndAt = null;
-      if (this.pomodoroMode === 'focus') this.completedFocusSessions += 1;
-      this.showSuccess(this.pomodoroMode === 'focus' ? 'Focus session complete.' : 'Break complete.');
-    }
-    this.savePomodoro();
+    this.changeDetector.markForCheck();
   }
 
-  private loadTasksOnly(): void {
-    this.taskService.getTasks().subscribe({
-      next: (tasks) => (this.tasks = tasks),
-    });
+  private scrollToRequestedSection(): void {
+    const requested = window.location.hash.replace('#', '');
+    const target = requested === 'pomodoro' ? 'timer' : requested;
+    if (!['todos', 'timer'].includes(target)) return;
+    window.setTimeout(() => {
+      document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
   }
 
   private localDateString(): string {
@@ -288,47 +295,21 @@ export class FocusComponent implements OnInit, OnDestroy {
     return `${year}-${month}-${day}`;
   }
 
-  private savePomodoro(): void {
-    localStorage.setItem('focus_pomodoro', JSON.stringify({
-      mode: this.pomodoroMode,
-      minutes: this.pomodoroMinutes,
-      remaining: this.pomodoroRemainingSeconds,
-      running: this.pomodoroRunning,
-      endAt: this.pomodoroEndAt,
-      completed: this.completedFocusSessions,
-    }));
-  }
-
-  private restorePomodoro(): void {
-    try {
-      const raw = localStorage.getItem('focus_pomodoro');
-      if (!raw) return;
-      const state = JSON.parse(raw);
-      if (['focus', 'short', 'long'].includes(state.mode)) this.pomodoroMode = state.mode;
-      this.pomodoroMinutes = Math.max(1, Number(state.minutes) || 25);
-      this.pomodoroRemainingSeconds = Math.max(0, Number(state.remaining) || this.pomodoroMinutes * 60);
-      this.pomodoroRunning = Boolean(state.running);
-      this.pomodoroEndAt = state.endAt ? Number(state.endAt) : null;
-      this.completedFocusSessions = Math.max(0, Number(state.completed) || 0);
-      if (this.pomodoroRunning && this.pomodoroEndAt) {
-        this.pomodoroRemainingSeconds = Math.max(0, Math.ceil((this.pomodoroEndAt - Date.now()) / 1000));
-        if (this.pomodoroRemainingSeconds === 0) {
-          this.pomodoroRunning = false;
-          this.pomodoroEndAt = null;
-        }
-      }
-    } catch {
-      localStorage.removeItem('focus_pomodoro');
-    }
-  }
-
   private showError(message: string): void {
     this.errorMessage = message || 'Something went wrong.';
-    window.setTimeout(() => (this.errorMessage = ''), 5000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.errorMessage = '';
+      this.changeDetector.markForCheck();
+    }, 5000);
   }
 
   private showSuccess(message: string): void {
     this.successMessage = message;
-    window.setTimeout(() => (this.successMessage = ''), 3000);
+    this.changeDetector.markForCheck();
+    window.setTimeout(() => {
+      this.successMessage = '';
+      this.changeDetector.markForCheck();
+    }, 3000);
   }
 }

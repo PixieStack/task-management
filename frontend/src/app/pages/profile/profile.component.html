@@ -5,11 +5,12 @@
       <h1>Profile & security</h1>
       <p>Keep your personal details and account access up to date.</p>
     </div>
-    <button class="avatar" type="button" (click)="updateProfilePicture()" [disabled]="loading.picture">
+    <button class="avatar" type="button" (click)="profilePictureInput.click()" [disabled]="loading.picture" aria-label="Upload profile picture">
       <img *ngIf="profilePicture" [src]="profilePicture" alt="Profile picture" />
       <span *ngIf="!profilePicture">{{ user?.username?.charAt(0) || 'U' }}</span>
       <small>{{ loading.picture ? 'Saving…' : 'Change photo' }}</small>
     </button>
+    <input #profilePictureInput class="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" (change)="onProfilePictureSelected($event)" />
   </header>
 
   <div class="message success" *ngIf="successMessage">{{ successMessage }}</div>
@@ -56,51 +57,6 @@
           <input formControlName="phone" placeholder="+27…" />
           <span class="field-error" *ngIf="hasError(profileForm, 'phone', 'pattern')">Enter a valid phone number.</span>
         </label>
-        <label>
-          Date of birth
-          <input formControlName="dateOfBirth" type="date" />
-        </label>
-        <label>
-          Gender
-          <select formControlName="gender">
-            <option value="">Prefer not to say</option>
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-            <option value="non-binary">Non-binary</option>
-            <option value="other">Other</option>
-          </select>
-        </label>
-        <label>
-          Country
-          <select formControlName="country">
-            <option value="">Select country</option>
-            <option *ngFor="let country of countries" [value]="country">{{ country }}</option>
-          </select>
-        </label>
-        <label class="span-two">
-          Address
-          <input formControlName="address" />
-        </label>
-        <label>
-          City
-          <input formControlName="city" />
-        </label>
-        <label>
-          State / province
-          <input formControlName="state" />
-        </label>
-        <label>
-          Postal code
-          <input formControlName="zipCode" />
-        </label>
-        <label>
-          Occupation
-          <input formControlName="occupation" />
-        </label>
-        <label>
-          Company / organization
-          <input formControlName="company" />
-        </label>
         <label class="span-two">
           Bio
           <textarea formControlName="bio" rows="4" maxlength="500"></textarea>
@@ -135,7 +91,10 @@
         </label>
         <label>
           Current password
-          <input formControlName="password" type="password" />
+          <span class="password-input">
+            <input formControlName="password" [type]="passwordVisibility.email ? 'text' : 'password'" autocomplete="current-password" />
+            <button type="button" (click)="passwordVisibility.email = !passwordVisibility.email" [attr.aria-label]="passwordVisibility.email ? 'Hide current password' : 'Show current password'" [attr.aria-pressed]="passwordVisibility.email"><i class="fas" [class.fa-eye]="!passwordVisibility.email" [class.fa-eye-slash]="passwordVisibility.email" aria-hidden="true"></i></button>
+          </span>
         </label>
         <button type="submit" class="primary" [disabled]="loading.email">
           {{ loading.email ? 'Updating…' : 'Update email' }}
@@ -151,22 +110,42 @@
       <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
         <label>
           Current password
-          <input formControlName="currentPassword" type="password" />
+          <span class="password-input">
+            <input formControlName="currentPassword" [type]="passwordVisibility.current ? 'text' : 'password'" autocomplete="current-password" />
+            <button type="button" (click)="passwordVisibility.current = !passwordVisibility.current" [attr.aria-label]="passwordVisibility.current ? 'Hide current password' : 'Show current password'" [attr.aria-pressed]="passwordVisibility.current"><i class="fas" [class.fa-eye]="!passwordVisibility.current" [class.fa-eye-slash]="passwordVisibility.current" aria-hidden="true"></i></button>
+          </span>
         </label>
         <label>
           New password
-          <input formControlName="newPassword" type="password" />
+          <span class="password-input">
+            <input formControlName="newPassword" [type]="passwordVisibility.new ? 'text' : 'password'" autocomplete="new-password" />
+            <button type="button" (click)="passwordVisibility.new = !passwordVisibility.new" [attr.aria-label]="passwordVisibility.new ? 'Hide new password' : 'Show new password'" [attr.aria-pressed]="passwordVisibility.new"><i class="fas" [class.fa-eye]="!passwordVisibility.new" [class.fa-eye-slash]="passwordVisibility.new" aria-hidden="true"></i></button>
+          </span>
           <span class="field-error" *ngIf="hasError(passwordForm, 'newPassword', 'pattern')">Password does not meet the requirements.</span>
         </label>
         <label>
           Confirm new password
-          <input formControlName="confirmPassword" type="password" />
+          <span class="password-input">
+            <input formControlName="confirmPassword" [type]="passwordVisibility.confirm ? 'text' : 'password'" autocomplete="new-password" />
+            <button type="button" (click)="passwordVisibility.confirm = !passwordVisibility.confirm" [attr.aria-label]="passwordVisibility.confirm ? 'Hide confirmed password' : 'Show confirmed password'" [attr.aria-pressed]="passwordVisibility.confirm"><i class="fas" [class.fa-eye]="!passwordVisibility.confirm" [class.fa-eye-slash]="passwordVisibility.confirm" aria-hidden="true"></i></button>
+          </span>
           <span class="field-error" *ngIf="passwordMismatch()">Passwords do not match.</span>
         </label>
         <button type="submit" class="primary" [disabled]="loading.password">
           {{ loading.password ? 'Updating…' : 'Update password' }}
         </button>
       </form>
+    </article>
+
+    <article class="card recovery-card">
+      <span class="security-icon" aria-hidden="true"><i class="fas fa-envelope-open-text"></i></span>
+      <p class="eyebrow">Account recovery</p>
+      <h2>Forgot your password?</h2>
+      <p class="muted">Send a secure, single-use reset link to <strong>{{ user?.email }}</strong>. The link will expire automatically.</p>
+      <button type="button" class="secondary recovery-button" (click)="sendPasswordReset()" [disabled]="loading.reset || !user?.email">
+        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+        {{ loading.reset ? 'Sending…' : 'Email me a reset link' }}
+      </button>
     </article>
 
     <article class="card danger-card">
@@ -177,7 +156,10 @@
       <form [formGroup]="deleteAccountForm" (ngSubmit)="deleteAccount()">
         <label>
           Password
-          <input formControlName="password" type="password" />
+          <span class="password-input">
+            <input formControlName="password" [type]="passwordVisibility.delete ? 'text' : 'password'" autocomplete="current-password" />
+            <button type="button" (click)="passwordVisibility.delete = !passwordVisibility.delete" [attr.aria-label]="passwordVisibility.delete ? 'Hide password' : 'Show password'" [attr.aria-pressed]="passwordVisibility.delete"><i class="fas" [class.fa-eye]="!passwordVisibility.delete" [class.fa-eye-slash]="passwordVisibility.delete" aria-hidden="true"></i></button>
+          </span>
         </label>
         <label>
           Type DELETE

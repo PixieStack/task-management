@@ -15,26 +15,11 @@
       <div class="auth-header">
         <span class="auth-kicker">Create your workspace</span>
         <h1 id="register-title">Start with a clearer system.</h1>
-        <p>Create an account with email, Google or Apple. Email/password accounts must verify through Brevo before sign-in.</p>
+        <p>Create your account with email and verify it through Brevo before signing in.</p>
       </div>
 
       <div *ngIf="registrationError" class="alert-message error-alert" role="alert">
         <i class="fas fa-exclamation-circle"></i><span>{{ registrationError }}</span>
-      </div>
-
-      <div class="oauth-area" *ngIf="oauthConfig.google_client_id || oauthConfig.apple_client_id">
-        <p class="oauth-terms-note">Accept the Terms and Privacy Policy below before continuing with a provider.</p>
-        <div id="google-register-button" class="google-provider" *ngIf="oauthConfig.google_client_id" aria-label="Continue with Google"></div>
-        <button
-          *ngIf="oauthConfig.apple_client_id"
-          type="button"
-          class="submit-button oauth-apple"
-          (click)="signUpWithApple()"
-          [disabled]="oauthBusy"
-        >
-          <span class="button-content"><i class="fab fa-apple"></i> Continue with Apple</span>
-        </button>
-        <div class="oauth-divider"><span>or create an account with email</span></div>
       </div>
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">

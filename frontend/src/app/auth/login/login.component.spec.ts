@@ -19,4 +19,9 @@ describe('LoginComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('offers email sign-in without third-party provider controls', () => {
+    expect(fixture.nativeElement.querySelector('input[type="email"]')).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('.oauth-area')).toBeNull();
+  });
 });

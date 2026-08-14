@@ -1,7 +1,7 @@
 {
   "name": "M.O.B TaskManager",
   "short_name": "TaskManager",
-  "description": "Tasks, habits, reading, meditation and AI productivity assistance.",
+  "description": "Tasks, habits, reading, projects and AI productivity assistance.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

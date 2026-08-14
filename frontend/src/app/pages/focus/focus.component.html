@@ -1,13 +1,12 @@
 <div class="focus-shell">
   <header class="focus-heading">
     <div>
-      <p class="eyebrow">Focus workspace</p>
+      <p class="eyebrow">Daily todo</p>
       <h1>{{ todayLabel }}</h1>
-      <p>Plan today, run a study sprint, and track exactly where your time goes.</p>
+      <p>Plan today, work through your list, and track time with one clear timer.</p>
     </div>
     <div class="today-summary">
-      <span><strong>{{ completedTodos }}/{{ todos.length }}</strong> todos done</span>
-      <span><strong>{{ completedFocusSessions }}</strong> focus sessions</span>
+      <span><strong>{{ completedTodos }}/{{ visibleTodoTotal }}</strong> todos done</span>
       <span><strong>{{ formatDuration(totalTrackedTodaySeconds) }}</strong> tracked</span>
     </div>
   </header>
@@ -15,26 +14,27 @@
   <div class="toast error" *ngIf="errorMessage">{{ errorMessage }}</div>
   <div class="toast success" *ngIf="successMessage">{{ successMessage }}</div>
 
-  <section class="active-timer" *ngIf="activeTimer">
-    <div>
-      <p class="eyebrow">Currently tracking</p>
-      <strong>{{ activeTimerLabel }}</strong>
-      <span>{{ activeTimer.item_type === 'task' ? 'Task' : 'Daily todo' }}</span>
-    </div>
-    <div class="active-clock">{{ formatDuration(currentActiveElapsedSeconds) }}</div>
-    <button class="stop-button" (click)="stopTimer()">Stop & save</button>
-  </section>
+  <div class="loading" *ngIf="loading">Syncing today’s todos and timer…</div>
 
-  <div class="loading" *ngIf="loading">Loading your focus workspace…</div>
-
-  <main class="focus-grid" *ngIf="!loading">
-    <section class="panel todo-panel">
+  <main class="focus-grid" [class.todo-only]="!activeTimer" [attr.aria-busy]="loading">
+    <section id="todos" class="panel todo-panel">
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Daily todos</p>
+          <p class="eyebrow">Daily todo</p>
           <h2>What must happen today?</h2>
         </div>
-        <span class="counter">{{ completedTodos }}/{{ todos.length }}</span>
+        <span class="counter">{{ completedTodos }}/{{ visibleTodoTotal }}</span>
+      </div>
+
+      <div class="status-tabs" role="tablist" aria-label="Todo status">
+        <button type="button" role="tab" [attr.aria-selected]="todoFilter === 'active'" [class.active]="todoFilter === 'active'" (click)="todoFilter = 'active'">Active <span>{{ activeTodos }}</span></button>
+        <button type="button" role="tab" [attr.aria-selected]="todoFilter === 'completed'" [class.active]="todoFilter === 'completed'" (click)="todoFilter = 'completed'">Completed <span>{{ completedTodos }}</span></button>
+        <button *ngIf="archivedTodos" type="button" class="archive-tab" role="tab" [attr.aria-selected]="todoFilter === 'archived'" [class.active]="todoFilter === 'archived'" (click)="todoFilter = 'archived'"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived <span>{{ archivedTodos }}</span></button>
+      </div>
+
+      <div class="list-tools">
+        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="todoSearch" placeholder="Search Todos" aria-label="Search Todos" /></label>
+        <label class="list-filter"><span>Priority</span><select [(ngModel)]="todoPriorityFilter" aria-label="Filter Todos by priority"><option value="all">All priorities</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></label>
       </div>
 
       <form class="todo-form" (ngSubmit)="createTodo()">
@@ -60,12 +60,13 @@
         ></textarea>
       </form>
 
-      <div class="empty" *ngIf="!todos.length">Nothing on today’s list yet.</div>
+      <div class="empty" *ngIf="!filteredTodos.length && !loading">{{ todoFilter === 'active' ? 'No active todos. Add something for today.' : 'No completed todos yet.' }}</div>
       <div class="todo-list">
-        <article class="todo-item" *ngFor="let todo of todos; trackBy: trackById" [class.done]="todo.completed">
+        <article class="todo-item" *ngFor="let todo of filteredTodos; trackBy: trackById" [class.done]="todo.completed">
           <button
             class="check"
             [class.checked]="todo.completed"
+            [disabled]="!!todo.archived_at"
             (click)="toggleTodo(todo)"
             [attr.aria-label]="todo.completed ? 'Reopen ' + todo.title : 'Complete ' + todo.title"
           >{{ todo.completed ? '✓' : '' }}</button>
@@ -75,91 +76,45 @@
               <span class="priority" [class.high]="todo.priority === 'High'">{{ todo.priority }}</span>
             </div>
             <p *ngIf="todo.notes">{{ todo.notes }}</p>
-            <small>Tracked: {{ formatDuration(todoElapsed(todo)) }}</small>
+            <small>Time spent: {{ formatDuration(todoElapsed(todo)) }}</small>
+            <small *ngIf="todo.archived_at" class="archived-status"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived {{ todo.archived_at | date:'mediumDate' }}</small>
           </div>
           <div class="item-actions">
             <button
-              *ngIf="!isTimingTodo(todo)"
+              *ngIf="!todo.completed && !isTimingTodo(todo)"
               class="secondary"
               (click)="startTimer('todo', todo.id)"
-              [disabled]="todo.completed || !!activeTimer"
-            >Start timer</button>
-            <button *ngIf="isTimingTodo(todo)" class="stop-inline" (click)="stopTimer()">Stop</button>
-            <button class="danger-text" (click)="deleteTodo(todo)">Delete</button>
+              [disabled]="!!activeTimer"
+            >{{ todo.time_spent_seconds > 0 ? 'Resume timer' : 'Start timer' }}</button>
+            <button *ngIf="isTimingTodo(todo)" class="stop-inline" (click)="pauseTimer()">Pause & save</button>
+            <button *ngIf="!todo.archived_at" class="danger-text" (click)="deleteTodo(todo)">Delete</button>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="panel pomodoro-panel">
+    <section id="timer" class="panel pomodoro-panel" *ngIf="activeTimer">
+      <button
+        type="button"
+        class="timer-close"
+        (click)="pauseTimer()"
+        aria-label="Close timer and save elapsed time"
+        title="Close timer and save"
+      >×</button>
       <div class="panel-header">
         <div>
-          <p class="eyebrow">Study timer</p>
-          <h2>Pomodoro</h2>
+          <p class="eyebrow">{{ activeTimer.item_type === 'task' ? 'Task timer' : 'Todo timer' }}</p>
+          <h2>{{ activeTimerLabel }}</h2>
         </div>
       </div>
 
-      <div class="mode-tabs" aria-label="Pomodoro modes">
-        <button [class.active]="pomodoroMode === 'focus'" (click)="setPomodoroMode('focus')">Focus 25</button>
-        <button [class.active]="pomodoroMode === 'short'" (click)="setPomodoroMode('short')">Break 5</button>
-        <button [class.active]="pomodoroMode === 'long'" (click)="setPomodoroMode('long')">Long break 15</button>
+      <div class="pomodoro-clock active-item-clock" aria-live="polite">{{ formatRunningDuration(activeItemElapsedSeconds) }}</div>
+      <p class="pomodoro-label">Currently tracking {{ activeTimer.item_type === 'task' ? 'a task' : 'this todo' }}</p>
+      <div class="pomodoro-actions single-action">
+        <button class="stop-button big" (click)="pauseTimer()">Pause & save</button>
       </div>
-
-      <div class="pomodoro-clock">{{ pomodoroDisplay() }}</div>
-      <p class="pomodoro-label">
-        {{ pomodoroMode === 'focus' ? 'Deep focus' : pomodoroMode === 'short' ? 'Short break' : 'Long break' }}
-      </p>
-
-      <div class="pomodoro-actions">
-        <button class="primary big" (click)="togglePomodoro()">{{ pomodoroRunning ? 'Pause' : 'Start' }}</button>
-        <button class="secondary big" (click)="resetPomodoro()">Reset</button>
-      </div>
-
-      <div class="custom-timer">
-        <label>
-          Custom minutes
-          <input type="number" min="1" max="180" [(ngModel)]="pomodoroMinutes" />
-        </label>
-        <button class="secondary" (click)="applyCustomPomodoro()">Set timer</button>
-      </div>
-      <p class="muted">Pomodoro keeps its countdown through a page refresh on this device.</p>
+      <p class="muted">Pausing saves this time. Resume later from the list to continue from the saved total.</p>
     </section>
 
-    <section class="panel task-panel">
-      <div class="panel-header">
-        <div>
-          <p class="eyebrow">Task timing</p>
-          <h2>Track work on your tasks</h2>
-        </div>
-        <span class="counter">{{ activeTasks.length }} active</span>
-      </div>
-
-      <div class="empty" *ngIf="!tasks.length">Create a task from the dashboard or ask the AI assistant.</div>
-      <div class="task-list">
-        <article class="task-item" *ngFor="let task of tasks; trackBy: trackById" [class.done]="task.completed">
-          <div class="item-copy">
-            <div class="title-line">
-              <strong>{{ task.title }}</strong>
-              <span class="priority" [class.high]="task.priority === 'High'">{{ task.priority }}</span>
-            </div>
-            <p *ngIf="task.description">{{ task.description }}</p>
-            <div class="task-meta">
-              <span>{{ task.status }}</span>
-              <span *ngIf="task.time_estimate">Estimate {{ task.time_estimate }}m</span>
-              <span>Tracked {{ formatDuration(taskElapsed(task)) }}</span>
-            </div>
-          </div>
-          <div class="item-actions">
-            <button
-              *ngIf="!isTimingTask(task)"
-              class="secondary"
-              (click)="startTimer('task', task.id!)"
-              [disabled]="task.completed || !task.id || !!activeTimer"
-            >Start timer</button>
-            <button *ngIf="isTimingTask(task)" class="stop-inline" (click)="stopTimer()">Stop</button>
-          </div>
-        </article>
-      </div>
-    </section>
   </main>
 </div>

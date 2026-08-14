@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.archive_logic import archive_completed_items, set_completion_state
 from app.auth import get_current_user, get_db
 
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
@@ -26,7 +27,11 @@ def _parse_due_date(value):
 
 
 def _get(tid: int, uid: int, db: Session):
-    obj = db.query(models.Task).filter(models.Task.id == tid, models.Task.owner_id == uid).first()
+    obj = db.query(models.Task).filter(
+        models.Task.id == tid,
+        models.Task.owner_id == uid,
+        models.Task.deleted_at.is_(None),
+    ).first()
     if not obj:
         raise HTTPException(status_code=404, detail="Task not found")
     return obj
@@ -41,7 +46,11 @@ def read_tasks(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    query = db.query(models.Task).filter(models.Task.owner_id == current_user.id)
+    archive_completed_items(db, current_user.id)
+    query = db.query(models.Task).filter(
+        models.Task.owner_id == current_user.id,
+        models.Task.deleted_at.is_(None),
+    )
     if status_filter:
         query = query.filter(models.Task.status == status_filter)
     if priority_filter:
@@ -80,6 +89,7 @@ def create_task(
         time_spent_seconds=seconds,
         owner_id=current_user.id,
     )
+    set_completion_state(obj, completed)
     db.add(obj)
     db.commit()
     db.refresh(obj)
@@ -115,8 +125,11 @@ def update_task(
     if updates.get("status") == "Completed" or updates.get("completed") is True:
         updates["completed"] = True
         updates["status"] = "Completed"
+    elif "status" in updates and updates["status"] != "Completed":
+        updates["completed"] = False
     elif updates.get("completed") is False and obj.status == "Completed" and "status" not in updates:
         updates["status"] = "Not Started"
+    set_completion_state(obj, updates.get("completed", obj.completed))
     for key, value in updates.items():
         setattr(obj, key, value)
     obj.updated_at = datetime.utcnow()
@@ -131,6 +144,14 @@ def delete_task(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    db.delete(_get(task_id, current_user.id, db))
+    task = _get(task_id, current_user.id, db)
+    now = datetime.utcnow()
+    task.deleted_at = now
+    task.updated_at = now
+    db.query(models.TimeSession).filter(
+        models.TimeSession.user_id == current_user.id,
+        models.TimeSession.task_id == task.id,
+        models.TimeSession.deleted_at.is_(None),
+    ).update({models.TimeSession.deleted_at: now}, synchronize_session=False)
     db.commit()
     return None

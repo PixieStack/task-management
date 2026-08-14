@@ -72,4 +72,18 @@ body = smtp.message.get_body(preferencelist=("plain",)).get_content()
 assert "https://api.example.test/auth/verify-email?token=verification-token-value" in body
 assert "expires in 60 minutes" in body
 
-print("Brevo SMTP verification transport smoke test passed")
+habit_sent = email_service.send_habit_completion_email(
+    "new-user@example.com",
+    "New User",
+    "Read before bed",
+    30,
+)
+assert habit_sent is True
+assert len(FakeSMTP.instances) == 2
+habit_message = FakeSMTP.instances[1].message
+assert habit_message["Subject"] == "You completed your 30-day habit!"
+habit_body = habit_message.get_body(preferencelist=("plain",)).get_content()
+assert "Read before bed" in habit_body
+assert "30 daily check-ins" in habit_body
+
+print("Brevo SMTP verification and habit completion transport smoke test passed")

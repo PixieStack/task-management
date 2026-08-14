@@ -3,18 +3,87 @@
     <div>
       <p class="eyebrow">Focus workspace</p>
       <h1>Your day, without the clutter.</h1>
-      <p>Tasks, habits, reading, meditation and AI support in one focused workspace.</p>
+      <p>Tasks, habits, reading, projects and AI support in one focused workspace.</p>
     </div>
   </div>
 
   <div class="toast error" *ngIf="errorMessage">{{ errorMessage }}</div>
   <div class="toast success" *ngIf="successMessage">{{ successMessage }}</div>
 
+  <div class="task-due-overlay" *ngIf="taskDueReview as task" role="dialog" aria-modal="true" aria-labelledby="task-due-title">
+    <div class="task-due-card">
+      <span class="review-icon task-due-icon" aria-hidden="true">!</span>
+      <p class="eyebrow">Due time reached</p>
+      <h2 id="task-due-title">Did you complete this task?</h2>
+      <p><strong>{{ task.title }}</strong> was due {{ task.due_date | date:'mediumDate' }} at {{ task.due_date | date:'shortTime' }}. It will only be marked complete if you confirm.</p>
+      <div class="review-actions">
+        <button class="primary" type="button" (click)="completeDueTask()">Yes, complete task</button>
+        <button class="secondary" type="button" (click)="keepDueTaskActive()">No, keep active</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="habit-review-overlay" *ngIf="habitReview as habit" role="dialog" aria-modal="true" aria-labelledby="habit-review-title">
+    <div class="habit-review-card" *ngIf="habitReviewStage === 'question'; else extendHabitCard">
+      <span class="review-icon" aria-hidden="true">?</span>
+      <p class="eyebrow">Planned days complete</p>
+      <h2 id="habit-review-title">Does this feel like a habit now?</h2>
+      <p>You completed {{ habit.check_in_count }} daily check-ins for <strong>{{ habit.name }}</strong>. Be honest with yourself—does doing it now feel established?</p>
+      <div class="review-actions">
+        <button class="primary" type="button" (click)="confirmHabitEstablished()" [disabled]="habitReviewSaving">Yes, it’s a habit</button>
+        <button class="secondary" type="button" (click)="showHabitExtension()" [disabled]="habitReviewSaving">Not yet, I need more days</button>
+      </div>
+    </div>
+    <ng-template #extendHabitCard>
+      <form class="habit-review-card" (ngSubmit)="extendHabitPlan()">
+        <span class="review-icon extend" aria-hidden="true">+</span>
+        <p class="eyebrow">Keep building</p>
+        <h2 id="habit-review-title">How many more days do you need?</h2>
+        <p>Add time to <strong>{{ habit.name }}</strong>. After those daily check-ins, we’ll ask you again.</p>
+        <label class="field extension-days" for="additional-habit-days">
+          <span class="field-label">Additional days</span>
+          <input id="additional-habit-days" name="additionalHabitDays" type="number" min="1" max="365" inputmode="numeric" required [(ngModel)]="additionalHabitDays" />
+        </label>
+        <div class="extension-preview">New plan: <strong>{{ habit.duration_days + additionalHabitDays }} total days</strong></div>
+        <div class="review-actions">
+          <button class="primary" type="submit" [disabled]="habitReviewSaving">Add days & continue</button>
+          <button class="secondary" type="button" (click)="habitReviewStage = 'question'" [disabled]="habitReviewSaving">Back</button>
+        </div>
+      </form>
+    </ng-template>
+  </div>
+
+  <div class="celebration" *ngIf="completedHabit as habit" role="dialog" aria-modal="true" aria-labelledby="habit-celebration-title">
+    <div class="confetti" aria-hidden="true"><i *ngFor="let piece of celebrationPieces; let index = index" [style.--piece]="index"></i></div>
+    <div class="balloons" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="celebration-card">
+      <span class="celebration-badge" aria-hidden="true">✓</span>
+      <p class="eyebrow">Habit complete</p>
+      <h2 id="habit-celebration-title">You did it!</h2>
+      <p>You completed <strong>{{ habit.name }}</strong> for {{ habit.duration_days }} daily check-ins.</p>
+      <small>We sent a congratulations email to celebrate your progress.</small>
+      <button class="primary" type="button" (click)="closeHabitCelebration()">Celebrate & continue</button>
+    </div>
+  </div>
+
+  <div class="celebration" *ngIf="completionCelebration as celebration" role="dialog" aria-modal="true" aria-labelledby="challenge-celebration-title">
+    <div class="confetti" aria-hidden="true"><i *ngFor="let piece of celebrationPieces; let index = index" [style.--piece]="index"></i></div>
+    <div class="balloons" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="celebration-card">
+      <span class="celebration-badge" aria-hidden="true">✓</span>
+      <p class="eyebrow">{{ celebration.eyebrow }}</p>
+      <h2 id="challenge-celebration-title">{{ celebration.title }}</h2>
+      <p>{{ celebration.message }}</p>
+      <small>We sent a congratulations email to celebrate your progress.</small>
+      <button class="primary" type="button" (click)="closeCompletionCelebration()">Celebrate & continue</button>
+    </div>
+  </div>
+
   <nav class="section-tabs" aria-label="Dashboard sections">
     <button [class.active]="activeSection === 'overview'" (click)="setSection('overview')">Overview</button>
     <button [class.active]="activeSection === 'tasks'" (click)="setSection('tasks')">Tasks</button>
     <button [class.active]="activeSection === 'habits'" (click)="setSection('habits')">Habits</button>
-    <button [class.active]="activeSection === 'challenges'" (click)="setSection('challenges')">Reading & Meditation</button>
+    <button [class.active]="activeSection === 'challenges'" (click)="setSection('challenges')">Challenges</button>
     <button [class.active]="activeSection === 'ai'" (click)="setSection('ai')">AI Assistant</button>
   </nav>
 
@@ -36,9 +105,9 @@
         <small>Daily check-ins</small>
       </button>
       <button class="stat-card" (click)="setSection('challenges')">
-        <span>Active challenges</span>
+        <span>Active plans</span>
         <strong>{{ activeChallenges }}</strong>
-        <small>Reading + meditation</small>
+        <small>Reading + projects</small>
       </button>
     </div>
 
@@ -51,9 +120,9 @@
           </div>
           <button class="link-button" (click)="setSection('tasks')">View all</button>
         </div>
-        <div class="empty" *ngIf="!tasks.length">Add your first task to get started.</div>
+        <div class="empty" *ngIf="!overviewTasks.length">Add your first task to get started.</div>
         <div class="compact-list">
-          <div class="compact-row" *ngFor="let task of tasks.slice(0, 5); trackBy: trackById">
+          <div class="compact-row" *ngFor="let task of overviewTasks; trackBy: trackById">
             <button
               class="check"
               [class.done]="task.completed"
@@ -78,20 +147,21 @@
           </div>
           <button class="link-button" (click)="setSection('habits')">Manage</button>
         </div>
-        <div class="empty" *ngIf="!habits.length">Create a daily habit and check it off here.</div>
+        <div class="empty" *ngIf="!overviewHabits.length">Create a daily habit and check it off here.</div>
         <div class="compact-list">
-          <div class="compact-row" *ngFor="let habit of habits.slice(0, 5); trackBy: trackById">
+          <div class="compact-row" *ngFor="let habit of overviewHabits; trackBy: trackById">
             <button
               class="check"
-              [class.done]="isHabitDoneToday(habit)"
+              [class.done]="isHabitDoneToday(habit) || habit.completed"
               (click)="toggleHabit(habit)"
-              [attr.aria-label]="'Toggle ' + habit.name"
+              [disabled]="!canHabitCheckIn(habit) && !habit.completion_review_required"
+              [attr.aria-label]="habitCheckInLabel(habit) + ': ' + habit.name"
             >
-              {{ isHabitDoneToday(habit) ? '✓' : '' }}
+              {{ isHabitDoneToday(habit) || habit.completed ? '✓' : '' }}
             </button>
             <div>
               <strong>{{ habit.name }}</strong>
-              <small>{{ habitStreak(habit) }} day streak</small>
+              <small>{{ habit.check_in_count }}/{{ habit.duration_days }} daily check-ins</small>
             </div>
           </div>
         </div>
@@ -102,12 +172,12 @@
       <div class="panel-header">
         <div>
           <p class="eyebrow">Longer focus</p>
-          <h2>Reading & meditation progress</h2>
+          <h2>Reading & project progress</h2>
         </div>
         <button class="link-button" (click)="setSection('challenges')">Open challenges</button>
       </div>
-      <div class="challenge-mini-grid" *ngIf="challenges.length; else noChallenges">
-        <div class="mini-challenge" *ngFor="let challenge of challenges.slice(0, 4); trackBy: trackById">
+      <div class="challenge-mini-grid" *ngIf="overviewChallenges.length || overviewProjects.length; else noChallenges">
+        <div class="mini-challenge" *ngFor="let challenge of overviewChallenges; trackBy: trackById">
           <div class="mini-top">
             <strong>{{ challenge.title }}</strong>
             <span>{{ challenge.progress | number:'1.0-0' }}%</span>
@@ -115,73 +185,95 @@
           <div class="progress-track"><span [style.width.%]="challenge.progress"></span></div>
           <small>{{ challenge.current_streak }}/{{ challenge.duration }} check-ins</small>
         </div>
+        <div class="mini-challenge" *ngFor="let project of overviewProjects; trackBy: trackById">
+          <div class="mini-top">
+            <strong>{{ project.title }}</strong>
+            <span>{{ projectStatusLabel(project.status) }}</span>
+          </div>
+          <small>{{ project.category }}</small>
+        </div>
       </div>
       <ng-template #noChallenges>
-        <div class="empty">Start a reading or meditation challenge when you're ready.</div>
+        <div class="empty">Start a reading challenge or create your first project.</div>
       </ng-template>
     </article>
   </section>
 
   <section *ngIf="activeSection === 'tasks'" class="section two-column">
     <article class="panel form-panel">
-      <p class="eyebrow">New task</p>
-      <h2>Capture what matters</h2>
-      <form (ngSubmit)="createTask()">
-        <label>
-          Task title
-          <input name="taskTitle" [(ngModel)]="newTask.title" placeholder="e.g. Finish project proposal" required />
+      <div class="form-intro">
+        <div>
+          <p class="eyebrow">New task</p>
+          <h2>Capture what matters</h2>
+          <p>Start with a clear outcome. You can add planning details now or come back to them later.</p>
+        </div>
+      </div>
+      <form class="friendly-form" #taskForm="ngForm" (ngSubmit)="createTask()">
+        <label class="field field-main" for="task-title">
+          <span class="field-label">Task title <em>Required</em></span>
+          <span class="field-help" id="task-title-help">Use a short, action-focused title.</span>
+          <input id="task-title" name="taskTitle" [(ngModel)]="newTask.title" aria-describedby="task-title-help" placeholder="e.g. Finish the project proposal" autocomplete="off" required />
         </label>
-        <label>
-          Description
-          <textarea name="taskDescription" [(ngModel)]="newTask.description" rows="3" placeholder="Optional details"></textarea>
+        <label class="field" for="task-description">
+          <span class="field-label">Description <small>Optional</small></span>
+          <textarea id="task-description" name="taskDescription" [(ngModel)]="newTask.description" rows="3" placeholder="Add notes, links, or the next step"></textarea>
         </label>
-        <div class="form-row">
-          <label>
-            Priority
-            <select name="taskPriority" [(ngModel)]="newTask.priority">
+        <div class="form-divider"><span>Planning details</span></div>
+        <div class="form-row compact-fields">
+          <label class="field" for="task-priority">
+            <span class="field-label">Priority <em>Required</em></span>
+            <select id="task-priority" name="taskPriority" required [(ngModel)]="newTask.priority">
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
           </label>
-          <label>
-            Due date
-            <input name="taskDueDate" type="date" [(ngModel)]="newTask.due_date" />
+          <label class="field" for="task-due-date">
+            <span class="field-label">Due date <em>Required</em></span>
+            <input id="task-due-date" name="taskDueDate" type="date" required [(ngModel)]="newTask.due_date" />
           </label>
         </div>
-        <div class="form-row">
-          <label>
-            Estimate (minutes)
-            <input name="taskEstimate" type="number" min="0" [(ngModel)]="newTask.time_estimate" />
+        <div class="form-row compact-fields">
+          <label class="field" for="task-due-time">
+            <span class="field-label">Due time <em>Required</em></span>
+            <input id="task-due-time" name="taskDueTime" type="time" required [(ngModel)]="newTask.due_time" [disabled]="!newTask.due_date" />
           </label>
-          <label>
-            Tags
-            <input name="taskTags" [(ngModel)]="newTask.tags" placeholder="work, urgent" />
+          <label class="field" for="task-tags">
+            <span class="field-label">Tags <small>Optional</small></span>
+            <input id="task-tags" name="taskTags" [(ngModel)]="newTask.tags" placeholder="work, urgent" autocomplete="off" />
           </label>
         </div>
-        <button class="primary" type="submit">Add task</button>
+        <button class="primary form-submit" type="submit" [disabled]="taskForm.invalid">
+          <span>Add task</span><span aria-hidden="true">→</span>
+        </button>
       </form>
     </article>
 
     <article class="panel list-panel">
       <div class="panel-header task-header">
         <div>
-          <p class="eyebrow">Task list</p>
-          <h2>{{ filteredTasks.length }} shown</h2>
+          <p class="eyebrow">Task timing</p>
+          <h2>Track work on your tasks</h2>
+          <small class="panel-subtitle">{{ filteredTasks.length }} {{ taskFilter }} · start and stop timing from each active task</small>
         </div>
-        <div class="filters">
-          <button [class.active]="taskFilter === 'all'" (click)="taskFilter = 'all'">All</button>
-          <button [class.active]="taskFilter === 'active'" (click)="taskFilter = 'active'">Active</button>
-          <button [class.active]="taskFilter === 'completed'" (click)="taskFilter = 'completed'">Done</button>
-          <button [class.active]="taskFilter === 'overdue'" (click)="taskFilter = 'overdue'">Overdue</button>
+        <div class="filters" role="tablist" aria-label="Task status">
+          <button role="tab" [attr.aria-selected]="taskFilter === 'active'" [class.active]="taskFilter === 'active'" (click)="taskFilter = 'active'">Active <span>{{ activeTasks }}</span></button>
+          <button role="tab" [attr.aria-selected]="taskFilter === 'completed'" [class.active]="taskFilter === 'completed'" (click)="taskFilter = 'completed'">Completed <span>{{ completedTasks }}</span></button>
+          <button role="tab" [attr.aria-selected]="taskFilter === 'overdue'" [class.active]="taskFilter === 'overdue'" (click)="taskFilter = 'overdue'">Overdue <span>{{ overdueTasks }}</span></button>
+          <button *ngIf="archivedTasks" class="archive-tab" role="tab" [attr.aria-selected]="taskFilter === 'archived'" [class.active]="taskFilter === 'archived'" (click)="taskFilter = 'archived'"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived <span>{{ archivedTasks }}</span></button>
         </div>
+      </div>
+
+      <div class="list-tools">
+        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="taskSearch" placeholder="Search tasks" aria-label="Search tasks" /></label>
+        <label class="list-filter"><span>Priority</span><select [(ngModel)]="taskPriorityFilter" aria-label="Filter tasks by priority"><option value="all">All priorities</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></label>
       </div>
 
       <div class="loading" *ngIf="loading.tasks">Loading tasks…</div>
       <div class="empty" *ngIf="!loading.tasks && !filteredTasks.length">No tasks match this view.</div>
       <div class="task-list">
         <article class="task-item" *ngFor="let task of filteredTasks; trackBy: trackById" [class.is-overdue]="isOverdue(task)">
-          <button class="check large" [class.done]="task.completed" (click)="toggleTask(task)">{{ task.completed ? '✓' : '' }}</button>
+          <button class="check large" [class.done]="task.completed" [disabled]="!!task.archived_at" (click)="toggleTask(task)">{{ task.completed ? '✓' : '' }}</button>
           <div class="task-body">
             <div class="task-title-row">
               <strong [class.strike]="task.completed">{{ task.title }}</strong>
@@ -190,20 +282,25 @@
             <p *ngIf="task.description">{{ task.description }}</p>
             <div class="meta">
               <span>{{ task.status }}</span>
-              <span *ngIf="task.due_date" [class.overdue]="isOverdue(task)">Due {{ task.due_date | date:'MediumDate' }}</span>
-              <span *ngIf="task.time_estimate">Estimate: {{ task.time_estimate }}m</span>
-              <span *ngIf="task.time_spent">Tracked: {{ task.time_spent }}m</span>
+              <span *ngIf="task.created_at">Created {{ task.created_at | date:'mediumDate' }}</span>
+              <span *ngIf="task.due_date" [class.overdue]="isOverdue(task)">Due {{ task.due_date | date:'mediumDate' }} at {{ task.due_date | date:'shortTime' }}</span>
+              <span *ngIf="task.due_date && !task.completed" [class.overdue]="isOverdue(task)">{{ taskDeadlineLabel(task) }}</span>
+              <span>Tracked: {{ formatDuration(taskElapsed(task)) }}</span>
             </div>
             <div class="tags" *ngIf="task.tags.length"><span *ngFor="let tag of task.tags">{{ tag }}</span></div>
             <div class="task-actions">
-              <select [ngModel]="task.status" (ngModelChange)="updateTaskStatus(task, $event)" [disabled]="task.completed">
+              <select *ngIf="!task.completed" [ngModel]="task.status" (ngModelChange)="updateTaskStatus(task, $event)">
                 <option value="Not Started">Not Started</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Pending">Pending</option>
                 <option value="Completed">Completed</option>
               </select>
-              <button class="secondary small" (click)="toggleTimer(task)" [disabled]="task.completed">{{ isTimerRunning(task) ? 'Stop & save timer' : 'Start timer' }}</button>
-              <button class="danger-text" (click)="deleteTask(task)">Delete</button>
+              <span *ngIf="task.completed" class="completed-status"><i class="fas fa-check" aria-hidden="true"></i> Completed</span>
+              <span *ngIf="task.archived_at" class="archived-status"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived {{ task.archived_at | date:'mediumDate' }}</span>
+              <button *ngIf="!task.completed" class="secondary small" (click)="toggleTimer(task)">
+                {{ isTimerRunning(task) ? 'Pause & save' : taskElapsed(task) > 0 ? 'Resume timer' : 'Start timer' }}
+              </button>
+              <button *ngIf="!task.archived_at" class="danger-text" (click)="deleteTask(task)">Delete</button>
             </div>
           </div>
         </article>
@@ -213,22 +310,46 @@
 
   <section *ngIf="activeSection === 'habits'" class="section two-column">
     <article class="panel form-panel">
-      <p class="eyebrow">New habit</p>
-      <h2>Build consistency</h2>
-      <form (ngSubmit)="createHabit()">
-        <label>
-          Habit
-          <input name="habitName" [(ngModel)]="newHabit.name" placeholder="e.g. Journal for 5 minutes" required />
+      <div class="form-intro">
+        <div>
+          <p class="eyebrow">New habit</p>
+          <h2>Build consistency</h2>
+          <p>Make it small and repeatable. A habit that is easy to start is easier to keep.</p>
+        </div>
+      </div>
+      <form class="friendly-form" #habitForm="ngForm" (ngSubmit)="createHabit()">
+        <label class="field field-main" for="habit-name">
+          <span class="field-label">Habit name <em>Required</em></span>
+          <span class="field-help" id="habit-name-help">Describe the action you want to repeat.</span>
+          <input id="habit-name" name="habitName" [(ngModel)]="newHabit.name" aria-describedby="habit-name-help" placeholder="e.g. Journal for 5 minutes" autocomplete="off" required />
         </label>
-        <label>
-          Why it matters
-          <textarea name="habitDescription" [(ngModel)]="newHabit.description" rows="3" placeholder="Optional reminder"></textarea>
+        <label class="field" for="habit-description">
+          <span class="field-label">Why it matters <small>Optional</small></span>
+          <textarea id="habit-description" name="habitDescription" [(ngModel)]="newHabit.description" rows="3" placeholder="Add a motivating reminder for yourself"></textarea>
         </label>
-        <label>
-          Daily target count
-          <input name="habitTarget" type="number" min="1" max="1000" [(ngModel)]="newHabit.target_count" />
+        <div class="form-divider"><span>Choose a duration</span></div>
+        <fieldset class="duration-fieldset">
+          <legend>How long do you want to build this habit?</legend>
+          <div class="duration-options">
+            <button *ngFor="let days of habitDurationOptions" type="button" [class.selected]="!newHabit.custom_duration && newHabit.duration_days === days" (click)="setHabitDuration(days)">
+              <strong>{{ days }}</strong><span>days</span>
+            </button>
+            <button type="button" [class.selected]="newHabit.custom_duration" (click)="setHabitDuration('custom')">
+              <strong>Custom</strong><span>1–365 days</span>
+            </button>
+          </div>
+        </fieldset>
+        <label *ngIf="newHabit.custom_duration" class="field custom-duration" for="habit-duration">
+          <span class="field-label">Custom duration <small>Days</small></span>
+          <input id="habit-duration" name="habitDuration" type="number" min="1" max="365" inputmode="numeric" required [(ngModel)]="newHabit.duration_days" />
         </label>
-        <button class="primary" type="submit">Create habit</button>
+        <div class="habit-plan-summary">
+          <span aria-hidden="true">✓</span>
+          <p><strong>{{ newHabit.duration_days }}-day daily habit</strong><small>One protected check-in every 24 hours</small></p>
+        </div>
+        <button class="primary form-submit" type="submit" [disabled]="habitForm.invalid">
+          <span>Create habit</span><span aria-hidden="true">→</span>
+        </button>
       </form>
     </article>
 
@@ -236,23 +357,39 @@
       <div class="panel-header">
         <div>
           <p class="eyebrow">Daily tracker</p>
-          <h2>{{ completedHabitsToday }}/{{ habits.length }} complete today</h2>
+          <h2>{{ habitFilter === 'active' ? 'Habits in progress' : habitFilter === 'completed' ? 'Completed habits' : 'Habit archive' }}</h2>
+        </div>
+        <div class="filters" role="tablist" aria-label="Habit status">
+          <button role="tab" [attr.aria-selected]="habitFilter === 'active'" [class.active]="habitFilter === 'active'" (click)="habitFilter = 'active'">Active <span>{{ activeHabits }}</span></button>
+          <button role="tab" [attr.aria-selected]="habitFilter === 'completed'" [class.active]="habitFilter === 'completed'" (click)="habitFilter = 'completed'">Completed <span>{{ completedHabits }}</span></button>
+          <button *ngIf="archivedHabits" class="archive-tab" role="tab" [attr.aria-selected]="habitFilter === 'archived'" [class.active]="habitFilter === 'archived'" (click)="habitFilter = 'archived'"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived <span>{{ archivedHabits }}</span></button>
         </div>
       </div>
+      <div class="list-tools">
+        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="habitSearch" placeholder="Search habits" aria-label="Search habits" /></label>
+        <label class="list-filter"><span>Length</span><select [(ngModel)]="habitDurationFilter" aria-label="Filter habits by length"><option value="all">Any length</option><option value="short">Up to 21 days</option><option value="standard">22–60 days</option><option value="long">Over 60 days</option></select></label>
+      </div>
       <div class="loading" *ngIf="loading.habits">Loading habits…</div>
-      <div class="empty" *ngIf="!loading.habits && !habits.length">No habits yet.</div>
+      <div class="empty" *ngIf="!loading.habits && !filteredHabits.length">{{ habitFilter === 'active' ? 'No active habits. Create one to get started.' : 'No completed habits yet.' }}</div>
       <div class="habit-list">
-        <article class="habit-item" *ngFor="let habit of habits; trackBy: trackById">
-          <button class="habit-check" [class.done]="isHabitDoneToday(habit)" (click)="toggleHabit(habit)">
-            <span>{{ isHabitDoneToday(habit) ? '✓' : '○' }}</span>
+        <article class="habit-item" *ngFor="let habit of filteredHabits; trackBy: trackById" [class.habit-completed]="habit.completed">
+          <button class="habit-check" [class.done]="isHabitDoneToday(habit) || habit.completed" [disabled]="!!habit.archived_at || (!canHabitCheckIn(habit) && !habit.completion_review_required)" (click)="toggleHabit(habit)" [attr.aria-label]="habitCheckInLabel(habit) + ': ' + habit.name">
+            <span>{{ isHabitDoneToday(habit) || habit.completed ? '✓' : '○' }}</span>
             <div>
               <strong>{{ habit.name }}</strong>
               <small>{{ habit.description || 'Daily habit' }}</small>
+              <small *ngIf="habit.created_at">Created {{ habit.created_at | date:'mediumDate' }}</small>
             </div>
           </button>
+          <div class="habit-progress">
+            <div><span>{{ habit.check_in_count }} of {{ habit.duration_days }} days</span><strong>{{ habit.progress | number:'1.0-0' }}%</strong></div>
+            <div class="progress-track"><span [style.width.%]="habit.progress"></span></div>
+            <small>{{ habit.completed ? 'Completed — amazing consistency!' : habitCheckInLabel(habit) }}</small>
+          </div>
           <div class="habit-side">
-            <span class="streak">{{ habitStreak(habit) }} day streak</span>
-            <button class="danger-text" (click)="deleteHabit(habit)">Delete</button>
+            <span class="streak">{{ habit.remaining_check_ins }} days left</span>
+            <span *ngIf="habit.archived_at" class="archived-status"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived</span>
+            <button *ngIf="!habit.archived_at" class="danger-text" (click)="deleteHabit(habit)">Delete</button>
           </div>
         </article>
       </div>
@@ -261,46 +398,115 @@
 
   <section *ngIf="activeSection === 'challenges'" class="section two-column">
     <article class="panel form-panel">
-      <p class="eyebrow">Focused challenge</p>
-      <h2>Choose one thing to practice</h2>
-      <form (ngSubmit)="createChallenge()">
-        <label>
-          Challenge type
-          <select name="challengeType" [(ngModel)]="newChallenge.challenge_type" (ngModelChange)="onChallengeTypeChange()">
-            <option value="meditation">Meditation</option>
-            <option value="reading">Reading</option>
+      <div class="form-intro">
+        <div>
+          <p class="eyebrow">Reading & projects</p>
+          <h2>What do you want to work on?</h2>
+          <p>Build a reading routine or manage a project from idea through completion.</p>
+        </div>
+      </div>
+      <div class="mode-switch" role="tablist" aria-label="Choose reading or project">
+        <button type="button" role="tab" [attr.aria-selected]="readingProjectMode === 'reading'" [class.active]="readingProjectMode === 'reading'" (click)="setReadingProjectMode('reading')">Reading</button>
+        <button type="button" role="tab" [attr.aria-selected]="readingProjectMode === 'project'" [class.active]="readingProjectMode === 'project'" (click)="setReadingProjectMode('project')">Project</button>
+      </div>
+
+      <form *ngIf="readingProjectMode === 'reading'" class="friendly-form" #challengeForm="ngForm" (ngSubmit)="createChallenge()">
+        <label class="field" for="challenge-title">
+          <span class="field-label">Book title <em>Required</em></span>
+          <input id="challenge-title" name="challengeTitle" required [(ngModel)]="newChallenge.title" autocomplete="off" placeholder="e.g. The Hobbit" />
+        </label>
+        <label class="field" for="challenge-book-type">
+          <span class="field-label">Book type <em>Required</em></span>
+          <select id="challenge-book-type" name="challengeBookType" required [(ngModel)]="newChallenge.book_type">
+            <option value="fiction">Fiction</option>
+            <option value="non_fiction">Non-fiction</option>
           </select>
         </label>
-        <label>
-          Title
-          <input name="challengeTitle" [(ngModel)]="newChallenge.title" [placeholder]="newChallenge.challenge_type === 'meditation' ? 'Meditation Challenge' : 'Reading Challenge'" />
-        </label>
-        <div class="form-row">
-          <label>
-            Duration (days)
-            <input name="challengeDuration" type="number" min="1" max="365" [(ngModel)]="newChallenge.duration" />
+        <div class="form-divider"><span>Set your pace</span></div>
+        <div class="form-row compact-fields">
+          <label class="field" for="challenge-duration">
+            <span class="field-label">Duration in days <em>Required</em></span>
+            <input id="challenge-duration" name="challengeDuration" type="number" min="1" max="365" inputmode="numeric" required [(ngModel)]="newChallenge.duration" />
           </label>
-          <label>
-            Daily goal
-            <input name="challengeGoal" [(ngModel)]="newChallenge.dailyGoal" placeholder="10 minutes / 20 pages" />
+          <label class="field" for="challenge-goal">
+            <span class="field-label">Daily goal <em>Required</em></span>
+            <input id="challenge-goal" name="challengeGoal" required [(ngModel)]="newChallenge.dailyGoal" placeholder="e.g. 20 pages" autocomplete="off" />
           </label>
         </div>
-        <button class="primary" type="submit">Start challenge</button>
+        <div class="form-summary">
+          <span aria-hidden="true">✓</span>
+          <p><strong>{{ newChallenge.duration }} day reading plan</strong><small>{{ newChallenge.dailyGoal || 'Set your own daily pace' }}</small></p>
+        </div>
+        <button class="primary form-submit" type="submit" [disabled]="challengeForm.invalid">
+          <span>Start challenge</span><span aria-hidden="true">→</span>
+        </button>
+      </form>
+
+      <form *ngIf="readingProjectMode === 'project'" class="friendly-form" #projectForm="ngForm" (ngSubmit)="createProject()">
+        <label class="field" for="project-title">
+          <span class="field-label">Project title <em>Required</em></span>
+          <input id="project-title" name="projectTitle" required maxlength="200" [(ngModel)]="newProject.title" autocomplete="off" placeholder="e.g. Portfolio redesign" />
+        </label>
+        <label class="field" for="project-description">
+          <span class="field-label">Description <em>Required</em></span>
+          <textarea id="project-description" name="projectDescription" required maxlength="2000" rows="3" [(ngModel)]="newProject.description" placeholder="What does success look like?"></textarea>
+        </label>
+        <label class="field" for="project-category">
+          <span class="field-label">Category <em>Required</em></span>
+          <select id="project-category" name="projectCategory" required [(ngModel)]="newProject.category">
+            <option *ngFor="let category of availableProjectCategories" [value]="category">{{ category }}</option>
+            <option value="__other__">Other…</option>
+          </select>
+        </label>
+        <div class="custom-category" *ngIf="newProject.category === '__other__'">
+          <label class="field" for="custom-project-category">
+            <span class="field-label">New category</span>
+            <span class="field-help">This will be saved only to your account for next time.</span>
+            <input id="custom-project-category" name="customProjectCategory" maxlength="100" [(ngModel)]="customProjectCategory" placeholder="e.g. Event planning" autocomplete="off" />
+          </label>
+          <button class="secondary" type="button" (click)="saveProjectCategory()" [disabled]="savingProjectCategory || !customProjectCategory.trim()">
+            {{ savingProjectCategory ? 'Saving…' : 'Add category' }}
+          </button>
+        </div>
+        <button class="primary form-submit" type="submit" [disabled]="projectForm.invalid || newProject.category === '__other__'">
+          <span>Create project</span><span aria-hidden="true">→</span>
+        </button>
       </form>
     </article>
 
-    <article class="panel list-panel">
-      <div class="panel-header">
+    <article class="panel list-panel challenge-library">
+      <div class="challenge-library-tabs" role="tablist" aria-label="Challenge collections">
+        <button type="button" role="tab" [attr.aria-selected]="challengeViewTab === 'reading'" [class.active]="challengeViewTab === 'reading'" (click)="challengeViewTab = 'reading'">
+          <i class="fas fa-book-open" aria-hidden="true"></i>
+          <span><strong>Reading</strong><small>{{ challenges.length }} challenges</small></span>
+        </button>
+        <button type="button" role="tab" [attr.aria-selected]="challengeViewTab === 'projects'" [class.active]="challengeViewTab === 'projects'" (click)="challengeViewTab = 'projects'">
+          <i class="fas fa-diagram-project" aria-hidden="true"></i>
+          <span><strong>Projects</strong><small>{{ projects.length }} in pipeline</small></span>
+        </button>
+      </div>
+
+      <ng-container *ngIf="challengeViewTab === 'reading'">
+      <div class="panel-header challenge-panel-heading">
         <div>
-          <p class="eyebrow">Your challenges</p>
-          <h2>Show up once a day</h2>
+          <p class="eyebrow">Your reading</p>
+          <h2>{{ challengeFilter === 'active' ? 'Reading in progress' : challengeFilter === 'completed' ? 'Completed reading' : 'Reading archive' }}</h2>
+        </div>
+        <div class="filters" role="tablist" aria-label="Reading status">
+          <button role="tab" [attr.aria-selected]="challengeFilter === 'active'" [class.active]="challengeFilter === 'active'" (click)="challengeFilter = 'active'">Active <span>{{ activeReadingChallenges }}</span></button>
+          <button role="tab" [attr.aria-selected]="challengeFilter === 'completed'" [class.active]="challengeFilter === 'completed'" (click)="challengeFilter = 'completed'">Completed <span>{{ completedChallenges }}</span></button>
+          <button *ngIf="archivedChallenges" class="archive-tab" role="tab" [attr.aria-selected]="challengeFilter === 'archived'" [class.active]="challengeFilter === 'archived'" (click)="challengeFilter = 'archived'"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived <span>{{ archivedChallenges }}</span></button>
         </div>
       </div>
+      <div class="list-tools">
+        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="challengeSearch" placeholder="Search books" aria-label="Search reading challenges" /></label>
+        <label class="list-filter"><span>Book type</span><select [(ngModel)]="challengeBookFilter" aria-label="Filter by book type"><option value="all">All books</option><option value="fiction">Fiction</option><option value="non_fiction">Non-fiction</option></select></label>
+      </div>
       <div class="loading" *ngIf="loading.challenges">Loading challenges…</div>
-      <div class="empty" *ngIf="!loading.challenges && !challenges.length">No reading or meditation challenges yet.</div>
+      <div class="empty" *ngIf="!loading.challenges && !filteredChallenges.length">{{ challengeFilter === 'active' ? 'No active reading challenges.' : 'No completed reading challenges yet.' }}</div>
       <div class="challenge-list">
-        <article class="challenge-card" *ngFor="let challenge of challenges; trackBy: trackById" [class.finished]="challenge.completed">
-          <div class="challenge-icon">{{ challenge.challenge_type === 'meditation' ? '🧘' : '📚' }}</div>
+        <article class="challenge-card" *ngFor="let challenge of filteredChallenges; trackBy: trackById" [class.finished]="challenge.completed">
+          <div class="challenge-icon">📚</div>
           <div class="challenge-body">
             <div class="task-title-row">
               <strong>{{ challenge.title }}</strong>
@@ -310,45 +516,188 @@
             <div class="progress-track"><span [style.width.%]="challenge.progress"></span></div>
             <div class="meta">
               <span>{{ challenge.current_streak }}/{{ challenge.duration }} check-ins</span>
+              <span>{{ challenge.book_type === 'non_fiction' ? 'Non-fiction' : 'Fiction' }}</span>
               <span>Best streak: {{ challenge.best_streak }}</span>
+              <span *ngIf="challenge.created_at">Created {{ challenge.created_at | date:'mediumDate' }}</span>
             </div>
             <div class="task-actions">
-              <button class="primary small" (click)="checkInChallenge(challenge)" [disabled]="challenge.completed || checkedInToday(challenge)">
+              <span *ngIf="challenge.archived_at" class="archived-status"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived {{ challenge.archived_at | date:'mediumDate' }}</span>
+              <button *ngIf="!challenge.archived_at" class="primary small" (click)="checkInChallenge(challenge)" [disabled]="challenge.completed || checkedInToday(challenge)">
                 {{ challenge.completed ? 'Completed' : checkedInToday(challenge) ? 'Checked in today' : 'Check in today' }}
               </button>
-              <button class="danger-text" (click)="deleteChallenge(challenge)">Delete</button>
+              <button *ngIf="!challenge.archived_at" class="danger-text" (click)="deleteChallenge(challenge)">Delete</button>
             </div>
           </div>
         </article>
       </div>
+      </ng-container>
+
+      <ng-container *ngIf="challengeViewTab === 'projects'">
+      <div class="project-section-heading challenge-panel-heading">
+        <div>
+          <p class="eyebrow">Your projects</p>
+          <h2>{{ projectFilter === 'active' ? 'Active project pipeline' : projectFilter === 'completed' ? 'Completed projects' : 'Project archive' }}</h2>
+        </div>
+        <div class="filters" role="tablist" aria-label="Project status">
+          <button role="tab" [attr.aria-selected]="projectFilter === 'active'" [class.active]="projectFilter === 'active'" (click)="projectFilter = 'active'">Active <span>{{ activeProjects }}</span></button>
+          <button role="tab" [attr.aria-selected]="projectFilter === 'completed'" [class.active]="projectFilter === 'completed'" (click)="projectFilter = 'completed'">Completed <span>{{ completedProjects }}</span></button>
+          <button *ngIf="archivedProjects" class="archive-tab" role="tab" [attr.aria-selected]="projectFilter === 'archived'" [class.active]="projectFilter === 'archived'" (click)="projectFilter = 'archived'"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived <span>{{ archivedProjects }}</span></button>
+        </div>
+      </div>
+      <div class="list-tools">
+        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="projectSearch" placeholder="Search projects" aria-label="Search projects" /></label>
+        <label class="list-filter"><span>Category</span><select [(ngModel)]="projectCategoryFilter" aria-label="Filter projects by category"><option value="all">All categories</option><option *ngFor="let category of projectFilterCategories" [value]="category">{{ category }}</option></select></label>
+      </div>
+      <div class="loading" *ngIf="loading.projects">Loading projects…</div>
+      <div class="empty" *ngIf="!loading.projects && !filteredProjects.length">{{ projectFilter === 'active' ? 'No active projects. Create one when you are ready.' : 'No completed projects yet.' }}</div>
+      <div class="project-list">
+        <article class="project-card" *ngFor="let project of filteredProjects; trackBy: trackById" [class.finished]="project.status === 'complete'">
+          <div class="project-card-top">
+            <span class="project-icon" aria-hidden="true">◆</span>
+            <div>
+              <strong>{{ project.title }}</strong>
+              <small>{{ project.category }} · Created {{ project.created_at | date:'mediumDate' }}</small>
+            </div>
+          </div>
+          <p *ngIf="project.description">{{ project.description }}</p>
+          <div class="project-actions">
+            <span *ngIf="project.archived_at" class="archived-status"><i class="fas fa-box-archive" aria-hidden="true"></i> Archived {{ project.archived_at | date:'mediumDate' }}</span>
+            <label *ngIf="!project.archived_at" [for]="'project-status-' + project.id">Status</label>
+            <select *ngIf="!project.archived_at" [id]="'project-status-' + project.id" [ngModel]="project.status" (ngModelChange)="updateProjectStatus(project, $event)">
+              <option *ngFor="let status of projectStatuses" [value]="status.value">{{ status.label }}</option>
+            </select>
+            <button *ngIf="!project.archived_at" class="danger-text" type="button" (click)="deleteProject(project)">Delete</button>
+          </div>
+        </article>
+      </div>
+      </ng-container>
     </article>
   </section>
 
   <section *ngIf="activeSection === 'ai'" class="section ai-layout">
-    <article class="panel ai-compose">
-      <p class="eyebrow">AI assistant</p>
-      <h2>Plan from your actual app data</h2>
-      <p class="muted">The assistant can see your current task, habit, reading and meditation progress. Your API key stays on the backend.</p>
-      <div class="prompt-chips">
-        <button *ngFor="let prompt of aiSuggestedPrompts" (click)="usePrompt(prompt)">{{ prompt }}</button>
-      </div>
-      <form (ngSubmit)="askAI()">
-        <label>What do you need help with?
-          <textarea name="aiQuestion" [(ngModel)]="aiQuestion" rows="5" placeholder="Ask for a plan, prioritization, habit advice, reading plan…"></textarea>
-        </label>
-        <button class="primary" type="submit" [disabled]="loading.ai || !aiQuestion.trim()">{{ loading.ai ? 'Thinking…' : 'Ask AI' }}</button>
-      </form>
-    </article>
     <article class="panel conversation-panel">
-      <div class="panel-header"><div><p class="eyebrow">Conversation</p><h2>Recent answers</h2></div></div>
-      <div class="empty" *ngIf="!conversations.length">Your AI answers will appear here.</div>
-      <div class="conversation-list">
-        <article class="conversation" *ngFor="let item of conversations; trackBy: trackById">
-          <div class="message user-message"><strong>You</strong><p>{{ item.question }}</p></div>
-          <div class="message ai-message"><strong>Task Manager AI</strong><p>{{ item.answer }}</p>
-            <div class="rating"><span>Helpful?</span><button [class.selected]="item.feedback === 5" (click)="rateAI(item, 5)">Yes</button><button [class.selected]="item.feedback === 2" (click)="rateAI(item, 2)">Not really</button></div>
+      <div class="panel-header conversation-heading">
+        <div>
+          <p class="eyebrow">AI assistant</p>
+          <h2>{{ conversations.length ? activeChatTitle : 'Ready when you are' }}</h2>
+          <p class="conversation-status" [class.error]="aiStatus && !aiStatus.ready" *ngIf="aiStatus"><i class="fas fa-circle" aria-hidden="true"></i> {{ aiStatus.message }}</p>
+        </div>
+        <div class="conversation-actions">
+          <span class="chat-saved"><i class="fas fa-cloud" aria-hidden="true"></i> Saved automatically</span>
+          <button class="secondary" type="button" (click)="startNewChat()"><i class="fas fa-plus" aria-hidden="true"></i> New chat</button>
+        </div>
+      </div>
+      <div class="ai-error" *ngIf="aiError" role="alert"><strong>Assistant needs attention:</strong> {{ aiError }}</div>
+      <div class="chat-workspace">
+        <aside class="chat-history" aria-label="Saved chats">
+          <div class="chat-history-heading">
+            <div><p>Chat history</p><small>{{ aiChats.length }} saved</small></div>
+            <i class="fas fa-clock-rotate-left" aria-hidden="true"></i>
           </div>
-        </article>
+          <div class="chat-history-list" *ngIf="aiChats.length; else noSavedChats">
+            <button *ngFor="let chat of aiChats; trackBy: trackByChatId" type="button" [class.active]="chat.chat_id === activeChatId" [attr.aria-current]="chat.chat_id === activeChatId ? 'true' : null" (click)="selectAIChat(chat)">
+              <span class="chat-title-row"><strong>{{ chat.chat_id === 'legacy' ? 'Earlier conversations' : chat.title }}</strong><em *ngIf="chat.chat_id === activeChatId">Open</em></span>
+              <small>{{ chat.message_count }} {{ chat.message_count === 1 ? 'exchange' : 'exchanges' }}</small>
+              <time>{{ chat.updated_at | date:'mediumDate' }} at {{ chat.updated_at | date:'shortTime' }}</time>
+            </button>
+          </div>
+          <ng-template #noSavedChats><p class="chat-history-empty">Your saved chats will appear here.</p></ng-template>
+        </aside>
+
+        <section class="chat-thread" aria-label="Current conversation">
+          <div class="chat-thread-bar">
+            <span><i class="fas fa-comments" aria-hidden="true"></i> {{ currentMessageCount }} messages</span>
+            <small>Newest messages appear at the bottom</small>
+          </div>
+          <div #conversationViewport class="conversation-list" role="log" aria-live="polite">
+            <div class="empty conversation-empty" *ngIf="!conversations.length">
+              <i class="fas fa-comment-dots" aria-hidden="true"></i>
+              <strong>Start a new conversation</strong>
+              <span>Write a message below. Your replies will stay together here.</span>
+            </div>
+            <article class="conversation" *ngFor="let item of conversations; trackBy: trackById">
+              <div class="message user-message">
+                <div class="message-meta"><strong>You</strong><time>{{ item.created_at | date:'shortTime' }}</time></div>
+                <p>{{ item.question }}</p>
+              </div>
+              <div class="message ai-message">
+                <div class="message-meta"><strong>Assistant</strong><time>{{ item.created_at | date:'shortTime' }}</time></div>
+                <p>{{ item.answer }}</p>
+                <ng-container *ngIf="aiFormPrompt(item) as prompt">
+                  <section class="assistant-form assistant-quick-details" *ngIf="isActiveAIForm(item)" [attr.aria-label]="prompt.title">
+                    <div class="assistant-form-heading">
+                      <div>
+                        <span><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> {{ aiWorkflowName(prompt.workflow_type) }}</span>
+                        <strong>{{ prompt.title }}</strong>
+                        <p>{{ prompt.description }}</p>
+                      </div>
+                      <small>One quick reply</small>
+                    </div>
+                    <form class="assistant-detail-list" (ngSubmit)="submitAIForm(item)">
+                      <label class="assistant-question" *ngFor="let field of prompt.fields" [class.choice-question]="field.input_type === 'select'" [class.has-error]="prompt.errors?.[field.key]" [hidden]="!aiFieldVisible(item, field, prompt)">
+                        <span class="assistant-question-copy">
+                          <strong>{{ field.label }}</strong>
+                          <small>{{ field.required ? 'Needed to create it' : 'Optional — only if useful' }}</small>
+                        </span>
+
+                        <textarea *ngIf="field.input_type === 'textarea'" rows="2" [name]="'ai-' + item.id + '-' + field.key" [ngModel]="aiFormValues(item, prompt)[field.key]" (ngModelChange)="selectAIField(item, prompt, field, $event)" [placeholder]="field.placeholder || 'Add a little context'"></textarea>
+                        <input *ngIf="field.input_type !== 'textarea' && field.input_type !== 'select'" [name]="'ai-' + item.id + '-' + field.key" [type]="field.input_type" [min]="field.min" [max]="field.max" [ngModel]="aiFormValues(item, prompt)[field.key]" (ngModelChange)="selectAIField(item, prompt, field, $event)" [placeholder]="field.placeholder || field.label" />
+
+                        <div class="assistant-options" *ngIf="field.input_type === 'select'">
+                          <button *ngFor="let option of aiFieldOptions(item, field, prompt)" type="button" [class.selected]="aiFormValues(item, prompt)[field.key] === option.value" (click)="selectAIField(item, prompt, field, option.value)" [disabled]="loading.ai">
+                            <i class="fas fa-check" aria-hidden="true"></i>{{ option.label }}
+                          </button>
+                          <span class="no-ai-options" *ngIf="field.depends_on && aiFormValues(item, prompt)[field.depends_on] && !aiFieldOptions(item, field, prompt).length">No active items available.</span>
+                        </div>
+                        <input *ngIf="field.input_type === 'select' && field.allow_custom" class="assistant-custom-answer" [name]="'ai-custom-' + item.id + '-' + field.key" type="text" [ngModel]="aiFormValues(item, prompt)[field.key]" (ngModelChange)="selectAIField(item, prompt, field, $event)" placeholder="Or type your own category" />
+                        <em class="assistant-field-error" *ngIf="prompt.errors?.[field.key]">{{ prompt.errors[field.key] }}</em>
+                      </label>
+
+                      <div class="assistant-submit-row">
+                        <button type="button" class="assistant-cancel" (click)="cancelAIForm(item)" [disabled]="loading.ai">Cancel</button>
+                        <span><i class="fas fa-shield-check" aria-hidden="true"></i> Nothing is saved until you confirm.</span>
+                        <button class="primary assistant-confirm" type="submit" [disabled]="loading.ai || !aiFormReady(item, prompt)">
+                          <i class="fas" [class.fa-sparkles]="!loading.ai" [class.fa-spinner]="loading.ai" [class.fa-spin]="loading.ai" aria-hidden="true"></i>
+                          {{ loading.ai ? 'Creating…' : prompt.title }}
+                        </button>
+                      </div>
+                    </form>
+                  </section>
+                </ng-container>
+                <div class="executed-actions" *ngIf="item.context?.executed_actions?.length">
+                  <span *ngFor="let action of item.context.executed_actions">
+                    <i class="fas fa-check" aria-hidden="true"></i> {{ aiActionLabel(action) }}
+                    <button *ngIf="aiActionRoute(action)" type="button" (click)="openAIAction(action)">Open <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></button>
+                  </span>
+                </div>
+                <div class="rating"><span>Helpful?</span><button [class.selected]="item.feedback === 5" (click)="rateAI(item, 5)">Yes</button><button [class.selected]="item.feedback === 2" (click)="rateAI(item, 2)">Not really</button></div>
+              </div>
+            </article>
+            <article class="conversation pending-conversation" *ngIf="pendingAIQuestion">
+              <div class="message user-message">
+                <div class="message-meta"><strong>You</strong><span>Sending</span></div>
+                <p>{{ pendingAIQuestion }}</p>
+              </div>
+              <div class="message ai-message thinking-message" aria-label="Assistant is thinking">
+                <strong>Assistant</strong>
+                <span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              </div>
+            </article>
+          </div>
+          <form class="chat-composer" (ngSubmit)="askAI()">
+            <div class="conversation-prompts" aria-label="Suggested prompts">
+              <button *ngFor="let prompt of aiSuggestedPrompts.slice(0, 2)" type="button" (click)="usePrompt(prompt)">{{ prompt }}</button>
+            </div>
+            <label for="ai-chat-message">Message your assistant</label>
+            <div class="chat-composer-row">
+              <textarea id="ai-chat-message" name="aiQuestion" [(ngModel)]="aiQuestion" rows="2" placeholder="Ask for help or tell the assistant what to create…"></textarea>
+              <button class="primary chat-send" type="submit" [disabled]="loading.ai || !aiQuestion.trim()">
+                <i class="fas" [class.fa-paper-plane]="!loading.ai" [class.fa-spinner]="loading.ai" [class.fa-spin]="loading.ai" aria-hidden="true"></i>
+                <span>{{ loading.ai ? 'Thinking…' : 'Send' }}</span>
+              </button>
+            </div>
+          </form>
+        </section>
       </div>
     </article>
   </section>

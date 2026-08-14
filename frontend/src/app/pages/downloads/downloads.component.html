@@ -9,10 +9,11 @@
       </p>
 
       <div class="hero-actions">
-        <button type="button" class="primary-action" (click)="installWebApp()">
+        <button type="button" class="primary-action" (click)="downloadForThisDevice()">
           <i class="fas fa-download" aria-hidden="true"></i>
-          {{ isStandalone ? 'Web app already installed' : 'Install web app' }}
+          Get app for this device
         </button>
+        <button type="button" class="secondary-action" (click)="installWebApp()">{{ isStandalone ? 'Web app already installed' : 'Install web app' }}</button>
         <a class="secondary-action" href="#platform-downloads">View platform downloads</a>
       </div>
 
@@ -136,4 +137,22 @@
       </div>
     </div>
   </section>
+
+  <div class="device-chooser-backdrop" *ngIf="showDeviceChooser" (click)="closeDeviceChooser()">
+    <section class="device-chooser" role="dialog" aria-modal="true" aria-labelledby="device-chooser-title" (click)="$event.stopPropagation()">
+      <button class="chooser-close" type="button" (click)="closeDeviceChooser()" aria-label="Close device chooser"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+      <span class="eyebrow">Choose your device</span>
+      <h2 id="device-chooser-title">Which app package do you need?</h2>
+      <p>We only enable downloads after a real package has been published and verified.</p>
+
+      <div class="chooser-grid">
+        <button *ngFor="let card of cards" type="button" [class.detected]="isDetected(card)" [class.unavailable]="card.id !== 'web' && (!target(card).available || !target(card).url)" [disabled]="card.id !== 'web' && (!target(card).available || !target(card).url)" (click)="chooseDownload(card)">
+          <span class="chooser-icon"><i [class]="card.icon" aria-hidden="true"></i></span>
+          <span class="chooser-copy"><strong>{{ card.title }}</strong><small>{{ card.id === 'web' ? 'Available in your browser' : target(card).available ? 'Package available' : 'Not published yet' }}</small></span>
+          <em *ngIf="isDetected(card)">Detected</em>
+          <i class="fas" [class.fa-arrow-down]="card.id === 'web' || target(card).available" [class.fa-lock]="card.id !== 'web' && !target(card).available" aria-hidden="true"></i>
+        </button>
+      </div>
+    </section>
+  </div>
 </section>

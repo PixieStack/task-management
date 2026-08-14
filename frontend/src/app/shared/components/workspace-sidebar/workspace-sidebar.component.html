@@ -1,0 +1,67 @@
+<aside class="workspace-sidebar" aria-label="Workspace navigation">
+  <a class="workspace-brand" routerLink="/dashboard" aria-label="M.O.B TaskManager dashboard">
+    <span class="brand-mark">M</span>
+    <span class="brand-copy">
+      <strong>M.O.B</strong>
+      <small>TaskManager</small>
+    </span>
+  </a>
+
+  <nav class="workspace-nav">
+    <a routerLink="/dashboard" [class.active]="isActive('/dashboard')">
+      <i class="fas fa-table-cells-large" aria-hidden="true"></i>
+      <span>Dashboard</span>
+    </a>
+    <a routerLink="/dashboard" fragment="tasks" [class.active]="isActive('/dashboard', 'tasks')">
+      <i class="fas fa-list-check" aria-hidden="true"></i>
+      <span>Tasks</span>
+    </a>
+    <a routerLink="/todo" [class.active]="isActive('/todo')">
+      <i class="fas fa-square-check" aria-hidden="true"></i>
+      <span>Todo</span>
+    </a>
+    <a routerLink="/focus-timer" [class.active]="isActive('/focus-timer')">
+      <i class="fas fa-stopwatch" aria-hidden="true"></i>
+      <span>Timer</span>
+    </a>
+    <a routerLink="/dashboard" fragment="habits" [class.active]="isActive('/dashboard', 'habits')">
+      <i class="fas fa-repeat" aria-hidden="true"></i>
+      <span>Habits</span>
+    </a>
+    <a routerLink="/dashboard" fragment="challenges" [class.active]="isActive('/dashboard', 'challenges')">
+      <i class="fas fa-book-open-reader" aria-hidden="true"></i>
+      <span>Challenges</span>
+    </a>
+    <a routerLink="/dashboard" fragment="ai" aria-label="AI Assistant" [class.active]="isActive('/dashboard', 'ai')">
+      <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
+      <span>AI Assistant</span>
+      <small class="ai-badge" aria-hidden="true">AI</small>
+    </a>
+  </nav>
+
+  <div class="workspace-account">
+    <a routerLink="/profile" class="account-link" [class.active]="isActive('/profile')">
+      <span class="avatar">{{ initials }}</span>
+      <span class="account-copy">
+        <strong>{{ user?.username || 'Account' }}</strong>
+        <small>{{ user?.email || 'Profile settings' }}</small>
+      </span>
+    </a>
+    <button type="button" class="logout-button" (click)="requestLogout()" aria-label="Log out">
+      <i class="fas fa-arrow-right-from-bracket" aria-hidden="true"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+</aside>
+
+<div class="logout-toast" *ngIf="showLogoutConfirmation" role="alertdialog" aria-modal="true" aria-labelledby="logout-title" aria-describedby="logout-description">
+  <span class="logout-toast-icon" aria-hidden="true"><i class="fas fa-arrow-right-from-bracket"></i></span>
+  <div class="logout-toast-copy">
+    <strong id="logout-title">Log out of your account?</strong>
+    <p id="logout-description">You’ll need to sign in again to open your workspace.</p>
+  </div>
+  <div class="logout-toast-actions">
+    <button type="button" class="stay-button" (click)="cancelLogout()">Stay signed in</button>
+    <button type="button" class="confirm-logout-button" (click)="confirmLogout()">Yes, log out</button>
+  </div>
+</div>

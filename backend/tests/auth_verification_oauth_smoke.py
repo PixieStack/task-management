@@ -125,96 +125,11 @@ old_link = client.get(f"/auth/verify-email?token={original}", follow_redirects=F
 assert "verification=invalid" in old_link.headers["location"]
 
 
-# Google provider tokens are verified by the backend adapter, then stored as app identities.
-def fake_google(provider, credential):
-    assert provider == "google"
-    assert credential == "google-test-credential-token"
-    return {
-        "iss": "https://accounts.google.com",
-        "sub": "google-subject-123",
-        "email": "google-user@example.com",
-        "email_verified": True,
-        "given_name": "Google",
-        "family_name": "Tester",
-    }
+# Third-party provider routes are deliberately absent; authentication is email-only.
+assert client.get("/auth/oauth/config").status_code == 404
+assert client.post(
+    "/auth/oauth/login",
+    json={"provider": "google", "credential": "disabled-provider-token"},
+).status_code == 404
 
-
-auth_router.verify_provider_id_token = fake_google
-google_login = expect(
-    client.post(
-        "/auth/oauth/login",
-        json={"provider": "google", "credential": "google-test-credential-token"},
-    ),
-    200,
-).json()
-assert google_login["user"]["email"] == "google-user@example.com"
-with database.SessionLocal() as db:
-    google_identity = db.query(models.OAuthIdentity).filter(
-        models.OAuthIdentity.provider == "google",
-        models.OAuthIdentity.provider_subject == "google-subject-123",
-    ).first()
-    assert google_identity is not None
-    google_user = db.query(models.User).filter(models.User.id == google_identity.user_id).first()
-    assert google_user is not None and google_user.email_verified is True
-
-
-# Apple uses the same app account/session model after its provider token is verified.
-def fake_apple(provider, credential):
-    assert provider == "apple"
-    assert credential == "apple-test-credential-token"
-    return {
-        "iss": "https://appleid.apple.com",
-        "sub": "apple-subject-456",
-        "email": "apple-user@example.com",
-        "email_verified": "true",
-    }
-
-
-auth_router.verify_provider_id_token = fake_apple
-apple_login = expect(
-    client.post(
-        "/auth/oauth/login",
-        json={"provider": "apple", "credential": "apple-test-credential-token"},
-    ),
-    200,
-).json()
-assert apple_login["user"]["email"] == "apple-user@example.com"
-with database.SessionLocal() as db:
-    apple_identity = db.query(models.OAuthIdentity).filter(
-        models.OAuthIdentity.provider == "apple",
-        models.OAuthIdentity.provider_subject == "apple-subject-456",
-    ).first()
-    assert apple_identity is not None
-
-
-# Existing email accounts can safely link a verified provider identity instead of duplicating users.
-with database.SessionLocal() as db:
-    before = db.query(models.User).filter(models.User.email == "verification@example.com").count()
-
-
-def fake_linked_google(_provider, _credential):
-    return {
-        "iss": "https://accounts.google.com",
-        "sub": "google-link-existing",
-        "email": "verification@example.com",
-        "email_verified": True,
-    }
-
-
-auth_router.verify_provider_id_token = fake_linked_google
-expect(
-    client.post(
-        "/auth/oauth/login",
-        json={"provider": "google", "credential": "link-existing-account-token"},
-    ),
-    200,
-)
-with database.SessionLocal() as db:
-    after = db.query(models.User).filter(models.User.email == "verification@example.com").count()
-    assert before == after == 1
-    assert db.query(models.OAuthIdentity).filter(
-        models.OAuthIdentity.provider == "google",
-        models.OAuthIdentity.provider_subject == "google-link-existing",
-    ).first() is not None
-
-print("Email verification and OAuth smoke test passed")
+print("Email verification smoke test passed")

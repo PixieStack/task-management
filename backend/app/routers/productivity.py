@@ -1,10 +1,11 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app import models
+from app.archive_logic import archive_completed_items, set_completion_state
 from app.auth import get_current_user, get_db
 from app.productivity_schemas import DailyTodoCreate, DailyTodoOut, DailyTodoUpdate, TimeSessionOut, TimeSessionStart
 
@@ -15,6 +16,7 @@ def _get_todo(todo_id: int, user_id: int, db: Session) -> models.DailyTodo:
     todo = db.query(models.DailyTodo).filter(
         models.DailyTodo.id == todo_id,
         models.DailyTodo.user_id == user_id,
+        models.DailyTodo.deleted_at.is_(None),
     ).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Daily todo not found")
@@ -25,6 +27,7 @@ def _get_task(task_id: int, user_id: int, db: Session) -> models.Task:
     task = db.query(models.Task).filter(
         models.Task.id == task_id,
         models.Task.owner_id == user_id,
+        models.Task.deleted_at.is_(None),
     ).first()
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
@@ -35,7 +38,16 @@ def _active_session(user_id: int, db: Session) -> Optional[models.TimeSession]:
     return db.query(models.TimeSession).filter(
         models.TimeSession.user_id == user_id,
         models.TimeSession.ended_at.is_(None),
+        models.TimeSession.deleted_at.is_(None),
     ).first()
+
+
+def _as_utc(value: Optional[datetime]) -> Optional[datetime]:
+    if value is None:
+        return None
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
 
 
 def _session_payload(session: models.TimeSession) -> dict:
@@ -48,12 +60,30 @@ def _session_payload(session: models.TimeSession) -> dict:
         "item_type": session.item_type,
         "task_id": session.task_id,
         "todo_id": session.todo_id,
-        "started_at": session.started_at,
-        "ended_at": session.ended_at,
+        "started_at": _as_utc(session.started_at),
+        "ended_at": _as_utc(session.ended_at),
         "elapsed_seconds": session.elapsed_seconds,
         "live_elapsed_seconds": live_elapsed,
-        "created_at": session.created_at,
+        "created_at": _as_utc(session.created_at),
     }
+
+
+def _finish_session(session: models.TimeSession, user_id: int, db: Session) -> int:
+    now = datetime.utcnow()
+    elapsed = max(1, int((now - session.started_at).total_seconds()))
+    session.ended_at = now
+    session.elapsed_seconds = elapsed
+
+    if session.item_type == "task" and session.task_id:
+        task = _get_task(session.task_id, user_id, db)
+        task.time_spent_seconds = max(0, task.time_spent_seconds or 0) + elapsed
+        task.time_spent = int(round(task.time_spent_seconds / 60))
+        task.updated_at = now
+    elif session.item_type == "todo" and session.todo_id:
+        todo = _get_todo(session.todo_id, user_id, db)
+        todo.time_spent_seconds = max(0, todo.time_spent_seconds or 0) + elapsed
+        todo.updated_at = now
+    return elapsed
 
 
 @router.get("/todos", response_model=List[DailyTodoOut])
@@ -63,7 +93,11 @@ def list_todos(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    query = db.query(models.DailyTodo).filter(models.DailyTodo.user_id == current_user.id)
+    archive_completed_items(db, current_user.id)
+    query = db.query(models.DailyTodo).filter(
+        models.DailyTodo.user_id == current_user.id,
+        models.DailyTodo.deleted_at.is_(None),
+    )
     if todo_date is not None:
         query = query.filter(models.DailyTodo.todo_date == todo_date)
     if not include_completed:
@@ -89,6 +123,7 @@ def create_todo(
         completed=data.completed,
         priority=data.priority,
     )
+    set_completion_state(todo, data.completed)
     db.add(todo)
     db.commit()
     db.refresh(todo)
@@ -103,7 +138,13 @@ def update_todo(
     db: Session = Depends(get_db),
 ):
     todo = _get_todo(todo_id, current_user.id, db)
-    for key, value in data.model_dump(exclude_unset=True).items():
+    updates = data.model_dump(exclude_unset=True)
+    if updates.get("completed") is True:
+        active = _active_session(current_user.id, db)
+        if active and active.item_type == "todo" and active.todo_id == todo.id:
+            _finish_session(active, current_user.id, db)
+    set_completion_state(todo, updates.get("completed", todo.completed))
+    for key, value in updates.items():
         if key in {"title", "notes"} and isinstance(value, str):
             value = value.strip()
         setattr(todo, key, value)
@@ -120,7 +161,14 @@ def delete_todo(
     db: Session = Depends(get_db),
 ):
     todo = _get_todo(todo_id, current_user.id, db)
-    db.delete(todo)
+    now = datetime.utcnow()
+    todo.deleted_at = now
+    todo.updated_at = now
+    db.query(models.TimeSession).filter(
+        models.TimeSession.user_id == current_user.id,
+        models.TimeSession.todo_id == todo.id,
+        models.TimeSession.deleted_at.is_(None),
+    ).update({models.TimeSession.deleted_at: now}, synchronize_session=False)
     db.commit()
     return None
 
@@ -173,20 +221,7 @@ def stop_timer(
     if not session:
         raise HTTPException(status_code=404, detail="No timer is currently running")
 
-    now = datetime.utcnow()
-    elapsed = max(1, int((now - session.started_at).total_seconds()))
-    session.ended_at = now
-    session.elapsed_seconds = elapsed
-
-    if session.item_type == "task" and session.task_id:
-        task = _get_task(session.task_id, current_user.id, db)
-        task.time_spent_seconds = max(0, task.time_spent_seconds or 0) + elapsed
-        task.time_spent = int(round(task.time_spent_seconds / 60))
-        task.updated_at = now
-    elif session.item_type == "todo" and session.todo_id:
-        todo = _get_todo(session.todo_id, current_user.id, db)
-        todo.time_spent_seconds = max(0, todo.time_spent_seconds or 0) + elapsed
-        todo.updated_at = now
+    _finish_session(session, current_user.id, db)
 
     db.commit()
     db.refresh(session)
@@ -209,6 +244,7 @@ def list_time_sessions(
     db: Session = Depends(get_db),
 ):
     sessions = db.query(models.TimeSession).filter(
-        models.TimeSession.user_id == current_user.id
+        models.TimeSession.user_id == current_user.id,
+        models.TimeSession.deleted_at.is_(None),
     ).order_by(models.TimeSession.started_at.desc()).limit(limit).all()
     return [_session_payload(session) for session in sessions]

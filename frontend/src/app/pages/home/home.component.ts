@@ -26,7 +26,7 @@ export class HomeComponent {
     {
       title: 'Build consistency',
       icon: 'fas fa-repeat',
-      description: 'Track habits plus reading and meditation challenges alongside the work you need to finish.',
+      description: 'Track habits, reading challenges and projects alongside the work you need to finish.',
     },
     {
       title: 'Use AI to act',
@@ -41,6 +41,6 @@ export class HomeComponent {
   }
 
   onGetStarted(): void {
-    this.router.navigate(['/register']);
+    this.router.navigate(['/access'], { queryParams: { mode: 'register' } });
   }
 }

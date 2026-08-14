@@ -35,6 +35,8 @@ class DailyTodoOut(BaseModel):
     time_spent_seconds: int
     created_at: datetime
     updated_at: datetime
+    completed_at: Optional[datetime] = None
+    archived_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

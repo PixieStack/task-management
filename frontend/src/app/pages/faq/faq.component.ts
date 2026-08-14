@@ -32,14 +32,14 @@ export class FaqComponent {
     {
       question: 'What is M.O.B TaskManager?',
       answer:
-        'M.O.B TaskManager is a personal productivity workspace for tasks, Daily Todos, habits, reading and meditation challenges, Pomodoro focus, persistent time tracking and AI-assisted actions.',
+        'M.O.B TaskManager is a personal productivity workspace for tasks, Daily Todos, habits, reading challenges, projects, Pomodoro focus, persistent time tracking and AI-assisted actions.',
       category: 'general',
       isOpen: false,
     },
     {
       question: 'What can the AI assistant actually do?',
       answer:
-        'The assistant can answer questions about your productivity and can perform approved actions such as creating or updating tasks and Daily Todos, working with habits and reading or meditation challenges, and starting or stopping task and todo timers. The app checks that each requested change is allowed and belongs to your account.',
+        'The assistant can answer questions about your productivity and can perform approved actions such as creating or updating tasks and Daily Todos, working with habits and reading challenges, and starting or stopping task and todo timers. The app checks that each requested change is allowed and belongs to your account.',
       category: 'general',
       isOpen: false,
     },
@@ -82,14 +82,14 @@ export class FaqComponent {
     {
       question: 'What does the Pomodoro feature include?',
       answer:
-        'The Focus workspace includes a standard 25-minute focus mode, 5-minute short break, 15-minute long break and custom durations. Pomodoro is separate from an item timer, so you can use the study interval while also measuring time spent on a specific task or todo.',
+        'The standalone Focus Timer includes a 25-minute focus mode, 5-minute short break, 15-minute long break and custom durations. It creates no task, Todo or backend time record. Persisted Todo timing remains beside the Todo list.',
       category: 'features',
       isOpen: false,
     },
     {
       question: 'Which challenges are supported?',
       answer:
-        'The current app intentionally supports Reading and Meditation challenges. Older generic diet, fasting, coding, exercise and other challenge concepts were removed to keep the product focused.',
+        'The app supports focused Reading challenges plus flexible Projects with reusable personal categories and clear workflow statuses.',
       category: 'features',
       isOpen: false,
     },

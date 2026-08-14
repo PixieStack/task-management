@@ -57,7 +57,11 @@ def update_user_password(db: Session, user_id: int, new_password: str) -> bool:
 
 
 def get_tasks(db: Session, user_id: int):
-    return db.query(models.Task).filter(models.Task.owner_id == user_id).all()
+    return db.query(models.Task).filter(
+        models.Task.owner_id == user_id,
+        models.Task.deleted_at.is_(None),
+        models.Task.archived_at.is_(None),
+    ).all()
 
 
 def get_task_analytics(db: Session, user_id: int) -> Dict[str, Any]:

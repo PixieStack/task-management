@@ -1,28 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService, OAuthConfig } from '../../shared/services/auth.service';
-import { OAuthProviderService } from '../../shared/services/oauth-provider.service';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({ selector: 'app-register', standalone: true, imports: [CommonModule, ReactiveFormsModule, RouterModule], templateUrl: './register.component.html', styleUrls: ['./register.component.scss'] })
-export class RegisterComponent implements OnInit, AfterViewInit {
+export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   showPassword = false;
   showConfirmPassword = false;
   isLoading = false;
-  oauthBusy = false;
   registrationError: string | null = null;
-  oauthConfig: OAuthConfig = {};
   passwordStrength = { value: 0, class: '', label: '' };
-  private viewReady = false;
-  private googleRendered = false;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private oauthProvider: OAuthProviderService,
   ) {}
 
   ngOnInit(): void {
@@ -34,13 +28,7 @@ export class RegisterComponent implements OnInit, AfterViewInit {
       termsAccepted: [false, Validators.requiredTrue],
     }, { validators: this.passwordMatchValidator });
     this.registerForm.get('password')?.valueChanges.subscribe((value) => this.passwordStrength = this.calculatePasswordStrength(value || ''));
-    this.authService.getOAuthConfig().subscribe({
-      next: (config) => { this.oauthConfig = config; this.setupGoogle(); },
-      error: () => { this.oauthConfig = {}; },
-    });
   }
-
-  ngAfterViewInit(): void { this.viewReady = true; this.setupGoogle(); }
 
   strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
     const v = control.value;
@@ -63,55 +51,6 @@ export class RegisterComponent implements OnInit, AfterViewInit {
         this.router.navigate(['/login'], { queryParams: { registered: '1', email: response.email } });
       },
       error: (error) => { this.isLoading = false; this.registrationError = error.message || 'Registration failed. Please try again.'; },
-    });
-  }
-
-  async signUpWithApple(): Promise<void> {
-    if (!this.oauthConfig.apple_client_id || this.oauthBusy) return;
-    if (!this.registerForm.get('termsAccepted')?.value) {
-      this.registerForm.get('termsAccepted')?.markAsTouched();
-      this.registrationError = 'Accept the Terms of Service and Privacy Policy before continuing.';
-      return;
-    }
-    this.oauthBusy = true;
-    this.registrationError = null;
-    try {
-      const credential = await this.oauthProvider.signInWithApple(this.oauthConfig.apple_client_id);
-      this.completeOAuth('apple', credential);
-    } catch (error) {
-      this.oauthBusy = false;
-      this.registrationError = error instanceof Error ? error.message : 'Apple sign-up failed.';
-    }
-  }
-
-  private setupGoogle(): void {
-    if (!this.viewReady || this.googleRendered || !this.oauthConfig.google_client_id) return;
-    const target = document.getElementById('google-register-button');
-    if (!target) return;
-    this.googleRendered = true;
-    this.oauthProvider.renderGoogleButton(
-      target,
-      this.oauthConfig.google_client_id,
-      (credential) => {
-        if (!this.registerForm.get('termsAccepted')?.value) {
-          this.registerForm.get('termsAccepted')?.markAsTouched();
-          this.registrationError = 'Accept the Terms of Service and Privacy Policy before continuing.';
-          return;
-        }
-        this.completeOAuth('google', credential);
-      },
-    ).catch((error) => {
-      this.googleRendered = false;
-      this.registrationError = error instanceof Error ? error.message : 'Google sign-up failed.';
-    });
-  }
-
-  private completeOAuth(provider: 'google' | 'apple', credential: string): void {
-    this.oauthBusy = true;
-    this.registrationError = null;
-    this.authService.oauthLogin(provider, credential).subscribe({
-      next: () => { this.oauthBusy = false; this.router.navigate(['/dashboard']); },
-      error: (error) => { this.oauthBusy = false; this.registrationError = error.message || `${provider} sign-up failed.`; },
     });
   }
 }

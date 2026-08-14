@@ -13,7 +13,7 @@ import { AuthService } from '../../shared/services/auth.service';
   template: `
     <main class="reset-page">
       <section class="reset-card" aria-labelledby="forgot-password-title">
-        <a routerLink="/login" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
+        <a routerLink="/access" class="back-link"><i class="fas fa-arrow-left"></i> Back to sign in</a>
         <div class="brand-icon" aria-hidden="true"><i class="fas fa-key"></i></div>
         <span class="kicker">Account recovery</span>
         <h1 id="forgot-password-title">Reset your password.</h1>

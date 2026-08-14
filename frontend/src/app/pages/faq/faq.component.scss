@@ -89,7 +89,8 @@
 
 .search-input { padding:.75rem .85rem .75rem 2.65rem; }
 .category-select { padding:.75rem .85rem; }
-.category-select option { color:#111827; }
+.category-select { color-scheme: dark; }
+.category-select option { color:#f8fafc; background:#111827; }
 .search-input::placeholder { color:#5d6a80; }
 .search-input:focus,.category-select:focus { border-color:rgba(34,211,238,.48); box-shadow:0 0 0 3px rgba(34,211,238,.08); }
 

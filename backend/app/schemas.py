@@ -96,7 +96,17 @@ class TaskBase(BaseModel):
 
 
 class TaskCreate(TaskBase):
-    pass
+    priority: str
+    due_date: Union[datetime, str]
+
+    @field_validator("due_date", mode="before")
+    @classmethod
+    def require_due_date_and_time(cls, value):
+        if value is None or (isinstance(value, str) and not value.strip()):
+            raise ValueError("due date and time are required")
+        if isinstance(value, str) and not re.search(r"[T ]\d{2}:\d{2}", value):
+            raise ValueError("due time is required")
+        return value
 
 
 class TaskUpdate(BaseModel):
@@ -146,6 +156,8 @@ class TaskOut(BaseModel):
     owner_id: int
     created_at: datetime
     updated_at: datetime
+    completed_at: Optional[datetime] = None
+    archived_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
-from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, JSON, String, Text
+from sqlalchemy import Boolean, CheckConstraint, Column, Date, DateTime, Float, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from .database import Base
@@ -20,6 +20,7 @@ class User(Base):
     email_verified_at = Column(DateTime)
     auth_version = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    deleted_at = Column(DateTime)
 
     tasks = relationship("Task", back_populates="owner", cascade="all, delete-orphan")
 
@@ -40,6 +41,9 @@ class Task(Base):
     time_spent_seconds = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    completed_at = Column(DateTime, index=True)
+    archived_at = Column(DateTime, index=True)
+    deleted_at = Column(DateTime, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     owner = relationship("User", back_populates="tasks")
@@ -58,6 +62,9 @@ class DailyTodo(Base):
     time_spent_seconds = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    completed_at = Column(DateTime, index=True)
+    archived_at = Column(DateTime, index=True)
+    deleted_at = Column(DateTime, index=True)
 
     user = relationship("User")
 
@@ -74,6 +81,7 @@ class TimeSession(Base):
     ended_at = Column(DateTime)
     elapsed_seconds = Column(Integer, default=0, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    deleted_at = Column(DateTime, index=True)
 
     user = relationship("User")
     task = relationship("Task")
@@ -119,6 +127,9 @@ class UserProfile(Base):
 
 class Challenge(Base):
     __tablename__ = "challenges"
+    __table_args__ = (
+        CheckConstraint("book_type in ('fiction', 'non_fiction')", name="ck_challenges_book_type"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -126,6 +137,7 @@ class Challenge(Base):
     description = Column(Text)
     duration = Column(Integer, nullable=False)
     challenge_type = Column(String(50), nullable=False)
+    book_type = Column(String(20), nullable=False)
     start_date = Column(DateTime, nullable=False)
     current_streak = Column(Integer, default=0)
     best_streak = Column(Integer, default=0)
@@ -137,6 +149,9 @@ class Challenge(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    completed_at = Column(DateTime, index=True)
+    archived_at = Column(DateTime, index=True)
+    deleted_at = Column(DateTime, index=True)
 
     user = relationship("User")
 
@@ -151,9 +166,71 @@ class Habit(Base):
     category = Column(String(100))
     frequency = Column(String(50), default="daily")
     target_count = Column(Integer, default=1)
+    duration_days = Column(Integer, nullable=False, default=21)
+    last_check_in_at = Column(DateTime)
+    completed = Column(Boolean, nullable=False, default=False)
+    completed_at = Column(DateTime)
+    archived_at = Column(DateTime, index=True)
     icon = Column(String(100))
     color = Column(String(50))
     created_at = Column(DateTime, default=datetime.utcnow)
+    deleted_at = Column(DateTime, index=True)
+
+    user = relationship("User")
+    entries = relationship("HabitEntry", back_populates="habit", cascade="all, delete-orphan", order_by="HabitEntry.date")
+
+    @property
+    def check_in_count(self):
+        return sum(1 for entry in self.entries if entry.completed and entry.deleted_at is None)
+
+    @property
+    def remaining_check_ins(self):
+        return max(0, self.duration_days - self.check_in_count)
+
+    @property
+    def progress(self):
+        return min(100.0, (self.check_in_count / max(1, self.duration_days)) * 100)
+
+    @property
+    def next_check_in_at(self):
+        return self.last_check_in_at + timedelta(hours=24) if self.last_check_in_at else None
+
+    @property
+    def completion_review_required(self):
+        return not self.completed and self.check_in_count >= self.duration_days
+
+    @property
+    def can_check_in(self):
+        return not self.completed and not self.completion_review_required and (not self.next_check_in_at or datetime.utcnow() >= self.next_check_in_at)
+
+
+class Project(Base):
+    __tablename__ = "projects"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    title = Column(String(200), nullable=False)
+    description = Column(Text)
+    category = Column(String(100), nullable=False)
+    status = Column(String(30), nullable=False, default="in_progress", index=True)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    completed_at = Column(DateTime(timezone=True), index=True)
+    archived_at = Column(DateTime(timezone=True), index=True)
+    deleted_at = Column(DateTime(timezone=True), index=True)
+
+    user = relationship("User")
+
+
+class ProjectCategory(Base):
+    __tablename__ = "project_categories"
+    __table_args__ = (UniqueConstraint("user_id", "normalized_name", name="uq_project_categories_user_normalized_name"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    name = Column(String(100), nullable=False)
+    normalized_name = Column(String(100), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
     user = relationship("User")
 
@@ -171,8 +248,9 @@ class HabitEntry(Base):
     energy = Column(Integer)
     notes = Column(Text)
     created_at = Column(DateTime, default=datetime.utcnow)
+    deleted_at = Column(DateTime, index=True)
 
-    habit = relationship("Habit")
+    habit = relationship("Habit", back_populates="entries")
     user = relationship("User")
 
 
@@ -185,6 +263,7 @@ class AIConversation(Base):
     answer = Column(Text, nullable=False)
     context = Column(JSON)
     feedback = Column(Integer)
+    chat_id = Column(String(64), nullable=False, default="legacy", index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")

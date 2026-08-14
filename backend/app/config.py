@@ -53,8 +53,3 @@ SENDER_NAME = os.getenv("SENDER_NAME", "Task Manager")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", SENDER_EMAIL)
 APP_URL = os.getenv("APP_URL", "http://localhost:4200").rstrip("/")
 API_PUBLIC_URL = os.getenv("API_PUBLIC_URL", "http://localhost:8000").rstrip("/")
-
-# OAuth provider client IDs. Supabase Auth is not used for provider sign-in.
-GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
-APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID", "").strip()
-APPLE_REDIRECT_URI = os.getenv("APPLE_REDIRECT_URI", "").strip()

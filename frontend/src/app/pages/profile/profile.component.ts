@@ -42,29 +42,18 @@ export class ProfileComponent implements OnInit {
     password: false,
     delete: false,
     picture: false,
+    reset: false,
   };
 
   successMessage = '';
   errorMessage = '';
-
-  countries = [
-    'South Africa',
-    'Botswana',
-    'Eswatini',
-    'Lesotho',
-    'Mozambique',
-    'Namibia',
-    'Zimbabwe',
-    'United Kingdom',
-    'United States',
-    'Canada',
-    'Australia',
-    'Germany',
-    'France',
-    'India',
-    'Nigeria',
-    'Kenya',
-  ];
+  passwordVisibility = {
+    email: false,
+    current: false,
+    new: false,
+    confirm: false,
+    delete: false,
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -78,15 +67,6 @@ export class ProfileComponent implements OnInit {
       lastName: [''],
       email: [{ value: '', disabled: true }],
       phone: ['', [Validators.pattern(/^\+?[0-9\s()\-]{7,20}$/)]],
-      address: [''],
-      city: [''],
-      state: [''],
-      zipCode: [''],
-      country: [''],
-      gender: [''],
-      dateOfBirth: [''],
-      occupation: [''],
-      company: [''],
       bio: ['', [Validators.maxLength(500)]],
     });
 
@@ -164,17 +144,6 @@ export class ProfileComponent implements OnInit {
 
     const profileUpdate: Partial<UserProfile> = {
       phone: value.phone?.trim() || undefined,
-      address: value.address?.trim() || undefined,
-      city: value.city?.trim() || undefined,
-      state: value.state?.trim() || undefined,
-      zip_code: value.zipCode?.trim() || undefined,
-      country: value.country || undefined,
-      gender: value.gender || undefined,
-      date_of_birth: value.dateOfBirth
-        ? new Date(`${value.dateOfBirth}T00:00:00`).toISOString()
-        : undefined,
-      occupation: value.occupation?.trim() || undefined,
-      company: value.company?.trim() || undefined,
       bio: value.bio?.trim() || undefined,
     };
 
@@ -198,40 +167,47 @@ export class ProfileComponent implements OnInit {
     this.loadProfile();
   }
 
-  updateProfilePicture(): void {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/png,image/jpeg,image/webp';
+  onProfilePictureSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+    this.loading.picture = true;
+    this.profileService.prepareProfilePicture(file).then((base64) => {
+      this.profileService.uploadProfilePicture(base64).subscribe({
+        next: (profile) => {
+          this.profilePicture = profile.profile_picture || null;
+          this.cacheProfilePicture(this.profilePicture);
+          window.dispatchEvent(new CustomEvent('profile-picture-updated', { detail: this.profilePicture }));
+          this.loading.picture = false;
+          input.value = '';
+          this.showSuccess('Profile picture updated.');
+        },
+        error: (error) => {
+          this.loading.picture = false;
+          input.value = '';
+          this.showError(error.message);
+        },
+      });
+    }).catch((error: Error) => {
+      this.loading.picture = false;
+      input.value = '';
+      this.showError(error.message);
+    });
+  }
 
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (!file) return;
-      if (file.size > 2 * 1024 * 1024) {
-        this.showError('Profile picture must be smaller than 2 MB.');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = String(reader.result || '');
-        this.loading.picture = true;
-        this.profileService.uploadProfilePicture(base64).subscribe({
-          next: (profile) => {
-            this.profilePicture = profile.profile_picture || null;
-            this.cacheProfilePicture(this.profilePicture);
-            this.loading.picture = false;
-            this.showSuccess('Profile picture updated.');
-          },
-          error: (error) => {
-            this.loading.picture = false;
-            this.showError(error.message);
-          },
-        });
-      };
-      reader.readAsDataURL(file);
-    };
-
-    input.click();
+  sendPasswordReset(): void {
+    if (!this.user?.email || this.loading.reset) return;
+    this.loading.reset = true;
+    this.authService.forgotPassword(this.user.email).subscribe({
+      next: (response) => {
+        this.loading.reset = false;
+        this.showSuccess(response.message);
+      },
+      error: (error) => {
+        this.loading.reset = false;
+        this.showError(error.message);
+      },
+    });
   }
 
   changeEmail(): void {
@@ -293,7 +269,7 @@ export class ProfileComponent implements OnInit {
     this.authService.deleteAccount(password, confirmPhrase).subscribe({
       next: () => {
         this.loading.delete = false;
-        this.router.navigate(['/login']);
+        this.router.navigate(['/access']);
       },
       error: (error) => {
         this.loading.delete = false;
@@ -329,17 +305,6 @@ export class ProfileComponent implements OnInit {
       lastName: user.last_name || '',
       email: user.email,
       phone: profile.phone || '',
-      address: profile.address || '',
-      city: profile.city || '',
-      state: profile.state || '',
-      zipCode: profile.zip_code || '',
-      country: profile.country || '',
-      gender: profile.gender || '',
-      dateOfBirth: profile.date_of_birth
-        ? profile.date_of_birth.slice(0, 10)
-        : '',
-      occupation: profile.occupation || '',
-      company: profile.company || '',
       bio: profile.bio || '',
     });
 
