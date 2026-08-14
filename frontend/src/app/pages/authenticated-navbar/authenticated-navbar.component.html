@@ -10,6 +10,7 @@
   <div class="workspace-links" aria-label="Workspace navigation">
     <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
     <a routerLink="/todo" routerLinkActive="active">Todo</a>
+    <a routerLink="/downloads" [queryParams]="{ auto: 1 }" routerLinkActive="active">Download app</a>
   </div>
 
   <div class="user-profile">
@@ -63,6 +64,11 @@
             <li>
               <a routerLink="/profile" routerLinkActive="active" (click)="closeProfileDropdown()">
                 <i class="fas fa-user-circle"></i> Account settings
+              </a>
+            </li>
+            <li>
+              <a routerLink="/downloads" [queryParams]="{ auto: 1 }" routerLinkActive="active" (click)="closeProfileDropdown()">
+                <i class="fas fa-download"></i> Download app
               </a>
             </li>
             <li class="dropdown-divider"></li>

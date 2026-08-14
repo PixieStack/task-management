@@ -36,8 +36,8 @@
     <div>
       <strong>Download safety</strong>
       <p>
-        A button only becomes active after a real package URL is published. QR codes are generated
-        from the same verified URL, so this page never points users at placeholder installers.
+        The installable web app is available now. Native installers become active only after a
+        signed package is published, so this page never points users at placeholder files.
       </p>
     </div>
   </div>
@@ -65,7 +65,7 @@
               <i class="fas fa-arrow-down" aria-hidden="true"></i>
               {{ isStandalone ? 'Installed' : card.packageLabel }}
             </button>
-            <span class="status-pill available">Browser install</span>
+            <span class="status-pill available">Available now</span>
           </ng-container>
 
           <ng-template #nativeDownload>
@@ -97,7 +97,7 @@
         <ng-template #qrPending>
           <div class="qr-panel qr-disabled">
             <i class="fas fa-qrcode" aria-hidden="true"></i>
-            <span>QR activates when the download is published</span>
+            <span>{{ card.id === 'web' ? 'Preparing install link' : 'QR activates when the download is published' }}</span>
           </div>
         </ng-template>
       </div>

@@ -248,7 +248,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
 
     this.installStatus = this.isIos
       ? 'On iPhone/iPad: open this site in Safari, tap Share, then choose Add to Home Screen.'
-      : 'Use your browser menu and choose Install app / Add to Home screen when available.';
+      : 'Open your browser menu, then choose Install M.O.B TaskManager or Add to Home screen.';
   }
 
   downloadForThisDevice(): void {
@@ -354,7 +354,8 @@ export class DownloadsComponent implements OnInit, OnDestroy {
         if (!target.available || !target.url) return;
 
         try {
-          this.qrCodes[card.id] = await qrCodeApi.toDataURL(target.url, {
+          const downloadUrl = new URL(target.url, window.location.origin).href;
+          this.qrCodes[card.id] = await qrCodeApi.toDataURL(downloadUrl, {
             errorCorrectionLevel: 'M',
             margin: 4,
             width: 256,
