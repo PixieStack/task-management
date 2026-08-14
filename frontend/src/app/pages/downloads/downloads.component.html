@@ -4,8 +4,8 @@
       <span class="eyebrow">M.O.B TaskManager everywhere</span>
       <h1>Choose how you want to install the app</h1>
       <p>
-        Keep using the normal web version, install the PWA from your browser, or download a native
-        package for macOS, Windows, Android, iPhone and iPad when that release is published.
+        Download the native package built for macOS, Windows, Android, iPhone, or iPad.
+        Only platform-tested release files are enabled.
       </p>
 
       <div class="hero-actions">
@@ -13,7 +13,6 @@
           <i class="fas fa-download" aria-hidden="true"></i>
           Get app for this device
         </button>
-        <button type="button" class="secondary-action" (click)="installWebApp()">{{ isStandalone ? 'Web app already installed' : 'Install web app' }}</button>
         <a class="secondary-action" href="#platform-downloads">View platform downloads</a>
       </div>
 
@@ -26,7 +25,7 @@
       </div>
       <div>
         <strong>One account. One backend. Multiple devices.</strong>
-        <span>Web · macOS Intel · macOS Apple Silicon · Windows · Android · iPhone · iPad</span>
+        <span>macOS Intel · macOS Apple Silicon · Windows · Android · iPhone · iPad</span>
       </div>
     </div>
   </div>
@@ -36,8 +35,8 @@
     <div>
       <strong>Download safety</strong>
       <p>
-        The installable web app is available now. Native installers become active only after a
-        signed package is published, so this page never points users at placeholder files.
+        Native installers become active only after the package is built and verified, so this page
+        never points users at placeholder files.
       </p>
     </div>
   </div>
@@ -60,15 +59,6 @@
 
       <div class="download-area">
         <div class="download-controls">
-          <ng-container *ngIf="card.id === 'web'; else nativeDownload">
-            <button type="button" class="download-button" (click)="installWebApp()">
-              <i class="fas fa-arrow-down" aria-hidden="true"></i>
-              {{ isStandalone ? 'Installed' : card.packageLabel }}
-            </button>
-            <span class="status-pill available">Available now</span>
-          </ng-container>
-
-          <ng-template #nativeDownload>
             <a
               *ngIf="target(card).available && target(card).url; else notPublished"
               class="download-button"
@@ -86,7 +76,6 @@
               </button>
               <span class="status-pill pending">Release pending</span>
             </ng-template>
-          </ng-template>
         </div>
 
         <div class="qr-panel" *ngIf="qrCodes[card.id]; else qrPending">
@@ -97,7 +86,7 @@
         <ng-template #qrPending>
           <div class="qr-panel qr-disabled">
             <i class="fas fa-qrcode" aria-hidden="true"></i>
-            <span>{{ card.id === 'web' ? 'Preparing install link' : 'QR activates when the download is published' }}</span>
+            <span>QR activates when the download is published</span>
           </div>
         </ng-template>
       </div>
@@ -117,8 +106,8 @@
       <div>
         <strong>iPhone / iPad</strong>
         <p>
-          The PWA can be added from Safari after the web deployment. A native iOS app still needs
-          Apple signing/provisioning before it can be installed on a physical device or distributed.
+          A native iOS app requires Apple signing and provisioning before it can be installed on a
+          physical device or distributed through TestFlight or the App Store.
         </p>
       </div>
       <div>
@@ -146,11 +135,11 @@
       <p>We only enable downloads after a real package has been published and verified.</p>
 
       <div class="chooser-grid">
-        <button *ngFor="let card of cards" type="button" [class.detected]="isDetected(card)" [class.unavailable]="card.id !== 'web' && (!target(card).available || !target(card).url)" [disabled]="card.id !== 'web' && (!target(card).available || !target(card).url)" (click)="chooseDownload(card)">
+        <button *ngFor="let card of cards" type="button" [class.detected]="isDetected(card)" [class.unavailable]="!target(card).available || !target(card).url" [disabled]="!target(card).available || !target(card).url" (click)="chooseDownload(card)">
           <span class="chooser-icon"><i [class]="card.icon" aria-hidden="true"></i></span>
-          <span class="chooser-copy"><strong>{{ card.title }}</strong><small>{{ card.id === 'web' ? 'Available in your browser' : target(card).available ? 'Package available' : 'Not published yet' }}</small></span>
+          <span class="chooser-copy"><strong>{{ card.title }}</strong><small>{{ target(card).available ? 'Package available' : 'Not published yet' }}</small></span>
           <em *ngIf="isDetected(card)">Detected</em>
-          <i class="fas" [class.fa-arrow-down]="card.id === 'web' || target(card).available" [class.fa-lock]="card.id !== 'web' && !target(card).available" aria-hidden="true"></i>
+          <i class="fas" [class.fa-arrow-down]="target(card).available" [class.fa-lock]="!target(card).available" aria-hidden="true"></i>
         </button>
       </div>
     </section>

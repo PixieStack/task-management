@@ -1,23 +1,19 @@
 {
-  "web": {
-    "available": true,
-    "url": "/"
-  },
   "macos": {
-    "available": false,
-    "url": ""
+    "available": true,
+    "url": "https://github.com/PixieStack/task-management/releases/download/native-v2.0.0/MOB-TaskManager-macOS-Universal.dmg"
   },
   "windowsX64": {
-    "available": false,
-    "url": ""
+    "available": true,
+    "url": "https://github.com/PixieStack/task-management/releases/download/native-v2.0.0/MOB-TaskManager-Windows-x64.exe"
   },
   "windowsArm64": {
-    "available": false,
-    "url": ""
+    "available": true,
+    "url": "https://github.com/PixieStack/task-management/releases/download/native-v2.0.0/MOB-TaskManager-Windows-ARM64.exe"
   },
   "android": {
-    "available": false,
-    "url": ""
+    "available": true,
+    "url": "https://github.com/PixieStack/task-management/releases/download/native-v2.0.0/MOB-TaskManager-Android.apk"
   },
   "ios": {
     "available": false,

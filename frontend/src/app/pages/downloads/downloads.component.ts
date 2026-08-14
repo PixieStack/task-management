@@ -88,18 +88,6 @@ function resolveQRCodeApi(): QRCodeBrowserApi {
 export class DownloadsComponent implements OnInit, OnDestroy {
   readonly cards: DownloadCard[] = [
     {
-      id: 'web',
-      title: 'Web / PWA',
-      subtitle: 'Install from a supported browser after the Render site is live.',
-      icon: 'fas fa-globe',
-      packageLabel: 'Install web app',
-      notes: [
-        'Keeps the normal website available in every modern browser.',
-        'On iPhone/iPad, Safari can add the web app to the Home Screen.',
-        'On supported desktop/Android browsers, use the browser install prompt.',
-      ],
-    },
-    {
       id: 'macos',
       title: 'macOS',
       subtitle: 'One Universal build for Intel and Apple Silicon Macs.',
@@ -108,7 +96,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       notes: [
         'Includes x86_64 for Intel Macs such as the 2019 MacBook Pro.',
         'Includes arm64 for Apple Silicon M-series Macs.',
-        'Public distribution should be Apple-signed and notarized before release.',
+        'The CI release verifies that the app contains both Intel and Apple Silicon binaries.',
       ],
     },
     {
@@ -119,7 +107,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       packageLabel: 'Download Windows x64',
       notes: [
         'Targets current 64-bit Intel and AMD Windows computers.',
-        'NSIS EXE/MSI packaging is supported by the native build pipeline.',
+        'The downloadable NSIS installer is produced by the verified native build pipeline.',
       ],
     },
     {
@@ -130,30 +118,30 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       packageLabel: 'Download Windows ARM64',
       notes: [
         'Separate ARM64 package avoids relying on x64 emulation where possible.',
-        'Release availability depends on the ARM64 packaging job passing.',
+        'The package contains an ARM64 executable verified by the release pipeline.',
       ],
     },
     {
       id: 'android',
       title: 'Android',
-      subtitle: 'APK for direct testing and AAB for future Play distribution.',
+      subtitle: 'Installable APK for current 64-bit Android phones and tablets.',
       icon: 'fab fa-android',
       packageLabel: 'Download Android',
       notes: [
-        'The test pipeline can generate an installable APK.',
-        'A production release needs a persistent Android signing key.',
+        'The APK is built and verified by the Android native pipeline.',
+        'Android may ask you to allow installation from this browser before opening it.',
       ],
     },
     {
       id: 'ios',
       title: 'iPhone / iPad',
-      subtitle: 'Native iOS build plus PWA Home Screen installation.',
+      subtitle: 'Native iPhone and iPad app distributed through Apple signing.',
       icon: 'fas fa-mobile-screen-button',
       packageLabel: 'Get iPhone / iPad app',
       notes: [
         'The iOS simulator build can be automated in CI.',
         'Installing the native app on a real iPhone/iPad requires Apple signing/provisioning.',
-        'Until native signing is configured, the hosted PWA can still be installed from Safari.',
+        'The download activates after a device-signed IPA or App Store build is published.',
       ],
     },
   ];
@@ -308,7 +296,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     if (platform.includes('win') || userAgent.includes('windows')) {
       return /arm64|aarch64/.test(userAgent) ? 'windowsArm64' : 'windowsX64';
     }
-    if (/linux|cros/.test(userAgent)) return 'web';
+    if (/linux|cros/.test(userAgent)) return null;
     return null;
   }
 
