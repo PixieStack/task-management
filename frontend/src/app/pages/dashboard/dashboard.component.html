@@ -266,7 +266,15 @@
 
       <div class="list-tools">
         <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="taskSearch" placeholder="Search tasks" aria-label="Search tasks" /></label>
-        <label class="list-filter"><span>Priority</span><select [(ngModel)]="taskPriorityFilter" aria-label="Filter tasks by priority"><option value="all">All priorities</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></label>
+        <div class="filter-item">
+          <label class="list-filter"><span>Priority</span></label>
+          <select [(ngModel)]="taskPriorityFilter" aria-label="Filter tasks by priority">
+            <option value="all">All</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select>
+        </div>
       </div>
 
       <div class="loading" *ngIf="loading.tasks">Loading tasks…</div>
