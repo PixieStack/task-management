@@ -6,11 +6,11 @@ async function json(route: Route, body: unknown, status = 200): Promise<void> {
 
 async function authenticate(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    localStorage.setItem('token', 'admin-e2e-token');
-    localStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
-    localStorage.setItem('userId', '1');
-    localStorage.setItem('username', 'Admin Tester');
-    localStorage.setItem('userEmail', 'admin@example.com');
+    sessionStorage.setItem('token', 'admin-e2e-token');
+    sessionStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
+    sessionStorage.setItem('userId', '1');
+    sessionStorage.setItem('username', 'Admin Tester');
+    sessionStorage.setItem('userEmail', 'admin@example.com');
   });
 }
 
