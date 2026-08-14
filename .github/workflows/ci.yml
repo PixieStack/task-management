@@ -30,6 +30,7 @@ jobs:
       - run: PYTHONPATH=. python tests/productivity_smoke.py
       - run: PYTHONPATH=. python tests/auth_verification_oauth_smoke.py
       - run: PYTHONPATH=. python tests/brevo_email_smoke.py
+      - run: PYTHONPATH=. python tests/admin_smoke.py
 
   frontend:
     runs-on: ubuntu-latest
