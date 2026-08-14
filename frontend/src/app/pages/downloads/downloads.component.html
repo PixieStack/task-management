@@ -35,8 +35,8 @@
     <div>
       <strong>Download safety</strong>
       <p>
-        Native installers become active only after the package is built and verified, so this page
-        never points users at placeholder files.
+        Native installers are verified before publication. On iPhone and iPad, the supported
+        install option uses Safari to add the web app to the Home Screen.
       </p>
     </div>
   </div>
@@ -59,6 +59,14 @@
 
       <div class="download-area">
         <div class="download-controls">
+          <ng-container *ngIf="card.id === 'ios'; else nativeDownload">
+            <button type="button" class="download-button" (click)="installWebApp()">
+              <i class="fas fa-mobile-screen-button" aria-hidden="true"></i>
+              {{ card.packageLabel }}
+            </button>
+            <span class="status-pill available">Safari Home Screen</span>
+          </ng-container>
+          <ng-template #nativeDownload>
             <a
               *ngIf="target(card).available && target(card).url; else notPublished"
               class="download-button"
@@ -76,6 +84,7 @@
               </button>
               <span class="status-pill pending">Release pending</span>
             </ng-template>
+          </ng-template>
         </div>
 
         <div class="qr-panel" *ngIf="qrCodes[card.id]; else qrPending">

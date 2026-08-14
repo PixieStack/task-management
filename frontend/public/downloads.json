@@ -16,7 +16,7 @@
     "url": "https://github.com/PixieStack/task-management/releases/download/native-v2.0.0/MOB-TaskManager-Android.apk"
   },
   "ios": {
-    "available": false,
-    "url": ""
+    "available": true,
+    "url": "/"
   }
 }

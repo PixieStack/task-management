@@ -135,13 +135,13 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     {
       id: 'ios',
       title: 'iPhone / iPad',
-      subtitle: 'Native iPhone and iPad app distributed through Apple signing.',
+      subtitle: 'Install from a supported browser after the Render site is live.',
       icon: 'fas fa-mobile-screen-button',
-      packageLabel: 'Get iPhone / iPad app',
+      packageLabel: 'Install on iPhone / iPad',
       notes: [
-        'The iOS simulator build can be automated in CI.',
-        'Installing the native app on a real iPhone/iPad requires Apple signing/provisioning.',
-        'The download activates after a device-signed IPA or App Store build is published.',
+        'Keeps the normal website available in every modern browser.',
+        'On iPhone/iPad, Safari can add the web app to the Home Screen.',
+        'On supported desktop/Android browsers, use the browser install prompt.',
       ],
     },
   ];
@@ -241,7 +241,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
 
   downloadForThisDevice(): void {
     const targetId = this.detectedTarget;
-    if (targetId === 'web') {
+    if (targetId === 'web' || targetId === 'ios') {
       void this.installWebApp();
       return;
     }
@@ -261,7 +261,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   }
 
   chooseDownload(card: DownloadCard): void {
-    if (card.id === 'web') {
+    if (card.id === 'web' || card.id === 'ios') {
       this.showDeviceChooser = false;
       void this.installWebApp();
       return;
