@@ -7,6 +7,14 @@ from app.main import app
 
 
 FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend" / "dist" / "frontend" / "browser"
+# The API exposes a diagnostic GET / route in backend-only environments. On
+# Render, this entrypoint hosts Angular on the same origin, so the SPA owns /.
+app.router.routes = [
+    route
+    for route in app.router.routes
+    if not (getattr(route, "path", None) == "/" and getattr(route, "name", None) == "root")
+]
+
 
 
 @app.get("/{frontend_path:path}", include_in_schema=False)
