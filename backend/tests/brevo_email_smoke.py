@@ -50,6 +50,8 @@ email_service.BREVO_SMTP_KEY = "ci-smtp-key"
 email_service.SENDER_EMAIL = "verified-sender@example.com"
 email_service.SENDER_NAME = "M.O.B TaskManager"
 email_service.API_PUBLIC_URL = "https://api.example.test"
+email_service.BREVO_SMTP_LOGIN = ""
+email_service.BREVO_SMTP_KEY = ""
 api_calls = []
 email_service.BREVO_API_KEY = "ci-api-key"
 email_service.httpx.post = lambda url, **kwargs: api_calls.append((url, kwargs)) or FakeResponse()
@@ -70,6 +72,8 @@ assert api_request["json"]["to"] == [{"email": "api-user@example.com"}]
 assert api_request["json"]["subject"] == "Verify your M.O.B TaskManager email"
 assert "api-verification-token" in api_request["json"]["textContent"]
 email_service.BREVO_API_KEY = ""
+email_service.BREVO_SMTP_LOGIN = "ci-smtp-login"
+email_service.BREVO_SMTP_KEY = "ci-smtp-key"
 
 email_service.smtplib.SMTP = FakeSMTP
 

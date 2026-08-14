@@ -64,10 +64,9 @@ def send_email(
     html_body: str | None = None,
     reply_to: str | None = None,
 ) -> bool:
-    if BREVO_API_KEY and SENDER_EMAIL:
-        return _send_with_brevo_api(to_email, subject, text_body, html_body, reply_to)
-
     if not (BREVO_SMTP_LOGIN and BREVO_SMTP_KEY and SENDER_EMAIL):
+        if BREVO_API_KEY and SENDER_EMAIL:
+            return _send_with_brevo_api(to_email, subject, text_body, html_body, reply_to)
         logger.warning("Brevo SMTP is not configured; skipping email to %s", to_email)
         return False
 
@@ -91,6 +90,9 @@ def send_email(
         return True
     except Exception:
         logger.exception("Brevo SMTP delivery failed for %s", to_email)
+        if BREVO_API_KEY and SENDER_EMAIL:
+            logger.warning("Falling back to Brevo API delivery")
+            return _send_with_brevo_api(to_email, subject, text_body, html_body, reply_to)
         return False
 
 
