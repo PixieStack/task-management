@@ -60,7 +60,7 @@
       <div class="download-area">
         <div class="download-controls">
           <ng-container *ngIf="card.id === 'ios'; else nativeDownload">
-            <button type="button" class="download-button" (click)="installWebApp()">
+            <button type="button" class="download-button" (click)="installWebApp(true)">
               <i class="fas fa-mobile-screen-button" aria-hidden="true"></i>
               {{ card.packageLabel }}
             </button>

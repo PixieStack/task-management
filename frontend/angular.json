@@ -53,6 +53,16 @@
               "outputHashing": "all",
               "serviceWorker": "ngsw-config.json"
             },
+            "native": {
+              "optimization": {
+                "scripts": true,
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                },
+                "fonts": true
+              }
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,

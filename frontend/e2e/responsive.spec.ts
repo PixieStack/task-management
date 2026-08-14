@@ -55,6 +55,7 @@ async function expectNoHorizontalOverflow(page: Page, label: string): Promise<vo
 
         if (
           element.classList.contains('bg-shape') ||
+          element.classList.contains('orbit') ||
           element.classList.contains('auth-background')
         ) return false;
         if (isInsideIntentionalHorizontalScroller(element)) return false;
@@ -203,21 +204,18 @@ test.describe('responsive layout smoke suite', () => {
     await expectNoHorizontalOverflow(page, '390px password reset flow');
   });
 
-  test('Downloads page keeps unpublished release links and QR codes disabled', async ({ page }) => {
+  test('Downloads page exposes native releases and the iPhone/iPad PWA', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
-    await expect(page.locator('.download-card')).toHaveCount(6);
-    await expect(page.getByRole('button', { name: 'Install web app' })).toHaveCount(2);
-    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
-    await expect(page.locator('.qr-panel img')).toHaveCount(0);
-    await expect(page.locator('.download-card:not([data-platform="web"]) a.download-button')).toHaveCount(0);
-    await page.getByRole('button', { name: 'Get app for this device' }).click();
-    await expect(page.getByRole('dialog', { name: 'Which app package do you need?' })).toBeVisible();
-    await expect(page.locator('.chooser-grid > button')).toHaveCount(6);
-    await expect(page.locator('.chooser-grid > button.detected')).toHaveCount(1);
-    await page.getByRole('button', { name: 'Close device chooser' }).click();
-    await expectNoHorizontalOverflow(page, '390px unpublished downloads page');
+    await expect(page.locator('.download-card')).toHaveCount(5);
+    await expect(page.locator('a.download-button')).toHaveCount(4);
+    await expect(page.getByRole('button', { name: 'Install on iPhone / iPad' })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(0);
+    await expect(page.locator('.qr-panel img')).toHaveCount(5);
+    await page.getByRole('button', { name: 'Install on iPhone / iPad' }).click();
+    await expect(page.locator('.install-status')).toContainText('Safari');
+    await expectNoHorizontalOverflow(page, '390px native downloads page');
   });
 
   test('Downloads page generates a QR code when a real public release URL is configured', async ({ page }) => {
@@ -226,12 +224,11 @@ test.describe('responsive layout smoke suite', () => {
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          web: { available: true, url: 'https://downloads.example.test/mob-taskmanager' },
           macos: { available: false, url: '' },
           windowsX64: { available: false, url: '' },
           windowsArm64: { available: false, url: '' },
           android: { available: false, url: '' },
-          ios: { available: false, url: '' },
+          ios: { available: true, url: 'https://app.example.test/' },
         }),
       });
     });
@@ -239,11 +236,11 @@ test.describe('responsive layout smoke suite', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
-    const qrImage = page.getByRole('img', { name: 'QR code for Web / PWA' });
+    const qrImage = page.getByRole('img', { name: 'QR code for iPhone / iPad' });
     await expect(qrImage).toBeVisible();
     await expect(qrImage).toHaveAttribute('src', /^data:image\/png;base64,/);
-    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(5);
-    await expectNoHorizontalOverflow(page, '390px published web QR downloads page');
+    await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(4);
+    await expectNoHorizontalOverflow(page, '390px published iPhone PWA QR downloads page');
   });
 
   for (const viewport of [viewports[0], viewports[2], viewports[4], viewports[5]]) {

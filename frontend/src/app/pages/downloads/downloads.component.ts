@@ -215,7 +215,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     return this.manifest[card.id];
   }
 
-  async installWebApp(): Promise<void> {
+  async installWebApp(forceIosInstructions = false): Promise<void> {
     if (this.isStandalone) {
       this.installStatus = 'This web app is already installed.';
       return;
@@ -234,7 +234,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.installStatus = this.isIos
+    this.installStatus = this.isIos || forceIosInstructions
       ? 'On iPhone/iPad: open this site in Safari, tap Share, then choose Add to Home Screen.'
       : 'Open your browser menu, then choose Install M.O.B TaskManager or Add to Home screen.';
   }
@@ -242,7 +242,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   downloadForThisDevice(): void {
     const targetId = this.detectedTarget;
     if (targetId === 'web' || targetId === 'ios') {
-      void this.installWebApp();
+      void this.installWebApp(targetId === 'ios');
       return;
     }
 
@@ -263,7 +263,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   chooseDownload(card: DownloadCard): void {
     if (card.id === 'web' || card.id === 'ios') {
       this.showDeviceChooser = false;
-      void this.installWebApp();
+      void this.installWebApp(card.id === 'ios');
       return;
     }
     const target = this.target(card);
