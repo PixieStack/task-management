@@ -37,6 +37,11 @@ class FakeSMTP:
     def send_message(self, message):
         self.message = message
 
+class FakeResponse:
+    def raise_for_status(self):
+        return None
+
+
 
 email_service.BREVO_SMTP_SERVER = "smtp-relay.brevo.com"
 email_service.BREVO_SMTP_PORT = 587
@@ -45,6 +50,27 @@ email_service.BREVO_SMTP_KEY = "ci-smtp-key"
 email_service.SENDER_EMAIL = "verified-sender@example.com"
 email_service.SENDER_NAME = "M.O.B TaskManager"
 email_service.API_PUBLIC_URL = "https://api.example.test"
+api_calls = []
+email_service.BREVO_API_KEY = "ci-api-key"
+email_service.httpx.post = lambda url, **kwargs: api_calls.append((url, kwargs)) or FakeResponse()
+
+api_sent = email_service.send_verification_email(
+    "api-user@example.com",
+    "API User",
+    "api-verification-token",
+    60,
+)
+assert api_sent is True
+assert len(api_calls) == 1
+api_url, api_request = api_calls[0]
+assert api_url == "https://api.brevo.com/v3/smtp/email"
+assert api_request["headers"]["api-key"] == "ci-api-key"
+assert api_request["json"]["sender"]["email"] == "verified-sender@example.com"
+assert api_request["json"]["to"] == [{"email": "api-user@example.com"}]
+assert api_request["json"]["subject"] == "Verify your M.O.B TaskManager email"
+assert "api-verification-token" in api_request["json"]["textContent"]
+email_service.BREVO_API_KEY = ""
+
 email_service.smtplib.SMTP = FakeSMTP
 
 sent = email_service.send_verification_email(
