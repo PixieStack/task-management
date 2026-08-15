@@ -9,10 +9,12 @@
       </p>
 
       <div class="hero-actions">
-        <button type="button" class="primary-action" (click)="downloadForThisDevice()">
+        <a *ngIf="isLoggedIn" class="primary-action" href="#platform-downloads">
           <i class="fas fa-download" aria-hidden="true"></i>
-          Get app for this device
-        </button>
+          View app for this device
+        </a>
+        <a *ngIf="!isLoggedIn" class="primary-action" routerLink="/login" [queryParams]="{ returnUrl: '/downloads' }">Sign in to download</a>
+        <a *ngIf="!isLoggedIn" class="secondary-action" routerLink="/register" [queryParams]="{ returnUrl: '/downloads' }">Create account</a>
         <a class="secondary-action" href="#platform-downloads">View platform downloads</a>
       </div>
 
@@ -41,8 +43,16 @@
     </div>
   </div>
 
+  <div class="release-note" *ngIf="isLoggedIn && displayedCards.length === 0">
+    <i class="fas fa-mobile-screen-button" aria-hidden="true"></i>
+    <div>
+      <strong>No native package for this device</strong>
+      <p>This device could not be matched to a supported Windows, macOS, Android, or iPhone/iPad option.</p>
+    </div>
+  </div>
+
   <div id="platform-downloads" class="download-grid">
-    <article class="download-card" *ngFor="let card of cards" [attr.data-platform]="card.id">
+    <article class="download-card" *ngFor="let card of displayedCards" [attr.data-platform]="card.id">
       <div class="card-heading">
         <div class="platform-icon" aria-hidden="true">
           <i [class]="card.icon"></i>
@@ -59,6 +69,7 @@
 
       <div class="download-area">
         <div class="download-controls">
+          <ng-container *ngIf="isLoggedIn; else accountRequired">
           <ng-container *ngIf="card.id === 'ios'; else nativeDownload">
             <button type="button" class="download-button" (click)="installWebApp(true)">
               <i class="fas fa-mobile-screen-button" aria-hidden="true"></i>
@@ -85,9 +96,18 @@
               <span class="status-pill pending">Release pending</span>
             </ng-template>
           </ng-template>
+          </ng-container>
+          <ng-template #accountRequired>
+            <button type="button" class="download-button disabled" disabled>
+              <i class="fas fa-lock" aria-hidden="true"></i>
+              Sign in to download
+            </button>
+            <span class="status-pill pending">Account required</span>
+          </ng-template>
+
         </div>
 
-        <div class="qr-panel" *ngIf="qrCodes[card.id]; else qrPending">
+        <div class="qr-panel" *ngIf="isLoggedIn && qrCodes[card.id]; else qrPending">
           <img [src]="qrCodes[card.id]" [alt]="'QR code for ' + card.title" />
           <span>Scan to open this install option</span>
         </div>
@@ -95,7 +115,7 @@
         <ng-template #qrPending>
           <div class="qr-panel qr-disabled">
             <i class="fas fa-qrcode" aria-hidden="true"></i>
-            <span>QR activates when the download is published</span>
+            <span>{{ isLoggedIn ? 'QR activates when the download is published' : 'Sign in to unlock the download and QR code' }}</span>
           </div>
         </ng-template>
       </div>

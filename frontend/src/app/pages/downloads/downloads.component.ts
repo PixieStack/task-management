@@ -9,7 +9,8 @@ import {
   OnInit,
   PLATFORM_ID,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../../shared/services/auth.service';
 import * as QRCodeNamespace from 'qrcode';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -81,7 +82,7 @@ function resolveQRCodeApi(): QRCodeBrowserApi {
 @Component({
   selector: 'app-downloads',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './downloads.component.html',
   styleUrls: ['./downloads.component.scss'],
 })
@@ -158,6 +159,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   qrCodes: Partial<Record<keyof DownloadManifest, string>> = {};
   qrErrors: Partial<Record<keyof DownloadManifest, boolean>> = {};
   isBrowser = false;
+  isLoggedIn = false;
   isIos = false;
   isStandalone = false;
   canPromptInstall = false;
@@ -176,12 +178,13 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly http: HttpClient,
     private readonly changeDetectorRef: ChangeDetectorRef,
-    private readonly route: ActivatedRoute,
+    private readonly authService: AuthService,
     @Inject(PLATFORM_ID) private readonly platformId: object,
   ) {}
 
   ngOnInit(): void {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    this.isLoggedIn = this.authService.isLoggedIn();
     if (!this.isBrowser) return;
 
     this.isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -196,11 +199,9 @@ export class DownloadsComponent implements OnInit, OnDestroy {
       next: (config) => {
         this.manifest = this.mergeManifest(config);
         void this.generateQrCodes();
-        if (this.route.snapshot.queryParamMap.get('auto') === '1') this.downloadForThisDevice();
       },
       error: () => {
         void this.generateQrCodes();
-        if (this.route.snapshot.queryParamMap.get('auto') === '1') this.downloadForThisDevice();
       },
     });
   }
@@ -213,6 +214,14 @@ export class DownloadsComponent implements OnInit, OnDestroy {
 
   target(card: DownloadCard): DownloadTargetConfig {
     return this.manifest[card.id];
+  }
+
+  get displayedCards(): DownloadCard[] {
+    if (!this.isLoggedIn) return this.cards;
+    if (!this.detectedTarget) return [];
+
+    const detectedCard = this.cards.find((card) => card.id === this.detectedTarget);
+    return detectedCard ? [detectedCard] : [];
   }
 
   async installWebApp(forceIosInstructions = false): Promise<void> {
@@ -237,27 +246,6 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     this.installStatus = this.isIos || forceIosInstructions
       ? 'On iPhone/iPad: open this site in Safari, tap Share, then choose Add to Home Screen.'
       : 'Open your browser menu, then choose Install M.O.B TaskManager or Add to Home screen.';
-  }
-
-  downloadForThisDevice(): void {
-    const targetId = this.detectedTarget;
-    if (targetId === 'web' || targetId === 'ios') {
-      void this.installWebApp(targetId === 'ios');
-      return;
-    }
-
-    if (targetId) {
-      const target = this.manifest[targetId];
-      if (target.available && target.url) {
-        window.location.assign(target.url);
-        return;
-      }
-    }
-
-    this.showDeviceChooser = true;
-    this.installStatus = targetId
-      ? `${this.cardTitle(targetId)} was detected, but its native package is not published yet. Choose another option.`
-      : 'We could not identify your device confidently. Choose the platform you want.';
   }
 
   chooseDownload(card: DownloadCard): void {
@@ -316,7 +304,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   }
 
   private async generateQrCodes(): Promise<void> {
-    if (!this.isBrowser) return;
+    if (!this.isBrowser || !this.isLoggedIn) return;
 
     this.qrCodes = {};
     this.qrErrors = {};
@@ -325,7 +313,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     try {
       qrCodeApi = resolveQRCodeApi();
     } catch (error) {
-      for (const card of this.cards) {
+      for (const card of this.displayedCards) {
         const target = this.manifest[card.id];
         if (target.available && target.url) {
           this.qrErrors[card.id] = true;
@@ -337,7 +325,7 @@ export class DownloadsComponent implements OnInit, OnDestroy {
     }
 
     await Promise.all(
-      this.cards.map(async (card) => {
+      this.displayedCards.map(async (card) => {
         const target = this.manifest[card.id];
         if (!target.available || !target.url) return;
 
