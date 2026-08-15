@@ -31,7 +31,7 @@ export interface AppUpdateState {
   message: string;
 }
 
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '2.0.1';
 const LIVE_MANIFEST_URL = 'https://pixiestack-task-management-app-20260814.onrender.com/downloads.json';
 
 const INITIAL_STATE: AppUpdateState = {

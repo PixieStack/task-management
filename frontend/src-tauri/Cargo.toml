@@ -1,6 +1,6 @@
 [package]
 name = "mob-taskmanager"
-version = "2.0.0"
+version = "2.0.1"
 description = "M.O.B TaskManager desktop and mobile shell"
 authors = ["PixieStack"]
 edition = "2021"

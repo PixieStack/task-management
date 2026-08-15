@@ -23,7 +23,7 @@ def _get(cid: int, uid: int, db: Session):
 @router.post("", response_model=ChallengeOut, status_code=status.HTTP_201_CREATED)
 def create_challenge(data: ChallengeCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
     meta = META[data.challenge_type]
-    obj = models.Challenge(user_id=current_user.id, title=data.title, description=data.description, duration=data.duration, challenge_type=data.challenge_type, book_type=data.book_type, start_date=datetime.utcnow(), xp_reward=0, icon=data.icon or meta["icon"])
+    obj = models.Challenge(user_id=current_user.id, title=data.title, description=data.description, duration=data.duration, challenge_type=data.challenge_type, book_type=data.book_type, start_date=datetime.utcnow(), xp_reward=0, icon=data.icon or meta["icon"], completed=False, is_active=True)
     db.add(obj); db.commit(); db.refresh(obj); return obj
 
 @router.get("", response_model=List[ChallengeOut])

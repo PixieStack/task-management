@@ -56,12 +56,14 @@ todo = expect(
             "title": "Review lecture notes",
             "notes": "Focus smoke test",
             "todo_date": "2026-08-09",
+            "completed": True,
             "priority": "High",
         },
     ),
     201,
 ).json()
 assert todo["time_spent_seconds"] == 0
+assert todo["completed"] is False
 
 todos = expect(
     client.get("/api/productivity/todos?todo_date=2026-08-09", headers=headers),
@@ -132,6 +134,8 @@ task = expect(
         headers=headers,
         json={
             "title": "Timed study task",
+            "completed": True,
+            "status": "Completed",
             "priority": "Medium",
             "due_date": "2026-08-10T18:30:00",
             "time_estimate": 25,
@@ -139,6 +143,8 @@ task = expect(
     ),
     201,
 ).json()
+assert task["completed"] is False
+assert task["status"] == "Not Started"
 expect(
     client.post(
         "/api/productivity/timer/start",
@@ -155,7 +161,7 @@ assert tracked_task["status"] == "In Progress"
 # Creation requests collect every detail in one friendly card and submit once.
 guided_task = expect(client.post("/api/ai/ask", headers=headers, json={"question": "Create a task", "chat_id": "guided-replacement"}), 200).json()
 assert [field["key"] for field in guided_task["context"]["form_prompt"]["fields"]] == [
-    "title", "description", "status", "priority", "due_date", "due_time", "time_estimate", "tags"
+    "title", "description", "priority", "due_date", "due_time", "time_estimate", "tags"
 ]
 incomplete_task = expect(
     client.post(
@@ -169,7 +175,7 @@ incomplete_task = expect(
     ),
     200,
 ).json()
-assert set(incomplete_task["context"]["form_prompt"]["errors"]) == {"status", "priority", "due_date", "due_time"}
+assert set(incomplete_task["context"]["form_prompt"]["errors"]) == {"priority", "due_date", "due_time"}
 completed_task = expect(
     client.post(
         "/api/ai/ask",
@@ -181,7 +187,6 @@ completed_task = expect(
                 "workflow_values": {
                     "title": "One-submit AI task",
                     "description": "Collected together",
-                    "status": "Not Started",
                     "priority": "High",
                     "due_date": "2026-08-12",
                     "due_time": "14:30",
@@ -242,14 +247,17 @@ assert conversation["answer"] == 'Done — I created the task “AI-created revi
 assert "Done:" not in conversation["answer"]
 
 all_tasks = expect(client.get("/api/tasks", headers=headers), 200).json()
-assert any(item["title"] == "AI-created revision task" for item in all_tasks)
+created_ai_task = next(item for item in all_tasks if item["title"] == "AI-created revision task")
+assert created_ai_task["completed"] is False
+assert created_ai_task["status"] == "Not Started"
 all_todos = expect(
     client.get("/api/productivity/todos?todo_date=2026-08-09", headers=headers),
     200,
 ).json()
-assert any(item["title"] == "AI daily todo" for item in all_todos)
+created_ai_todo = next(item for item in all_todos if item["title"] == "AI daily todo")
+assert created_ai_todo["completed"] is False
 
-# The chatbot can modify productivity data, create routines and start a timer.
+# The chatbot can modify productivity data and create active routines without starting timers.
 async def fake_manage(_messages):
     return json.dumps(
         {
@@ -283,11 +291,6 @@ async def fake_manage(_messages):
                     "category": "Software Development",
                     "status": "complete",
                 },
-                {
-                    "type": "start_timer",
-                    "item_type": "task",
-                    "target": "AI-created revision task",
-                },
             ],
         }
     )
@@ -308,7 +311,6 @@ assert [item["type"] for item in managed["context"]["executed_actions"]] == [
     "create_habit",
     "create_challenge",
     "create_project",
-    "start_timer",
 ]
 
 updated_task = next(
@@ -326,11 +328,17 @@ updated_todo = next(
 )
 assert updated_todo["completed"] is True
 
-active_ai_timer = expect(client.get("/api/productivity/timer/active", headers=headers), 200).json()
-assert active_ai_timer["item_type"] == "task"
-assert active_ai_timer["task_id"] == updated_task["id"]
+assert expect(client.get("/api/productivity/timer/active", headers=headers), 200).json() is None
+expect(
+    client.post(
+        "/api/productivity/timer/start",
+        headers=headers,
+        json={"item_type": "task", "item_id": updated_task["id"]},
+    ),
+    201,
+)
 
-# The chatbot can stop tracking and check in user-owned routines/challenges.
+# The chatbot can stop a user-started timer and check in user-owned routines/challenges.
 async def fake_check_in(_messages):
     return json.dumps(
         {
@@ -362,11 +370,14 @@ assert expect(client.get("/api/productivity/timer/active", headers=headers), 200
 
 habits = expect(client.get("/api/habits", headers=headers), 200).json()
 reading_habit = next(item for item in habits if item["name"] == "Read 20 minutes")
+assert reading_habit["completed"] is False
 habit_entries = expect(client.get("/api/habits/entries", headers=headers), 200).json()
 assert any(item["habit_id"] == reading_habit["id"] and item["completed"] for item in habit_entries)
 
 challenges = expect(client.get("/api/challenges", headers=headers), 200).json()
 reading_challenge = next(item for item in challenges if item["title"] == "AI reading challenge")
+assert reading_challenge["completed"] is False
+assert reading_challenge["is_active"] is True
 assert reading_challenge["current_streak"] == 1
 assert reading_challenge["progress"] > 0
 assert reading_challenge["book_type"] == "fiction"

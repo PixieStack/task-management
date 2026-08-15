@@ -120,10 +120,10 @@ def create_todo(
         title=data.title.strip(),
         notes=(data.notes or "").strip(),
         todo_date=data.todo_date,
-        completed=data.completed,
+        completed=False,
         priority=data.priority,
     )
-    set_completion_state(todo, data.completed)
+    set_completion_state(todo, False)
     db.add(todo)
     db.commit()
     db.refresh(todo)

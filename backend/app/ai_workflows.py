@@ -8,17 +8,10 @@ PRIORITIES = [
     {"label": "Medium", "value": "Medium"},
     {"label": "High", "value": "High"},
 ]
-TASK_STATUSES = [
-    {"label": "Not started", "value": "Not Started"},
-    {"label": "In progress", "value": "In Progress"},
-    {"label": "Pending", "value": "Pending"},
-    {"label": "Completed", "value": "Completed"},
-]
 WORKFLOW_FIELDS: dict[str, list[dict[str, Any]]] = {
     "task": [
         {"key": "title", "label": "What needs to get done?", "required": True, "input_type": "text", "placeholder": "e.g. Finish the project proposal"},
         {"key": "description", "label": "Anything helpful I should remember?", "required": False, "input_type": "textarea", "placeholder": "Add a little context"},
-        {"key": "status", "label": "Where should this task start?", "required": True, "input_type": "select", "options": TASK_STATUSES},
         {"key": "priority", "label": "How important is it?", "required": True, "input_type": "select", "options": PRIORITIES},
         {"key": "due_date", "label": "Which day is it due?", "required": True, "input_type": "date"},
         {"key": "due_time", "label": "What time is it due?", "required": True, "input_type": "time"},
@@ -30,7 +23,6 @@ WORKFLOW_FIELDS: dict[str, list[dict[str, Any]]] = {
         {"key": "notes", "label": "Anything I should add with it?", "required": False, "input_type": "textarea", "placeholder": "A note or useful context"},
         {"key": "todo_date", "label": "Which day is this for?", "required": True, "input_type": "date"},
         {"key": "priority", "label": "How important is it?", "required": True, "input_type": "select", "options": PRIORITIES},
-        {"key": "todo_status", "label": "Should it start active or completed?", "required": True, "input_type": "select", "options": [{"label": "Active", "value": "active"}, {"label": "Completed", "value": "completed"}]},
     ],
     "habit": [
         {"key": "name", "label": "What would you like to repeat?", "required": True, "input_type": "text", "placeholder": "e.g. Walk every morning"},
@@ -49,14 +41,6 @@ WORKFLOW_FIELDS: dict[str, list[dict[str, Any]]] = {
         {"key": "description", "label": "What does success look like?", "required": True, "input_type": "textarea", "placeholder": "Describe the outcome you want"},
         {"key": "category", "label": "Where should I organise it?", "required": True, "input_type": "select", "dynamic": "project_categories"},
     ],
-    "tracked_timer": [
-        {"key": "item_type", "label": "Are you working on a task or Todo?", "required": True, "input_type": "select", "options": [{"label": "Task", "value": "task"}, {"label": "Todo", "value": "todo"}]},
-        {"key": "target", "label": "Which one should I start timing?", "required": True, "input_type": "select", "dynamic": "timer_targets"},
-    ],
-    "pomodoro": [
-        {"key": "minutes", "label": "How long would you like to focus?", "required": True, "input_type": "select", "options": [{"label": "25 minutes", "value": "25"}, {"label": "45 minutes", "value": "45"}, {"label": "60 minutes", "value": "60"}, {"label": "Custom", "value": "custom"}]},
-        {"key": "custom_minutes", "label": "How many minutes works for you?", "required": True, "input_type": "number", "min": 1, "max": 180},
-    ],
 }
 
 
@@ -64,10 +48,8 @@ def detect_workflow(message: str) -> Optional[str]:
     text = " ".join(message.lower().split())
     if not re.search(r"\b(create|add|make|new|set up|start|track)\b", text):
         return None
-    if "pomodoro" in text or "focus timer" in text or "standalone timer" in text:
-        return "pomodoro"
-    if re.search(r"\b(timer|timing|track time)\b", text):
-        return "tracked_timer"
+    if "pomodoro" in text or "focus timer" in text or "standalone timer" in text or re.search(r"\b(timer|timing|track time)\b", text):
+        return None
     if re.search(r"\b(project)\b", text):
         return "project"
     if re.search(r"\b(reading|challenge|reading plan)\b", text):
@@ -89,8 +71,6 @@ def _field_is_relevant(field: dict[str, Any], workflow: dict[str, Any]) -> bool:
     values = workflow["values"]
     if field["key"] == "custom_duration" and values.get("duration_choice") != "custom":
         return False
-    if field["key"] == "custom_minutes" and values.get("minutes") != "custom":
-        return False
     return True
 
 
@@ -100,8 +80,6 @@ WORKFLOW_TITLES = {
     "habit": ("Build a habit", "Choose the routine and a pace that feels realistic."),
     "challenge": ("Start a reading challenge", "Tell me about the book and your reading rhythm."),
     "project": ("Create a project", "Give me the outcome and where it belongs."),
-    "tracked_timer": ("Start tracking time", "Choose what you’re working on and I’ll start the clock."),
-    "pomodoro": ("Start a focus session", "Pick a focus length and I’ll prepare the timer."),
 }
 
 
@@ -112,20 +90,8 @@ def _resolved_field(field: dict[str, Any], context: dict[str, Any]) -> dict[str,
         names.extend(item["name"] for item in context.get("project_categories", []))
         prompt["options"] = [{"label": name, "value": name} for name in dict.fromkeys(names)]
         prompt["allow_custom"] = True
-    elif field.get("dynamic") == "timer_targets":
-        options = []
-        for kind, source in (("task", context.get("tasks", [])), ("todo", context.get("daily_todos", []))):
-            options.extend(
-                {"label": item["title"], "value": str(item["id"]), "when": kind}
-                for item in source
-                if not item.get("completed")
-            )
-        prompt["options"] = options
-        prompt["depends_on"] = "item_type"
     if field["key"] == "custom_duration":
         prompt.update({"depends_on": "duration_choice", "show_when": "custom"})
-    if field["key"] == "custom_minutes":
-        prompt.update({"depends_on": "minutes", "show_when": "custom"})
     if field["key"] == "due_time":
         prompt["depends_on"] = "due_date"
     return prompt
@@ -201,9 +167,9 @@ def build_action(workflow: dict[str, Any]) -> dict[str, Any]:
         due_date = values.get("due_date")
         if due_date and values.get("due_time"):
             due_date = f"{due_date}T{values['due_time']}:00"
-        return {"type": "create_task", "title": values["title"], "description": values.get("description") or "", "status": values["status"], "priority": values["priority"], "due_date": due_date, "time_estimate": values.get("time_estimate") or 0, "tags": [tag.strip() for tag in (values.get("tags") or "").split(",") if tag.strip()]}
+        return {"type": "create_task", "title": values["title"], "description": values.get("description") or "", "status": "Not Started", "priority": values["priority"], "due_date": due_date, "time_estimate": values.get("time_estimate") or 0, "tags": [tag.strip() for tag in (values.get("tags") or "").split(",") if tag.strip()]}
     if kind == "todo":
-        return {"type": "create_todo", "title": values["title"], "notes": values.get("notes") or "", "todo_date": values["todo_date"], "priority": values["priority"], "completed": values["todo_status"] == "completed"}
+        return {"type": "create_todo", "title": values["title"], "notes": values.get("notes") or "", "todo_date": values["todo_date"], "priority": values["priority"], "completed": False}
     if kind == "habit":
         duration = values.get("custom_duration") if values.get("duration_choice") == "custom" else values["duration_choice"]
         return {"type": "create_habit", "name": values["name"], "description": values.get("description") or "", "duration_days": int(duration)}
@@ -211,7 +177,4 @@ def build_action(workflow: dict[str, Any]) -> dict[str, Any]:
         return {"type": "create_challenge", "challenge_type": "reading", "title": values["title"], "book_type": values["book_type"], "duration": values["duration"], "daily_goal": values["daily_goal"]}
     if kind == "project":
         return {"type": "create_project", "title": values["title"], "description": values.get("description") or "", "category": values["category"]}
-    if kind == "tracked_timer":
-        return {"type": "start_timer", "item_type": values["item_type"], "target": values["target"]}
-    minutes = values.get("custom_minutes") if values.get("minutes") == "custom" else values["minutes"]
-    return {"type": "open_focus_timer", "minutes": int(minutes)}
+    raise ValueError(f"Unsupported creation workflow: {kind}")

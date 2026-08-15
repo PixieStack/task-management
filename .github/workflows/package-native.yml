@@ -171,7 +171,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      RELEASE_TAG: native-v2.0.0
+      RELEASE_TAG: native-v2.0.1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -192,6 +192,6 @@ jobs:
         shell: bash
         run: |
           if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "M.O.B TaskManager native apps v2.0.0" --notes "CI-built desktop and Android packages. Windows, macOS, Android, and iOS simulator builds passed their platform smoke tests before this release was published."
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "M.O.B TaskManager native apps v2.0.1" --notes "CI-built desktop and Android packages. Windows, macOS, Android, and iOS simulator builds passed their platform smoke tests before this release was published."
           fi
           gh release upload "$RELEASE_TAG" release-assets/* --clobber

@@ -41,9 +41,7 @@ ALLOWED_ACTIONS = {
     "create_project",
     "update_project",
     "delete_project",
-    "start_timer",
     "stop_timer",
-    "open_focus_timer",
 }
 
 GUIDED_ACTION_TYPES = {
@@ -52,8 +50,6 @@ GUIDED_ACTION_TYPES = {
     "create_habit": "habit",
     "create_challenge": "challenge",
     "create_project": "project",
-    "start_timer": "tracked_timer",
-    "open_focus_timer": "pomodoro",
 }
 
 SYSTEM_PROMPT = """You are the action-capable assistant inside a personal productivity app.
@@ -62,11 +58,11 @@ Return ONLY valid JSON with this exact top-level shape:
 {"reply":"short natural-language response","actions":[{"type":"...", ...}]}
 
 Allowed action types:
-- create_task: title, optional description, required priority (Low/Medium/High), required due_date (ISO datetime including date and time), tags (array), time_estimate (minutes)
+- create_task: title, optional description, required priority (Low/Medium/High), required due_date (ISO datetime including date and time), tags (array), time_estimate (minutes). New tasks always start active with status Not Started
 - update_task: target (task title or numeric id), plus any of title, description, priority, due_date, tags, status, time_estimate
 - complete_task: target
 - delete_task: target
-- create_todo: title, optional notes, todo_date (YYYY-MM-DD, default today), priority
+- create_todo: title, optional notes, todo_date (YYYY-MM-DD, default today), priority. New Todos always start active
 - update_todo: target, plus any of title, notes, todo_date, priority
 - complete_todo: target
 - delete_todo: target
@@ -79,7 +75,6 @@ Allowed action types:
 - create_project: required title, description, and category. New projects always begin in progress.
 - update_project: target, plus any of title, description, category, status
 - delete_project: target
-- start_timer: item_type (task/todo), target
 - stop_timer: no additional fields
 
 Rules:
@@ -91,6 +86,7 @@ Rules:
 6. For ordinary questions, answer warmly in plain language rather than sounding robotic or listing internal action names.
 7. Keep reply concise and never mention JSON, schemas, databases, action types, or implementation details.
 8. Act only on the latest user message. Earlier actions in this chat are completed history and must never be repeated unless the latest message explicitly asks for them again.
+9. Never start a task, Todo, Pomodoro, or focus timer. Timing is always started manually by the user from the feature page.
 """
 
 
@@ -243,9 +239,7 @@ def _natural_action_reply(executed: list[dict]) -> str:
             "create_project": f"created the project{quoted}",
             "update_project": f"updated the project{quoted}",
             "delete_project": f"deleted the project{quoted}",
-            "start_timer": f"started timing{quoted}",
             "stop_timer": "stopped the timer and saved the elapsed time",
-            "open_focus_timer": "prepared the Pomodoro timer",
         }.get(kind, "updated your workspace")
         phrases.append(phrase)
     if len(phrases) == 1:
@@ -378,12 +372,9 @@ def _execute_action(
         )
         if not obj.title:
             raise HTTPException(status_code=400, detail="AI task title was empty")
-        requested_status = str(action.get("status") or "Not Started")
-        if requested_status not in {"Not Started", "In Progress", "Pending", "Completed"}:
-            raise HTTPException(status_code=400, detail="Invalid task status")
-        obj.status = requested_status
-        obj.completed = requested_status == "Completed"
-        set_completion_state(obj, obj.completed)
+        obj.status = 'Not Started'
+        obj.completed = False
+        set_completion_state(obj, False)
         db.add(obj)
         db.flush()
         return {"type": kind, "id": obj.id, "title": obj.title}
@@ -447,7 +438,7 @@ def _execute_action(
             notes=str(action.get("notes", "") or "").strip(),
             todo_date=todo_date,
             priority=priority,
-            completed=bool(action.get("completed", False)),
+            completed=False,
         )
         if not todo.title:
             raise HTTPException(status_code=400, detail="AI todo title was empty")
@@ -500,6 +491,7 @@ def _execute_action(
             target_count=1,
             duration_days=max(1, min(int(action.get("duration_days") or 21), 365)),
             icon="fas fa-check-circle",
+            completed=False,
         )
         if not habit.name:
             raise HTTPException(status_code=400, detail="AI habit name was empty")
@@ -553,6 +545,8 @@ def _execute_action(
             start_date=datetime.utcnow(),
             xp_reward=0,
             icon="fas fa-book-open",
+            completed=False,
+            is_active=True,
         )
         db.add(challenge)
         db.flush()
@@ -641,37 +635,8 @@ def _execute_action(
             )
         return {"type": kind, "id": project.id, "title": project.title, "status": project.status, "completed_now": completed_now}
 
-    if kind == "start_timer":
-        active = db.query(models.TimeSession).filter(models.TimeSession.user_id == uid, models.TimeSession.ended_at.is_(None), models.TimeSession.deleted_at.is_(None)).first()
-        if active:
-            raise HTTPException(status_code=409, detail="A timer is already running. Stop it first.")
-        item_type = action.get("item_type")
-        if item_type == "task":
-            task = _find_task(db, uid, action.get("target"))
-            if not task or task.completed:
-                raise HTTPException(status_code=404, detail="Active task not found or target is ambiguous")
-            if task.status == "Not Started":
-                task.status = "In Progress"
-            session = models.TimeSession(user_id=uid, item_type="task", task_id=task.id, started_at=datetime.utcnow())
-            label = task.title
-        elif item_type == "todo":
-            todo = _find_todo(db, uid, action.get("target"))
-            if not todo or todo.completed:
-                raise HTTPException(status_code=404, detail="Active todo not found or target is ambiguous")
-            session = models.TimeSession(user_id=uid, item_type="todo", todo_id=todo.id, started_at=datetime.utcnow())
-            label = todo.title
-        else:
-            raise HTTPException(status_code=400, detail="Timer item type must be task or todo")
-        db.add(session)
-        db.flush()
-        return {"type": kind, "session_id": session.id, "item_type": item_type, "title": label}
-
     if kind == "stop_timer":
         return _stop_active_timer(db, uid)
-
-    if kind == "open_focus_timer":
-        minutes = max(1, min(int(action.get("minutes") or 25), 180))
-        return {"type": kind, "title": f"{minutes}-minute Pomodoro", "navigate_to": "/focus-timer", "minutes": minutes, "autostart": True}
 
     raise HTTPException(status_code=400, detail="Unsupported AI action")
 

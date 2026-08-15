@@ -33,16 +33,13 @@
       </div>
 
       <div class="list-tools">
-        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="todoSearch" placeholder="Search Todos" aria-label="Search Todos" /></label>
-        <div class="filter-item">
-          <label class="list-filter"><span>Priority</span></label>
-          <select [(ngModel)]="todoPriorityFilter" aria-label="Filter Todos by priority">
+        <label class="list-search"><span class="tool-label">Search</span><span class="search-control"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="todoSearch" placeholder="Search Todos" aria-label="Search Todos" /></span></label>
+        <label class="list-filter"><span class="tool-label">Priority</span><select [(ngModel)]="todoPriorityFilter" aria-label="Filter Todos by priority">
             <option value="all">All</option>
             <option value="High">High</option>
             <option value="Medium">Medium</option>
             <option value="Low">Low</option>
-          </select>
-        </div>
+          </select></label>
       </div>
 
       <form class="todo-form" (ngSubmit)="createTodo()">
