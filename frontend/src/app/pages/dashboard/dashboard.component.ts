@@ -1182,9 +1182,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       create_habit: 'Created habit',
       create_challenge: 'Created reading challenge',
       create_project: 'Created project',
-      start_timer: 'Started timer',
       stop_timer: 'Stopped timer',
-      open_focus_timer: 'Started Pomodoro',
       update_task: 'Updated task',
       update_todo: 'Updated Todo',
       update_project: 'Updated project',
@@ -1200,8 +1198,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       create_habit: '/dashboard#habits',
       create_challenge: '/dashboard#challenges',
       create_project: '/dashboard#challenges',
-      start_timer: '/focus-timer',
-      open_focus_timer: '/focus-timer',
     };
     return routes[action?.type] || null;
   }
@@ -1209,12 +1205,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   openAIAction(action: any): void {
     const route = this.aiActionRoute(action);
     if (!route) return;
-    if (action?.type === 'create_project') {
+    if (action?.type === 'create_task') {
+      this.taskFilter = 'active';
+      this.taskSearch = '';
+      this.taskPriorityFilter = 'all';
+    } else if (action?.type === 'create_habit') {
+      this.habitFilter = 'active';
+      this.habitSearch = '';
+      this.habitDurationFilter = 'all';
+    } else if (action?.type === 'create_project') {
       this.challengeViewTab = 'projects';
       this.projectFilter = 'active';
+      this.projectSearch = '';
+      this.projectCategoryFilter = 'all';
     } else if (action?.type === 'create_challenge') {
       this.challengeViewTab = 'reading';
       this.challengeFilter = 'active';
+      this.challengeSearch = '';
+      this.challengeBookFilter = 'all';
     }
     void this.router.navigateByUrl(route);
   }

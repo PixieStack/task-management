@@ -10,6 +10,8 @@ interface AboutFeature {
 }
 
 interface ProductPillar {
+  icon: string;
+  accent: 'violet' | 'cyan' | 'amber' | 'green';
   title: string;
   description: string;
 }
@@ -78,21 +80,29 @@ export class AboutUsComponent {
 
   readonly pillars: ProductPillar[] = [
     {
+      icon: 'fa-inbox',
+      accent: 'violet',
       title: 'Capture',
       description:
         'Turn ideas and responsibilities into clear tasks or daily actions before they disappear into notes and tabs.',
     },
     {
+      icon: 'fa-bullseye',
+      accent: 'cyan',
       title: 'Focus',
       description:
         'Use priority, Pomodoro and persistent time tracking to stay on one meaningful piece of work at a time.',
     },
     {
+      icon: 'fa-arrow-trend-up',
+      accent: 'amber',
       title: 'Build consistency',
       description:
         'Keep habits, reading and projects visible alongside work instead of treating personal progress as a separate system.',
     },
     {
+      icon: 'fa-wand-magic-sparkles',
+      accent: 'green',
       title: 'Use AI intentionally',
       description:
         'The assistant can understand your current app data and perform a limited set of validated productivity actions on your behalf.',

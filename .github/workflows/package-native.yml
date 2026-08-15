@@ -1,15 +1,27 @@
 name: Package Native Apps
 
 on:
+  push:
+    branches:
+      - agent/align-priority-filters
+      - master
   workflow_dispatch:
     inputs:
       api_base_url:
         description: "Absolute backend URL, e.g. https://your-api.onrender.com"
-        required: true
+        required: false
         type: string
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: native-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APP_RELEASE_VERSION: 2.0.${{ github.run_number }}
+  APP_API_BASE_URL: ${{ inputs.api_base_url || 'https://pixiestack-task-management-app-20260814.onrender.com' }}
 
 jobs:
   windows-x64:
@@ -18,13 +30,13 @@ jobs:
     defaults:
       run:
         working-directory: frontend
-    env:
-      APP_API_BASE_URL: ${{ inputs.api_base_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
+      - name: Assign deployment release version
+        run: node scripts/set-release-version.mjs "${{ env.APP_RELEASE_VERSION }}"
       - uses: dtolnay/rust-toolchain@stable
       - run: rustup target add x86_64-pc-windows-msvc
       - run: npm install
@@ -44,13 +56,13 @@ jobs:
     defaults:
       run:
         working-directory: frontend
-    env:
-      APP_API_BASE_URL: ${{ inputs.api_base_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
+      - name: Assign deployment release version
+        run: node scripts/set-release-version.mjs "${{ env.APP_RELEASE_VERSION }}"
       - uses: dtolnay/rust-toolchain@stable
       - uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -71,13 +83,13 @@ jobs:
     defaults:
       run:
         working-directory: frontend
-    env:
-      APP_API_BASE_URL: ${{ inputs.api_base_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
+      - name: Assign deployment release version
+        run: node scripts/set-release-version.mjs "${{ env.APP_RELEASE_VERSION }}"
       - uses: dtolnay/rust-toolchain@stable
       - run: rustup target add x86_64-apple-darwin aarch64-apple-darwin
       - run: npm install
@@ -104,13 +116,13 @@ jobs:
     defaults:
       run:
         working-directory: frontend
-    env:
-      APP_API_BASE_URL: ${{ inputs.api_base_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
+      - name: Assign deployment release version
+        run: node scripts/set-release-version.mjs "${{ env.APP_RELEASE_VERSION }}"
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -137,13 +149,13 @@ jobs:
     defaults:
       run:
         working-directory: frontend
-    env:
-      APP_API_BASE_URL: ${{ inputs.api_base_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22.22.3"
+      - name: Assign deployment release version
+        run: node scripts/set-release-version.mjs "${{ env.APP_RELEASE_VERSION }}"
       - uses: dtolnay/rust-toolchain@stable
       - run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim x86_64-apple-ios
       - name: Ensure CocoaPods
@@ -164,3 +176,34 @@ jobs:
           name: mob-taskmanager-ios-simulator
           if-no-files-found: error
           path: frontend/src-tauri/gen/apple/build/**/*.app
+
+  publish-release:
+    name: Publish verified native downloads
+    needs: [windows-x64, windows-arm64, macos, android, ios-simulator]
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: native-v2.0.${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Prepare stable public filenames
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir release-assets
+          cp "$(find artifacts/mob-taskmanager-windows-x64 -name '*.exe' -print -quit)" release-assets/MOB-TaskManager-Windows-x64.exe
+          cp "$(find artifacts/mob-taskmanager-windows-x64 -name '*.msi' -print -quit)" release-assets/MOB-TaskManager-Windows-x64.msi
+          cp "$(find artifacts/mob-taskmanager-windows-arm64 -name '*.exe' -print -quit)" release-assets/MOB-TaskManager-Windows-ARM64.exe
+          cp "$(find artifacts/mob-taskmanager-macos-universal -name '*.dmg' -print -quit)" release-assets/MOB-TaskManager-macOS-Universal.dmg
+          cp "$(find artifacts/mob-taskmanager-android-test-apk -name '*.apk' -print -quit)" release-assets/MOB-TaskManager-Android.apk
+          sha256sum release-assets/* > release-assets/SHA256SUMS.txt
+      - name: Create or update GitHub release
+        shell: bash
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --target "$GITHUB_SHA" --title "M.O.B TaskManager native apps v2.0.${{ github.run_number }}" --notes "CI-built desktop and Android packages. Windows, macOS, Android, and iOS simulator builds passed their platform smoke tests before this release was published."
+          fi
+          gh release upload "$RELEASE_TAG" release-assets/* --clobber

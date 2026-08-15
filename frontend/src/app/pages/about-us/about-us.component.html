@@ -125,8 +125,17 @@
     </div>
 
     <div class="pillar-list">
-      <article class="pillar" *ngFor="let pillar of pillars; trackBy: trackByTitle">
-        <div>
+      <article
+        class="pillar glass-panel"
+        *ngFor="let pillar of pillars; let index = index; trackBy: trackByTitle"
+        [attr.data-accent]="pillar.accent"
+        [style.--pillar-delay]="index * 90 + 'ms'"
+      >
+        <div class="pillar-topline">
+          <span class="pillar-icon"><i class="fas" [ngClass]="pillar.icon" aria-hidden="true"></i></span>
+          <span class="pillar-index">0{{ index + 1 }}</span>
+        </div>
+        <div class="pillar-copy">
           <h3>{{ pillar.title }}</h3>
           <p>{{ pillar.description }}</p>
         </div>
@@ -207,7 +216,7 @@
       </p>
 
       <div class="creator-actions">
-        <a class="download-app-action" routerLink="/downloads" [queryParams]="{ auto: 1 }">
+        <a class="download-app-action" routerLink="/downloads">
           <i class="fas fa-download" aria-hidden="true"></i> Download the app
         </a>
         <a class="primary-action" href="https://pixiestack.github.io/eden-portfolio" target="_blank" rel="noopener noreferrer">

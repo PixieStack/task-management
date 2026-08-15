@@ -35,9 +35,10 @@ def _validate_password(password: str) -> None:
         )
 
 
-def _token_response(user: models.User) -> dict:
+def _token_response(user: models.User, expires_minutes: int | None = None) -> dict:
     token, expires_in = create_access_token(
-        {"sub": user.email, "user_id": user.id, "auth_version": user.auth_version}
+        {"sub": user.email, "user_id": user.id, "auth_version": user.auth_version},
+        expires_minutes=expires_minutes,
     )
     return {
         "access_token": token,
@@ -159,7 +160,7 @@ def login(data: schemas.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=403, detail="Account is deactivated")
     if not user.email_verified:
         raise HTTPException(status_code=403, detail="Verify your email before signing in.")
-    return _token_response(user)
+    return _token_response(user, expires_minutes=43200 if data.remember_me else None)
 
 
 @router.post("/forgot-password")

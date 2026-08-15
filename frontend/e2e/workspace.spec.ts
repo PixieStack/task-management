@@ -85,7 +85,7 @@ test.describe('authenticated productivity workspace', () => {
 
     await page.getByRole('button', { name: 'Log out', exact: true }).click();
     await page.getByRole('button', { name: 'Yes, log out' }).click();
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/access$/);
     expect(await page.evaluate(() => sessionStorage.getItem('token'))).toBeNull();
 
     await page.goBack();
@@ -524,8 +524,8 @@ test.describe('authenticated productivity workspace', () => {
     expect(response.status()).toBe(200);
 
     await expect(page.getByText(/I created the task.*Study networking.*and added the Todo.*Read notes/)).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText('Saved Study networking', { exact: true })).toBeVisible();
-    await expect(page.getByText('Saved Read notes', { exact: true })).toBeVisible();
+    await expect(page.locator('.executed-actions span').nth(0)).toContainText('Created task: Study networking');
+    await expect(page.locator('.executed-actions span').nth(1)).toContainText('Created Todo: Read notes');
     await expect(page.getByRole('button', { name: 'New chat' })).toBeVisible();
     await expect(page.getByText('AI updated your workspace.')).toBeVisible({ timeout: 15_000 });
   });

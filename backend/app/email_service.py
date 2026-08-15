@@ -6,10 +6,13 @@ from email.utils import formataddr
 from html import escape
 from urllib.parse import urlencode
 
+import httpx
+
 from app.config import (
     ADMIN_EMAIL,
     API_PUBLIC_URL,
     APP_URL,
+    BREVO_API_KEY,
     BREVO_SMTP_KEY,
     BREVO_SMTP_LOGIN,
     BREVO_SMTP_PORT,
@@ -19,6 +22,39 @@ from app.config import (
 )
 
 logger = logging.getLogger(__name__)
+BREVO_API_URL = "https://api.brevo.com/v3/smtp/email"
+
+
+def _send_with_brevo_api(
+    to_email: str,
+    subject: str,
+    text_body: str,
+    html_body: str | None,
+    reply_to: str | None,
+) -> bool:
+    payload: dict = {
+        "sender": {"name": SENDER_NAME, "email": SENDER_EMAIL},
+        "to": [{"email": to_email}],
+        "subject": subject,
+        "textContent": text_body,
+    }
+    if html_body:
+        payload["htmlContent"] = html_body
+    if reply_to:
+        payload["replyTo"] = {"email": reply_to}
+
+    try:
+        response = httpx.post(
+            BREVO_API_URL,
+            headers={"api-key": BREVO_API_KEY, "accept": "application/json"},
+            json=payload,
+            timeout=20,
+        )
+        response.raise_for_status()
+        return True
+    except Exception:
+        logger.exception("Brevo API delivery failed for %s", to_email)
+        return False
 
 
 def send_email(
@@ -29,6 +65,8 @@ def send_email(
     reply_to: str | None = None,
 ) -> bool:
     if not (BREVO_SMTP_LOGIN and BREVO_SMTP_KEY and SENDER_EMAIL):
+        if BREVO_API_KEY and SENDER_EMAIL:
+            return _send_with_brevo_api(to_email, subject, text_body, html_body, reply_to)
         logger.warning("Brevo SMTP is not configured; skipping email to %s", to_email)
         return False
 
@@ -52,6 +90,9 @@ def send_email(
         return True
     except Exception:
         logger.exception("Brevo SMTP delivery failed for %s", to_email)
+        if BREVO_API_KEY and SENDER_EMAIL:
+            logger.warning("Falling back to Brevo API delivery")
+            return _send_with_brevo_api(to_email, subject, text_body, html_body, reply_to)
         return False
 
 

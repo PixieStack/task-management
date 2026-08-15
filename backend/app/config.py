@@ -47,9 +47,18 @@ APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID", "")
 
 # Brevo is the only transactional email provider used by this app.
 BREVO_SMTP_SERVER = os.getenv("BREVO_SMTP_SERVER", "smtp-relay.brevo.com")
-BREVO_SMTP_PORT = int(os.getenv("BREVO_SMTP_PORT", "587"))
+_configured_brevo_smtp_port = int(os.getenv("BREVO_SMTP_PORT", "587"))
+# Render Free blocks standard SMTP ports; Brevo explicitly supports 2525 as
+# the submission alternative when 587 is unavailable.
+BREVO_SMTP_PORT = (
+    2525
+    if os.getenv("RENDER", "").lower() == "true"
+    and _configured_brevo_smtp_port in {25, 465, 587}
+    else _configured_brevo_smtp_port
+)
 BREVO_SMTP_LOGIN = os.getenv("BREVO_SMTP_LOGIN", "")
 BREVO_SMTP_KEY = os.getenv("BREVO_SMTP_KEY", "")
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "")
 SENDER_EMAIL = os.getenv("SENDER_EMAIL", "")
 SENDER_NAME = os.getenv("SENDER_NAME", "Task Manager")
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", SENDER_EMAIL)

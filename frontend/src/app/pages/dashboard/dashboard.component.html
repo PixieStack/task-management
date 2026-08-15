@@ -265,8 +265,13 @@
       </div>
 
       <div class="list-tools">
-        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="taskSearch" placeholder="Search tasks" aria-label="Search tasks" /></label>
-        <label class="list-filter"><span>Priority</span><select [(ngModel)]="taskPriorityFilter" aria-label="Filter tasks by priority"><option value="all">All priorities</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option></select></label>
+        <label class="list-search"><span class="tool-label">Search</span><span class="search-control"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="taskSearch" placeholder="Search tasks" aria-label="Search tasks" /></span></label>
+        <label class="list-filter"><span class="tool-label">Priority</span><select [(ngModel)]="taskPriorityFilter" aria-label="Filter tasks by priority">
+            <option value="all">All</option>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+          </select></label>
       </div>
 
       <div class="loading" *ngIf="loading.tasks">Loading tasks…</div>
@@ -366,8 +371,8 @@
         </div>
       </div>
       <div class="list-tools">
-        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="habitSearch" placeholder="Search habits" aria-label="Search habits" /></label>
-        <label class="list-filter"><span>Length</span><select [(ngModel)]="habitDurationFilter" aria-label="Filter habits by length"><option value="all">Any length</option><option value="short">Up to 21 days</option><option value="standard">22–60 days</option><option value="long">Over 60 days</option></select></label>
+        <label class="list-search"><span class="tool-label">Search</span><span class="search-control"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="habitSearch" placeholder="Search habits" aria-label="Search habits" /></span></label>
+        <label class="list-filter"><span class="tool-label">Length</span><select [(ngModel)]="habitDurationFilter" aria-label="Filter habits by length"><option value="all">Any length</option><option value="short">Up to 21 days</option><option value="standard">22–60 days</option><option value="long">Over 60 days</option></select></label>
       </div>
       <div class="loading" *ngIf="loading.habits">Loading habits…</div>
       <div class="empty" *ngIf="!loading.habits && !filteredHabits.length">{{ habitFilter === 'active' ? 'No active habits. Create one to get started.' : 'No completed habits yet.' }}</div>
@@ -499,8 +504,8 @@
         </div>
       </div>
       <div class="list-tools">
-        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="challengeSearch" placeholder="Search books" aria-label="Search reading challenges" /></label>
-        <label class="list-filter"><span>Book type</span><select [(ngModel)]="challengeBookFilter" aria-label="Filter by book type"><option value="all">All books</option><option value="fiction">Fiction</option><option value="non_fiction">Non-fiction</option></select></label>
+        <label class="list-search"><span class="tool-label">Search</span><span class="search-control"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="challengeSearch" placeholder="Search books" aria-label="Search reading challenges" /></span></label>
+        <label class="list-filter"><span class="tool-label">Book type</span><select [(ngModel)]="challengeBookFilter" aria-label="Filter by book type"><option value="all">All books</option><option value="fiction">Fiction</option><option value="non_fiction">Non-fiction</option></select></label>
       </div>
       <div class="loading" *ngIf="loading.challenges">Loading challenges…</div>
       <div class="empty" *ngIf="!loading.challenges && !filteredChallenges.length">{{ challengeFilter === 'active' ? 'No active reading challenges.' : 'No completed reading challenges yet.' }}</div>
@@ -545,8 +550,8 @@
         </div>
       </div>
       <div class="list-tools">
-        <label class="list-search"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="projectSearch" placeholder="Search projects" aria-label="Search projects" /></label>
-        <label class="list-filter"><span>Category</span><select [(ngModel)]="projectCategoryFilter" aria-label="Filter projects by category"><option value="all">All categories</option><option *ngFor="let category of projectFilterCategories" [value]="category">{{ category }}</option></select></label>
+        <label class="list-search"><span class="tool-label">Search</span><span class="search-control"><i class="fas fa-magnifying-glass" aria-hidden="true"></i><input type="search" [(ngModel)]="projectSearch" placeholder="Search projects" aria-label="Search projects" /></span></label>
+        <label class="list-filter"><span class="tool-label">Category</span><select [(ngModel)]="projectCategoryFilter" aria-label="Filter projects by category"><option value="all">All categories</option><option *ngFor="let category of projectFilterCategories" [value]="category">{{ category }}</option></select></label>
       </div>
       <div class="loading" *ngIf="loading.projects">Loading projects…</div>
       <div class="empty" *ngIf="!loading.projects && !filteredProjects.length">{{ projectFilter === 'active' ? 'No active projects. Create one when you are ready.' : 'No completed projects yet.' }}</div>

@@ -22,7 +22,7 @@ def _get(hid: int, uid: int, db: Session):
 
 @router.post("", response_model=HabitOut, status_code=status.HTTP_201_CREATED)
 def create_habit(data: HabitCreate, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    obj = models.Habit(user_id=current_user.id, name=data.name.strip(), description=data.description, category=data.category, frequency="daily", target_count=1, duration_days=data.duration_days, icon=data.icon, color=data.color)
+    obj = models.Habit(user_id=current_user.id, name=data.name.strip(), description=data.description, category=data.category, frequency="daily", target_count=1, duration_days=data.duration_days, icon=data.icon, color=data.color, completed=False)
     db.add(obj); db.commit(); db.refresh(obj); return obj
 
 @router.get("", response_model=List[HabitOut])

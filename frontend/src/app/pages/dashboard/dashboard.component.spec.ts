@@ -79,7 +79,14 @@ describe('DashboardComponent', () => {
     expect(component.aiActionRoute({ type: 'create_todo' })).toBe('/todo');
     expect(component.aiActionRoute({ type: 'create_habit' })).toBe('/dashboard#habits');
     expect(component.aiActionRoute({ type: 'create_project' })).toBe('/dashboard#challenges');
-    expect(component.aiActionRoute({ type: 'open_focus_timer' })).toBe('/focus-timer');
+    expect(component.aiActionRoute({ type: 'open_focus_timer' })).toBeNull();
+    component.taskFilter = 'completed';
+    component.taskSearch = 'hidden';
+    component.taskPriorityFilter = 'High';
+    component.openAIAction({ type: 'create_task', id: 21 });
+    expect(component.taskFilter).toBe('active');
+    expect(component.taskSearch).toBe('');
+    expect(component.taskPriorityFilter).toBe('all');
   });
 
   it('shows archived items only in their archive and applies search filters', () => {

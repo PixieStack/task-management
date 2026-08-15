@@ -2,157 +2,112 @@
   <div class="downloads-hero">
     <div class="hero-copy">
       <span class="eyebrow">M.O.B TaskManager everywhere</span>
-      <h1>Choose how you want to install the app</h1>
-      <p>
-        Keep using the normal web version, install the PWA from your browser, or download a native
-        package for macOS, Windows, Android, iPhone and iPad when that release is published.
+      <h1>Your app, on your device</h1>
+      <p *ngIf="!isLoggedIn">
+        Browse every supported version below. To download or install an app, first create an
+        account and sign in.
+      </p>
+      <p *ngIf="isLoggedIn">
+        We detected your device and only show the correct app package for it. Nothing downloads
+        until you select the download or update button.
       </p>
 
-      <div class="hero-actions">
-        <button type="button" class="primary-action" (click)="downloadForThisDevice()">
-          <i class="fas fa-download" aria-hidden="true"></i>
-          Get app for this device
-        </button>
-        <button type="button" class="secondary-action" (click)="installWebApp()">{{ isStandalone ? 'Web app already installed' : 'Install web app' }}</button>
-        <a class="secondary-action" href="#platform-downloads">View platform downloads</a>
+      <div class="hero-actions" *ngIf="!isLoggedIn">
+        <a class="primary-action" routerLink="/register" [queryParams]="{ returnUrl: '/downloads' }">Create account</a>
+        <a class="secondary-action" routerLink="/login" [queryParams]="{ returnUrl: '/downloads' }">Sign in</a>
       </div>
 
       <p class="install-status" *ngIf="installStatus" aria-live="polite">{{ installStatus }}</p>
     </div>
 
     <div class="hero-panel" aria-label="Supported application targets">
-      <div class="hero-logo-wrap">
-        <img src="assets/Logo.png" alt="M.O.B TaskManager logo" />
-      </div>
+      <div class="hero-logo-wrap"><img src="assets/Logo.png" alt="M.O.B TaskManager logo" /></div>
       <div>
-        <strong>One account. One backend. Multiple devices.</strong>
-        <span>Web · macOS Intel · macOS Apple Silicon · Windows · Android · iPhone · iPad</span>
+        <strong>One account. Every supported device.</strong>
+        <span>Windows · macOS · Android · iPhone / iPad web app</span>
       </div>
     </div>
   </div>
 
-  <div class="release-note">
-    <i class="fas fa-circle-info" aria-hidden="true"></i>
+  <div class="account-notice" *ngIf="!isLoggedIn">
+    <i class="fas fa-user-lock" aria-hidden="true"></i>
     <div>
-      <strong>Download safety</strong>
-      <p>
-        A button only becomes active after a real package URL is published. QR codes are generated
-        from the same verified URL, so this page never points users at placeholder installers.
-      </p>
+      <strong>An account is required to download</strong>
+      <p>The platform list is public, but downloads become available only after you create an account and sign in.</p>
     </div>
   </div>
 
-  <div id="platform-downloads" class="download-grid">
-    <article class="download-card" *ngFor="let card of cards" [attr.data-platform]="card.id">
+  <div class="release-note" *ngIf="isLoggedIn && displayedCards.length === 0">
+    <i class="fas fa-mobile-screen-button" aria-hidden="true"></i>
+    <div>
+      <strong>No app package for this device</strong>
+      <p>We could not match this device to Windows, macOS, Android, or iPhone/iPad.</p>
+    </div>
+  </div>
+
+  <div id="platform-downloads" class="download-list">
+    <article class="download-card" *ngFor="let card of displayedCards" [attr.data-platform]="card.id">
       <div class="card-heading">
-        <div class="platform-icon" aria-hidden="true">
-          <i [class]="card.icon"></i>
-        </div>
+        <div class="platform-icon" aria-hidden="true"><i [class]="card.icon"></i></div>
         <div>
           <h2>{{ card.title }}</h2>
           <p>{{ card.subtitle }}</p>
         </div>
       </div>
 
-      <ul class="platform-notes">
-        <li *ngFor="let note of card.notes">{{ note }}</li>
-      </ul>
+      <p class="platform-summary">{{ card.notes[0] }}</p>
 
-      <div class="download-area">
-        <div class="download-controls">
-          <ng-container *ngIf="card.id === 'web'; else nativeDownload">
-            <button type="button" class="download-button" (click)="installWebApp()">
-              <i class="fas fa-arrow-down" aria-hidden="true"></i>
-              {{ isStandalone ? 'Installed' : card.packageLabel }}
-            </button>
-            <span class="status-pill available">Browser install</span>
-          </ng-container>
+      <dl class="release-details">
+        <div><dt>Latest version</dt><dd>v{{ target(card).version }}</dd></div>
+        <div><dt>Release date</dt><dd>{{ releaseDate(card) }}</dd></div>
+        <div><dt>Availability</dt><dd>{{ target(card).available ? 'Available' : 'Coming soon' }}</dd></div>
+      </dl>
 
-          <ng-template #nativeDownload>
-            <a
-              *ngIf="target(card).available && target(card).url; else notPublished"
-              class="download-button"
-              [href]="target(card).url"
-              rel="noopener"
-            >
-              <i class="fas fa-arrow-down" aria-hidden="true"></i>
-              {{ card.packageLabel }}
-            </a>
-
-            <ng-template #notPublished>
-              <button type="button" class="download-button disabled" disabled>
-                <i class="fas fa-lock" aria-hidden="true"></i>
-                Not published yet
-              </button>
-              <span class="status-pill pending">Release pending</span>
-            </ng-template>
-          </ng-template>
-        </div>
-
-        <div class="qr-panel" *ngIf="qrCodes[card.id]; else qrPending">
-          <img [src]="qrCodes[card.id]" [alt]="'QR code for ' + card.title" />
-          <span>Scan to open this install option</span>
-        </div>
-
-        <ng-template #qrPending>
-          <div class="qr-panel qr-disabled">
-            <i class="fas fa-qrcode" aria-hidden="true"></i>
-            <span>QR activates when the download is published</span>
+      <ng-container *ngIf="isLoggedIn">
+        <section class="system-details" *ngIf="updateState.installed; else downloadAction" aria-label="System and app details">
+          <div class="details-heading">
+            <div>
+              <span class="eyebrow">System / app details</span>
+              <h3>{{ updateState.native ? 'Installed native app' : 'Installed iPhone/iPad web app' }}</h3>
+            </div>
+            <span class="status-pill" [class.update]="updateState.updateAvailable">
+              {{ updateState.updateAvailable ? 'Update available' : 'Up to date' }}
+            </span>
           </div>
+
+          <dl class="system-grid">
+            <div><dt>Device package</dt><dd>{{ card.title }}</dd></div>
+            <div><dt>Installed version</dt><dd>v{{ updateState.currentVersion }}</dd></div>
+            <div><dt>Latest version</dt><dd>v{{ updateState.latestVersion }}</dd></div>
+            <div><dt>Latest release</dt><dd>{{ releaseDate(card) }}</dd></div>
+          </dl>
+
+          <p class="update-message" aria-live="polite">{{ updateState.message }}</p>
+          <div class="update-actions">
+            <button type="button" class="secondary-action" (click)="checkForUpdates()" [disabled]="updateState.checking">
+              <i class="fas fa-rotate" [class.fa-spin]="updateState.checking" aria-hidden="true"></i>
+              {{ updateState.checking ? 'Checking…' : 'Check for updates' }}
+            </button>
+            <button *ngIf="updateState.updateAvailable" type="button" class="download-button" (click)="installUpdate()">
+              <i class="fas fa-cloud-arrow-down" aria-hidden="true"></i>
+              {{ updateState.standalone ? 'Update app now' : 'Download latest update' }}
+            </button>
+          </div>
+        </section>
+
+        <ng-template #downloadAction>
+          <button
+            type="button"
+            class="download-button"
+            [class.disabled]="!target(card).available"
+            [disabled]="!target(card).available"
+            (click)="startDownload(card)"
+          >
+            <i [class]="card.id === 'ios' ? 'fas fa-mobile-screen-button' : 'fas fa-arrow-down'" aria-hidden="true"></i>
+            {{ target(card).available ? card.packageLabel : 'Not published yet' }}
+          </button>
         </ng-template>
-      </div>
+      </ng-container>
     </article>
-  </div>
-
-  <section class="device-guidance">
-    <h2>What “supported” means</h2>
-    <div class="guidance-grid">
-      <div>
-        <strong>macOS</strong>
-        <p>
-          The Universal package contains both Intel x86_64 and Apple Silicon arm64 code. A 2019
-          Intel MacBook uses the Intel side; current M-series Macs use the Apple Silicon side.
-        </p>
-      </div>
-      <div>
-        <strong>iPhone / iPad</strong>
-        <p>
-          The PWA can be added from Safari after the web deployment. A native iOS app still needs
-          Apple signing/provisioning before it can be installed on a physical device or distributed.
-        </p>
-      </div>
-      <div>
-        <strong>Windows</strong>
-        <p>
-          Separate x64 and ARM64 package targets are configured so Intel/AMD PCs and ARM Windows
-          devices can use native installers built for their architecture.
-        </p>
-      </div>
-      <div>
-        <strong>Android</strong>
-        <p>
-          The build pipeline can create an APK for direct device testing and can be prepared for a
-          signed store release. Production distribution requires a persistent release signing key.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <div class="device-chooser-backdrop" *ngIf="showDeviceChooser" (click)="closeDeviceChooser()">
-    <section class="device-chooser" role="dialog" aria-modal="true" aria-labelledby="device-chooser-title" (click)="$event.stopPropagation()">
-      <button class="chooser-close" type="button" (click)="closeDeviceChooser()" aria-label="Close device chooser"><i class="fas fa-xmark" aria-hidden="true"></i></button>
-      <span class="eyebrow">Choose your device</span>
-      <h2 id="device-chooser-title">Which app package do you need?</h2>
-      <p>We only enable downloads after a real package has been published and verified.</p>
-
-      <div class="chooser-grid">
-        <button *ngFor="let card of cards" type="button" [class.detected]="isDetected(card)" [class.unavailable]="card.id !== 'web' && (!target(card).available || !target(card).url)" [disabled]="card.id !== 'web' && (!target(card).available || !target(card).url)" (click)="chooseDownload(card)">
-          <span class="chooser-icon"><i [class]="card.icon" aria-hidden="true"></i></span>
-          <span class="chooser-copy"><strong>{{ card.title }}</strong><small>{{ card.id === 'web' ? 'Available in your browser' : target(card).available ? 'Package available' : 'Not published yet' }}</small></span>
-          <em *ngIf="isDetected(card)">Detected</em>
-          <i class="fas" [class.fa-arrow-down]="card.id === 'web' || target(card).available" [class.fa-lock]="card.id !== 'web' && !target(card).available" aria-hidden="true"></i>
-        </button>
-      </div>
-    </section>
   </div>
 </section>

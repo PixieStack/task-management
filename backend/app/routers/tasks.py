@@ -72,8 +72,8 @@ def create_task(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    completed = data.completed or data.status == "Completed"
-    task_status = "Completed" if completed else data.status
+    completed = False
+    task_status = 'Not Started'
     seconds = data.time_spent_seconds or max(0, data.time_spent) * 60
     minutes = data.time_spent if data.time_spent > 0 else int(round(seconds / 60))
     obj = models.Task(

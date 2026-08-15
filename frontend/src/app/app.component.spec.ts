@@ -1,7 +1,9 @@
-import { of } from 'rxjs';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
+
 import { AppComponent } from './app.component';
 import { AuthService } from './shared/services/auth.service';
+import { AppUpdateService, AppUpdateState } from './shared/services/app-update.service';
 
 describe('AppComponent', () => {
   function createComponent(loggedIn = false, url = '/'): AppComponent {
@@ -13,8 +15,26 @@ describe('AppComponent', () => {
       url,
       events: of(),
     } as unknown as Router;
+    const updateState: AppUpdateState = {
+      installed: false,
+      native: false,
+      standalone: false,
+      target: null,
+      currentVersion: '2.0.0',
+      latestVersion: '2.0.0',
+      releaseDate: '',
+      updateUrl: '',
+      updateAvailable: false,
+      checking: false,
+      message: '',
+    };
+    const appUpdate = {
+      snapshot: updateState,
+      state$: of(updateState),
+      initialize: () => Promise.resolve(),
+    } as unknown as AppUpdateService;
 
-    return new AppComponent(authService, router);
+    return new AppComponent(authService, router, appUpdate);
   }
 
   it('should create the app', () => {
