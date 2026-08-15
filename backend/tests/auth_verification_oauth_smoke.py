@@ -87,6 +87,19 @@ expect(
     200,
 )
 
+remembered_login = expect(
+    client.post(
+        "/auth/login",
+        json={
+            "email": "verification@example.com",
+            "password": "StrongPass8!",
+            "remember_me": True,
+        },
+    ),
+    200,
+).json()
+assert remembered_login["expires_in"] == 30 * 24 * 60 * 60
+
 # Verification links cannot be reused.
 reused = client.get(
     f"/auth/verify-email?token={captured['token']}",

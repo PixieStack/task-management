@@ -53,11 +53,11 @@ export class AccessComponent implements OnInit {
     this.mode = requestedMode === 'register' || this.route.snapshot.routeConfig?.path === 'register'
       ? 'register'
       : 'login';
-    const email = this.route.snapshot.queryParams['email'] || '';
+    const email = this.route.snapshot.queryParams['email'] || this.authService.getRememberedEmail();
     this.loginForm = this.fb.group({
       email: [email, [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      rememberMe: [false],
+      rememberMe: [this.authService.shouldRemember()],
     });
     this.registerForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
@@ -98,8 +98,8 @@ export class AccessComponent implements OnInit {
     }
     this.isLoading = true;
     this.errorMessage = '';
-    const { email, password } = this.loginForm.value;
-    this.authService.login(email, password).subscribe({
+    const { email, password, rememberMe } = this.loginForm.value;
+    this.authService.login(email, password, Boolean(rememberMe)).subscribe({
       next: () => {
         this.isLoading = false;
         void this.router.navigateByUrl(this.returnUrl);

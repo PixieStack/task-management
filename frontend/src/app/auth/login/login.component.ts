@@ -35,9 +35,9 @@ export class LoginComponent implements OnInit {
     }
 
     this.loginForm = this.fb.group({
-      email: [this.route.snapshot.queryParams['email'] || '', [Validators.required, Validators.email]],
+      email: [this.route.snapshot.queryParams['email'] || this.authService.getRememberedEmail(), [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
-      rememberMe: [false],
+      rememberMe: [this.authService.shouldRemember()],
     });
 
     if (this.route.snapshot.queryParams['verified'] === '1') {
@@ -58,8 +58,8 @@ export class LoginComponent implements OnInit {
     }
     this.isLoading = true;
     this.loginError = '';
-    const { email, password } = this.loginForm.value;
-    this.authService.login(email, password).subscribe({
+    const { email, password, rememberMe } = this.loginForm.value;
+    this.authService.login(email, password, Boolean(rememberMe)).subscribe({
       next: () => { this.isLoading = false; this.router.navigateByUrl(this.returnUrl); },
       error: (err) => { this.isLoading = false; this.loginError = err.message || 'Login failed. Please try again.'; },
     });

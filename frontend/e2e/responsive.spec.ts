@@ -132,6 +132,12 @@ async function stubProtectedLayoutApi(page: Page): Promise<void> {
 test.describe('responsive layout smoke suite', () => {
   test.describe.configure({ timeout: 120_000 });
 
+  test.beforeEach(async ({ page }) => {
+    await page.route('https://api.github.com/repos/PixieStack/task-management/releases/latest**', async (route) => {
+      await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+    });
+  });
+
   for (const viewport of viewports) {
     test(`${viewport.name} public routes fit ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
@@ -329,7 +335,7 @@ test.describe('responsive layout smoke suite', () => {
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
     await expect(page.getByRole('heading', { name: 'Installed iPhone/iPad web app' })).toBeVisible();
-    await expect(page.getByText('Installed version').locator('..')).toContainText('v2.0.0');
+    await expect(page.getByText('Installed version').locator('..')).toContainText('v2.0.2');
     await expect(page.getByText('Latest version').last().locator('..')).toContainText('v2.1.0');
     await expect(page.getByText('Update available', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Check for updates' })).toBeVisible();

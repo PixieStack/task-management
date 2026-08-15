@@ -31,8 +31,9 @@ export interface AppUpdateState {
   message: string;
 }
 
-export const APP_VERSION = '2.0.1';
+export const APP_VERSION = '2.0.2';
 const LIVE_MANIFEST_URL = 'https://pixiestack-task-management-app-20260814.onrender.com/downloads.json';
+const LATEST_RELEASE_URL = 'https://api.github.com/repos/PixieStack/task-management/releases/latest';
 
 const INITIAL_STATE: AppUpdateState = {
   installed: false,
@@ -53,6 +54,8 @@ export class AppUpdateService {
   private readonly stateSubject = new BehaviorSubject<AppUpdateState>(INITIAL_STATE);
   readonly state$ = this.stateSubject.asObservable();
   private monitoringStarted = false;
+  private cachedManifest: Partial<DownloadManifest> | null = null;
+  private manifestCachedAt = 0;
 
   constructor(
     private readonly http: HttpClient,
@@ -122,6 +125,59 @@ export class AppUpdateService {
     return null;
   }
 
+  async getLatestManifest(force = false): Promise<Partial<DownloadManifest>> {
+    const now = Date.now();
+    if (!force && this.cachedManifest && now - this.manifestCachedAt < 60_000) {
+      return this.cachedManifest;
+    }
+
+    // A unique query bypasses browser/CDN caches without adding cross-origin
+    // request headers that would force a CORS preflight in native webviews.
+    let manifest: Partial<DownloadManifest> = {};
+    try {
+      manifest = await firstValueFrom(
+        this.http.get<Partial<DownloadManifest>>(LIVE_MANIFEST_URL + '?check=' + now),
+      );
+    } catch {
+      try {
+        manifest = await firstValueFrom(
+          this.http.get<Partial<DownloadManifest>>('/downloads.json?check=' + now),
+        );
+      } catch {
+        // GitHub release assets below can still provide native updates.
+      }
+    }
+
+    try {
+      const release = await firstValueFrom(this.http.get<{
+        tag_name?: string;
+        published_at?: string;
+        assets?: Array<{ name: string; browser_download_url: string }>;
+      }>(LATEST_RELEASE_URL + '?check=' + now));
+      const version = release.tag_name?.match(/^native-v([0-9]+[.][0-9]+[.][0-9]+)$/)?.[1];
+      if (version) {
+        const releaseDate = (release.published_at || '').slice(0, 10);
+        const assets = new Map((release.assets || []).map((asset) => [asset.name, asset.browser_download_url]));
+        const releaseTargets: Partial<Record<DownloadTargetId, string>> = {
+          macos: assets.get('MOB-TaskManager-macOS-Universal.dmg'),
+          windowsX64: assets.get('MOB-TaskManager-Windows-x64.exe'),
+          windowsArm64: assets.get('MOB-TaskManager-Windows-ARM64.exe'),
+          android: assets.get('MOB-TaskManager-Android.apk'),
+        };
+        Object.entries(releaseTargets).forEach(([target, url]) => {
+          const id = target as DownloadTargetId;
+          if (!url || this.compareVersions(version, manifest[id]?.version || '0.0.0') < 0) return;
+          manifest[id] = { available: true, url, version, releaseDate };
+        });
+      }
+    } catch {
+      // The live Render manifest remains the reliable fallback if GitHub rate-limits a check.
+    }
+
+    this.cachedManifest = manifest;
+    this.manifestCachedAt = now;
+    return manifest;
+  }
   async checkForUpdates(): Promise<void> {
     const state = this.stateSubject.value;
     if (!state.installed || !state.target) return;
@@ -129,9 +185,7 @@ export class AppUpdateService {
 
     try {
       if (state.standalone && this.swUpdate.isEnabled) await this.swUpdate.checkForUpdate();
-      const manifest = await firstValueFrom(
-        this.http.get<Partial<DownloadManifest>>(`/downloads.json?check=${Date.now()}`),
-      );
+      const manifest = await this.getLatestManifest(true);
       const latest = manifest[state.target];
       const updateAvailable = Boolean(
         latest?.available && latest.version && this.compareVersions(latest.version, state.currentVersion) > 0,
@@ -173,7 +227,7 @@ export class AppUpdateService {
     if (this.monitoringStarted) return;
     this.monitoringStarted = true;
     window.addEventListener('focus', () => void this.checkForUpdates());
-    window.setInterval(() => void this.checkForUpdates(), 60 * 60 * 1000);
+    window.setInterval(() => void this.checkForUpdates(), 15 * 60 * 1000);
   }
 
   private compareVersions(left: string, right: string): number {

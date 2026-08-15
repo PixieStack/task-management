@@ -1,5 +1,4 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -110,7 +109,6 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   };
 
   constructor(
-    private readonly http: HttpClient,
     private readonly authService: AuthService,
     private readonly changeDetectorRef: ChangeDetectorRef,
     readonly appUpdate: AppUpdateService,
@@ -202,11 +200,9 @@ export class DownloadsComponent implements OnInit, OnDestroy {
   }
 
   private loadManifest(): void {
-    this.http.get<Partial<DownloadManifest>>('/downloads.json').subscribe({
-      next: (config) => {
-        this.manifest = this.mergeManifest(config);
-        this.changeDetectorRef.markForCheck();
-      },
+    void this.appUpdate.getLatestManifest().then((config) => {
+      this.manifest = this.mergeManifest(config);
+      this.changeDetectorRef.markForCheck();
     });
   }
 
