@@ -1935,7 +1935,14 @@ textarea { resize: vertical; }
 
   .conversation-actions {
     width: 100%;
-    justify-content: space-between;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .conversation-actions .secondary {
+    width: 100%;
+    justify-content: center;
   }
 
   .habit-side { grid-column: 1; grid-row: auto; justify-content: space-between; }
