@@ -204,15 +204,15 @@ test.describe('responsive layout smoke suite', () => {
     await expectNoHorizontalOverflow(page, '390px password reset flow');
   });
 
-  test('public Downloads page lists every platform but keeps downloads locked', async ({ page }) => {
+  test('public Downloads page lists every platform without download or QR controls', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
     await expect(page.locator('.download-card')).toHaveCount(5);
-    await expect(page.locator('a.download-button')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Sign in to download' })).toHaveCount(5);
-    await expect(page.locator('.qr-panel img')).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'Sign in to download' })).toBeVisible();
+    await expect(page.locator('.download-button')).toHaveCount(0);
+    await expect(page.getByText('An account is required to download')).toBeVisible();
+    await expect(page.locator('.qr-panel')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Sign in', exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Create account' })).toBeVisible();
     await expect(page).toHaveURL(/\/downloads$/);
     await expectNoHorizontalOverflow(page, '390px public downloads catalogue');
@@ -232,6 +232,16 @@ test.describe('responsive layout smoke suite', () => {
       });
     });
 
+    await page.route('**/downloads.json*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          windowsX64: { available: true, url: 'https://app.example.test/windows.exe', version: '2.0.0', releaseDate: '2026-08-15' },
+        }),
+      });
+    });
+
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
 
@@ -239,13 +249,14 @@ test.describe('responsive layout smoke suite', () => {
     await expect(page.locator('.download-card[data-platform="windowsX64"]')).toBeVisible();
     await expect(page.locator('.download-card[data-platform="macos"]')).toHaveCount(0);
     await expect(page.locator('.download-card[data-platform="android"]')).toHaveCount(0);
-    await expect(page.locator('a.download-button')).toHaveCount(1);
-    await expect(page.locator('.qr-panel img')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Download Windows app' })).toBeVisible();
+    await expect(page.locator('.qr-panel')).toHaveCount(0);
+    await expect(page.getByText('15 August 2026')).toBeVisible();
     await expect(page).toHaveURL(/\/downloads$/);
     await expectNoHorizontalOverflow(page, 'signed-in Windows download');
   });
 
-  test('signed-in iPhone users see only the PWA option and its QR code', async ({ page }) => {
+  test('signed-in iPhone users see only the PWA install option without a QR code', async ({ page }) => {
     await page.addInitScript(() => {
       sessionStorage.setItem('token', 'responsive-download-test-token');
       sessionStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
@@ -259,16 +270,16 @@ test.describe('responsive layout smoke suite', () => {
       });
     });
 
-    await page.route('**/downloads.json', async (route) => {
+    await page.route('**/downloads.json*', async (route) => {
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          macos: { available: false, url: '' },
-          windowsX64: { available: false, url: '' },
-          windowsArm64: { available: false, url: '' },
-          android: { available: false, url: '' },
-          ios: { available: true, url: 'https://app.example.test/' },
+          macos: { available: false, url: '', version: '2.0.0', releaseDate: '2026-08-15' },
+          windowsX64: { available: false, url: '', version: '2.0.0', releaseDate: '2026-08-15' },
+          windowsArm64: { available: false, url: '', version: '2.0.0', releaseDate: '2026-08-15' },
+          android: { available: false, url: '', version: '2.0.0', releaseDate: '2026-08-15' },
+          ios: { available: true, url: 'https://app.example.test/', version: '2.0.0', releaseDate: '2026-08-15' },
         }),
       });
     });
@@ -279,15 +290,53 @@ test.describe('responsive layout smoke suite', () => {
     await expect(page.locator('.download-card')).toHaveCount(1);
     await expect(page.locator('.download-card[data-platform="ios"]')).toBeVisible();
     await expect(page.locator('.download-card[data-platform="windowsX64"]')).toHaveCount(0);
-    const qrImage = page.getByRole('img', { name: 'QR code for iPhone / iPad' });
-    await expect(qrImage).toBeVisible();
-    await expect(qrImage).toHaveAttribute('src', /^data:image\/png;base64,/);
+    await expect(page.locator('.qr-panel')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Install on iPhone / iPad' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Not published yet' })).toHaveCount(0);
     await expect(page).toHaveURL(/\/downloads$/);
     await expectNoHorizontalOverflow(page, '390px signed-in iPhone PWA download');
   });
 
+  test('installed iPhone PWA shows system details and an available update', async ({ page }) => {
+    await page.addInitScript(() => {
+      sessionStorage.setItem('token', 'responsive-download-test-token');
+      sessionStorage.setItem('expires_at', new Date(Date.now() + 60 * 60 * 1000).toISOString());
+      sessionStorage.setItem('userId', '1');
+      sessionStorage.setItem('username', 'Installed PWA Tester');
+      sessionStorage.setItem('userEmail', 'installed@example.com');
+      Object.defineProperty(navigator, 'platform', { configurable: true, value: 'iPhone' });
+      Object.defineProperty(navigator, 'userAgent', {
+        configurable: true,
+        value: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1',
+      });
+      const originalMatchMedia = window.matchMedia.bind(window);
+      window.matchMedia = (query: string) => query === '(display-mode: standalone)'
+        ? ({ matches: true, media: query, onchange: null, addListener() {}, removeListener() {}, addEventListener() {}, removeEventListener() {}, dispatchEvent: () => true } as MediaQueryList)
+        : originalMatchMedia(query);
+    });
+
+    await page.route('**/downloads.json*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ios: { available: true, url: '/', version: '2.1.0', releaseDate: '2026-08-15' },
+        }),
+      });
+    });
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/downloads', { waitUntil: 'domcontentloaded' });
+
+    await expect(page.getByRole('heading', { name: 'Installed iPhone/iPad web app' })).toBeVisible();
+    await expect(page.getByText('Installed version').locator('..')).toContainText('v2.0.0');
+    await expect(page.getByText('Latest version').last().locator('..')).toContainText('v2.1.0');
+    await expect(page.getByText('Update available', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Check for updates' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Update app now' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Install on iPhone / iPad' })).toHaveCount(0);
+    await expectNoHorizontalOverflow(page, '390px installed iPhone PWA update details');
+  });
   for (const viewport of [viewports[0], viewports[2], viewports[4], viewports[5]]) {
     test(`${viewport.name} protected layouts fit ${viewport.width}px`, async ({ page }) => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
